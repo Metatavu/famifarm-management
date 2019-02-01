@@ -20,6 +20,8 @@ import {
 import BasicLayout from "./BasicLayout";
 import SeedList from "src/containers/SeedList";
 import CreateSeed from "./CreateSeed";
+import ProductionLineList from "src/containers/ProductionLineList";
+import CreateProductionLine from "./CreateProductionLine";
 
 export interface Props {
   authenticated: boolean,
@@ -170,6 +172,24 @@ class WelcomePage extends React.Component<Props, any> {
                 exact={true}
                 render={props => (
                     <CreateSeed
+                      keycloak={this.state.keycloak}
+                    />
+                )}
+              />
+              <Route
+                path="/productionLines"
+                exact={true}
+                render={props => (
+                    <ProductionLineList
+                      keycloak={this.state.keycloak}
+                    />
+                )}
+              />
+              <Route
+                path="/createProductionLine"
+                exact={true}
+                render={props => (
+                    <CreateProductionLine
                       keycloak={this.state.keycloak}
                     />
                 )}
