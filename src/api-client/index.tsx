@@ -7,7 +7,9 @@ import {
   PackageSize,
   PackageSizesApi,
   Seed,
-  SeedsApi} from "famifarm-client";
+  SeedsApi,
+  ProductionLine,
+  ProductionLinesApi} from "famifarm-client";
 import { KeycloakInstance } from "keycloak-js";
 
 export default class FamiFarmApiClient {
@@ -224,6 +226,57 @@ export default class FamiFarmApiClient {
    */
   deleteSeed(keycloak: KeycloakInstance, seedId: string):  Promise<void> {
     return this.doRequest(keycloak, new SeedsApi(this.getConfig(keycloak)).deleteSeed(seedId));
+  }
+
+  /**
+   * List production lines
+   * 
+   * @param keycloak 
+   * @param firstResult 
+   * @param maxResults 
+   */
+  listProductionLines(keycloak: KeycloakInstance, firstResult: number, maxResults: number): Promise<ProductionLine[]> {
+    return this.doRequest(keycloak, new ProductionLinesApi(this.getConfig(keycloak)).listProductionLines(firstResult, maxResults));
+  }
+
+  /**
+   * Find production line
+   * 
+   * @param keycloak 
+   * @param productionLineId 
+   */
+  findProductionLine(keycloak: KeycloakInstance, productionLineId: string): Promise<ProductionLine> {
+    return this.doRequest(keycloak, new ProductionLinesApi(this.getConfig(keycloak)).findProductionLine(productionLineId));
+  }
+
+  /**
+   * Create production line
+   * 
+   * @param keycloak 
+   * @param productionLine 
+   */
+  createProductionLine(keycloak: KeycloakInstance, productionLine: ProductionLine):  Promise<ProductionLine> {
+    return this.doRequest(keycloak, new ProductionLinesApi(this.getConfig(keycloak)).createProductionLine(productionLine));
+  }
+
+  /**
+   * Update production line
+   * 
+   * @param keycloak 
+   * @param productionLine 
+   */
+  updateProductionLine(keycloak: KeycloakInstance, productionLine: ProductionLine):  Promise<ProductionLine> {
+    return this.doRequest(keycloak, new ProductionLinesApi(this.getConfig(keycloak)).updateProductionLine(productionLine.id!, productionLine));
+  }
+
+  /**
+   * Delete production line
+   * 
+   * @param keycloak 
+   * @param productionLineId
+   */
+  deleteProductionLine(keycloak: KeycloakInstance, productionLineId: string):  Promise<void> {
+    return this.doRequest(keycloak, new ProductionLinesApi(this.getConfig(keycloak)).deleteProductionLine(productionLineId));
   }
 
   /**

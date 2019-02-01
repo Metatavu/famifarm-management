@@ -1,6 +1,6 @@
 import * as constants from '../constants'
 import { KeycloakInstance } from 'keycloak-js';
-import { Team, Product, PackageSize, Seed } from 'famifarm-client';
+import { Team, Product, PackageSize, Seed, ProductionLine } from 'famifarm-client';
 
 export interface UserLogin {
   type: constants.USER_LOGIN;
@@ -92,11 +92,32 @@ export interface SeedDeleted {
   seedId: string;
 }
 
+export interface ProductionLinesFound {
+  type: constants.PRODUCTION_LINES_FOUND;
+  productionLines: ProductionLine[];
+}
+
+export interface ProductionLineSelected {
+  type: constants.PRODUCTION_LINE_SELECTED;
+  productionLine: ProductionLine;
+}
+
+export interface ProductionLineCreated {
+  type: constants.PRODUCTION_LINE_CREATED;
+  productionLine: ProductionLine;
+}
+
+export interface ProductionLineDeleted {
+  type: constants.PRODUCTION_LINE_DELETED;
+  productionLineId: string;
+}
+
 
 export type AppAction = UserLogin | UserLogout | TeamsFound | TeamSelected | TeamCreated | TeamDeleted 
   | ProductsFound | ProductSelected | ProductCreated | ProductDeleted | PackageSizesFound 
   | PackageSizeSelected | PackageSizeCreated | PackageSizeDeleted | SeedsFound | SeedCreated
-  | SeedSelected | SeedDeleted;
+  | SeedSelected | SeedDeleted | ProductionLinesFound | ProductionLineSelected | ProductionLineCreated
+  | ProductionLineDeleted;
 
 export function userLogin(keycloak: KeycloakInstance, authenticated: boolean): UserLogin {
   return {
@@ -221,5 +242,33 @@ export function seedDeleted(seedId: string): SeedDeleted {
   return {
     type: constants.SEED_DELETED,
     seedId: seedId
+  }
+}
+
+export function productionLinesFound(productionLines: ProductionLine[]): ProductionLinesFound {
+  return {
+    type: constants.PRODUCTION_LINES_FOUND,
+    productionLines: productionLines
+  }
+}
+
+export function productionLineSelected(productionLine: ProductionLine): ProductionLineSelected {
+  return {
+    type: constants.PRODUCTION_LINE_SELECTED,
+    productionLine: productionLine
+  }
+}
+
+export function productionLineCreated(productionLine: ProductionLine): ProductionLineCreated {
+  return {
+    type: constants.PRODUCTION_LINE_CREATED,
+    productionLine: productionLine
+  }
+}
+
+export function productionLineDeleted(productionLineId: string): ProductionLineDeleted {
+  return {
+    type: constants.PRODUCTION_LINE_DELETED,
+    productionLineId: productionLineId
   }
 }

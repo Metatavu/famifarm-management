@@ -36,6 +36,9 @@ class WelcomePage extends React.Component<Props, any> {
     },{
       "text": "Siemenet",
       "link": "/seeds"
+    },{
+      "text": "Tuotantolinjat",
+      "link": "/productionLines"
     }];
   }
 
