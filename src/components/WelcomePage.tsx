@@ -22,6 +22,8 @@ import SeedList from "src/containers/SeedList";
 import CreateSeed from "./CreateSeed";
 import ProductionLineList from "src/containers/ProductionLineList";
 import CreateProductionLine from "./CreateProductionLine";
+import SeedBatchList from "src/containers/SeedBatchList";
+import CreateSeedBatch from "src/containers/CreateSeedBatch";
 
 export interface Props {
   authenticated: boolean,
@@ -190,6 +192,24 @@ class WelcomePage extends React.Component<Props, any> {
                 exact={true}
                 render={props => (
                     <CreateProductionLine
+                      keycloak={this.state.keycloak}
+                    />
+                )}
+              />
+              <Route
+                path="/seedBatches"
+                exact={true}
+                render={props => (
+                    <SeedBatchList
+                      keycloak={this.state.keycloak}
+                    />
+                )}
+              />
+              <Route
+                path="/createSeedBatch"
+                exact={true}
+                render={props => (
+                    <CreateSeedBatch
                       keycloak={this.state.keycloak}
                     />
                 )}

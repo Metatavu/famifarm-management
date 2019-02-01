@@ -1,5 +1,5 @@
 import { KeycloakInstance } from "keycloak-js";
-import { Team, Product, PackageSize, Seed, ProductionLine } from 'famifarm-client';
+import { Team, Product, PackageSize, Seed, ProductionLine, SeedBatch } from 'famifarm-client';
 
 export interface StoreState {
   keycloak?: KeycloakInstance;
@@ -14,4 +14,6 @@ export interface StoreState {
   seed: Seed;
   productionLines: ProductionLine[];
   productionLine: ProductionLine;
+  seedBatches: SeedBatch[];
+  seedBatch: SeedBatch;
 }

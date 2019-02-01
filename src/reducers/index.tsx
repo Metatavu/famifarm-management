@@ -17,7 +17,10 @@ import {
   SEED_SELECTED,
   PRODUCTION_LINES_FOUND,
   PRODUCTION_LINE_DELETED,
-  PRODUCTION_LINE_SELECTED } from '../constants/index';
+  PRODUCTION_LINE_SELECTED,
+  SEED_BATCHES_FOUND,
+  SEED_BATCH_SELECTED,
+  SEED_BATCH_DELETED } from '../constants/index';
 
 export function processAction(state: StoreState, action: AppAction): StoreState {
   switch (action.type) {
@@ -55,6 +58,12 @@ export function processAction(state: StoreState, action: AppAction): StoreState 
       return { ...state, productionLine: action.productionLine};
     case PRODUCTION_LINE_DELETED:
       return { ...state,  productionLines: (state.productionLines || []).filter((productionLine) => {return productionLine.id !== action.productionLineId})};
+    case SEED_BATCHES_FOUND:
+      return { ...state, seedBatches: action.seedBatches };
+    case SEED_BATCH_SELECTED:
+      return { ...state, seedBatch: action.seedBatch};
+    case SEED_BATCH_DELETED:
+      return { ...state,  seedBatches: (state.seedBatches || []).filter((seedBatch) => {return seedBatch.id !== action.seedBatchId})};
   }
   return state;
 }

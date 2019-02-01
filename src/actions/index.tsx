@@ -1,6 +1,6 @@
 import * as constants from '../constants'
 import { KeycloakInstance } from 'keycloak-js';
-import { Team, Product, PackageSize, Seed, ProductionLine } from 'famifarm-client';
+import { Team, Product, PackageSize, Seed, ProductionLine, SeedBatch } from 'famifarm-client';
 
 export interface UserLogin {
   type: constants.USER_LOGIN;
@@ -112,12 +112,32 @@ export interface ProductionLineDeleted {
   productionLineId: string;
 }
 
+export interface SeedBatchesFound {
+  type: constants.SEED_BATCHES_FOUND;
+  seedBatches: SeedBatch[];
+}
+
+export interface SeedBatchSelected {
+  type: constants.SEED_BATCH_SELECTED;
+  seedBatch: SeedBatch;
+}
+
+export interface SeedBatchCreated {
+  type: constants.SEED_BATCH_CREATED;
+  seedBatch: SeedBatch;
+}
+
+export interface SeedBatchDeleted {
+  type: constants.SEED_BATCH_DELETED;
+  seedBatchId: string;
+}
+
 
 export type AppAction = UserLogin | UserLogout | TeamsFound | TeamSelected | TeamCreated | TeamDeleted 
   | ProductsFound | ProductSelected | ProductCreated | ProductDeleted | PackageSizesFound 
   | PackageSizeSelected | PackageSizeCreated | PackageSizeDeleted | SeedsFound | SeedCreated
   | SeedSelected | SeedDeleted | ProductionLinesFound | ProductionLineSelected | ProductionLineCreated
-  | ProductionLineDeleted;
+  | ProductionLineDeleted | SeedBatchesFound | SeedBatchSelected | SeedBatchCreated | SeedBatchDeleted;
 
 export function userLogin(keycloak: KeycloakInstance, authenticated: boolean): UserLogin {
   return {
@@ -270,5 +290,33 @@ export function productionLineDeleted(productionLineId: string): ProductionLineD
   return {
     type: constants.PRODUCTION_LINE_DELETED,
     productionLineId: productionLineId
+  }
+}
+
+export function seedBatchesFound(seedBatches: SeedBatch[]): SeedBatchesFound {
+  return {
+    type: constants.SEED_BATCHES_FOUND,
+    seedBatches: seedBatches
+  }
+}
+
+export function seedBatchSelected(seedBatch: SeedBatch): SeedBatchSelected {
+  return {
+    type: constants.SEED_BATCH_SELECTED,
+    seedBatch: seedBatch
+  }
+}
+
+export function seedBatchCreated(seedBatch: SeedBatch): SeedBatchCreated {
+  return {
+    type: constants.SEED_BATCH_CREATED,
+    seedBatch: seedBatch
+  }
+}
+
+export function seedBatchDeleted(seedBatchId: string): SeedBatchDeleted {
+  return {
+    type: constants.SEED_BATCH_DELETED,
+    seedBatchId: seedBatchId
   }
 }

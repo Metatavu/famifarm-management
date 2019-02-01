@@ -9,7 +9,9 @@ import {
   Seed,
   SeedsApi,
   ProductionLine,
-  ProductionLinesApi} from "famifarm-client";
+  ProductionLinesApi,
+  SeedBatchesApi,
+  SeedBatch} from "famifarm-client";
 import { KeycloakInstance } from "keycloak-js";
 
 export default class FamiFarmApiClient {
@@ -277,6 +279,57 @@ export default class FamiFarmApiClient {
    */
   deleteProductionLine(keycloak: KeycloakInstance, productionLineId: string):  Promise<void> {
     return this.doRequest(keycloak, new ProductionLinesApi(this.getConfig(keycloak)).deleteProductionLine(productionLineId));
+  }
+
+  /**
+   * List seed batches
+   * 
+   * @param keycloak 
+   * @param firstResult 
+   * @param maxResults 
+   */
+  listSeedBatches(keycloak: KeycloakInstance, firstResult: number, maxResults: number): Promise<SeedBatch[]> {
+    return this.doRequest(keycloak, new SeedBatchesApi(this.getConfig(keycloak)).listSeedBatches(firstResult, maxResults));
+  }
+
+  /**
+   * Find seed batch
+   * 
+   * @param keycloak 
+   * @param seedBatchId 
+   */
+  findSeedBatch(keycloak: KeycloakInstance, seedBatchId: string): Promise<SeedBatch> {
+    return this.doRequest(keycloak, new SeedBatchesApi(this.getConfig(keycloak)).findSeedBatch(seedBatchId));
+  }
+
+  /**
+   * Create seed batch
+   * 
+   * @param keycloak 
+   * @param seedBatch 
+   */
+  createSeedBatch(keycloak: KeycloakInstance, seedBatch: SeedBatch):  Promise<SeedBatch> {
+    return this.doRequest(keycloak, new SeedBatchesApi(this.getConfig(keycloak)).createSeedBatch(seedBatch));
+  }
+
+  /**
+   * Update seed batch
+   * 
+   * @param keycloak 
+   * @param seedBatch 
+   */
+  updateSeedBatch(keycloak: KeycloakInstance, seedBatch: SeedBatch):  Promise<SeedBatch> {
+    return this.doRequest(keycloak, new SeedBatchesApi(this.getConfig(keycloak)).updateSeedBatch(seedBatch.id!, seedBatch));
+  }
+
+  /**
+   * Delete seed batch
+   * 
+   * @param keycloak 
+   * @param seedBatchId
+   */
+  deleteSeedBatch(keycloak: KeycloakInstance, seedBatchId: string):  Promise<void> {
+    return this.doRequest(keycloak, new SeedBatchesApi(this.getConfig(keycloak)).deleteSeedBatch(seedBatchId));
   }
 
   /**
