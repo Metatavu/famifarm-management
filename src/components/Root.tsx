@@ -28,11 +28,11 @@ class WelcomePage extends React.Component<Props, any> {
       "text": "Tiimit",
       "link": "/teams"
     },{
-      "text": "Tiimit",
-      "link": "/teams"
+      "text": "Tuotteet",
+      "link": "/products"
     },{
-      "text": "Tiimit",
-      "link": "/teams"
+      "text": "Pakkauskoot",
+      "link": "/packageSizes"
     }];
   }
 

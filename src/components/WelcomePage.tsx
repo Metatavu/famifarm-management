@@ -3,8 +3,13 @@ import * as Keycloak from 'keycloak-js';
 import { BrowserRouter, Route, NavLink } from 'react-router-dom';
 import Root from './Root';
 import TeamList from '../containers/TeamList';
+import ProductList from '../containers/ProductList';
 import EditTeam from '../containers/EditTeam';
 import CreateTeam from '../containers/CreateTeam';
+import CreateProduct from '../containers/CreateProduct';
+import PackageSizeList from '../containers/PackageSizeList';
+import CreatePackageSize from '../containers/CreatePackageSize';
+
 import {
   Grid,
   Loader,
@@ -109,6 +114,42 @@ class WelcomePage extends React.Component<Props, any> {
                 exact={true}
                 render={props => (
                     <CreateTeam
+                      keycloak={this.state.keycloak}
+                    />
+                )}
+              />
+              <Route
+                path="/products"
+                exact={true}
+                render={props => (
+                    <ProductList
+                      keycloak={this.state.keycloak}
+                    />
+                )}
+              />
+              <Route
+                path="/createProduct"
+                exact={true}
+                render={props => (
+                    <CreateProduct
+                      keycloak={this.state.keycloak}
+                    />
+                )}
+              />
+              <Route
+                path="/packageSizes"
+                exact={true}
+                render={props => (
+                    <PackageSizeList
+                      keycloak={this.state.keycloak}
+                    />
+                )}
+              />
+              <Route
+                path="/createPackageSize"
+                exact={true}
+                render={props => (
+                    <CreatePackageSize
                       keycloak={this.state.keycloak}
                     />
                 )}
