@@ -64,7 +64,7 @@ class WelcomePage extends React.Component<Props, any> {
       <BasicLayout>
         { !this.props.authenticated ? (
         <div>
-          <Grid centered className="vittu">
+          <Grid centered>
             <Loader active size="medium" />
           </Grid>
         </div>
