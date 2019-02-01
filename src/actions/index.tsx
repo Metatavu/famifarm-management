@@ -1,6 +1,6 @@
 import * as constants from '../constants'
 import { KeycloakInstance } from 'keycloak-js';
-import { Team } from 'famifarm-client';
+import { Team, Product, PackageSize } from 'famifarm-client';
 
 export interface UserLogin {
   type: constants.USER_LOGIN;
@@ -32,8 +32,50 @@ export interface TeamDeleted {
   teamId: string;
 }
 
+export interface ProductsFound {
+  type: constants.PRODUCTS_FOUND;
+  products: Product[];
+}
 
-export type AppAction = UserLogin | UserLogout | TeamsFound | TeamSelected | TeamCreated | TeamDeleted;
+export interface ProductSelected {
+  type: constants.PRODUCT_SELECTED;
+  product: Product;
+}
+
+export interface ProductCreated {
+  type: constants.PRODUCT_CREATED;
+  product: Product;
+}
+
+export interface ProductDeleted {
+  type: constants.PRODUCT_DELETED;
+  productId: string;
+}
+
+export interface PackageSizesFound {
+  type: constants.PACKAGE_SIZES_FOUND;
+  packageSizes: PackageSize[];
+}
+
+export interface PackageSizeSelected {
+  type: constants.PACKAGE_SIZE_SELECTED;
+  packageSize: PackageSize;
+}
+
+export interface PackageSizeCreated {
+  type: constants.PACKAGE_SIZE_CREATED;
+  packageSize: PackageSize;
+}
+
+export interface PackageSizeDeleted {
+  type: constants.PACKAGE_SIZE_DELETED;
+  packageSizeId: string;
+}
+
+
+export type AppAction = UserLogin | UserLogout | TeamsFound | TeamSelected | TeamCreated | TeamDeleted 
+  | ProductsFound | ProductSelected | ProductCreated | ProductDeleted | PackageSizesFound 
+  | PackageSizeSelected | PackageSizeCreated | PackageSizeDeleted;
 
 export function userLogin(keycloak: KeycloakInstance, authenticated: boolean): UserLogin {
   return {
@@ -74,5 +116,61 @@ export function teamDeleted(teamId: string): TeamDeleted {
   return {
     type: constants.TEAM_DELETED,
     teamId: teamId
+  }
+}
+
+export function productsFound(products: Product[]): ProductsFound {
+  return {
+    type: constants.PRODUCTS_FOUND,
+    products: products
+  }
+}
+
+export function productSelected(product: Product): ProductSelected {
+  return {
+    type: constants.PRODUCT_SELECTED,
+    product: product
+  }
+}
+
+export function productCreated(product: Product): ProductCreated {
+  return {
+    type: constants.PRODUCT_CREATED,
+    product: product
+  }
+}
+
+export function productDeleted(productId: string): ProductDeleted {
+  return {
+    type: constants.PRODUCT_DELETED,
+    productId: productId
+  }
+}
+
+export function packageSizesFound(packageSizes: PackageSize[]): PackageSizesFound {
+  return {
+    type: constants.PACKAGE_SIZES_FOUND,
+    packageSizes: packageSizes
+  }
+}
+
+export function packageSizeSelected(packageSize: PackageSize): PackageSizeSelected {
+  return {
+    type: constants.PACKAGE_SIZE_SELECTED,
+    packageSize: packageSize
+  }
+}
+
+export function packageSizeCreated(packageSize: PackageSize): PackageSizeCreated {
+  return {
+    type: constants.PACKAGE_SIZE_CREATED,
+    packageSize: packageSize
+  }
+}
+
+export function packageSizeDeleted(packageSizeId: string): PackageSizeDeleted {
+  return {
+    type: constants.PACKAGE_SIZE_DELETED,
+    packageSizeId: packageSizeId
   }
 }

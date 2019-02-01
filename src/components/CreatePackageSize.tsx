@@ -1,0 +1,81 @@
+import * as React from "react";
+import * as Keycloak from 'keycloak-js';
+import FamiFarmApiClient from '../api-client';
+import { PackageSize } from 'famifarm-client';
+import { Redirect } from 'react-router';
+
+import {
+  Grid,
+  Button,
+  Form,
+  Input
+} from "semantic-ui-react";
+
+export interface Props {
+  keycloak?: Keycloak.KeycloakInstance;
+  packageSize?: PackageSize;
+  onPackageSizeCreated?: (packageSize: PackageSize) => void;
+}
+
+export interface State {
+  name: string;
+  defaultPackageSize: string
+  redirect: boolean;
+}
+
+class EditPackageSize extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      name: "",
+      defaultPackageSize: "",
+      redirect: false
+    };
+
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  /**
+   * Handle form submit
+   */
+  handleSubmit() {
+    const packageSizeObject = {
+      name: this.state.name
+    };
+    new FamiFarmApiClient().createPackageSize(this.props.keycloak!, packageSizeObject).then(() => {
+      this.setState({redirect: true});
+    });
+  }
+
+  render() {
+    if (this.state.redirect) {
+      return <Redirect to="/packageSizes" push={true} />;
+    }
+    return (
+      <Grid>
+        <Grid.Row className="content-page-header-row">
+          <Grid.Column width={8}>
+            <h2>Uusi pakkauskoko</h2>
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row>
+          <Grid.Column width={8}>
+            <Form>
+              <Form.Field required>
+                <label>Pakkauskoon nimi</label>
+                <Input 
+                  value={this.state.name} 
+                  placeholder='Nimi' 
+                  onChange={(e) => this.setState({name: e.currentTarget.value})}
+                />
+              </Form.Field>
+              <Button className="submit-button" onClick={this.handleSubmit} type='submit'>Tallenna</Button>
+            </Form>
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
+    );
+  }
+}
+
+export default EditPackageSize;
