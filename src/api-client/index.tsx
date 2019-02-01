@@ -217,7 +217,7 @@ export default class FamiFarmApiClient {
   }
 
   /**
-   * Delete package size
+   * Delete seed
    * 
    * @param keycloak 
    * @param seedId
