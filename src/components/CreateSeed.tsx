@@ -8,20 +8,18 @@ import {
   Grid,
   Button,
   Form,
-  Input,
-  InputOnChangeData
+  Input
 } from "semantic-ui-react";
 
-export interface Props {
+interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   seed?: Seed;
   onSeedCreated?: (seed: Seed) => void;
 }
 
-export interface State {
+interface State {
   name?: LocalizedValue[];
   redirect: boolean;
-  defaultPackageSize: string;
 }
 
 class CreateSeed extends React.Component<Props, State> {
@@ -32,8 +30,7 @@ class CreateSeed extends React.Component<Props, State> {
           language: "fi",
           value: ""
         }],
-        redirect: false,
-        defaultPackageSize: ""
+        redirect: false
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -46,16 +43,6 @@ class CreateSeed extends React.Component<Props, State> {
     new FamiFarmApiClient().createSeed(this.props.keycloak!, seedObject).then(() => {
       this.setState({redirect: true});
     });
-  }
-
-  /**
-   * Handle select change
-   * 
-   * @param e event
-   * @param {value} value
-   */
-  onSelectChange = (e: any, { value }: InputOnChangeData) => {
-    this.setState({defaultPackageSize: value});
   }
 
   render() {
