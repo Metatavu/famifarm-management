@@ -33,6 +33,9 @@ class WelcomePage extends React.Component<Props, any> {
     },{
       "text": "Pakkauskoot",
       "link": "/packageSizes"
+    },{
+      "text": "Siemenet",
+      "link": "/seeds"
     }];
   }
 

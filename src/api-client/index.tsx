@@ -5,7 +5,9 @@ import {
   Product,
   ProductsApi, 
   PackageSize,
-  PackageSizesApi} from "famifarm-client";
+  PackageSizesApi,
+  Seed,
+  SeedsApi} from "famifarm-client";
 import { KeycloakInstance } from "keycloak-js";
 
 export default class FamiFarmApiClient {
@@ -171,6 +173,57 @@ export default class FamiFarmApiClient {
    */
   deletePackageSize(keycloak: KeycloakInstance, packageSizeId: string):  Promise<void> {
     return this.doRequest(keycloak, new PackageSizesApi(this.getConfig(keycloak)).deletePackageSize(packageSizeId));
+  }
+
+  /**
+   * List seeds
+   * 
+   * @param keycloak 
+   * @param firstResult 
+   * @param maxResults 
+   */
+  listSeeds(keycloak: KeycloakInstance, firstResult: number, maxResults: number): Promise<Seed[]> {
+    return this.doRequest(keycloak, new SeedsApi(this.getConfig(keycloak)).listSeeds(firstResult, maxResults));
+  }
+
+  /**
+   * Find seed
+   * 
+   * @param keycloak 
+   * @param seedId 
+   */
+  findSeed(keycloak: KeycloakInstance, seedId: string): Promise<Seed> {
+    return this.doRequest(keycloak, new SeedsApi(this.getConfig(keycloak)).findSeed(seedId));
+  }
+
+  /**
+   * Create seed
+   * 
+   * @param keycloak 
+   * @param seed 
+   */
+  createSeed(keycloak: KeycloakInstance, seed: Seed):  Promise<Seed> {
+    return this.doRequest(keycloak, new SeedsApi(this.getConfig(keycloak)).createSeed(seed));
+  }
+
+  /**
+   * Update seed
+   * 
+   * @param keycloak 
+   * @param seed 
+   */
+  updateSeed(keycloak: KeycloakInstance, seed: Seed):  Promise<Seed> {
+    return this.doRequest(keycloak, new SeedsApi(this.getConfig(keycloak)).updateSeed(seed.id!, seed));
+  }
+
+  /**
+   * Delete package size
+   * 
+   * @param keycloak 
+   * @param seedId
+   */
+  deleteSeed(keycloak: KeycloakInstance, seedId: string):  Promise<void> {
+    return this.doRequest(keycloak, new SeedsApi(this.getConfig(keycloak)).deleteSeed(seedId));
   }
 
   /**

@@ -1,6 +1,6 @@
 import * as constants from '../constants'
 import { KeycloakInstance } from 'keycloak-js';
-import { Team, Product, PackageSize } from 'famifarm-client';
+import { Team, Product, PackageSize, Seed } from 'famifarm-client';
 
 export interface UserLogin {
   type: constants.USER_LOGIN;
@@ -72,10 +72,31 @@ export interface PackageSizeDeleted {
   packageSizeId: string;
 }
 
+export interface SeedsFound {
+  type: constants.SEEDS_FOUND;
+  seeds: Seed[];
+}
+
+export interface SeedSelected {
+  type: constants.SEED_SELECTED;
+  seed: Seed;
+}
+
+export interface SeedCreated {
+  type: constants.SEED_CREATED;
+  seed: Seed;
+}
+
+export interface SeedDeleted {
+  type: constants.SEED_DELETED;
+  seedId: string;
+}
+
 
 export type AppAction = UserLogin | UserLogout | TeamsFound | TeamSelected | TeamCreated | TeamDeleted 
   | ProductsFound | ProductSelected | ProductCreated | ProductDeleted | PackageSizesFound 
-  | PackageSizeSelected | PackageSizeCreated | PackageSizeDeleted;
+  | PackageSizeSelected | PackageSizeCreated | PackageSizeDeleted | SeedsFound | SeedCreated
+  | SeedSelected | SeedDeleted;
 
 export function userLogin(keycloak: KeycloakInstance, authenticated: boolean): UserLogin {
   return {
@@ -172,5 +193,33 @@ export function packageSizeDeleted(packageSizeId: string): PackageSizeDeleted {
   return {
     type: constants.PACKAGE_SIZE_DELETED,
     packageSizeId: packageSizeId
+  }
+}
+
+export function seedsFound(seeds: Seed[]): SeedsFound {
+  return {
+    type: constants.SEEDS_FOUND,
+    seeds: seeds
+  }
+}
+
+export function seedSelected(seed: Seed): SeedSelected {
+  return {
+    type: constants.SEED_SELECTED,
+    seed: seed
+  }
+}
+
+export function seedCreated(seed: Seed): SeedCreated {
+  return {
+    type: constants.SEED_CREATED,
+    seed: seed
+  }
+}
+
+export function seedDeleted(seedId: string): SeedDeleted {
+  return {
+    type: constants.SEED_DELETED,
+    seedId: seedId
   }
 }
