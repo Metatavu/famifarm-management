@@ -3,7 +3,7 @@ import * as Keycloak from 'keycloak-js';
 import FamiFarmApiClient from '../api-client';
 import { SeedBatch, Seed } from 'famifarm-client';
 import { Redirect } from 'react-router';
-import { DateTimeInput } from 'semantic-ui-calendar-react';
+import { DateInput } from 'semantic-ui-calendar-react';
 
 import {
   Grid,
@@ -113,11 +113,12 @@ class CreateSeedBatch extends React.Component<Props, State> {
                   onChange={this.onSelectChange}
                 />
                 <label>Erä saapunut</label>
-                <DateTimeInput
+                <DateInput
                   name="dateTime"
-                  placeholder="Date Time"
+                  placeholder="Date"
                   value={this.state.time}
                   iconPosition="left"
+                  dateFormat="YYYY-MM-DDTHH:mmZ"
                   onChange={this.handleTimeChange}
                 />
               </Form.Field>
