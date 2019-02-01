@@ -18,6 +18,8 @@ import {
 } from "semantic-ui-react";
 
 import BasicLayout from "./BasicLayout";
+import SeedList from "src/containers/SeedList";
+import CreateSeed from "./CreateSeed";
 
 export interface Props {
   authenticated: boolean,
@@ -150,6 +152,24 @@ class WelcomePage extends React.Component<Props, any> {
                 exact={true}
                 render={props => (
                     <CreatePackageSize
+                      keycloak={this.state.keycloak}
+                    />
+                )}
+              />
+              <Route
+                path="/seeds"
+                exact={true}
+                render={props => (
+                    <SeedList
+                      keycloak={this.state.keycloak}
+                    />
+                )}
+              />
+              <Route
+                path="/createSeed"
+                exact={true}
+                render={props => (
+                    <CreateSeed
                       keycloak={this.state.keycloak}
                     />
                 )}

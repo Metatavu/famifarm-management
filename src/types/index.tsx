@@ -1,5 +1,5 @@
 import { KeycloakInstance } from "keycloak-js";
-import { Team, Product, PackageSize } from 'famifarm-client';
+import { Team, Product, PackageSize, Seed } from 'famifarm-client';
 
 export interface StoreState {
   keycloak?: KeycloakInstance;
@@ -9,5 +9,7 @@ export interface StoreState {
   products: Product[];
   product: Product;
   packageSizes: PackageSize[];
-  packageSize: PackageSize
+  packageSize: PackageSize;
+  seeds: Seed[];
+  seed: Seed;
 }
