@@ -60,15 +60,11 @@ class SeedBatchsList extends React.Component<Props, State> {
 
     return (
       <Grid>
-        <Grid.Row className="content-page-header-row">
-          <Grid.Column width={3}>
-            <h2>Siemenerät</h2>
-          </Grid.Column>
-          <Grid.Column width={2} floated="right">
-            <NavLink to="/createSeedBatch">
-              <Button className="submit-button">Uusi siemenerä</Button>
-            </NavLink>
-          </Grid.Column>
+        <Grid.Row className="content-page-header-row" style={{flex: 1,justifyContent: "space-between", paddingLeft: 10, paddingRight: 10}}>
+          <h2>Siemenerät</h2>
+          <NavLink to="/createSeedBatch">
+            <Button className="submit-button">Uusi siemenerä</Button>
+          </NavLink>
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
