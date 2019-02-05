@@ -3,6 +3,7 @@ import * as Keycloak from 'keycloak-js';
 import FamiFarmApiClient from '../api-client';
 import { NavLink } from 'react-router-dom';
 import { ProductionLine } from 'famifarm-client';
+import strings from "src/localization/strings";
 
 import {
   List,
@@ -51,7 +52,7 @@ class ProductionLinesList extends React.Component<Props, State> {
         <List.Item>
           <List.Content floated='right'>
             <NavLink to={productionLinePath}>
-              <Button className="submit-button">Avaa</Button>
+              <Button className="submit-button">{strings.open}</Button>
             </NavLink>
           </List.Content>
           <List.Header>{productionLine.lineNumber}</List.Header>
@@ -62,9 +63,9 @@ class ProductionLinesList extends React.Component<Props, State> {
     return (
       <Grid>
         <Grid.Row className="content-page-header-row" style={{flex: 1,justifyContent: "space-between", paddingLeft: 10, paddingRight: 10}}>
-          <h2>Tuotantolinjat</h2>
+          <h2>{strings.productionLines}</h2>
           <NavLink to="/createProductionLine">
-            <Button className="submit-button">Uusi tuotantolinja</Button>
+            <Button className="submit-button">{strings.newProductionLine}</Button>
           </NavLink>
         </Grid.Row>
         <Grid.Row>

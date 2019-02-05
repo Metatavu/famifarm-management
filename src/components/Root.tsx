@@ -3,6 +3,7 @@ import * as Keycloak from 'keycloak-js';
 import FamiFarmApiClient from '../api-client';
 import { NavLink } from 'react-router-dom';
 import { Card } from 'semantic-ui-react';
+import strings from "src/localization/strings";
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance,
@@ -25,22 +26,22 @@ class WelcomePage extends React.Component<Props, any> {
 
   getLinks() {
     return [{
-      "text": "Tiimit",
+      "text": strings.teams,
       "link": "/teams"
     },{
-      "text": "Tuotteet",
+      "text": strings.products,
       "link": "/products"
     },{
-      "text": "Pakkauskoot",
+      "text": strings.packageSizes,
       "link": "/packageSizes"
     },{
-      "text": "Siemenet",
+      "text": strings.seeds,
       "link": "/seeds"
     },{
-      "text": "Tuotantolinjat",
+      "text": strings.productionLines,
       "link": "/productionLines"
     },{
-      "text": "Siemenerät",
+      "text": strings.seedBatches,
       "link": "/seedBatches"
     }];
   }

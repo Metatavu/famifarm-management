@@ -3,6 +3,7 @@ import * as Keycloak from 'keycloak-js';
 import FamiFarmApiClient from '../api-client';
 import { NavLink } from 'react-router-dom';
 import { Product } from 'famifarm-client';
+import strings from "src/localization/strings";
 
 import {
   List,
@@ -50,7 +51,7 @@ class ProductsList extends React.Component<Props, State> {
         <List.Item>
           <List.Content floated='right'>
             <NavLink to={productPath}>
-              <Button className="submit-button">Avaa</Button>
+              <Button className="submit-button">{strings.open}</Button>
             </NavLink>
           </List.Content>
           <List.Header>{product.name![0].value}</List.Header>
@@ -61,9 +62,9 @@ class ProductsList extends React.Component<Props, State> {
     return (
       <Grid>
         <Grid.Row className="content-page-header-row" style={{flex: 1,justifyContent: "space-between", paddingLeft: 10, paddingRight: 10}}>
-          <h2>Tuotteet</h2>
+          <h2>{strings.products}</h2>
           <NavLink to="/createProduct">
-            <Button className="submit-button">Uusi tuote</Button>
+            <Button className="submit-button">{strings.newProduct}</Button>
           </NavLink>
         </Grid.Row>
         <Grid.Row>

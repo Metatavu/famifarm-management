@@ -3,6 +3,7 @@ import * as Keycloak from 'keycloak-js';
 import FamiFarmApiClient from '../api-client';
 import { Product, LocalizedValue, PackageSize } from 'famifarm-client';
 import { Redirect } from 'react-router';
+import strings from "../localization/strings";
 
 import {
   Grid,
@@ -84,28 +85,28 @@ class CreateProduct extends React.Component<Props, State> {
       <Grid>
         <Grid.Row className="content-page-header-row">
           <Grid.Column width={8}>
-            <h2>Uusi tuote</h2>
+            <h2>{strings.newProduct}</h2>
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={8}>
             <Form>
               <Form.Field required>
-                <label>Tuotteen nimi</label>
+                <label>{strings.productName}</label>
                 <Input 
                   value={this.state.name![0].value} 
-                  placeholder='Nimi' 
+                  placeholder={strings.productName}
                   onChange={(e) => this.setState({name: [{language: "fi", value: e.currentTarget.value}]})}
                 />
               </Form.Field>
               <Form.Select 
                 fluid 
-                label='Pakkauskoko' 
+                label={strings.packageSize} 
                 options={packageSizeOptions} 
-                placeholder='Pakkauskoko' 
+                placeholder={strings.packageSize} 
                 onChange={this.onSelectChange}
               />
-              <Button className="submit-button" onClick={this.handleSubmit} type='submit'>Tallenna</Button>
+              <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save} </Button>
             </Form>
           </Grid.Column>
         </Grid.Row>

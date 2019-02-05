@@ -3,6 +3,7 @@ import * as Keycloak from 'keycloak-js';
 import FamiFarmApiClient from '../api-client';
 import { NavLink } from 'react-router-dom';
 import { SeedBatch } from 'famifarm-client';
+import strings from "src/localization/strings";
 
 import {
   List,
@@ -50,7 +51,7 @@ class SeedBatchsList extends React.Component<Props, State> {
         <List.Item>
           <List.Content floated='right'>
             <NavLink to={seedBatchPath}>
-              <Button className="submit-button">Avaa</Button>
+              <Button className="submit-button">{strings.open}</Button>
             </NavLink>
           </List.Content>
           <List.Header>{seedBatch.code}</List.Header>
@@ -61,9 +62,9 @@ class SeedBatchsList extends React.Component<Props, State> {
     return (
       <Grid>
         <Grid.Row className="content-page-header-row" style={{flex: 1,justifyContent: "space-between", paddingLeft: 10, paddingRight: 10}}>
-          <h2>Siemenerät</h2>
+          <h2>{strings.seedBatches}</h2>
           <NavLink to="/createSeedBatch">
-            <Button className="submit-button">Uusi siemenerä</Button>
+            <Button className="submit-button">{strings.newSeedBatch}</Button>
           </NavLink>
         </Grid.Row>
         <Grid.Row>

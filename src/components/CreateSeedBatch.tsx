@@ -4,6 +4,7 @@ import FamiFarmApiClient from '../api-client';
 import { SeedBatch, Seed } from 'famifarm-client';
 import { Redirect } from 'react-router';
 import { DateInput } from 'semantic-ui-calendar-react';
+import strings from "src/localization/strings";
 
 import {
   Grid,
@@ -92,37 +93,37 @@ class CreateSeedBatch extends React.Component<Props, State> {
       <Grid>
         <Grid.Row className="content-page-header-row">
           <Grid.Column width={8}>
-            <h2>Uusi siemenerä</h2>
+            <h2>{strings.newSeedBatch}</h2>
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={8}>
             <Form>
               <Form.Field required>
-                <label>Siemenerän koodi</label>
+                <label>{strings.seedBatchCode}</label>
                 <Input 
                   value={this.state.code} 
-                  placeholder='Koodi' 
+                  placeholder={strings.seedBatchCode}
                   onChange={(e) => this.setState({code: e.currentTarget.value})}
                 />
                 <Form.Select 
                   fluid 
-                  label='Siemen' 
+                  label={strings.seed} 
                   options={seedOptions} 
-                  placeholder='Siemen' 
+                  placeholder={strings.seed}
                   onChange={this.onSelectChange}
                 />
-                <label>Erä saapunut</label>
+                <label>{strings.seedBatchArrived}</label>
                 <DateInput
                   name="dateTime"
-                  placeholder="Date"
+                  placeholder={strings.date}
                   value={this.state.time}
                   iconPosition="left"
                   dateFormat="YYYY-MM-DDTHH:mmZ"
                   onChange={this.handleTimeChange}
                 />
               </Form.Field>
-              <Button className="submit-button" onClick={this.handleSubmit} type='submit'>Tallenna</Button>
+              <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
             </Form>
           </Grid.Column>
         </Grid.Row>

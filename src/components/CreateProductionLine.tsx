@@ -10,6 +10,7 @@ import {
   Form,
   Input
 } from "semantic-ui-react";
+import strings from "src/localization/strings";
 
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
@@ -40,7 +41,7 @@ class CreateProductionLine extends React.Component<Props, State> {
     const lineNumber = parseInt(this.state.lineNumber)
 
     if (isNaN(lineNumber)) {
-      alert("Tuotantolinjan numero ei saa olla muu kuin numero");
+      alert(strings.productionLineNotNumber);
       return;
     }
     
@@ -61,21 +62,21 @@ class CreateProductionLine extends React.Component<Props, State> {
       <Grid>
         <Grid.Row className="content-page-header-row">
           <Grid.Column width={8}>
-            <h2>Uusi tuotantolinja</h2>
+            <h2>{strings.newProductionLine}</h2>
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={8}>
             <Form>
               <Form.Field required>
-                <label>Tuontantolinjan numero</label>
+                <label>{strings.productionLineNumber}</label>
                 <Input 
                   value={this.state.lineNumber} 
-                  placeholder='Numero' 
+                  placeholder={strings.productionLineNumber}
                   onChange={(e) => this.setState({lineNumber: e.currentTarget.value})}
                 />
               </Form.Field>
-              <Button className="submit-button" onClick={this.handleSubmit} type='submit'>Tallenna</Button>
+              <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
             </Form>
           </Grid.Column>
         </Grid.Row>

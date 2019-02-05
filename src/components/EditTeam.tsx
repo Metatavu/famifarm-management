@@ -3,6 +3,7 @@ import * as Keycloak from 'keycloak-js';
 import FamiFarmApiClient from '../api-client';
 import { Team } from 'famifarm-client';
 import { Redirect } from 'react-router';
+import strings from "src/localization/strings";
 
 import {
   Grid,
@@ -57,10 +58,8 @@ class EditTeam extends React.Component<Props, State> {
     this.setState({team: team});
   }
 
-  handleSubmit() {
-    new FamiFarmApiClient().updateTeam(this.props.keycloak!, this.state.team!).then(() => {
-      alert("Hurraa!");
-    });
+  async handleSubmit() {
+    await new FamiFarmApiClient().updateTeam(this.props.keycloak!, this.state.team!);
   }
 
   handleDelete() {
@@ -92,21 +91,21 @@ class EditTeam extends React.Component<Props, State> {
             <h2>{this.props.team!.name![0].value}</h2>
           </Grid.Column>
           <Grid.Column width={3} floated="right">
-            <Button className="danger-button" onClick={this.handleDelete}>Poista tiimi</Button>
+            <Button className="danger-button" onClick={this.handleDelete}>{strings.deleteTeam}</Button>
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={8}>
           <Form>
           <Form.Field required>
-            <label>Tiimin nimi</label>
+            <label>{strings.teamName}</label>
             <Input 
               value={this.state.team && this.state.team!.name![0].value} 
-              placeholder='Tiimin nimi' 
+              placeholder={strings.teamName}
               onChange={this.handeNameChange}
             />
           </Form.Field>
-            <Button className="submit-button" onClick={this.handleSubmit} type='submit'>Tallenna</Button>
+            <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
           </Form>
           </Grid.Column>
         </Grid.Row>

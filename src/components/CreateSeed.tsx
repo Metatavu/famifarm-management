@@ -3,6 +3,7 @@ import * as Keycloak from 'keycloak-js';
 import FamiFarmApiClient from '../api-client';
 import { Seed, LocalizedValue } from 'famifarm-client';
 import { Redirect } from 'react-router';
+import strings from "src/localization/strings";
 
 import {
   Grid,
@@ -54,21 +55,21 @@ class CreateSeed extends React.Component<Props, State> {
       <Grid>
         <Grid.Row className="content-page-header-row">
           <Grid.Column width={8}>
-            <h2>Uusi siemen</h2>
+            <h2>{strings.newSeed}</h2>
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={8}>
             <Form>
               <Form.Field required>
-                <label>Siemenen nimi</label>
+                <label>{strings.seedName}</label>
                 <Input 
                   value={this.state.name![0].value} 
-                  placeholder='Nimi' 
+                  placeholder={strings.seedName}
                   onChange={(e) => this.setState({name: [{language: "fi", value: e.currentTarget.value}]})}
                 />
               </Form.Field>
-              <Button className="submit-button" onClick={this.handleSubmit} type='submit'>Tallenna</Button>
+              <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
             </Form>
           </Grid.Column>
         </Grid.Row>
