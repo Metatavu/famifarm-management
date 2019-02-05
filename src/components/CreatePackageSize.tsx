@@ -48,6 +48,9 @@ class EditPackageSize extends React.Component<Props, State> {
     });
   }
 
+  /**
+   * Render edit view for package size
+   */
   render() {
     if (this.state.redirect) {
       return <Redirect to="/packageSizes" push={true} />;

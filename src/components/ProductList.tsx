@@ -30,12 +30,18 @@ class ProductsList extends React.Component<Props, State> {
     };
   }
 
+  /**
+   * Component did mount life-sycle event
+   */
   componentDidMount() {
     new FamiFarmApiClient().listProducts(this.props.keycloak!, 0, 100).then((products) => {
       this.props.onProductsFound && this.props.onProductsFound(products);
     });
   }
 
+  /**
+   * Render product list view
+   */
   render() {
     if (!this.props.products) {
       return (

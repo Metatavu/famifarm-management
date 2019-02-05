@@ -42,6 +42,9 @@ class CreateSeedBatch extends React.Component<Props, State> {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
+  /**
+   * Component did mount life-sycle method
+   */
   componentDidMount() {
     new FamiFarmApiClient().listSeeds(this.props.keycloak!, 0, 100).then((seeds) => {
       this.props.onSeedsFound && this.props.onSeedsFound(seeds);
@@ -60,11 +63,17 @@ class CreateSeedBatch extends React.Component<Props, State> {
 
   /**
    * Handle time change
+   * 
+   * @param event event
+   * @param {name, value} name and value
    */
   handleTimeChange = (event: any, {name, value} : any) => {
     this.setState({ time: value });
   }
 
+  /**
+   * Handle form submit
+   */
   handleSubmit() {
     const seedBatchObject = {
       code: this.state.code,
@@ -76,6 +85,9 @@ class CreateSeedBatch extends React.Component<Props, State> {
     });
   }
 
+  /**
+   * Render create seed batch view
+   */
   render() {
     if (this.state.redirect) {
       return <Redirect to="/seedBatches" push={true} />;

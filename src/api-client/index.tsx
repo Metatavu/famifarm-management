@@ -11,19 +11,25 @@ import {
   ProductionLine,
   ProductionLinesApi,
   SeedBatchesApi,
-  SeedBatch} from "famifarm-client";
+  SeedBatch,
+  PerformedCultivationAction,
+  PerformedCultivationActionsApi} from "famifarm-client";
 import { KeycloakInstance } from "keycloak-js";
 
 export default class FamiFarmApiClient {
 
+  /**
+   * Get keycloak configuration
+   * 
+   * @param keycloak keycloack
+   */
   getConfig(keycloak: KeycloakInstance): Configuration {
     const cnf = new Configuration({
       basePath: process.env.REACT_APP_FAMIFARM_API_BASE_PATH,
       apiKey: `Bearer ${keycloak.token}`
     });
-    console.log(cnf);
-    return cnf; 
 
+    return cnf; 
   }
 
   /**
@@ -330,6 +336,57 @@ export default class FamiFarmApiClient {
    */
   deleteSeedBatch(keycloak: KeycloakInstance, seedBatchId: string):  Promise<void> {
     return this.doRequest(keycloak, new SeedBatchesApi(this.getConfig(keycloak)).deleteSeedBatch(seedBatchId));
+  }
+
+  /**
+   * List performedCultivationActions
+   * 
+   * @param keycloak 
+   * @param firstResult 
+   * @param maxResults 
+   */
+  listPerformedCultivationActions(keycloak: KeycloakInstance, firstResult: number, maxResults: number): Promise<PerformedCultivationAction[]> {
+    return this.doRequest(keycloak, new PerformedCultivationActionsApi(this.getConfig(keycloak)).listPerformedCultivationActions(firstResult, maxResults));
+  }
+
+  /**
+   * Find performedCultivationAction
+   * 
+   * @param keycloak 
+   * @param performedCultivationActionId 
+   */
+  findPerformedCultivationAction(keycloak: KeycloakInstance, performedCultivationActionId: string): Promise<PerformedCultivationAction> {
+    return this.doRequest(keycloak, new PerformedCultivationActionsApi(this.getConfig(keycloak)).findPerformedCultivationAction(performedCultivationActionId));
+  }
+
+  /**
+   * Create performedCultivationAction
+   * 
+   * @param keycloak 
+   * @param performedCultivationAction 
+   */
+  createPerformedCultivationAction(keycloak: KeycloakInstance, performedCultivationAction: PerformedCultivationAction):  Promise<PerformedCultivationAction> {
+    return this.doRequest(keycloak, new PerformedCultivationActionsApi(this.getConfig(keycloak)).createPerformedCultivationAction(performedCultivationAction));
+  }
+
+  /**
+   * Update performedCultivationAction
+   * 
+   * @param keycloak 
+   * @param performedCultivationAction 
+   */
+  updatePerformedCultivationAction(keycloak: KeycloakInstance, performedCultivationAction: PerformedCultivationAction):  Promise<PerformedCultivationAction> {
+    return this.doRequest(keycloak, new PerformedCultivationActionsApi(this.getConfig(keycloak)).updatePerformedCultivationAction(performedCultivationAction.id!, performedCultivationAction));
+  }
+
+  /**
+   * Delete performedCultivationAction
+   * 
+   * @param keycloak 
+   * @param performedCultivationActionId 
+   */
+  deletePerformedCultivationAction(keycloak: KeycloakInstance, performedCultivationActionId: string):  Promise<void> {
+    return this.doRequest(keycloak, new PerformedCultivationActionsApi(this.getConfig(keycloak)).deletePerformedCultivationAction(performedCultivationActionId));
   }
 
   /**

@@ -30,6 +30,9 @@ class ProductionLinesList extends React.Component<Props, State> {
     };
   }
 
+  /**
+   * Component did mount life-sycle event
+   */
   componentDidMount() {
     new FamiFarmApiClient().listProductionLines(this.props.keycloak!, 0, 100).then((productionLines) => {
       console.log(productionLines);
@@ -37,6 +40,9 @@ class ProductionLinesList extends React.Component<Props, State> {
     });
   }
 
+  /**
+   * Render production line list view
+   */
   render() {
     if (!this.props.productionLines) {
       return (

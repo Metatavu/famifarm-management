@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import FamiFarmApiClient from '../api-client';
-import { Team, LocalizedValue } from 'famifarm-client';
+import { PerformedCultivationAction, LocalizedValue } from 'famifarm-client';
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -14,8 +14,8 @@ import {
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  team?: Team;
-  onTeamCreated?: (team: Team) => void;
+  performedCultivationAction?: PerformedCultivationAction;
+  onPerformedCultivationActionCreated?: (performedCultivationAction: PerformedCultivationAction) => void;
 }
 
 export interface State {
@@ -23,7 +23,7 @@ export interface State {
   redirect: boolean;
 }
 
-class EditTeam extends React.Component<Props, State> {
+class EditPerformedCultivationAction extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -41,36 +41,36 @@ class EditTeam extends React.Component<Props, State> {
    * Handle form submit
    */
   handleSubmit() {
-    const teamObject = {
+    const performedCultivationActionObject = {
       name: this.state.name
     };
-    new FamiFarmApiClient().createTeam(this.props.keycloak!, teamObject).then(() => {
+    new FamiFarmApiClient().createPerformedCultivationAction(this.props.keycloak!, performedCultivationActionObject).then(() => {
       this.setState({redirect: true});
     });
   }
 
   /**
-   * Handle form submit
+   * Render create performed cultivation action view
    */
   render() {
     if (this.state.redirect) {
-      return <Redirect to="/teams" push={true} />;
+      return <Redirect to="/performedCultivationActions" push={true} />;
     }
     return (
       <Grid>
         <Grid.Row className="content-page-header-row">
           <Grid.Column width={8}>
-            <h2>{strings.newTeam}</h2>
+            <h2>{strings.newPerformedCultivationAction}</h2>
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={8}>
             <Form>
               <Form.Field required>
-                <label>{strings.teamName}</label>
+                <label>{strings.performedCultivationActionName}</label>
                 <Input 
                   value={this.state.name![0].value} 
-                  placeholder={strings.teamName} 
+                  placeholder={strings.performedCultivationActionName} 
                   onChange={(e) => this.setState({name: [{language: "fi", value: e.currentTarget.value}]})}
                 />
               </Form.Field>
@@ -83,4 +83,4 @@ class EditTeam extends React.Component<Props, State> {
   }
 }
 
-export default EditTeam;
+export default EditPerformedCultivationAction;

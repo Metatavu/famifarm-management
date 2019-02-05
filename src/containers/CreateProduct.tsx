@@ -5,6 +5,11 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { Product, PackageSize } from 'famifarm-client';
 
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
 export function mapStateToProps(state: StoreState) {
   return {
     products: state.products,
@@ -13,6 +18,11 @@ export function mapStateToProps(state: StoreState) {
   };
 }
 
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onProductCreated: (product: Product) => dispatch(actions.productCreated(product)),

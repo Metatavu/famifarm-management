@@ -30,5 +30,10 @@
   "teams": "Teams",
   "newTeam": "New team",
   "teamName": "Team name",
-  "deleteTeam": "Delete team"
+  "deleteTeam": "Delete team",
+  "performedCultivationAction": "Performed cultivation action",
+  "performedCultivationActions": "Performed cultivation actions",
+  "newPerformedCultivationAction": "New performed cultivation action",
+  "performedCultivationActionName": "Performed cultivation action name",
+  "deletePerformedCultivationAction": "Delete performed cultivation action"
 }

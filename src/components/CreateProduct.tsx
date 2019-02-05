@@ -42,12 +42,18 @@ class CreateProduct extends React.Component<Props, State> {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
+  /**
+   * Component did mount life-sycle method
+   */
   componentDidMount() {
     new FamiFarmApiClient().listPackageSizes(this.props.keycloak!, 0, 100).then((packageSizes) => {
       this.props.onPackageSizesFound && this.props.onPackageSizesFound(packageSizes);
     });
   }
 
+  /**
+   * Handle form submit
+   */
   handleSubmit() {
     const productObject = {
       name: this.state.name,
@@ -68,6 +74,9 @@ class CreateProduct extends React.Component<Props, State> {
     this.setState({defaultPackageSize: value});
   }
 
+  /**
+   * Render product create view
+   */
   render() {
     if (this.state.redirect) {
       return <Redirect to="/products" push={true} />;

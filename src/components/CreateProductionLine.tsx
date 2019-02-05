@@ -53,6 +53,9 @@ class CreateProductionLine extends React.Component<Props, State> {
     });
   }
 
+  /**
+   * Render create production line view
+   */
   render() {
     if (this.state.redirect) {
       return <Redirect to="/productionLines" push={true} />;

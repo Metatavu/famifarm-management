@@ -6,6 +6,10 @@ import { Grid } from "semantic-ui-react";
 import strings from "../localization/strings";
 
 class BasicLayout extends React.Component {
+
+  /**
+   * Render basic layout
+   */
   render() {
     return (
       <div>

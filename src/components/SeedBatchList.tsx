@@ -30,12 +30,18 @@ class SeedBatchsList extends React.Component<Props, State> {
     };
   }
 
+  /**
+   * Component did mount life-sycle event
+   */
   componentDidMount() {
     new FamiFarmApiClient().listSeedBatches(this.props.keycloak!, 0, 100).then((seedBatches) => {
       this.props.onSeedBatchesFound && this.props.onSeedBatchesFound(seedBatches);
     });
   }
 
+  /**
+   * Render seed batch list view
+   */
   render() {
     if (!this.props.seedBatches) {
       return (
