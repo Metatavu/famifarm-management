@@ -18,7 +18,7 @@ class WelcomePage extends React.Component<Props, any> {
   }
 
   /**
-   * Component did mount life-sycle event
+   * Component did mount life-cycle event
    */
   componentDidMount() {
     const apiClient = new FamiFarmApiClient();
@@ -51,6 +51,9 @@ class WelcomePage extends React.Component<Props, any> {
     },{
       "text": strings.seedBatches,
       "link": "/seedBatches"
+    },{
+      "text": strings.performedCultivationActions,
+      "link": "/performedCultivationActions"
     }];
   }
 

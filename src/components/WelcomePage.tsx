@@ -25,6 +25,9 @@ import ProductionLineList from "src/containers/ProductionLineList";
 import CreateProductionLine from "./CreateProductionLine";
 import SeedBatchList from "src/containers/SeedBatchList";
 import CreateSeedBatch from "src/containers/CreateSeedBatch";
+import PerformedCultivationActionList from "src/containers/PerformedCultivationActionList";
+import CreatePerformedCultivationAction from "src/containers/CreatePerformedCultivationAction";
+import EditPerformedCultivationAction from "src/containers/EditPerformedCultivationAction";
 
 export interface Props {
   authenticated: boolean,
@@ -41,7 +44,7 @@ class WelcomePage extends React.Component<Props, any> {
   }
 
   /**
-   * Component did mount life-sycle event
+   * Component did mount life-cycle event
    */
   componentDidMount() {
     const kcConf = {
@@ -79,6 +82,9 @@ class WelcomePage extends React.Component<Props, any> {
     },{
       "text": strings.seedBatches,
       "route": "/seedBatches"
+    },{
+      "text": strings.performedCultivationActions,
+      "route": "/performedCultivationActions"
     }];
 
     const sideBarNavigation = navigationRoutes.map((navigationRoute) => {
@@ -237,6 +243,34 @@ class WelcomePage extends React.Component<Props, any> {
                 render={props => (
                     <CreateSeedBatch
                       keycloak={this.state.keycloak}
+                    />
+                )}
+              />
+              <Route
+                path="/performedCultivationActions"
+                exact={true}
+                render={props => (
+                    <PerformedCultivationActionList
+                      keycloak={this.state.keycloak}
+                    />
+                )}
+              />
+              <Route
+                path="/createPerformedCultivationAction"
+                exact={true}
+                render={props => (
+                    <CreatePerformedCultivationAction
+                      keycloak={this.state.keycloak}
+                    />
+                )}
+              />
+              <Route
+                path="/performedCultivationActions/:createPerformedCultivationActionId"
+                exact={true}
+                render={props => (
+                    <EditPerformedCultivationAction
+                      keycloak={this.state.keycloak}
+                      performedCultivationActionId={props.match.params.createPerformedCultivationActionId as string}
                     />
                 )}
               />
