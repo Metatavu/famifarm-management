@@ -31,7 +31,7 @@ class ProductsList extends React.Component<Props, State> {
   }
 
   /**
-   * Component did mount life-sycle event
+   * Component did mount life-cycle event
    */
   componentDidMount() {
     new FamiFarmApiClient().listProducts(this.props.keycloak!, 0, 100).then((products) => {

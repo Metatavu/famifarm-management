@@ -43,7 +43,7 @@ class CreateSeedBatch extends React.Component<Props, State> {
   }
 
   /**
-   * Component did mount life-sycle method
+   * Component did mount life-cycle method
    */
   componentDidMount() {
     new FamiFarmApiClient().listSeeds(this.props.keycloak!, 0, 100).then((seeds) => {

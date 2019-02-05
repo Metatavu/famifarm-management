@@ -31,7 +31,7 @@ class SeedBatchsList extends React.Component<Props, State> {
   }
 
   /**
-   * Component did mount life-sycle event
+   * Component did mount life-cycle event
    */
   componentDidMount() {
     new FamiFarmApiClient().listSeedBatches(this.props.keycloak!, 0, 100).then((seedBatches) => {

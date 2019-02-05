@@ -40,7 +40,7 @@ class EditTeam extends React.Component<Props, State> {
   }
 
   /**
-   * Component did mount life-sycle method
+   * Component did mount life-cycle method
    */
   componentDidMount() {
     new FamiFarmApiClient().findTeam(this.props.keycloak!, this.props.teamId).then((team) => {

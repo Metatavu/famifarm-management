@@ -31,7 +31,7 @@ class PackageSizesList extends React.Component<Props, State> {
   }
 
   /**
-   * Component did mount life-sycle method
+   * Component did mount life-cycle method
    */
   componentDidMount() {
     new FamiFarmApiClient().listPackageSizes(this.props.keycloak!, 0, 100).then((packageSizes) => {
