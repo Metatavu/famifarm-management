@@ -61,15 +61,11 @@ class TeamsList extends React.Component<Props, State> {
 
     return (
       <Grid>
-        <Grid.Row className="content-page-header-row">
-          <Grid.Column width={3}>
-            <h2>Tiimit</h2>
-          </Grid.Column>
-          <Grid.Column width={2} floated="right">
-            <NavLink to="/createTeam">
-              <Button className="submit-button">Uusi tiimi</Button>
-            </NavLink>
-          </Grid.Column>
+        <Grid.Row className="content-page-header-row" style={{flex: 1,justifyContent: "space-between", paddingLeft: 10, paddingRight: 10}}>
+          <h2>Tiimit</h2>
+          <NavLink to="/createTeam">
+            <Button className="submit-button">Uusi tiimi</Button>
+          </NavLink>
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>

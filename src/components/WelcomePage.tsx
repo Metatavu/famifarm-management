@@ -55,14 +55,34 @@ class WelcomePage extends React.Component<Props, any> {
 
   render() {
 
-    const sideBarNavigation = [1,2,3].map((index) => {
+    const navigationRoutes = [{
+      text: "Tiimit",
+      route: "/teams"
+    }, {
+      text: "Tuotteet",
+      route: "/products"
+    }, {
+      text: "Pakkauskoot",
+      route: "/packageSizes"
+    }, {
+      text: "Siemenet",
+      route: "/seeds"
+    }, {
+      text: "Tuotantolinjat",
+      route: "/productionLines"
+    }, {
+      text: "Siemenerät",
+      route: "/seedBatches"
+    }];
+
+    const sideBarNavigation = navigationRoutes.map((navigationRoute) => {
       return (
-        <NavLink to="/teams">
+        <NavLink to={navigationRoute.route}>
            <List.Item>
             <List.Content>
               <List.Header>
                 <Container textAlign='center'>
-                  <h3>Tiimit</h3>
+                  <h3>{navigationRoute.text}</h3>
                 </Container>
               </List.Header>
             </List.Content>
@@ -81,12 +101,12 @@ class WelcomePage extends React.Component<Props, any> {
         </div>
         ) : (
           <Grid.Row>
-            <Grid.Column width={3} className="side-navigation-bar">
+            <Grid.Column width={4} className="side-navigation-bar">
             <List>
               {sideBarNavigation}
             </List>
             </Grid.Column>
-            <Grid.Column width={13}>
+            <Grid.Column width={12}>
             <Route
                 path="/"
                 exact={true}
