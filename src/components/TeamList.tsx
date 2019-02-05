@@ -30,12 +30,18 @@ class TeamsList extends React.Component<Props, State> {
     };
   }
 
+  /**
+   * Component did mount life-sycle event
+   */
   componentDidMount() {
     new FamiFarmApiClient().listTeams(this.props.keycloak!, 0, 100).then((teams) => {
       this.props.onTeamsFound && this.props.onTeamsFound(teams);
     });
   }
 
+  /**
+   * Render team list view
+   */
   render() {
     if (!this.props.teams) {
       return (

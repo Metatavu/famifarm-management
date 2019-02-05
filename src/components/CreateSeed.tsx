@@ -37,6 +37,9 @@ class CreateSeed extends React.Component<Props, State> {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
+  /**
+   * Handle form submit
+   */
   handleSubmit() {
     const seedObject = {
       name: this.state.name
@@ -46,6 +49,9 @@ class CreateSeed extends React.Component<Props, State> {
     });
   }
 
+  /**
+   * Render create seed view
+   */
   render() {
     if (this.state.redirect) {
       return <Redirect to="/seeds" push={true} />;

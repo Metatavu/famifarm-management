@@ -3,6 +3,10 @@ import { BrowserRouter, Route } from "react-router-dom";
 import WelcomePage from "../containers/WelcomePage";
 
 class App extends React.Component {
+
+  /**
+   * Render App component
+   */
   public render() {
     return (
       <BrowserRouter>

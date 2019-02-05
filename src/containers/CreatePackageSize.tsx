@@ -5,6 +5,11 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { PackageSize } from 'famifarm-client';
 
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
 export function mapStateToProps(state: StoreState) {
   return {
     packageSizes: state.packageSizes,
@@ -12,6 +17,11 @@ export function mapStateToProps(state: StoreState) {
   };
 }
 
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onPackageSizeCreated: (packageSize: PackageSize) => dispatch(actions.packageSizeCreated(packageSize))

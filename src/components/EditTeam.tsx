@@ -39,6 +39,9 @@ class EditTeam extends React.Component<Props, State> {
     this.handleDelete = this.handleDelete.bind(this);
   }
 
+  /**
+   * Component did mount life-sycle method
+   */
   componentDidMount() {
     new FamiFarmApiClient().findTeam(this.props.keycloak!, this.props.teamId).then((team) => {
       this.props.onTeamSelected && this.props.onTeamSelected(team);
@@ -46,6 +49,11 @@ class EditTeam extends React.Component<Props, State> {
     });
   }
 
+  /**
+   * Handle name change
+   * 
+   * @param event event
+   */
   handeNameChange(event: React.FormEvent<HTMLInputElement>) {
     const team = {
       id: this.state.team!.id,
@@ -58,10 +66,16 @@ class EditTeam extends React.Component<Props, State> {
     this.setState({team: team});
   }
 
+  /**
+   * Handle form submit
+   */
   async handleSubmit() {
     await new FamiFarmApiClient().updateTeam(this.props.keycloak!, this.state.team!);
   }
 
+  /**
+   * Handle team delete
+   */
   handleDelete() {
     const id = this.state.team!.id;
 
@@ -71,6 +85,9 @@ class EditTeam extends React.Component<Props, State> {
     });
   }
 
+  /**
+   * Render edit team view
+   */
   render() {
     if (!this.props.team) {
       return (

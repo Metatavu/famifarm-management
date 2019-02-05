@@ -22,6 +22,12 @@ import {
   SEED_BATCH_SELECTED,
   SEED_BATCH_DELETED } from '../constants/index';
 
+/**
+ * Process action 
+ * 
+ * @param state state
+ * @param action action
+ */
 export function processAction(state: StoreState, action: AppAction): StoreState {
   switch (action.type) {
     case USER_LOGIN:

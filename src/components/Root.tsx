@@ -17,6 +17,9 @@ class WelcomePage extends React.Component<Props, any> {
     };
   }
 
+  /**
+   * Component did mount life-sycle event
+   */
   componentDidMount() {
     const apiClient = new FamiFarmApiClient();
     const teams = apiClient.listTeams(this.props.keycloak!, 0, 100);
@@ -24,6 +27,11 @@ class WelcomePage extends React.Component<Props, any> {
     this.setState({teams: teams});
   }
 
+  /**
+   * Get links
+   * 
+   * @return array of link objects
+   */
   getLinks() {
     return [{
       "text": strings.teams,
@@ -46,6 +54,9 @@ class WelcomePage extends React.Component<Props, any> {
     }];
   }
 
+  /**
+   * Rendr root component view
+   */
   render() {
     const links = this.getLinks().map((link) => {
       return (

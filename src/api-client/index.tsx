@@ -16,14 +16,18 @@ import { KeycloakInstance } from "keycloak-js";
 
 export default class FamiFarmApiClient {
 
+  /**
+   * Get keycloak configuration
+   * 
+   * @param keycloak keycloack
+   */
   getConfig(keycloak: KeycloakInstance): Configuration {
     const cnf = new Configuration({
       basePath: process.env.REACT_APP_FAMIFARM_API_BASE_PATH,
       apiKey: `Bearer ${keycloak.token}`
     });
-    console.log(cnf);
-    return cnf; 
 
+    return cnf; 
   }
 
   /**

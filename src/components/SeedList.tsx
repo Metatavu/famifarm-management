@@ -30,12 +30,18 @@ class SeedsList extends React.Component<Props, State> {
     };
   }
 
+  /**
+   * Component did mount life-sycle event
+   */
   componentDidMount() {
     new FamiFarmApiClient().listSeeds(this.props.keycloak!, 0, 100).then((seeds) => {
       this.props.onSeedsFound && this.props.onSeedsFound(seeds);
     });
   }
 
+  /**
+   * Render seed list view
+   */
   render() {
     if (!this.props.seeds) {
       return (

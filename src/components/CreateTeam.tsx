@@ -37,9 +37,9 @@ class EditTeam extends React.Component<Props, State> {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  componentDidMount() {
-  }
-
+  /**
+   * Handle form submit
+   */
   handleSubmit() {
     const teamObject = {
       name: this.state.name
@@ -49,6 +49,9 @@ class EditTeam extends React.Component<Props, State> {
     });
   }
 
+  /**
+   * Handle form submit
+   */
   render() {
     if (this.state.redirect) {
       return <Redirect to="/teams" push={true} />;

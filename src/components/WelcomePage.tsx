@@ -40,6 +40,9 @@ class WelcomePage extends React.Component<Props, any> {
     };
   }
 
+  /**
+   * Component did mount life-sycle event
+   */
   componentDidMount() {
     const kcConf = {
       "realm": process.env.REACT_APP_KEYCLOAK_REALM,
@@ -54,8 +57,10 @@ class WelcomePage extends React.Component<Props, any> {
     this.setState({keycloak: keycloak});
   }
 
+  /**
+   * Render welcome page view
+   */
   render() {
-
     const navigationRoutes = [{
       "text": strings.teams,
       "route": "/teams"
