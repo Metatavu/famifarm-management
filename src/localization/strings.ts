@@ -41,6 +41,11 @@ export interface IStrings extends LocalizedStringsMethods {
   teamName: string;
   deleteTeam: string
 
+  performedCultivationAction: string;
+  performedCultivationActions: string;
+  newPerformedCultivationAction: string;
+  performedCultivationActionName: string;
+  deletePerformedCultivationAction: string;
 }
 
 const strings: IStrings = new LocalizedStrings({

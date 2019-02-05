@@ -1,6 +1,6 @@
 import * as constants from '../constants'
 import { KeycloakInstance } from 'keycloak-js';
-import { Team, Product, PackageSize, Seed, ProductionLine, SeedBatch } from 'famifarm-client';
+import { Team, Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction } from 'famifarm-client';
 
 export interface UserLogin {
   type: constants.USER_LOGIN;
@@ -132,12 +132,34 @@ export interface SeedBatchDeleted {
   seedBatchId: string;
 }
 
+export interface PerformedCultivationActionsFound {
+  type: constants.PERFORMED_CULTIVATION_ACTIONS_FOUND;
+  performedCultivationActions: PerformedCultivationAction[];
+}
+
+export interface PerformedCultivationActionSelected {
+  type: constants.PERFORMED_CULTIVATION_ACTION_SELECTED;
+  performedCultivationAction: PerformedCultivationAction;
+}
+
+export interface PerformedCultivationActionCreated {
+  type: constants.PERFORMED_CULTIVATION_ACTION_CREATED;
+  performedCultivationAction: PerformedCultivationAction;
+}
+
+export interface PerformedCultivationActionDeleted {
+  type: constants.PERFORMED_CULTIVATION_ACTION_DELETED;
+  performedCultivationActionId: string;
+}
+
 
 export type AppAction = UserLogin | UserLogout | TeamsFound | TeamSelected | TeamCreated | TeamDeleted 
   | ProductsFound | ProductSelected | ProductCreated | ProductDeleted | PackageSizesFound 
   | PackageSizeSelected | PackageSizeCreated | PackageSizeDeleted | SeedsFound | SeedCreated
   | SeedSelected | SeedDeleted | ProductionLinesFound | ProductionLineSelected | ProductionLineCreated
-  | ProductionLineDeleted | SeedBatchesFound | SeedBatchSelected | SeedBatchCreated | SeedBatchDeleted;
+  | ProductionLineDeleted | SeedBatchesFound | SeedBatchSelected | SeedBatchCreated | SeedBatchDeleted
+  | PerformedCultivationActionsFound | PerformedCultivationActionSelected | PerformedCultivationActionCreated
+  | PerformedCultivationActionDeleted;
 
 export function userLogin(keycloak: KeycloakInstance, authenticated: boolean): UserLogin {
   return {
@@ -318,5 +340,33 @@ export function seedBatchDeleted(seedBatchId: string): SeedBatchDeleted {
   return {
     type: constants.SEED_BATCH_DELETED,
     seedBatchId: seedBatchId
+  }
+}
+
+export function performedCultivationActionsFound(performedCultivationActions: PerformedCultivationAction[]): PerformedCultivationActionsFound {
+  return {
+    type: constants.PERFORMED_CULTIVATION_ACTIONS_FOUND,
+    performedCultivationActions: performedCultivationActions
+  }
+}
+
+export function performedCultivationActionSelected(performedCultivationAction: PerformedCultivationAction): PerformedCultivationActionSelected {
+  return {
+    type: constants.PERFORMED_CULTIVATION_ACTION_SELECTED,
+    performedCultivationAction: performedCultivationAction
+  }
+}
+
+export function performedCultivationActionCreated(performedCultivationAction: PerformedCultivationAction): PerformedCultivationActionCreated {
+  return {
+    type: constants.PERFORMED_CULTIVATION_ACTION_CREATED,
+    performedCultivationAction: performedCultivationAction
+  }
+}
+
+export function performedCultivationActionDeleted(performedCultivationActionId: string): PerformedCultivationActionDeleted {
+  return {
+    type: constants.PERFORMED_CULTIVATION_ACTION_DELETED,
+    performedCultivationActionId: performedCultivationActionId
   }
 }

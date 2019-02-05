@@ -20,7 +20,10 @@ import {
   PRODUCTION_LINE_SELECTED,
   SEED_BATCHES_FOUND,
   SEED_BATCH_SELECTED,
-  SEED_BATCH_DELETED } from '../constants/index';
+  SEED_BATCH_DELETED,
+  PERFORMED_CULTIVATION_ACTIONS_FOUND,
+  PERFORMED_CULTIVATION_ACTION_DELETED,
+  PERFORMED_CULTIVATION_ACTION_SELECTED } from '../constants/index';
 
 /**
  * Process action 
@@ -70,6 +73,12 @@ export function processAction(state: StoreState, action: AppAction): StoreState 
       return { ...state, seedBatch: action.seedBatch};
     case SEED_BATCH_DELETED:
       return { ...state,  seedBatches: (state.seedBatches || []).filter((seedBatch) => {return seedBatch.id !== action.seedBatchId})};
-  }
+    case PERFORMED_CULTIVATION_ACTIONS_FOUND:
+      return { ...state, performedCultivationActions: action.performedCultivationActions };
+    case PERFORMED_CULTIVATION_ACTION_SELECTED:
+      return { ...state, performedCultivationAction: action.performedCultivationAction};
+    case PERFORMED_CULTIVATION_ACTION_DELETED:
+      return { ...state,  performedCultivationActions: (state.performedCultivationActions || []).filter((performedCultivationAction) => {return performedCultivationAction.id !== action.performedCultivationActionId})};
+    }
   return state;
 }

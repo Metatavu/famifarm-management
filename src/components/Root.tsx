@@ -51,6 +51,9 @@ class WelcomePage extends React.Component<Props, any> {
     },{
       "text": strings.seedBatches,
       "link": "/seedBatches"
+    },{
+      "text": strings.performedCultivationActions,
+      "link": "/performedCultivationActions"
     }];
   }
 
