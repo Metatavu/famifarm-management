@@ -9,6 +9,7 @@ import CreateTeam from '../containers/CreateTeam';
 import CreateProduct from '../containers/CreateProduct';
 import PackageSizeList from '../containers/PackageSizeList';
 import CreatePackageSize from '../containers/CreatePackageSize';
+import strings from "src/localization/strings";
 
 import {
   Grid,
@@ -56,23 +57,23 @@ class WelcomePage extends React.Component<Props, any> {
   render() {
 
     const navigationRoutes = [{
-      text: "Tiimit",
-      route: "/teams"
-    }, {
-      text: "Tuotteet",
-      route: "/products"
-    }, {
-      text: "Pakkauskoot",
-      route: "/packageSizes"
-    }, {
-      text: "Siemenet",
-      route: "/seeds"
-    }, {
-      text: "Tuotantolinjat",
-      route: "/productionLines"
-    }, {
-      text: "Siemenerät",
-      route: "/seedBatches"
+      "text": strings.teams,
+      "route": "/teams"
+    },{
+      "text": strings.products,
+      "route": "/products"
+    },{
+      "text": strings.packageSizes,
+      "route": "/packageSizes"
+    },{
+      "text": strings.seeds,
+      "route": "/seeds"
+    },{
+      "text": strings.productionLines,
+      "route": "/productionLines"
+    },{
+      "text": strings.seedBatches,
+      "route": "/seedBatches"
     }];
 
     const sideBarNavigation = navigationRoutes.map((navigationRoute) => {

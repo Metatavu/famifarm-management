@@ -3,6 +3,7 @@ import * as Keycloak from 'keycloak-js';
 import FamiFarmApiClient from '../api-client';
 import { NavLink } from 'react-router-dom';
 import { Seed } from 'famifarm-client';
+import strings from "src/localization/strings";
 
 import {
   List,
@@ -31,7 +32,6 @@ class SeedsList extends React.Component<Props, State> {
 
   componentDidMount() {
     new FamiFarmApiClient().listSeeds(this.props.keycloak!, 0, 100).then((seeds) => {
-      console.log(seeds);
       this.props.onSeedsFound && this.props.onSeedsFound(seeds);
     });
   }
@@ -51,7 +51,7 @@ class SeedsList extends React.Component<Props, State> {
         <List.Item>
           <List.Content floated='right'>
             <NavLink to={seedPath}>
-              <Button className="submit-button">Avaa</Button>
+              <Button className="submit-button">{strings.open}</Button>
             </NavLink>
           </List.Content>
           <List.Header>{seed.name![0].value}</List.Header>
@@ -62,9 +62,9 @@ class SeedsList extends React.Component<Props, State> {
     return (
       <Grid>
         <Grid.Row className="content-page-header-row" style={{flex: 1,justifyContent: "space-between", paddingLeft: 10, paddingRight: 10}}>
-          <h2>Siemenet</h2>
+          <h2>{strings.seeds}</h2>
           <NavLink to="/createSeed">
-            <Button className="submit-button">Uusi siemen</Button>
+            <Button className="submit-button">{strings.newSeed}</Button>
           </NavLink>
         </Grid.Row>
         <Grid.Row>

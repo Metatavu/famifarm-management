@@ -3,6 +3,7 @@ import * as Keycloak from 'keycloak-js';
 import FamiFarmApiClient from '../api-client';
 import { NavLink } from 'react-router-dom';
 import { PackageSize } from 'famifarm-client';
+import strings from "src/localization/strings";
 
 import {
   List,
@@ -50,7 +51,7 @@ class PackageSizesList extends React.Component<Props, State> {
         <List.Item>
           <List.Content floated='right'>
             <NavLink to={packageSizePath}>
-              <Button className="submit-button">Avaa</Button>
+              <Button className="submit-button">{strings.open}</Button>
             </NavLink>
           </List.Content>
           <List.Header>{packageSize.name}</List.Header>
@@ -61,9 +62,9 @@ class PackageSizesList extends React.Component<Props, State> {
     return (
       <Grid>
         <Grid.Row className="content-page-header-row" style={{flex: 1,justifyContent: "space-between", paddingLeft: 10, paddingRight: 10}}>
-          <h2>Pakkauskoot</h2>
+          <h2>{strings.packageSizes}</h2>
           <NavLink to="/createPackageSize">
-            <Button className="submit-button">Uusi pakkauskoko</Button>
+            <Button className="submit-button">{strings.newPackageSize}</Button>
           </NavLink>
         </Grid.Row>
         <Grid.Row>

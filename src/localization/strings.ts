@@ -3,32 +3,44 @@ import LocalizedStrings, {
 } from 'localized-strings';
 
 export interface IStrings extends LocalizedStringsMethods {
-  menuBarUserItemText: string
-  menuBarManageAccountText: string
-  menuBarLogoutText: string
-  welcomeLoginButtonText: string
-  deleteButtonText: string
-  deleteBeerHeader: string
-  deletebeerText: string
-  deleteBeerYesText: string
-  deleteBeerNoText: string
-  addBeerText: string
-  addBeerInstructions: string
-  addBeerCancelText: string
-  addBeerOkText: string
-  addBeerPlaceholderText: string
-  editFormName: string
-  editFormDescription: string
-  editFormAbv: string
-  editFormIbu: string
-  editFormStyle: string
-  editFormBrewery: string
-  editFormFlavors: string
-  editFormEditButton: string
-  editFormExternalServiceHeader: string
-  editFormExternalServiceOkButton: string
-  editFormSubmitButton: string,
-  quessFlavorsCheckboxLabel: string
+  managementHeaderText: string;
+  save: string;
+  date: string;
+  open: string;
+
+  packageSize: string;
+  packageSizes: string;
+  newPackageSize: string;
+  packageSizeName: string;
+
+  product: string;
+  products: string;
+  newProduct: string;
+  productName: string;
+  
+  productionLine: string;
+  productionLines: string;
+  newProductionLine: string;
+  productionLineNumber: string;
+  productionLineNotNumber: string;
+
+  seed: string;
+  seeds: string;
+  newSeed: string;
+  seedName: string;
+
+  seedBatch: string;
+  seedBatches: string;
+  newSeedBatch: string;
+  seedBatchCode: string;
+  seedBatchArrived: string;
+
+  team: string;
+  teams: string;
+  newTeam: string;
+  teamName: string;
+  deleteTeam: string
+
 }
 
 const strings: IStrings = new LocalizedStrings({

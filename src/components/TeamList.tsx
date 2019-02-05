@@ -3,6 +3,7 @@ import * as Keycloak from 'keycloak-js';
 import FamiFarmApiClient from '../api-client';
 import { NavLink } from 'react-router-dom';
 import { Team } from 'famifarm-client';
+import strings from "src/localization/strings";
 
 import {
   List,
@@ -37,7 +38,6 @@ class TeamsList extends React.Component<Props, State> {
 
   render() {
     if (!this.props.teams) {
-      console.log(this.props.teams);
       return (
         <Grid style={{paddingTop: "100px"}} centered>
           <Loader active size="medium" />
@@ -51,7 +51,7 @@ class TeamsList extends React.Component<Props, State> {
         <List.Item>
           <List.Content floated='right'>
             <NavLink to={teamPath}>
-              <Button className="submit-button">Avaa</Button>
+              <Button className="submit-button">{strings.open}</Button>
             </NavLink>
           </List.Content>
           <List.Header>{team.name![0].value}</List.Header>
@@ -62,9 +62,9 @@ class TeamsList extends React.Component<Props, State> {
     return (
       <Grid>
         <Grid.Row className="content-page-header-row" style={{flex: 1,justifyContent: "space-between", paddingLeft: 10, paddingRight: 10}}>
-          <h2>Tiimit</h2>
+          <h2>{strings.teams}</h2>
           <NavLink to="/createTeam">
-            <Button className="submit-button">Uusi tiimi</Button>
+            <Button className="submit-button">{strings.newTeam}</Button>
           </NavLink>
         </Grid.Row>
         <Grid.Row>
