@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import FamiFarmApiClient from '../api-client';
-import { PerformedCultivationAction, LocalizedValue } from 'famifarm-client';
+import Api from "../api";
+import { PerformedCultivationAction, LocalizedValue } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -40,11 +40,17 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  handleSubmit() {
+  async handleSubmit() {
+    if (!this.props.keycloak) {
+      return
+    }
+
     const performedCultivationActionObject = {
       name: this.state.name
     };
-    new FamiFarmApiClient().createPerformedCultivationAction(this.props.keycloak!, performedCultivationActionObject).then(() => {
+
+    const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
+    performedCultivationActionService.createPerformedCultivationAction(performedCultivationActionObject).then(() => {
       this.setState({redirect: true});
     });
   }

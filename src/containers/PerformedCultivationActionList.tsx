@@ -3,7 +3,7 @@ import * as actions from "../actions";
 import { StoreState } from "../types/index";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import { PerformedCultivationAction } from 'famifarm-client';
+import { PerformedCultivationAction } from "famifarm-typescript-models";
 
 /**
  * Redux mapper for mapping store state to component props

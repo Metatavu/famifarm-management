@@ -46,6 +46,31 @@ export interface IStrings extends LocalizedStringsMethods {
   newPerformedCultivationAction: string;
   performedCultivationActionName: string;
   deletePerformedCultivationAction: string;
+
+  batches: string
+
+  sowingEventHeader: string
+  sowingEventText: string
+
+  tablespreadEventHeader: string
+  tablespreadEventText: string
+
+  plantingEventHeader: string
+  plantingEventText: string
+
+  observationsEventHeader: string
+  observationsEventText: string
+
+  harvestEventHeader: string
+  harvestEventText: string
+
+  packingEventHeader: string
+  packingEventText: string
+
+  wastageEventHeader: string
+  wastageEventText: string
+
+  unknownEventHeader: string
 }
 
 const strings: IStrings = new LocalizedStrings({

@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import FamiFarmApiClient from '../api-client';
-import { Product, LocalizedValue, PackageSize } from 'famifarm-client';
+import Api from "../api";
+import { Product, LocalizedValue, PackageSize } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "../localization/strings";
 
@@ -45,8 +45,13 @@ class CreateProduct extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle method
    */
-  componentDidMount() {
-    new FamiFarmApiClient().listPackageSizes(this.props.keycloak!, 0, 100).then((packageSizes) => {
+  async componentDidMount() {
+    if (!this.props.keycloak) {
+      return;
+    }
+
+    const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
+    packageSizeService.listPackageSizes().then((packageSizes) => {
       this.props.onPackageSizesFound && this.props.onPackageSizesFound(packageSizes);
     });
   }
@@ -54,12 +59,18 @@ class CreateProduct extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  handleSubmit() {
+  async handleSubmit() {
+    if (!this.props.keycloak) {
+      return;
+    }
+
     const productObject = {
       name: this.state.name,
       defaultPackageSize: this.state.defaultPackageSize
     };
-    new FamiFarmApiClient().createProduct(this.props.keycloak!, productObject).then(() => {
+
+    const productsService = await Api.getProductsService(this.props.keycloak);
+    productsService.createProduct(productObject).then(() => {
       this.setState({redirect: true});
     });
   }
