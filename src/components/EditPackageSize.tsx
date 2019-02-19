@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import FamiFarmApiClient from '../api-client';
-import { Team } from 'famifarm-client';
+import { PackageSize } from 'famifarm-client';
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -16,27 +16,27 @@ import {
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  teamId: string;
-  team?: Team;
-  onTeamSelected?: (team: Team) => void;
-  onTeamDeleted?: (teamId: string) => void;
+  packageSizeId: string;
+  packageSize?: PackageSize;
+  onPackageSizeSelected?: (packageSize: PackageSize) => void;
+  onPackageSizeDeleted?: (packageSizeId: string) => void;
 }
 
 export interface State {
-  team?: Team;
+  packageSize?: PackageSize;
   redirect: boolean;
   saving: boolean;
   messageVisible: boolean;
 }
 
-class EditTeam extends React.Component<Props, State> {
+class EditPackageSize extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-        team: undefined,
-        redirect: false,
-        saving: false,
-        messageVisible: false
+      packageSize: undefined,
+      redirect: false,
+      saving: false,
+      messageVisible: false
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -48,9 +48,9 @@ class EditTeam extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   componentDidMount() {
-    new FamiFarmApiClient().findTeam(this.props.keycloak!, this.props.teamId).then((team) => {
-      this.props.onTeamSelected && this.props.onTeamSelected(team);
-      this.setState({team: team});
+    new FamiFarmApiClient().findPackageSize(this.props.keycloak!, this.props.packageSizeId).then((packageSize) => {
+      this.props.onPackageSizeSelected && this.props.onPackageSizeSelected(packageSize);
+      this.setState({packageSize: packageSize});
     });
   }
 
@@ -60,15 +60,12 @@ class EditTeam extends React.Component<Props, State> {
    * @param event event
    */
   handeNameChange(event: React.FormEvent<HTMLInputElement>) {
-    const team = {
-      id: this.state.team!.id,
-      name: [{
-        language: "fi",
-        value: event.currentTarget.value
-      }]
+    const packageSize = {
+      id: this.state.packageSize!.id,
+      name: event.currentTarget.value
     };
 
-    this.setState({team: team});
+    this.setState({packageSize: packageSize});
   }
 
   /**
@@ -76,7 +73,7 @@ class EditTeam extends React.Component<Props, State> {
    */
   async handleSubmit() {
     this.setState({saving: true});
-    await new FamiFarmApiClient().updateTeam(this.props.keycloak!, this.state.team!);
+    await new FamiFarmApiClient().updatePackageSize(this.props.keycloak!, this.state.packageSize!);
     this.setState({saving: false});
 
     this.setState({messageVisible: true});
@@ -86,22 +83,22 @@ class EditTeam extends React.Component<Props, State> {
   }
 
   /**
-   * Handle team delete
+   * Handle packageSize delete
    */
   handleDelete() {
-    const id = this.state.team!.id;
+    const id = this.state.packageSize!.id;
 
-    new FamiFarmApiClient().deleteTeam(this.props.keycloak!, id!).then(() => {
-      this.props.onTeamDeleted && this.props.onTeamDeleted(id!);
+    new FamiFarmApiClient().deletePackageSize(this.props.keycloak!, id!).then(() => {
+      this.props.onPackageSizeDeleted && this.props.onPackageSizeDeleted(id!);
       this.setState({redirect: true});
     });
   }
 
   /**
-   * Render edit team view
+   * Render edit packageSize view
    */
   render() {
-    if (!this.props.team) {
+    if (!this.props.packageSize) {
       return (
         <Grid style={{paddingTop: "100px"}} centered className="pieru">
           <Loader active size="medium" />
@@ -110,14 +107,14 @@ class EditTeam extends React.Component<Props, State> {
     }
 
     if (this.state.redirect) {
-      return <Redirect to="/teams" push={true} />;
+      return <Redirect to="/packageSizes" push={true} />;
     }
 
     return (
       <Grid>
         <Grid.Row className="content-page-header-row">
           <Grid.Column width={6}>
-            <h2>{this.props.team!.name![0].value}</h2>
+            <h2>{this.props.packageSize!.name}</h2>
           </Grid.Column>
           <Grid.Column width={3} floated="right">
             <Button className="danger-button" onClick={this.handleDelete}>{strings.delete}</Button>
@@ -127,10 +124,10 @@ class EditTeam extends React.Component<Props, State> {
           <Grid.Column width={8}>
           <Form>
           <Form.Field required>
-            <label>{strings.teamName}</label>
+            <label>{strings.packageSizeName}</label>
             <Input 
-              value={this.state.team && this.state.team!.name![0].value} 
-              placeholder={strings.teamName}
+              value={this.state.packageSize && this.state.packageSize!.name} 
+              placeholder={strings.packageSizeName}
               onChange={this.handeNameChange}
             />
           </Form.Field>
@@ -155,4 +152,4 @@ class EditTeam extends React.Component<Props, State> {
   }
 }
 
-export default EditTeam;
+export default EditPackageSize;

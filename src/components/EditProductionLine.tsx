@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import FamiFarmApiClient from '../api-client';
-import { Team } from 'famifarm-client';
+import { ProductionLine } from 'famifarm-client';
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -16,31 +16,31 @@ import {
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  teamId: string;
-  team?: Team;
-  onTeamSelected?: (team: Team) => void;
-  onTeamDeleted?: (teamId: string) => void;
+  productionLineId: string;
+  productionLine?: ProductionLine;
+  onProductionLineSelected?: (productionLine: ProductionLine) => void;
+  onProductionLineDeleted?: (productionLineId: string) => void;
 }
 
 export interface State {
-  team?: Team;
+  productionLine?: ProductionLine;
   redirect: boolean;
   saving: boolean;
   messageVisible: boolean;
 }
 
-class EditTeam extends React.Component<Props, State> {
+class EditProductionLine extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-        team: undefined,
+        productionLine: undefined,
         redirect: false,
         saving: false,
         messageVisible: false
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handeNameChange = this.handeNameChange.bind(this);
+    this.handeLineNumberChange = this.handeLineNumberChange.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
   }
 
@@ -48,27 +48,31 @@ class EditTeam extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   componentDidMount() {
-    new FamiFarmApiClient().findTeam(this.props.keycloak!, this.props.teamId).then((team) => {
-      this.props.onTeamSelected && this.props.onTeamSelected(team);
-      this.setState({team: team});
+    new FamiFarmApiClient().findProductionLine(this.props.keycloak!, this.props.productionLineId).then((productionLine) => {
+      this.props.onProductionLineSelected && this.props.onProductionLineSelected(productionLine);
+      this.setState({productionLine: productionLine});
     });
   }
 
   /**
-   * Handle name change
+   * Handle line number change
    * 
    * @param event event
    */
-  handeNameChange(event: React.FormEvent<HTMLInputElement>) {
-    const team = {
-      id: this.state.team!.id,
-      name: [{
-        language: "fi",
-        value: event.currentTarget.value
-      }]
+  handeLineNumberChange(event: React.FormEvent<HTMLInputElement>) {
+    const lineNumber = parseInt(event.currentTarget.value);
+
+    if (isNaN(lineNumber)) {
+      alert(strings.productionLineNotNumber);
+      return;
+    }
+
+    const productionLine = {
+      id: this.state.productionLine!.id,
+      lineNumber: lineNumber
     };
 
-    this.setState({team: team});
+    this.setState({productionLine: productionLine});
   }
 
   /**
@@ -76,7 +80,7 @@ class EditTeam extends React.Component<Props, State> {
    */
   async handleSubmit() {
     this.setState({saving: true});
-    await new FamiFarmApiClient().updateTeam(this.props.keycloak!, this.state.team!);
+    await new FamiFarmApiClient().updateProductionLine(this.props.keycloak!, this.state.productionLine!);
     this.setState({saving: false});
 
     this.setState({messageVisible: true});
@@ -86,22 +90,22 @@ class EditTeam extends React.Component<Props, State> {
   }
 
   /**
-   * Handle team delete
+   * Handle productionLine delete
    */
   handleDelete() {
-    const id = this.state.team!.id;
+    const id = this.state.productionLine!.id;
 
-    new FamiFarmApiClient().deleteTeam(this.props.keycloak!, id!).then(() => {
-      this.props.onTeamDeleted && this.props.onTeamDeleted(id!);
+    new FamiFarmApiClient().deleteProductionLine(this.props.keycloak!, id!).then(() => {
+      this.props.onProductionLineDeleted && this.props.onProductionLineDeleted(id!);
       this.setState({redirect: true});
     });
   }
 
   /**
-   * Render edit team view
+   * Render edit productionLine view
    */
   render() {
-    if (!this.props.team) {
+    if (!this.props.productionLine) {
       return (
         <Grid style={{paddingTop: "100px"}} centered className="pieru">
           <Loader active size="medium" />
@@ -110,14 +114,14 @@ class EditTeam extends React.Component<Props, State> {
     }
 
     if (this.state.redirect) {
-      return <Redirect to="/teams" push={true} />;
+      return <Redirect to="/productionLines" push={true} />;
     }
 
     return (
       <Grid>
         <Grid.Row className="content-page-header-row">
           <Grid.Column width={6}>
-            <h2>{this.props.team!.name![0].value}</h2>
+            <h2>{this.props.productionLine!.lineNumber}</h2>
           </Grid.Column>
           <Grid.Column width={3} floated="right">
             <Button className="danger-button" onClick={this.handleDelete}>{strings.delete}</Button>
@@ -127,11 +131,11 @@ class EditTeam extends React.Component<Props, State> {
           <Grid.Column width={8}>
           <Form>
           <Form.Field required>
-            <label>{strings.teamName}</label>
+            <label>{strings.productionLineNumber}</label>
             <Input 
-              value={this.state.team && this.state.team!.name![0].value} 
-              placeholder={strings.teamName}
-              onChange={this.handeNameChange}
+              value={this.state.productionLine && this.state.productionLine!.lineNumber} 
+              placeholder={strings.productionLineNumber}
+              onChange={this.handeLineNumberChange}
             />
           </Form.Field>
             <Message
@@ -155,4 +159,4 @@ class EditTeam extends React.Component<Props, State> {
   }
 }
 
-export default EditTeam;
+export default EditProductionLine;

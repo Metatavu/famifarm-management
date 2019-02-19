@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import FamiFarmApiClient from '../api-client';
-import { Team } from 'famifarm-client';
+import { Seed } from 'famifarm-client';
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -16,24 +16,24 @@ import {
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  teamId: string;
-  team?: Team;
-  onTeamSelected?: (team: Team) => void;
-  onTeamDeleted?: (teamId: string) => void;
+  seedId: string;
+  seed?: Seed;
+  onSeedSelected?: (seed: Seed) => void;
+  onSeedDeleted?: (seedId: string) => void;
 }
 
 export interface State {
-  team?: Team;
+  seed?: Seed;
   redirect: boolean;
   saving: boolean;
   messageVisible: boolean;
 }
 
-class EditTeam extends React.Component<Props, State> {
+class EditSeed extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-        team: undefined,
+        seed: undefined,
         redirect: false,
         saving: false,
         messageVisible: false
@@ -48,9 +48,9 @@ class EditTeam extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   componentDidMount() {
-    new FamiFarmApiClient().findTeam(this.props.keycloak!, this.props.teamId).then((team) => {
-      this.props.onTeamSelected && this.props.onTeamSelected(team);
-      this.setState({team: team});
+    new FamiFarmApiClient().findSeed(this.props.keycloak!, this.props.seedId).then((seed) => {
+      this.props.onSeedSelected && this.props.onSeedSelected(seed);
+      this.setState({seed: seed});
     });
   }
 
@@ -60,15 +60,15 @@ class EditTeam extends React.Component<Props, State> {
    * @param event event
    */
   handeNameChange(event: React.FormEvent<HTMLInputElement>) {
-    const team = {
-      id: this.state.team!.id,
+    const seed = {
+      id: this.state.seed!.id,
       name: [{
         language: "fi",
         value: event.currentTarget.value
       }]
     };
 
-    this.setState({team: team});
+    this.setState({seed: seed});
   }
 
   /**
@@ -76,7 +76,7 @@ class EditTeam extends React.Component<Props, State> {
    */
   async handleSubmit() {
     this.setState({saving: true});
-    await new FamiFarmApiClient().updateTeam(this.props.keycloak!, this.state.team!);
+    await new FamiFarmApiClient().updateSeed(this.props.keycloak!, this.state.seed!);
     this.setState({saving: false});
 
     this.setState({messageVisible: true});
@@ -86,22 +86,22 @@ class EditTeam extends React.Component<Props, State> {
   }
 
   /**
-   * Handle team delete
+   * Handle seed delete
    */
   handleDelete() {
-    const id = this.state.team!.id;
+    const id = this.state.seed!.id;
 
-    new FamiFarmApiClient().deleteTeam(this.props.keycloak!, id!).then(() => {
-      this.props.onTeamDeleted && this.props.onTeamDeleted(id!);
+    new FamiFarmApiClient().deleteSeed(this.props.keycloak!, id!).then(() => {
+      this.props.onSeedDeleted && this.props.onSeedDeleted(id!);
       this.setState({redirect: true});
     });
   }
 
   /**
-   * Render edit team view
+   * Render edit seed view
    */
   render() {
-    if (!this.props.team) {
+    if (!this.props.seed) {
       return (
         <Grid style={{paddingTop: "100px"}} centered className="pieru">
           <Loader active size="medium" />
@@ -110,14 +110,14 @@ class EditTeam extends React.Component<Props, State> {
     }
 
     if (this.state.redirect) {
-      return <Redirect to="/teams" push={true} />;
+      return <Redirect to="/seeds" push={true} />;
     }
 
     return (
       <Grid>
         <Grid.Row className="content-page-header-row">
           <Grid.Column width={6}>
-            <h2>{this.props.team!.name![0].value}</h2>
+            <h2>{this.props.seed!.name![0].value}</h2>
           </Grid.Column>
           <Grid.Column width={3} floated="right">
             <Button className="danger-button" onClick={this.handleDelete}>{strings.delete}</Button>
@@ -127,10 +127,10 @@ class EditTeam extends React.Component<Props, State> {
           <Grid.Column width={8}>
           <Form>
           <Form.Field required>
-            <label>{strings.teamName}</label>
+            <label>{strings.seedName}</label>
             <Input 
-              value={this.state.team && this.state.team!.name![0].value} 
-              placeholder={strings.teamName}
+              value={this.state.seed && this.state.seed!.name![0].value} 
+              placeholder={strings.seedName}
               onChange={this.handeNameChange}
             />
           </Form.Field>
@@ -155,4 +155,4 @@ class EditTeam extends React.Component<Props, State> {
   }
 }
 
-export default EditTeam;
+export default EditSeed;

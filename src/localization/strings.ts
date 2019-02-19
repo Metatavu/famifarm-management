@@ -7,6 +7,8 @@ export interface IStrings extends LocalizedStringsMethods {
   save: string;
   date: string;
   open: string;
+  savedSuccessfully: string;
+  delete: string;
 
   packageSize: string;
   packageSizes: string;

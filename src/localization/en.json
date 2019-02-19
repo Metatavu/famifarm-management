@@ -3,6 +3,8 @@
   "save": "Save",
   "date": "Date",
   "open": "Open",
+  "savedSuccessfully": "Saved successfully!",
+  "delete": "Delete",
   "packageSize": "Package size",
   "packageSizes": "Package sizes",
   "newPackageSize": "New package size",
