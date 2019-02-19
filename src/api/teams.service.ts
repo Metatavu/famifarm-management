@@ -83,7 +83,7 @@ export class TeamsService {
   */
   public listTeams(firstResult?: number, maxResults?: number, ):Promise<Array<Team>> {
     const url = new URL(`${this.basePath}/v1/teams`);
-    const queryParameters = new URLSearchParams();
+    let queryParameters = new URLSearchParams();
     if (firstResult !== undefined && firstResult !== null) {
         queryParameters.set('firstResult', <any>firstResult);
     }

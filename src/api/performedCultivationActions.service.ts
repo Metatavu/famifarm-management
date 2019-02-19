@@ -83,7 +83,7 @@ export class PerformedCultivationActionsService {
   */
   public listPerformedCultivationActions(firstResult?: number, maxResults?: number, ):Promise<Array<PerformedCultivationAction>> {
     const url = new URL(`${this.basePath}/v1/performedCultivationActions`);
-    const queryParameters = new URLSearchParams();
+    let queryParameters = new URLSearchParams();
     if (firstResult !== undefined && firstResult !== null) {
         queryParameters.set('firstResult', <any>firstResult);
     }

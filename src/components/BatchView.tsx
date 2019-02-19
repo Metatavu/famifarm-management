@@ -21,16 +21,26 @@ import {
 import * as moment from "moment";
 import strings from "src/localization/strings";
 
-export interface Props {
+/**
+ * Interface representing component properties
+ */
+interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   batchId: string;
 }
 
-export interface State {
+
+/**
+ * Interface representing component state
+ */
+interface State {
   batchEvents: Event[]
   loading: boolean
 }
 
+/**
+ * React component displaying events of single batch
+ */
 class BatchView extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
@@ -156,7 +166,7 @@ class BatchView extends React.Component<Props, State> {
   /**
    * Render edit batch view
    */
-  render() {
+  public render() {
     if (this.state.loading) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>

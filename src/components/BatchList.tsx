@@ -14,7 +14,11 @@ import {
 } from "semantic-ui-react";
 import LocalizedUtils from "src/localization/localizedutils";
 
-export interface Props {
+
+/**
+ * Interface representing component properties
+ */
+interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   batches?: Batch[];
   products?: Product[];
@@ -22,10 +26,16 @@ export interface Props {
   onProductsFound?: (products: Product[]) => void;
 }
 
-export interface State {
+/**
+ * Interface representing component state
+ */
+interface State {
   batches: Batch[];
 }
 
+/**
+ * React component for displaying list of batches
+ */
 class BatchList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
@@ -67,7 +77,7 @@ class BatchList extends React.Component<Props, State> {
   /**
    * Render batch list view
    */
-  render() {
+  public render() {
     if (!this.props.batches) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>

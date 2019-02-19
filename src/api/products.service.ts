@@ -83,7 +83,7 @@ export class ProductsService {
   */
   public listProducts(firstResult?: number, maxResults?: number, ):Promise<Array<Product>> {
     const url = new URL(`${this.basePath}/v1/products`);
-    const queryParameters = new URLSearchParams();
+    let queryParameters = new URLSearchParams();
     if (firstResult !== undefined && firstResult !== null) {
         queryParameters.set('firstResult', <any>firstResult);
     }

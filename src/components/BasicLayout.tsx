@@ -5,14 +5,23 @@ import './styles.css';
 import { Menu, Container, Icon, Sidebar } from "semantic-ui-react";
 import strings from "../localization/strings";
 
+/**
+ * Interface representing component properties
+ */
 interface Props {
   sidebarItems: JSX.Element[]
 }
 
+/**
+ * Interface representing component state
+ */
 interface State {
   sidebarOpen: boolean
 }
 
+/**
+ * React component for basic application layout
+ */
 class BasicLayout extends React.Component<Props, State> {
 
   constructor(props: Props) {

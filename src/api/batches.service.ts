@@ -78,17 +78,29 @@ export class BatchesService {
   /**
    * 
    * @summary List all batches
+   * @param status Filters list by derived batch status.
    * @param firstResult Where to start listing
    * @param maxResult How many items to return at one time
+   * @param createdBefore Created before time
+   * @param createdAfter Created after time
   */
-  public listBatches(firstResult?: number, maxResult?: number, ):Promise<Array<Batch>> {
+  public listBatches(status?: string, firstResult?: number, maxResult?: number, createdBefore?: string, createdAfter?: string, ):Promise<Array<Batch>> {
     const url = new URL(`${this.basePath}/v1/batches`);
-    const queryParameters = new URLSearchParams();
+    let queryParameters = new URLSearchParams();
+    if (status !== undefined && status !== null) {
+        queryParameters.set('status', <any>status);
+    }
     if (firstResult !== undefined && firstResult !== null) {
         queryParameters.set('firstResult', <any>firstResult);
     }
     if (maxResult !== undefined && maxResult !== null) {
         queryParameters.set('maxResult', <any>maxResult);
+    }
+    if (createdBefore !== undefined && createdBefore !== null) {
+        queryParameters.set('createdBefore', <any>createdBefore);
+    }
+    if (createdAfter !== undefined && createdAfter !== null) {
+        queryParameters.set('createdAfter', <any>createdAfter);
     }
     url.search = queryParameters.toString();
     const options = {

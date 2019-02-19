@@ -84,7 +84,7 @@ export class EventsService {
   */
   public listEvents(firstResult?: number, maxResults?: number, batchId?: string, ):Promise<Array<Event>> {
     const url = new URL(`${this.basePath}/v1/events`);
-    const queryParameters = new URLSearchParams();
+    let queryParameters = new URLSearchParams();
     if (firstResult !== undefined && firstResult !== null) {
         queryParameters.set('firstResult', <any>firstResult);
     }

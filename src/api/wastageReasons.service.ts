@@ -83,7 +83,7 @@ export class WastageReasonsService {
   */
   public listWastageReasons(firstResult?: number, maxResults?: number, ):Promise<Array<WastageReason>> {
     const url = new URL(`${this.basePath}/v1/wastageReasons`);
-    const queryParameters = new URLSearchParams();
+    let queryParameters = new URLSearchParams();
     if (firstResult !== undefined && firstResult !== null) {
         queryParameters.set('firstResult', <any>firstResult);
     }

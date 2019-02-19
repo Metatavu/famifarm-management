@@ -83,7 +83,7 @@ export class PackageSizesService {
   */
   public listPackageSizes(firstResult?: number, maxResults?: number, ):Promise<Array<PackageSize>> {
     const url = new URL(`${this.basePath}/v1/packageSizes`);
-    const queryParameters = new URLSearchParams();
+    let queryParameters = new URLSearchParams();
     if (firstResult !== undefined && firstResult !== null) {
         queryParameters.set('firstResult', <any>firstResult);
     }

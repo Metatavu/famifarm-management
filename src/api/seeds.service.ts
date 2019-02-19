@@ -83,7 +83,7 @@ export class SeedsService {
   */
   public listSeeds(firstResult?: number, maxResults?: number, ):Promise<Array<Seed>> {
     const url = new URL(`${this.basePath}/v1/seeds`);
-    const queryParameters = new URLSearchParams();
+    let queryParameters = new URLSearchParams();
     if (firstResult !== undefined && firstResult !== null) {
         queryParameters.set('firstResult', <any>firstResult);
     }

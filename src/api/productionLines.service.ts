@@ -83,7 +83,7 @@ export class ProductionLinesService {
   */
   public listProductionLines(firstResult?: number, maxResults?: number, ):Promise<Array<ProductionLine>> {
     const url = new URL(`${this.basePath}/v1/productionLines`);
-    const queryParameters = new URLSearchParams();
+    let queryParameters = new URLSearchParams();
     if (firstResult !== undefined && firstResult !== null) {
         queryParameters.set('firstResult', <any>firstResult);
     }
