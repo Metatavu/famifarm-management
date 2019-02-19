@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import FamiFarmApiClient from '../api-client';
-import { SeedBatch, Seed } from 'famifarm-client';
+import Api from "../api";
+import { SeedBatch, Seed } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import { DateInput } from 'semantic-ui-calendar-react';
 import strings from "src/localization/strings";
@@ -45,8 +45,13 @@ class CreateSeedBatch extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle method
    */
-  componentDidMount() {
-    new FamiFarmApiClient().listSeeds(this.props.keycloak!, 0, 100).then((seeds) => {
+  async componentDidMount() {
+    if (!this.props.keycloak) {
+      return;
+    }
+
+    const seedsService = await Api.getSeedsService(this.props.keycloak);
+    seedsService.listSeeds().then((seeds) => {
       this.props.onSeedsFound && this.props.onSeedsFound(seeds);
     });
   }
@@ -74,13 +79,19 @@ class CreateSeedBatch extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  handleSubmit() {
+  async handleSubmit() {
+    if (!this.props.keycloak) {
+      return;
+    }
+
     const seedBatchObject = {
       code: this.state.code,
       seedId: this.state.seedId,
       time: this.state.time
     };
-    new FamiFarmApiClient().createSeedBatch(this.props.keycloak!, seedBatchObject).then(() => {
+
+    const seedBatchService = await Api.getSeedBatchesService(this.props.keycloak);
+    seedBatchService.createSeedBatch(seedBatchObject).then(() => {
       this.setState({redirect: true});
     });
   }

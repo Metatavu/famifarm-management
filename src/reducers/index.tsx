@@ -23,7 +23,8 @@ import {
   SEED_BATCH_DELETED,
   PERFORMED_CULTIVATION_ACTIONS_FOUND,
   PERFORMED_CULTIVATION_ACTION_DELETED,
-  PERFORMED_CULTIVATION_ACTION_SELECTED } from '../constants/index';
+  PERFORMED_CULTIVATION_ACTION_SELECTED, 
+  BATCHES_FOUND} from '../constants/index';
 
 /**
  * Process action 
@@ -45,6 +46,8 @@ export function processAction(state: StoreState, action: AppAction): StoreState 
       return { ...state,  teams: (state.teams || []).filter((team) => {return team.id !== action.teamId})};
     case PRODUCTS_FOUND:
       return { ...state, products: action.products };
+    case BATCHES_FOUND:
+      return { ...state, batches: action.batches };
     case PRODUCT_SELECTED:
       return { ...state, product: action.product};
     case PRODUCT_DELETED:

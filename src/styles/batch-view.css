@@ -1,0 +1,6 @@
+@media only screen and (min-width:1170px) {
+  .vertical-timeline-element-date {
+    padding-left: 60px !important;
+    padding-right: 60px !important;
+  }
+}

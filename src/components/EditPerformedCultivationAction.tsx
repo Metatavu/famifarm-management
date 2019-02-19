@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import FamiFarmApiClient from '../api-client';
-import { PerformedCultivationAction } from 'famifarm-client';
+import Api from "../api";
+import { PerformedCultivationAction } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -42,8 +42,13 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle method
    */
-  componentDidMount() {
-    new FamiFarmApiClient().findPerformedCultivationAction(this.props.keycloak!, this.props.performedCultivationActionId).then((performedCultivationAction) => {
+  async componentDidMount() {
+    if (!this.props.keycloak) {
+      return;
+    }
+    
+    const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
+    performedCultivationActionService.findPerformedCultivationAction(this.props.performedCultivationActionId).then((performedCultivationAction) => {
       this.props.onPerformedCultivationActionSelected && this.props.onPerformedCultivationActionSelected(performedCultivationAction);
       this.setState({performedCultivationAction: performedCultivationAction});
     });
@@ -70,16 +75,25 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
    * Handle form submit
    */
   async handleSubmit() {
-    await new FamiFarmApiClient().updatePerformedCultivationAction(this.props.keycloak!, this.state.performedCultivationAction!);
+    if (!this.props.keycloak || !this.state.performedCultivationAction) {
+      return;
+    }
+
+    const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
+    performedCultivationActionService.updatePerformedCultivationAction(this.state.performedCultivationAction, this.state.performedCultivationAction.id!);
   }
 
   /**
    * Handle performedCultivationAction delete
    */
-  handleDelete() {
-    const id = this.state.performedCultivationAction!.id;
+  async handleDelete() {
+    if (!this.props.keycloak) {
+      return;
+    }
 
-    new FamiFarmApiClient().deletePerformedCultivationAction(this.props.keycloak!, id!).then(() => {
+    const id = this.state.performedCultivationAction!.id;
+    const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
+    performedCultivationActionService.deletePerformedCultivationAction(id!).then(() => {
       this.props.onPerformedCultivationActionDeleted && this.props.onPerformedCultivationActionDeleted(id!);
       this.setState({redirect: true});
     });

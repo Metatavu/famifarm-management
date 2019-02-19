@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import FamiFarmApiClient from '../api-client';
-import { Seed, LocalizedValue } from 'famifarm-client';
+import Api from "../api";
+import { Seed, LocalizedValue } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -40,11 +40,17 @@ class CreateSeed extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  handleSubmit() {
+  async handleSubmit() {
+    if (!this.props.keycloak) {
+      return;
+    }
+
     const seedObject = {
       name: this.state.name
     };
-    new FamiFarmApiClient().createSeed(this.props.keycloak!, seedObject).then(() => {
+
+    const seedService = await Api.getSeedsService(this.props.keycloak);
+    seedService.createSeed(seedObject).then(() => {
       this.setState({redirect: true});
     });
   }

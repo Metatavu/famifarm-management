@@ -1,8 +1,8 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import FamiFarmApiClient from '../api-client';
+import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { SeedBatch } from 'famifarm-client';
+import { SeedBatch } from "famifarm-typescript-models";
 import strings from "src/localization/strings";
 
 import {
@@ -33,8 +33,13 @@ class SeedBatchsList extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle event
    */
-  componentDidMount() {
-    new FamiFarmApiClient().listSeedBatches(this.props.keycloak!, 0, 100).then((seedBatches) => {
+  async componentDidMount() {
+    if (!this.props.keycloak) {
+      return;
+    }
+
+    const seedBatchService = await Api.getSeedBatchesService(this.props.keycloak);
+    seedBatchService.listSeedBatches().then((seedBatches) => {
       this.props.onSeedBatchesFound && this.props.onSeedBatchesFound(seedBatches);
     });
   }

@@ -1,8 +1,8 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import FamiFarmApiClient from '../api-client';
+import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { ProductionLine } from 'famifarm-client';
+import { ProductionLine } from "famifarm-typescript-models";
 import strings from "src/localization/strings";
 
 import {
@@ -33,9 +33,13 @@ class ProductionLinesList extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle event
    */
-  componentDidMount() {
-    new FamiFarmApiClient().listProductionLines(this.props.keycloak!, 0, 100).then((productionLines) => {
-      console.log(productionLines);
+  async componentDidMount() {
+    if (!this.props.keycloak) {
+      return;
+    }
+
+    const productionLinesService = await Api.getProductionLinesService(this.props.keycloak);
+    productionLinesService.listProductionLines().then((productionLines) => {
       this.props.onProductionLinesFound && this.props.onProductionLinesFound(productionLines);
     });
   }

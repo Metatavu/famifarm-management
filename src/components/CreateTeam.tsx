@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import FamiFarmApiClient from '../api-client';
-import { Team, LocalizedValue } from 'famifarm-client';
+import Api from "../api";
+import { Team, LocalizedValue } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -40,11 +40,17 @@ class EditTeam extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  handleSubmit() {
+  async handleSubmit() {
+    if (!this.props.keycloak) {
+      return;
+    }
+
     const teamObject = {
       name: this.state.name
     };
-    new FamiFarmApiClient().createTeam(this.props.keycloak!, teamObject).then(() => {
+
+    const teamsService = await Api.getTeamsService(this.props.keycloak);
+    teamsService.createTeam(teamObject).then(() => {
       this.setState({redirect: true});
     });
   }

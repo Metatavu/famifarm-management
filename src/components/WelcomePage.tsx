@@ -14,8 +14,7 @@ import strings from "src/localization/strings";
 import {
   Grid,
   Loader,
-  List,
-  Container
+  Menu,
 } from "semantic-ui-react";
 
 import BasicLayout from "./BasicLayout";
@@ -28,6 +27,8 @@ import CreateSeedBatch from "src/containers/CreateSeedBatch";
 import PerformedCultivationActionList from "src/containers/PerformedCultivationActionList";
 import CreatePerformedCultivationAction from "src/containers/CreatePerformedCultivationAction";
 import EditPerformedCultivationAction from "src/containers/EditPerformedCultivationAction";
+import BatchList from "src/containers/BatchList";
+import BatchView from "./BatchView";
 
 export interface Props {
   authenticated: boolean,
@@ -65,6 +66,9 @@ class WelcomePage extends React.Component<Props, any> {
    */
   render() {
     const navigationRoutes = [{
+      "text": strings.batches,
+      "route": "/batches"
+    },{
       "text": strings.teams,
       "route": "/teams"
     },{
@@ -87,195 +91,202 @@ class WelcomePage extends React.Component<Props, any> {
       "route": "/performedCultivationActions"
     }];
 
-    const sideBarNavigation = navigationRoutes.map((navigationRoute) => {
+    const sideBarNavigation = navigationRoutes.map((navigationRoute, index) => {
       return (
-        <NavLink to={navigationRoute.route}>
-           <List.Item>
-            <List.Content>
-              <List.Header>
-                <Container textAlign='center'>
-                  <h3>{navigationRoute.text}</h3>
-                </Container>
-              </List.Header>
-            </List.Content>
-          </List.Item>
-        </NavLink>
+        <Menu.Item
+          key={index} 
+          to={navigationRoute.route} 
+          as={NavLink}>
+          {navigationRoute.text}
+        </Menu.Item>
       );
     });
 
     const appContent = (
-      <BasicLayout>
+      <BasicLayout sidebarItems={sideBarNavigation}>
         { !this.props.authenticated ? (
-        <div>
-          <Grid centered>
-            <Loader active size="medium" />
-          </Grid>
-        </div>
+          <div>
+            <Grid centered>
+              <Loader active size="medium" />
+            </Grid>
+          </div>
         ) : (
-          <Grid.Row>
-            <Grid.Column width={4} className="side-navigation-bar">
-            <List>
-              {sideBarNavigation}
-            </List>
-            </Grid.Column>
-            <Grid.Column width={12}>
+          <div>
             <Route
                 path="/"
                 exact={true}
                 render={props => (
-                    <Root
-                      keycloak={this.state.keycloak}
-                    />
+                  <Root
+                    keycloak={this.state.keycloak}
+                  />
                 )}
               />
               <Route
                 path="/teams"
                 exact={true}
                 render={props => (
-                    <TeamList
-                      keycloak={this.state.keycloak}
-                    />
+                  <TeamList
+                    keycloak={this.state.keycloak}
+                  />
+                )}
+              />
+              <Route
+                path="/batches"
+                exact={true}
+                render={props => (
+                  <BatchList
+                    keycloak={this.state.keycloak}
+                  />
+                )}
+              />
+              <Route
+                path="/batches/:batchId"
+                exact={true}
+                render={props => (
+                  <BatchView
+                    keycloak={this.state.keycloak}
+                    batchId={props.match.params.batchId as string}
+                  />
                 )}
               />
               <Route
                 path="/teams/:teamId"
                 exact={true}
                 render={props => (
-                    <EditTeam
-                      keycloak={this.state.keycloak}
-                      teamId={props.match.params.teamId as string}
-                    />
+                  <EditTeam
+                    keycloak={this.state.keycloak}
+                    teamId={props.match.params.teamId as string}
+                  />
                 )}
               />
               <Route
                 path="/createTeam"
                 exact={true}
                 render={props => (
-                    <CreateTeam
-                      keycloak={this.state.keycloak}
-                    />
+                  <CreateTeam
+                    keycloak={this.state.keycloak}
+                  />
                 )}
               />
               <Route
                 path="/products"
                 exact={true}
                 render={props => (
-                    <ProductList
-                      keycloak={this.state.keycloak}
-                    />
+                  <ProductList
+                    keycloak={this.state.keycloak}
+                  />
                 )}
               />
               <Route
                 path="/createProduct"
                 exact={true}
                 render={props => (
-                    <CreateProduct
-                      keycloak={this.state.keycloak}
-                    />
+                  <CreateProduct
+                    keycloak={this.state.keycloak}
+                  />
                 )}
               />
               <Route
                 path="/packageSizes"
                 exact={true}
                 render={props => (
-                    <PackageSizeList
-                      keycloak={this.state.keycloak}
-                    />
+                  <PackageSizeList
+                    keycloak={this.state.keycloak}
+                  />
                 )}
               />
               <Route
                 path="/createPackageSize"
                 exact={true}
                 render={props => (
-                    <CreatePackageSize
-                      keycloak={this.state.keycloak}
-                    />
+                  <CreatePackageSize
+                    keycloak={this.state.keycloak}
+                  />
                 )}
               />
               <Route
                 path="/seeds"
                 exact={true}
                 render={props => (
-                    <SeedList
-                      keycloak={this.state.keycloak}
-                    />
+                  <SeedList
+                    keycloak={this.state.keycloak}
+                  />
                 )}
               />
               <Route
                 path="/createSeed"
                 exact={true}
                 render={props => (
-                    <CreateSeed
-                      keycloak={this.state.keycloak}
-                    />
+                  <CreateSeed
+                    keycloak={this.state.keycloak}
+                  />
                 )}
               />
               <Route
                 path="/productionLines"
                 exact={true}
                 render={props => (
-                    <ProductionLineList
-                      keycloak={this.state.keycloak}
-                    />
+                  <ProductionLineList
+                    keycloak={this.state.keycloak}
+                  />
                 )}
               />
               <Route
                 path="/createProductionLine"
                 exact={true}
                 render={props => (
-                    <CreateProductionLine
-                      keycloak={this.state.keycloak}
-                    />
+                  <CreateProductionLine
+                    keycloak={this.state.keycloak}
+                  />
                 )}
               />
               <Route
                 path="/seedBatches"
                 exact={true}
                 render={props => (
-                    <SeedBatchList
-                      keycloak={this.state.keycloak}
-                    />
+                  <SeedBatchList
+                    keycloak={this.state.keycloak}
+                  />
                 )}
               />
               <Route
                 path="/createSeedBatch"
                 exact={true}
                 render={props => (
-                    <CreateSeedBatch
-                      keycloak={this.state.keycloak}
-                    />
+                  <CreateSeedBatch
+                    keycloak={this.state.keycloak}
+                  />
                 )}
               />
               <Route
                 path="/performedCultivationActions"
                 exact={true}
                 render={props => (
-                    <PerformedCultivationActionList
-                      keycloak={this.state.keycloak}
-                    />
+                  <PerformedCultivationActionList
+                    keycloak={this.state.keycloak}
+                  />
                 )}
               />
               <Route
                 path="/createPerformedCultivationAction"
                 exact={true}
                 render={props => (
-                    <CreatePerformedCultivationAction
-                      keycloak={this.state.keycloak}
-                    />
+                  <CreatePerformedCultivationAction
+                    keycloak={this.state.keycloak}
+                  />
                 )}
               />
               <Route
                 path="/performedCultivationActions/:createPerformedCultivationActionId"
                 exact={true}
                 render={props => (
-                    <EditPerformedCultivationAction
-                      keycloak={this.state.keycloak}
-                      performedCultivationActionId={props.match.params.createPerformedCultivationActionId as string}
-                    />
+                  <EditPerformedCultivationAction
+                    keycloak={this.state.keycloak}
+                    performedCultivationActionId={props.match.params.createPerformedCultivationActionId as string}
+                  />
                 )}
               />
-            </Grid.Column>
-          </Grid.Row>
+            </div>
         )}
       </BasicLayout>
     );
