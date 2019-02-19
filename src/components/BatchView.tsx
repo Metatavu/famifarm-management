@@ -69,6 +69,12 @@ class BatchView extends React.Component<Props, State> {
     });
   }
 
+  /**
+   * Gets icon for event
+   * 
+   * @param event event to get icon for
+   * @returns JSX element representing the icon
+   */
   private getEventIcon(event: Event): JSX.Element {
     const iconStyle = {
       maxWidth: "70%",
@@ -94,6 +100,12 @@ class BatchView extends React.Component<Props, State> {
     }
   }
 
+  /**
+   * Gets timeline content for event
+   * 
+   * @param event event to get the content for
+   * @returns JSX element representing timeline event content
+   */
   private getTimelineElementContent(event: Event): JSX.Element {
     //TODO: Additional data
     let eventData = null;
@@ -190,8 +202,6 @@ class BatchView extends React.Component<Props, State> {
         </VerticalTimelineElement>
       );
     });
-
-    console.log(timelineElements);
 
     return (
       <Grid>
