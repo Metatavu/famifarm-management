@@ -1,10 +1,11 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import FamiFarmApiClient from '../api-client';
-import { SeedBatch, Seed } from 'famifarm-client';
+import Api from "../api";
+import { SeedBatch, Seed } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import { DateInput } from 'semantic-ui-calendar-react';
 import strings from "src/localization/strings";
+
 
 import {
   Grid,
@@ -34,6 +35,7 @@ export interface State {
   redirect: boolean;
   saving: boolean;
   messageVisible: boolean;
+  seeds: Seed[];
 }
 
 class EditSeedBatch extends React.Component<Props, State> {
@@ -46,21 +48,34 @@ class EditSeedBatch extends React.Component<Props, State> {
       seedBatch: undefined,
       redirect: false,
       saving: false,
-      messageVisible: false
+      messageVisible: false,
+      seeds: []
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handeNameChange = this.handeNameChange.bind(this);
+    this.handeCodeChange = this.handeCodeChange.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
   }
 
   /**
    * Component did mount life-sycle method
    */
-  componentDidMount() {
-    new FamiFarmApiClient().findSeedBatch(this.props.keycloak!, this.props.seedBatchId).then((seedBatch) => {
+  async componentDidMount() {
+    if (!this.props.keycloak) {
+      return;
+    }
+
+    const seedBatchesService = await Api.getSeedBatchesService(this.props.keycloak);
+    const seedsService = await Api.getSeedsService(this.props.keycloak);
+
+    seedBatchesService.findSeedBatch(this.props.seedBatchId).then((seedBatch) => {
       this.props.onSeedBatchSelected && this.props.onSeedBatchSelected(seedBatch);
       this.setState({seedBatch: seedBatch});
+    });
+
+    seedsService.listSeeds().then((seeds) => {
+      this.props.onSeedsFound && this.props.onSeedsFound(seeds);
+      this.setState({seeds: seeds});
     });
   }
 
@@ -69,13 +84,15 @@ class EditSeedBatch extends React.Component<Props, State> {
    * 
    * @param event event
    */
-  handeNameChange(event: React.FormEvent<HTMLInputElement>) {
+  handeCodeChange(event: React.FormEvent<HTMLInputElement>) {
+    if (!this.state.seedBatch) {
+      return;
+    }
     const seedBatch = {
       id: this.state.seedBatch!.id,
-      name: [{
-        language: "fi",
-        value: event.currentTarget.value
-      }]
+      code: event.currentTarget.value,
+      seedId: this.state.seedBatch.seedId,
+      time: this.state.seedBatch.time
     };
 
     this.setState({seedBatch: seedBatch});
@@ -88,7 +105,18 @@ class EditSeedBatch extends React.Component<Props, State> {
    * @param {value} value
    */
   onSelectChange = (e: any, { value }: InputOnChangeData) => {
-    this.setState({seedId: value});
+    if (!this.state.seedBatch) {
+      return;
+    }
+
+    const seedBatch = {
+      id: this.state.seedBatch.id,
+      code: this.state.seedBatch.code,
+      seedId: value,
+      time: this.state.seedBatch.time
+    };
+
+    this.setState({seedBatch: seedBatch});
   }
 
   /**
@@ -98,15 +126,33 @@ class EditSeedBatch extends React.Component<Props, State> {
    * @param {name, value} name and value
    */
   handleTimeChange = (event: any, {name, value} : any) => {
-    this.setState({ time: value });
+    if (!this.state.seedBatch) {
+      return;
+    }
+
+    const seedBatch = {
+      id: this.state.seedBatch.id,
+      code: this.state.seedBatch.code,
+      seedId: this.state.seedBatch.seedId,
+      time: value
+    };
+
+    this.setState({seedBatch: seedBatch});
   }
 
   /**
    * Handle form submit
    */
   async handleSubmit() {
+    if (!this.props.keycloak || !this.state.seedBatch) {
+      return;
+    }
+
+    const seedBatchesService = await Api.getSeedBatchesService(this.props.keycloak);
+
     this.setState({saving: true});
-    await new FamiFarmApiClient().updateSeedBatch(this.props.keycloak!, this.state.seedBatch!);
+    seedBatchesService.updateSeedBatch(this.state.seedBatch, this.state.seedBatch.id || "");
+    this.props.onSeedBatchSelected && this.props.onSeedBatchSelected(this.state.seedBatch);
     this.setState({saving: false});
 
     this.setState({messageVisible: true});
@@ -118,10 +164,15 @@ class EditSeedBatch extends React.Component<Props, State> {
   /**
    * Handle seedBatch delete
    */
-  handleDelete() {
-    const id = this.state.seedBatch!.id;
+  async handleDelete() {
+    if (!this.props.keycloak || !this.state.seedBatch) {
+      return;
+    }
 
-    new FamiFarmApiClient().deleteSeedBatch(this.props.keycloak!, id!).then(() => {
+    const seedBatchesService = await Api.getSeedBatchesService(this.props.keycloak);
+    const id = this.state.seedBatch.id || "";
+
+    seedBatchesService.deleteSeedBatch(id).then(() => {
       this.props.onSeedBatchDeleted && this.props.onSeedBatchDeleted(id!);
       this.setState({redirect: true});
     });
@@ -166,27 +217,28 @@ class EditSeedBatch extends React.Component<Props, State> {
           <Form>
           <Form.Field required>
           <label>{strings.seedBatchCode}</label>
-                <Input 
-                  value={this.props.seedBatch!.code} 
-                  placeholder={strings.seedBatchCode}
-                  onChange={(e) => this.setState({code: e.currentTarget.value})}
-                />
-                <Form.Select 
-                  fluid 
-                  label={strings.seed} 
-                  options={seedOptions} 
-                  placeholder={strings.seed}
-                  onChange={this.onSelectChange}
-                />
-                <label>{strings.seedBatchArrived}</label>
-                <DateInput
-                  name="dateTime"
-                  placeholder={strings.date}
-                  value={this.props.seedBatch!.time}
-                  iconPosition="left"
-                  dateFormat="YYYY-MM-DDTHH:mmZ"
-                  onChange={this.handleTimeChange}
-                />
+          <Input 
+            value={this.state.seedBatch ? this.state.seedBatch.code : ""} 
+            placeholder={strings.seedBatchCode}
+            onChange={this.handeCodeChange}
+          />
+          <Form.Select 
+            fluid 
+            label={strings.seed} 
+            options={seedOptions} 
+            placeholder={strings.seed}
+            onChange={this.onSelectChange}
+            defaultValue={this.props.seedBatch ? this.props.seedBatch.seedId : ""}
+          />
+          <label>{strings.seedBatchArrived}</label>
+          <DateInput
+            name="dateTime"
+            placeholder={strings.date}
+            value={this.state.seedBatch ? this.state.seedBatch.time : ""}
+            iconPosition="left"
+            dateFormat="YYYY-MM-DDTHH:mmZ"
+            onChange={this.handleTimeChange}
+          />
           </Form.Field>
             <Message
               success

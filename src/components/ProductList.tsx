@@ -1,8 +1,8 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import FamiFarmApiClient from '../api-client';
+import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Product } from 'famifarm-client';
+import { Product } from "famifarm-typescript-models";
 import strings from "src/localization/strings";
 
 import {
@@ -33,8 +33,13 @@ class ProductsList extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle event
    */
-  componentDidMount() {
-    new FamiFarmApiClient().listProducts(this.props.keycloak!, 0, 100).then((products) => {
+  async componentDidMount() {
+    if (!this.props.keycloak) {
+      return;
+    }
+
+    const productsService = await Api.getProductsService(this.props.keycloak);
+    productsService.listProducts().then((products) => {
       this.props.onProductsFound && this.props.onProductsFound(products);
     });
   }

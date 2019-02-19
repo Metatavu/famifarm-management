@@ -11,7 +11,7 @@ class App extends React.Component {
     return (
       <BrowserRouter>
         <div className="App">
-          <Route exact path="/" component={WelcomePage} />
+          <Route path="/" component={WelcomePage} />
         </div>
       </BrowserRouter>
     );

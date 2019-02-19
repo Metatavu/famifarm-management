@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import FamiFarmApiClient from '../api-client';
-import { ProductionLine } from 'famifarm-client';
+import Api from "../api";
+import { ProductionLine } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -33,10 +33,10 @@ class EditProductionLine extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-        productionLine: undefined,
-        redirect: false,
-        saving: false,
-        messageVisible: false
+      productionLine: undefined,
+      redirect: false,
+      saving: false,
+      messageVisible: false
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -47,8 +47,14 @@ class EditProductionLine extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle method
    */
-  componentDidMount() {
-    new FamiFarmApiClient().findProductionLine(this.props.keycloak!, this.props.productionLineId).then((productionLine) => {
+  async componentDidMount() {
+    if (!this.props.keycloak) {
+      return;
+    }
+
+    const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
+
+    productionLineService.findProductionLine(this.props.productionLineId).then((productionLine) => {
       this.props.onProductionLineSelected && this.props.onProductionLineSelected(productionLine);
       this.setState({productionLine: productionLine});
     });
@@ -79,8 +85,14 @@ class EditProductionLine extends React.Component<Props, State> {
    * Handle form submit
    */
   async handleSubmit() {
+    if (!this.props.keycloak || !this.state.productionLine) {
+      return;
+    }
+
+    const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
+
     this.setState({saving: true});
-    await new FamiFarmApiClient().updateProductionLine(this.props.keycloak!, this.state.productionLine!);
+    productionLineService.updateProductionLine(this.state.productionLine, this.state.productionLine.id || "");
     this.setState({saving: false});
 
     this.setState({messageVisible: true});
@@ -92,11 +104,16 @@ class EditProductionLine extends React.Component<Props, State> {
   /**
    * Handle productionLine delete
    */
-  handleDelete() {
-    const id = this.state.productionLine!.id;
+  async handleDelete() {
+    if (!this.props.keycloak || !this.state.productionLine) {
+      return;
+    }
 
-    new FamiFarmApiClient().deleteProductionLine(this.props.keycloak!, id!).then(() => {
-      this.props.onProductionLineDeleted && this.props.onProductionLineDeleted(id!);
+    const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
+    const id = this.state.productionLine.id || "";
+
+    productionLineService.deleteProductionLine(id).then(() => {
+      this.props.onProductionLineDeleted && this.props.onProductionLineDeleted(id);
       this.setState({redirect: true});
     });
   }

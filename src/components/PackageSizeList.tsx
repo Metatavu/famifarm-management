@@ -1,8 +1,8 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import FamiFarmApiClient from '../api-client';
+import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { PackageSize } from 'famifarm-client';
+import { PackageSize } from "famifarm-typescript-models";
 import strings from "src/localization/strings";
 
 import {
@@ -33,8 +33,13 @@ class PackageSizesList extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle method
    */
-  componentDidMount() {
-    new FamiFarmApiClient().listPackageSizes(this.props.keycloak!, 0, 100).then((packageSizes) => {
+  async componentDidMount() {
+    if (!this.props.keycloak) {
+      return;
+    }
+
+    const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
+    packageSizeService.listPackageSizes().then((packageSizes) => {
       this.props.onPackageSizesFound && this.props.onPackageSizesFound(packageSizes);
     });
   }

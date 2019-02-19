@@ -1,6 +1,6 @@
 import * as constants from '../constants'
 import { KeycloakInstance } from 'keycloak-js';
-import { Team, Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction } from 'famifarm-client';
+import { Team, Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, Batch } from "famifarm-typescript-models";
 
 export interface UserLogin {
   type: constants.USER_LOGIN;
@@ -117,6 +117,11 @@ export interface SeedBatchesFound {
   seedBatches: SeedBatch[];
 }
 
+export interface BatchesFound {
+  type: constants.BATCHES_FOUND;
+  batches: Batch[];
+}
+
 export interface SeedBatchSelected {
   type: constants.SEED_BATCH_SELECTED;
   seedBatch: SeedBatch;
@@ -159,7 +164,7 @@ export type AppAction = UserLogin | UserLogout | TeamsFound | TeamSelected | Tea
   | SeedSelected | SeedDeleted | ProductionLinesFound | ProductionLineSelected | ProductionLineCreated
   | ProductionLineDeleted | SeedBatchesFound | SeedBatchSelected | SeedBatchCreated | SeedBatchDeleted
   | PerformedCultivationActionsFound | PerformedCultivationActionSelected | PerformedCultivationActionCreated
-  | PerformedCultivationActionDeleted;
+  | PerformedCultivationActionDeleted | BatchesFound;
 
 export function userLogin(keycloak: KeycloakInstance, authenticated: boolean): UserLogin {
   return {
@@ -319,6 +324,13 @@ export function seedBatchesFound(seedBatches: SeedBatch[]): SeedBatchesFound {
   return {
     type: constants.SEED_BATCHES_FOUND,
     seedBatches: seedBatches
+  }
+}
+
+export function batchesFound(batches: Batch[]): BatchesFound {
+  return {
+    type: constants.BATCHES_FOUND,
+    batches: batches
   }
 }
 

@@ -10,11 +10,14 @@ export type TEAMS_FOUND = typeof TEAMS_FOUND;
 export const TEAM_SELECTED = "TEAM_SELECTED";
 export type TEAM_SELECTED = typeof TEAM_SELECTED;
 
-export const TEAM_CREATED= "TEAM_CREATED";
+export const TEAM_CREATED = "TEAM_CREATED";
 export type TEAM_CREATED = typeof TEAM_CREATED;
 
-export const TEAM_DELETED= "TEAM_DELETED";
+export const TEAM_DELETED = "TEAM_DELETED";
 export type TEAM_DELETED = typeof TEAM_DELETED;
+
+export const BATCHES_FOUND = "BATCHES_FOUND";
+export type BATCHES_FOUND = typeof BATCHES_FOUND; 
 
 export const PRODUCTS_FOUND= "PRODUCTS_FOUND";
 export type PRODUCTS_FOUND = typeof PRODUCTS_FOUND;

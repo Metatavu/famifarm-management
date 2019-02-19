@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import FamiFarmApiClient from '../api-client';
-import { Seed } from 'famifarm-client';
+import Api from "../api";
+import { Seed } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -33,10 +33,10 @@ class EditSeed extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-        seed: undefined,
-        redirect: false,
-        saving: false,
-        messageVisible: false
+      seed: undefined,
+      redirect: false,
+      saving: false,
+      messageVisible: false
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -47,8 +47,14 @@ class EditSeed extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle method
    */
-  componentDidMount() {
-    new FamiFarmApiClient().findSeed(this.props.keycloak!, this.props.seedId).then((seed) => {
+  async componentDidMount() {
+    if (!this.props.keycloak) {
+      return;
+    }
+
+    const seedsService = await Api.getSeedsService(this.props.keycloak);
+
+    seedsService.findSeed(this.props.seedId).then((seed) => {
       this.props.onSeedSelected && this.props.onSeedSelected(seed);
       this.setState({seed: seed});
     });
@@ -75,8 +81,14 @@ class EditSeed extends React.Component<Props, State> {
    * Handle form submit
    */
   async handleSubmit() {
+    if (!this.props.keycloak || !this.state.seed) {
+      return;
+    }
+
+    const seedsService = await Api.getSeedsService(this.props.keycloak);
+
     this.setState({saving: true});
-    await new FamiFarmApiClient().updateSeed(this.props.keycloak!, this.state.seed!);
+    seedsService.updateSeed(this.state.seed, this.state.seed.id || "");
     this.setState({saving: false});
 
     this.setState({messageVisible: true});
@@ -88,11 +100,16 @@ class EditSeed extends React.Component<Props, State> {
   /**
    * Handle seed delete
    */
-  handleDelete() {
-    const id = this.state.seed!.id;
+  async handleDelete() {
+    if (!this.props.keycloak || !this.state.seed) {
+      return;
+    }
 
-    new FamiFarmApiClient().deleteSeed(this.props.keycloak!, id!).then(() => {
-      this.props.onSeedDeleted && this.props.onSeedDeleted(id!);
+    const seedsService = await Api.getSeedsService(this.props.keycloak);
+    const id = this.state.seed.id || "";
+
+    seedsService.deleteSeed(id).then(() => {
+      this.props.onSeedDeleted && this.props.onSeedDeleted(id);
       this.setState({redirect: true});
     });
   }

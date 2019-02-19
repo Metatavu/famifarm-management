@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import FamiFarmApiClient from '../api-client';
-import { PackageSize } from 'famifarm-client';
+import Api from "../api";
+import { PackageSize } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -47,8 +47,14 @@ class EditPackageSize extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle method
    */
-  componentDidMount() {
-    new FamiFarmApiClient().findPackageSize(this.props.keycloak!, this.props.packageSizeId).then((packageSize) => {
+  async componentDidMount() {
+    if (!this.props.keycloak) {
+      return;
+    }
+
+    const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
+
+    packageSizeService.findPackageSize(this.props.packageSizeId).then((packageSize) => {
       this.props.onPackageSizeSelected && this.props.onPackageSizeSelected(packageSize);
       this.setState({packageSize: packageSize});
     });
@@ -72,8 +78,18 @@ class EditPackageSize extends React.Component<Props, State> {
    * Handle form submit
    */
   async handleSubmit() {
+    if (!this.props.keycloak) {
+      return;
+    }
+
+    const packageSizeObject = this.state.packageSize || {};
+
+    const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
+
     this.setState({saving: true});
-    await new FamiFarmApiClient().updatePackageSize(this.props.keycloak!, this.state.packageSize!);
+
+    await packageSizeService.updatePackageSize(packageSizeObject, packageSizeObject.id || "");
+
     this.setState({saving: false});
 
     this.setState({messageVisible: true});
@@ -85,10 +101,15 @@ class EditPackageSize extends React.Component<Props, State> {
   /**
    * Handle packageSize delete
    */
-  handleDelete() {
-    const id = this.state.packageSize!.id;
+  async handleDelete() {
+    if (!this.props.keycloak || !this.state.packageSize) {
+      return;
+    }
 
-    new FamiFarmApiClient().deletePackageSize(this.props.keycloak!, id!).then(() => {
+    const id = this.state.packageSize.id || "";
+    const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
+
+    packageSizeService.deletePackageSize(id).then(() => {
       this.props.onPackageSizeDeleted && this.props.onPackageSizeDeleted(id!);
       this.setState({redirect: true});
     });

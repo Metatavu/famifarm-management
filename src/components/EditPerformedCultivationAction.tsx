@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import FamiFarmApiClient from '../api-client';
-import { PerformedCultivationAction } from 'famifarm-client';
+import Api from "../api";
+import { PerformedCultivationAction } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -10,7 +10,8 @@ import {
   Button,
   Loader,
   Form,
-  Input
+  Input,
+  Message
 } from "semantic-ui-react";
 
 export interface Props {
@@ -24,14 +25,18 @@ export interface Props {
 export interface State {
   performedCultivationAction?: PerformedCultivationAction;
   redirect: boolean;
+  saving: boolean;
+  messageVisible: boolean;
 }
 
 class EditPerformedCultivationAction extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-        performedCultivationAction: undefined,
-        redirect: false
+      performedCultivationAction: undefined,
+      redirect: false,
+      saving: false,
+      messageVisible: false
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -42,8 +47,13 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle method
    */
-  componentDidMount() {
-    new FamiFarmApiClient().findPerformedCultivationAction(this.props.keycloak!, this.props.performedCultivationActionId).then((performedCultivationAction) => {
+  async componentDidMount() {
+    if (!this.props.keycloak) {
+      return;
+    }
+    
+    const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
+    performedCultivationActionService.findPerformedCultivationAction(this.props.performedCultivationActionId).then((performedCultivationAction) => {
       this.props.onPerformedCultivationActionSelected && this.props.onPerformedCultivationActionSelected(performedCultivationAction);
       this.setState({performedCultivationAction: performedCultivationAction});
     });
@@ -70,16 +80,34 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
    * Handle form submit
    */
   async handleSubmit() {
-    await new FamiFarmApiClient().updatePerformedCultivationAction(this.props.keycloak!, this.state.performedCultivationAction!);
+    if (!this.props.keycloak || !this.state.performedCultivationAction) {
+      return;
+    }
+
+    this.setState({saving: true});
+
+    const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
+    performedCultivationActionService.updatePerformedCultivationAction(this.state.performedCultivationAction, this.state.performedCultivationAction.id!);
+    
+    this.setState({saving: false});
+
+    this.setState({messageVisible: true});
+    setTimeout(() => {
+      this.setState({messageVisible: false});
+    }, 3000);
   }
 
   /**
    * Handle performedCultivationAction delete
    */
-  handleDelete() {
-    const id = this.state.performedCultivationAction!.id;
+  async handleDelete() {
+    if (!this.props.keycloak) {
+      return;
+    }
 
-    new FamiFarmApiClient().deletePerformedCultivationAction(this.props.keycloak!, id!).then(() => {
+    const id = this.state.performedCultivationAction!.id;
+    const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
+    performedCultivationActionService.deletePerformedCultivationAction(id!).then(() => {
       this.props.onPerformedCultivationActionDeleted && this.props.onPerformedCultivationActionDeleted(id!);
       this.setState({redirect: true});
     });
@@ -108,7 +136,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
             <h2>{this.props.performedCultivationAction!.name![0].value}</h2>
           </Grid.Column>
           <Grid.Column width={3} floated="right">
-            <Button className="danger-button" onClick={this.handleDelete}>{strings.deletePerformedCultivationAction}</Button>
+            <Button className="danger-button" onClick={this.handleDelete}>{strings.delete}</Button>
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
@@ -122,7 +150,19 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
               onChange={this.handeNameChange}
             />
           </Form.Field>
-            <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
+            <Message
+              success
+              visible={this.state.messageVisible}
+              header={strings.savedSuccessfully}
+            />
+            <Button 
+              className="submit-button" 
+              onClick={this.handleSubmit} 
+              type='submit'
+              loading={this.state.saving}
+            >
+                {strings.save}
+            </Button>
           </Form>
           </Grid.Column>
         </Grid.Row>

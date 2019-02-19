@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import FamiFarmApiClient from '../api-client';
-import { Team } from 'famifarm-client';
+import Api from "../api";
+import { Team } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -33,10 +33,10 @@ class EditTeam extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-        team: undefined,
-        redirect: false,
-        saving: false,
-        messageVisible: false
+      team: undefined,
+      redirect: false,
+      saving: false,
+      messageVisible: false
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -47,8 +47,13 @@ class EditTeam extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle method
    */
-  componentDidMount() {
-    new FamiFarmApiClient().findTeam(this.props.keycloak!, this.props.teamId).then((team) => {
+  async componentDidMount() {
+    if (!this.props.keycloak) {
+      return;
+    }
+    
+    const teamsService = await Api.getTeamsService(this.props.keycloak);
+    teamsService.findTeam(this.props.teamId).then((team) => {
       this.props.onTeamSelected && this.props.onTeamSelected(team);
       this.setState({team: team});
     });
@@ -75,9 +80,12 @@ class EditTeam extends React.Component<Props, State> {
    * Handle form submit
    */
   async handleSubmit() {
-    this.setState({saving: true});
-    await new FamiFarmApiClient().updateTeam(this.props.keycloak!, this.state.team!);
-    this.setState({saving: false});
+    if (!this.props.keycloak || !this.state.team) {
+      return;
+    }
+    
+    const teamsService = await Api.getTeamsService(this.props.keycloak);
+    await teamsService.updateTeam(this.state.team, this.state.team.id!);
 
     this.setState({messageVisible: true});
     setTimeout(() => {
@@ -88,10 +96,15 @@ class EditTeam extends React.Component<Props, State> {
   /**
    * Handle team delete
    */
-  handleDelete() {
-    const id = this.state.team!.id;
+  async handleDelete() {
+    if (!this.props.keycloak || !this.state.team) {
+      return;
+    }
+    
+    const teamsService = await Api.getTeamsService(this.props.keycloak);
+    const id = this.state.team.id;
 
-    new FamiFarmApiClient().deleteTeam(this.props.keycloak!, id!).then(() => {
+    teamsService.deleteTeam(id!).then(() => {
       this.props.onTeamDeleted && this.props.onTeamDeleted(id!);
       this.setState({redirect: true});
     });

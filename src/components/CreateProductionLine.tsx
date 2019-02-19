@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import FamiFarmApiClient from '../api-client';
-import { ProductionLine } from 'famifarm-client';
+import Api from "../api";
+import { ProductionLine } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 
 import {
@@ -37,7 +37,11 @@ class CreateProductionLine extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  handleSubmit() {
+  async handleSubmit() {
+    if (!this.props.keycloak) {
+      return;
+    }
+
     const lineNumber = parseInt(this.state.lineNumber)
 
     if (isNaN(lineNumber)) {
@@ -48,7 +52,9 @@ class CreateProductionLine extends React.Component<Props, State> {
     const productionLineObject = {
       lineNumber: lineNumber
     };
-    new FamiFarmApiClient().createProductionLine(this.props.keycloak!, productionLineObject).then(() => {
+
+    const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
+    productionLineService.createProductionLine(productionLineObject).then(() => {
       this.setState({redirect: true});
     });
   }

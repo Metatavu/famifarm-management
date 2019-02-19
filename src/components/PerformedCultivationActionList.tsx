@@ -1,8 +1,8 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import FamiFarmApiClient from '../api-client';
+import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { PerformedCultivationAction } from 'famifarm-client';
+import { PerformedCultivationAction } from "famifarm-typescript-models";
 import strings from "src/localization/strings";
 
 import {
@@ -33,8 +33,13 @@ class PerformedCultivationActionsList extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle event
    */
-  componentDidMount() {
-    new FamiFarmApiClient().listPerformedCultivationActions(this.props.keycloak!, 0, 100).then((performedCultivationActions) => {
+  async componentDidMount() {
+    if (!this.props.keycloak) {
+      return;
+    }
+
+    const performedCultivationActionServer = await Api.getPerformedCultivationActionsService(this.props.keycloak);
+    performedCultivationActionServer.listPerformedCultivationActions().then((performedCultivationActions) => {
       this.props.onPerformedCultivationActionsFound && this.props.onPerformedCultivationActionsFound(performedCultivationActions);
     });
   }

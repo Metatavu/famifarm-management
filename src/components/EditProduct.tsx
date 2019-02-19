@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import FamiFarmApiClient from '../api-client';
-import { Product, PackageSize } from 'famifarm-client';
+import Api from "../api";
+import { Product, PackageSize } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -52,13 +52,20 @@ class EditProduct extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle method
    */
-  componentDidMount() {
-    new FamiFarmApiClient().findProduct(this.props.keycloak!, this.props.productId).then((product) => {
+  async componentDidMount() {
+    if (!this.props.keycloak) {
+      return;
+    }
+
+    const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
+    const productsService = await Api.getProductsService(this.props.keycloak);
+
+    productsService.findProduct(this.props.productId).then((product) => {
       this.props.onProductSelected && this.props.onProductSelected(product);
       this.setState({product: product});
     });
 
-    new FamiFarmApiClient().listPackageSizes(this.props.keycloak!, 0, 100).then((packageSizes) => {
+    packageSizeService.listPackageSizes(0, 100).then((packageSizes) => {
       this.props.onPackageSizesFound && this.props.onPackageSizesFound(packageSizes);
     });
   }
@@ -85,9 +92,14 @@ class EditProduct extends React.Component<Props, State> {
    * Handle form submit
    */
   async handleSubmit() {
-    console.log(this.state.product);
+    if (!this.props.keycloak || !this.state.product) {
+      return;
+    }
+
+    const productsService = await Api.getProductsService(this.props.keycloak);
+
     this.setState({saving: true});
-    await new FamiFarmApiClient().updateProduct(this.props.keycloak!, this.state.product!);
+    productsService.updateProduct(this.state.product, this.state.product.id || "");
     this.setState({saving: false});
 
     this.setState({messageVisible: true});
@@ -99,10 +111,15 @@ class EditProduct extends React.Component<Props, State> {
   /**
    * Handle product delete
    */
-  handleDelete() {
-    const id = this.state.product!.id;
+  async handleDelete() {
+    if (!this.props.keycloak || !this.state.product) {
+      return;
+    }
 
-    new FamiFarmApiClient().deleteProduct(this.props.keycloak!, id!).then(() => {
+    const productsService = await Api.getProductsService(this.props.keycloak);
+    const id = this.state.product.id || "";
+
+    productsService.deleteProduct(id).then(() => {
       this.props.onProductDeleted && this.props.onProductDeleted(id!);
       this.setState({redirect: true});
     });
@@ -174,6 +191,7 @@ class EditProduct extends React.Component<Props, State> {
               options={packageSizeOptions} 
               placeholder={strings.packageSize} 
               onChange={this.onSelectChange}
+              defaultValue={this.props.product ? this.props.product.defaultPackageSize : ""}
             />
           </Form.Field>
             <Message

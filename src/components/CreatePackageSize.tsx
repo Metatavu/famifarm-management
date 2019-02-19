@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import FamiFarmApiClient from '../api-client';
-import { PackageSize } from 'famifarm-client';
+import Api from "../api";
+import { PackageSize } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "../localization/strings";
 
@@ -37,11 +37,16 @@ class EditPackageSize extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  handleSubmit() {
+  async handleSubmit() {
+    if (!this.props.keycloak) {
+      return;
+    }
+
     const packageSizeObject = {
       name: this.state.name
     };
-    new FamiFarmApiClient().createPackageSize(this.props.keycloak!, packageSizeObject).then(() => {
+    const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
+    packageSizeService.createPackageSize(packageSizeObject).then(() => {
       this.setState({redirect: true});
     });
   }

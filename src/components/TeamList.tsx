@@ -1,8 +1,8 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import FamiFarmApiClient from '../api-client';
+import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Team } from 'famifarm-client';
+import { Team } from "famifarm-typescript-models";
 import strings from "src/localization/strings";
 
 import {
@@ -33,8 +33,13 @@ class TeamsList extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle event
    */
-  componentDidMount() {
-    new FamiFarmApiClient().listTeams(this.props.keycloak!, 0, 100).then((teams) => {
+  async componentDidMount() {
+    if (!this.props.keycloak) {
+      return;
+    }
+
+    const teamsService = await Api.getTeamsService(this.props.keycloak);
+    teamsService.listTeams().then((teams) => {
       this.props.onTeamsFound && this.props.onTeamsFound(teams);
     });
   }
