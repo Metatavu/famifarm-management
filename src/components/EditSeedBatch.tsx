@@ -13,7 +13,8 @@ import {
   Form,
   Input,
   Message,
-  InputOnChangeData
+  InputOnChangeData,
+  Confirm
 } from "semantic-ui-react";
 
 /**
@@ -41,6 +42,7 @@ interface State {
   saving: boolean;
   messageVisible: boolean;
   seeds: Seed[];
+  open:boolean;
 }
 
 /**
@@ -63,7 +65,8 @@ class EditSeedBatch extends React.Component<Props, State> {
       redirect: false,
       saving: false,
       messageVisible: false,
-      seeds: []
+      seeds: [],
+      open:false
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -223,7 +226,7 @@ class EditSeedBatch extends React.Component<Props, State> {
             <h2>{this.props.seedBatch!.code}</h2>
           </Grid.Column>
           <Grid.Column width={3} floated="right">
-            <Button className="danger-button" onClick={this.handleDelete}>{strings.delete}</Button>
+            <Button className="danger-button" onClick={()=>this.setState({open:true})}>{strings.delete}</Button>
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
@@ -270,6 +273,7 @@ class EditSeedBatch extends React.Component<Props, State> {
           </Form>
           </Grid.Column>
         </Grid.Row>
+        <Confirm open={this.state.open} size={"mini"} content={strings.deleteConfirmationText +this.props.seedBatch!.code } onCancel={()=>this.setState({open:false})} onConfirm={this.handleDelete} />
       </Grid>
     );
   }

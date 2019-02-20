@@ -12,7 +12,8 @@ import {
   Form,
   Input,
   Message,
-  InputOnChangeData
+  InputOnChangeData,
+  Confirm
 } from "semantic-ui-react";
 
 /**
@@ -37,6 +38,7 @@ interface State {
   saving: boolean;
   messageVisible: boolean;
   defaultPackageSize: string;
+  open: boolean;
 }
 
 /**
@@ -56,7 +58,8 @@ class EditProduct extends React.Component<Props, State> {
       redirect: false,
       saving: false,
       messageVisible: false,
-      defaultPackageSize: ""
+      defaultPackageSize: "",
+      open:false
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -187,7 +190,7 @@ class EditProduct extends React.Component<Props, State> {
             <h2>{this.props.product!.name![0].value}</h2>
           </Grid.Column>
           <Grid.Column width={3} floated="right">
-            <Button className="danger-button" onClick={this.handleDelete}>{strings.delete}</Button>
+            <Button className="danger-button" onClick={() => this.setState({open:true})}>{strings.delete}</Button>
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
@@ -225,6 +228,7 @@ class EditProduct extends React.Component<Props, State> {
           </Form>
           </Grid.Column>
         </Grid.Row>
+        <Confirm open={this.state.open} size={"mini"} content={strings.deleteConfirmationText+ this.props.product!.name![0].value } onCancel={()=>this.setState({open:false})} onConfirm={this.handleDelete} />
       </Grid>
     );
   }
