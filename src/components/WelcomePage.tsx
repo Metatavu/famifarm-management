@@ -27,6 +27,11 @@ import CreateSeedBatch from "src/containers/CreateSeedBatch";
 import PerformedCultivationActionList from "src/containers/PerformedCultivationActionList";
 import CreatePerformedCultivationAction from "src/containers/CreatePerformedCultivationAction";
 import EditPerformedCultivationAction from "src/containers/EditPerformedCultivationAction";
+import EditProduct from "src/containers/EditProduct";
+import EditPackageSize from "src/containers/EditPackageSize";
+import EditSeed from "src/containers/EditSeed";
+import EditProductionLine from "src/containers/EditProductionLine";
+import EditSeedBatch from "src/containers/EditSeedBatch";
 import BatchList from "src/containers/BatchList";
 import BatchView from "./BatchView";
 
@@ -178,6 +183,16 @@ class WelcomePage extends React.Component<Props, any> {
                 )}
               />
               <Route
+                path="/products/:productId"
+                exact={true}
+                render={props => (
+                    <EditProduct
+                      keycloak={this.state.keycloak}
+                      productId={props.match.params.productId as string}
+                    />
+                )}
+              />
+              <Route
                 path="/createProduct"
                 exact={true}
                 render={props => (
@@ -193,6 +208,16 @@ class WelcomePage extends React.Component<Props, any> {
                   <PackageSizeList
                     keycloak={this.state.keycloak}
                   />
+                )}
+              />
+              <Route
+                path="/packageSizes/:packageSizeId"
+                exact={true}
+                render={props => (
+                    <EditPackageSize
+                      keycloak={this.state.keycloak}
+                      packageSizeId={props.match.params.packageSizeId as string}
+                    />
                 )}
               />
               <Route
@@ -214,6 +239,16 @@ class WelcomePage extends React.Component<Props, any> {
                 )}
               />
               <Route
+                path="/seeds/:seedId"
+                exact={true}
+                render={props => (
+                    <EditSeed
+                      keycloak={this.state.keycloak}
+                      seedId={props.match.params.seedId as string}
+                    />
+                )}
+              />
+              <Route
                 path="/createSeed"
                 exact={true}
                 render={props => (
@@ -232,6 +267,16 @@ class WelcomePage extends React.Component<Props, any> {
                 )}
               />
               <Route
+                path="/productionLines/:productionLineId"
+                exact={true}
+                render={props => (
+                    <EditProductionLine
+                      keycloak={this.state.keycloak}
+                      productionLineId={props.match.params.productionLineId as string}
+                    />
+                )}
+              />
+              <Route
                 path="/createProductionLine"
                 exact={true}
                 render={props => (
@@ -247,6 +292,16 @@ class WelcomePage extends React.Component<Props, any> {
                   <SeedBatchList
                     keycloak={this.state.keycloak}
                   />
+                )}
+              />
+              <Route
+                path="/seedBatches/:seedBatchId"
+                exact={true}
+                render={props => (
+                    <EditSeedBatch
+                      keycloak={this.state.keycloak}
+                      seedBatchId={props.match.params.seedBatchId as string}
+                    />
                 )}
               />
               <Route

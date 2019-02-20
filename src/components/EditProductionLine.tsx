@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { Team } from "famifarm-typescript-models";
+import { ProductionLine } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -19,26 +19,26 @@ import {
  */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  teamId: string;
-  team?: Team;
-  onTeamSelected?: (team: Team) => void;
-  onTeamDeleted?: (teamId: string) => void;
+  productionLineId: string;
+  productionLine?: ProductionLine;
+  onProductionLineSelected?: (productionLine: ProductionLine) => void;
+  onProductionLineDeleted?: (productionLineId: string) => void;
 }
 
 /**
  * Interface representing component state
  */
 interface State {
-  team?: Team;
+  productionLine?: ProductionLine;
   redirect: boolean;
   saving: boolean;
   messageVisible: boolean;
 }
 
 /**
- * React component for edit team view
+ * React component for edit production line view
  */
-class EditTeam extends React.Component<Props, State> {
+class EditProductionLine extends React.Component<Props, State> {
 
   /**
    * Constructor 
@@ -47,14 +47,14 @@ class EditTeam extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      team: undefined,
+      productionLine: undefined,
       redirect: false,
       saving: false,
       messageVisible: false
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handeNameChange = this.handeNameChange.bind(this);
+    this.handeLineNumberChange = this.handeLineNumberChange.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
   }
 
@@ -65,41 +65,49 @@ class EditTeam extends React.Component<Props, State> {
     if (!this.props.keycloak) {
       return;
     }
-    
-    const teamsService = await Api.getTeamsService(this.props.keycloak);
-    teamsService.findTeam(this.props.teamId).then((team) => {
-      this.props.onTeamSelected && this.props.onTeamSelected(team);
-      this.setState({team: team});
+
+    const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
+
+    productionLineService.findProductionLine(this.props.productionLineId).then((productionLine) => {
+      this.props.onProductionLineSelected && this.props.onProductionLineSelected(productionLine);
+      this.setState({productionLine: productionLine});
     });
   }
 
   /**
-   * Handle name change
+   * Handle line number change
    * 
    * @param event event
    */
-  private handeNameChange(event: React.FormEvent<HTMLInputElement>) {
-    const team = {
-      id: this.state.team!.id,
-      name: [{
-        language: "fi",
-        value: event.currentTarget.value
-      }]
+  private handeLineNumberChange(event: React.FormEvent<HTMLInputElement>) {
+    const lineNumber = parseInt(event.currentTarget.value);
+
+    if (isNaN(lineNumber)) {
+      alert(strings.productionLineNotNumber);
+      return;
+    }
+
+    const productionLine = {
+      id: this.state.productionLine!.id,
+      lineNumber: lineNumber
     };
 
-    this.setState({team: team});
+    this.setState({productionLine: productionLine});
   }
 
   /**
    * Handle form submit
    */
   private async handleSubmit() {
-    if (!this.props.keycloak || !this.state.team) {
+    if (!this.props.keycloak || !this.state.productionLine) {
       return;
     }
-    
-    const teamsService = await Api.getTeamsService(this.props.keycloak);
-    await teamsService.updateTeam(this.state.team, this.state.team.id!);
+
+    const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
+
+    this.setState({saving: true});
+    productionLineService.updateProductionLine(this.state.productionLine, this.state.productionLine.id || "");
+    this.setState({saving: false});
 
     this.setState({messageVisible: true});
     setTimeout(() => {
@@ -108,43 +116,43 @@ class EditTeam extends React.Component<Props, State> {
   }
 
   /**
-   * Handle team delete
+   * Handle productionLine delete
    */
   private async handleDelete() {
-    if (!this.props.keycloak || !this.state.team) {
+    if (!this.props.keycloak || !this.state.productionLine) {
       return;
     }
-    
-    const teamsService = await Api.getTeamsService(this.props.keycloak);
-    const id = this.state.team.id;
 
-    teamsService.deleteTeam(id!).then(() => {
-      this.props.onTeamDeleted && this.props.onTeamDeleted(id!);
+    const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
+    const id = this.state.productionLine.id || "";
+
+    productionLineService.deleteProductionLine(id).then(() => {
+      this.props.onProductionLineDeleted && this.props.onProductionLineDeleted(id);
       this.setState({redirect: true});
     });
   }
 
   /**
-   * Render edit team view
+   * Render edit productionLine view
    */
   public render() {
-    if (!this.props.team) {
+    if (!this.props.productionLine) {
       return (
-        <Grid style={{paddingTop: "100px"}} centered >
+        <Grid style={{paddingTop: "100px"}} centered>
           <Loader active size="medium" />
         </Grid>
       );
     }
 
     if (this.state.redirect) {
-      return <Redirect to="/teams" push={true} />;
+      return <Redirect to="/productionLines" push={true} />;
     }
 
     return (
       <Grid>
         <Grid.Row className="content-page-header-row">
           <Grid.Column width={6}>
-            <h2>{this.props.team!.name![0].value}</h2>
+            <h2>{this.props.productionLine!.lineNumber}</h2>
           </Grid.Column>
           <Grid.Column width={3} floated="right">
             <Button className="danger-button" onClick={this.handleDelete}>{strings.delete}</Button>
@@ -154,11 +162,11 @@ class EditTeam extends React.Component<Props, State> {
           <Grid.Column width={8}>
           <Form>
           <Form.Field required>
-            <label>{strings.teamName}</label>
+            <label>{strings.productionLineNumber}</label>
             <Input 
-              value={this.state.team && this.state.team!.name![0].value} 
-              placeholder={strings.teamName}
-              onChange={this.handeNameChange}
+              value={this.state.productionLine && this.state.productionLine!.lineNumber} 
+              placeholder={strings.productionLineNumber}
+              onChange={this.handeLineNumberChange}
             />
           </Form.Field>
             <Message
@@ -182,4 +190,4 @@ class EditTeam extends React.Component<Props, State> {
   }
 }
 
-export default EditTeam;
+export default EditProductionLine;

@@ -20,7 +20,6 @@ export interface Props {
 
 export interface State {
   name: string;
-  defaultPackageSize: string
   redirect: boolean;
 }
 
@@ -29,7 +28,6 @@ class EditPackageSize extends React.Component<Props, State> {
     super(props);
     this.state = {
       name: "",
-      defaultPackageSize: "",
       redirect: false
     };
 

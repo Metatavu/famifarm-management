@@ -10,10 +10,14 @@ import {
   Button,
   Loader,
   Form,
-  Input
+  Input,
+  Message
 } from "semantic-ui-react";
 
-export interface Props {
+/**
+ * Interface representing component properties
+ */
+interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   performedCultivationActionId: string;
   performedCultivationAction?: PerformedCultivationAction;
@@ -21,17 +25,32 @@ export interface Props {
   onPerformedCultivationActionDeleted?: (performedCultivationActionId: string) => void;
 }
 
-export interface State {
+/**
+ * Interface representing component state
+ */
+interface State {
   performedCultivationAction?: PerformedCultivationAction;
   redirect: boolean;
+  saving: boolean;
+  messageVisible: boolean;
 }
 
+/**
+ * React component for edit performed cultivation action view
+ */
 class EditPerformedCultivationAction extends React.Component<Props, State> {
+
+  /**
+   * Constructor
+   * @param props component properties
+   */
   constructor(props: Props) {
     super(props);
     this.state = {
-        performedCultivationAction: undefined,
-        redirect: false
+      performedCultivationAction: undefined,
+      redirect: false,
+      saving: false,
+      messageVisible: false
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -42,7 +61,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle method
    */
-  async componentDidMount() {
+  public async componentDidMount() {
     if (!this.props.keycloak) {
       return;
     }
@@ -59,7 +78,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
    * 
    * @param event event
    */
-  handeNameChange(event: React.FormEvent<HTMLInputElement>) {
+  private handeNameChange(event: React.FormEvent<HTMLInputElement>) {
     const performedCultivationAction = {
       id: this.state.performedCultivationAction!.id,
       name: [{
@@ -74,19 +93,28 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  async handleSubmit() {
+  private async handleSubmit() {
     if (!this.props.keycloak || !this.state.performedCultivationAction) {
       return;
     }
 
+    this.setState({saving: true});
+
     const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
     performedCultivationActionService.updatePerformedCultivationAction(this.state.performedCultivationAction, this.state.performedCultivationAction.id!);
+    
+    this.setState({saving: false});
+
+    this.setState({messageVisible: true});
+    setTimeout(() => {
+      this.setState({messageVisible: false});
+    }, 3000);
   }
 
   /**
    * Handle performedCultivationAction delete
    */
-  async handleDelete() {
+  private async handleDelete() {
     if (!this.props.keycloak) {
       return;
     }
@@ -102,10 +130,10 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
   /**
    * Render edit performedCultivationAction view
    */
-  render() {
+  public render() {
     if (!this.props.performedCultivationAction) {
       return (
-        <Grid style={{paddingTop: "100px"}} centered className="pieru">
+        <Grid style={{paddingTop: "100px"}} centered >
           <Loader active size="medium" />
         </Grid>
       );
@@ -122,7 +150,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
             <h2>{this.props.performedCultivationAction!.name![0].value}</h2>
           </Grid.Column>
           <Grid.Column width={3} floated="right">
-            <Button className="danger-button" onClick={this.handleDelete}>{strings.deletePerformedCultivationAction}</Button>
+            <Button className="danger-button" onClick={this.handleDelete}>{strings.delete}</Button>
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
@@ -136,7 +164,19 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
               onChange={this.handeNameChange}
             />
           </Form.Field>
-            <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
+            <Message
+              success
+              visible={this.state.messageVisible}
+              header={strings.savedSuccessfully}
+            />
+            <Button 
+              className="submit-button" 
+              onClick={this.handleSubmit} 
+              type='submit'
+              loading={this.state.saving}
+            >
+                {strings.save}
+            </Button>
           </Form>
           </Grid.Column>
         </Grid.Row>

@@ -28,7 +28,7 @@ export class WastageReasonsService {
     };
 
     return fetch(url.toString(), options).then((response) => {
-      return response.json();
+      return this.handleResponse(response);
     });
   }
 
@@ -49,7 +49,7 @@ export class WastageReasonsService {
     };
 
     return fetch(url.toString(), options).then((response) => {
-      return response.json();
+      return this.handleResponse(response);
     });
   }
 
@@ -70,7 +70,7 @@ export class WastageReasonsService {
     };
 
     return fetch(url.toString(), options).then((response) => {
-      return response.json();
+      return this.handleResponse(response);
     });
   }
 
@@ -100,7 +100,7 @@ export class WastageReasonsService {
     };
 
     return fetch(url.toString(), options).then((response) => {
-      return response.json();
+      return this.handleResponse(response);
     });
   }
 
@@ -123,8 +123,22 @@ export class WastageReasonsService {
     };
 
     return fetch(url.toString(), options).then((response) => {
-      return response.json();
+      return this.handleResponse(response);
     });
+  }
+
+  /**
+   * Handle response from API
+   * 
+   * @param response response object
+   */
+  public handleResponse(response: any) {
+    switch (response.status) {
+      case 204:
+        return {};
+      default:
+        return response.json();
+    }
   }
 
 }
