@@ -14,7 +14,10 @@ import {
   Message
 } from "semantic-ui-react";
 
-export interface Props {
+/**
+ * Interface representing component properties
+ */
+interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   performedCultivationActionId: string;
   performedCultivationAction?: PerformedCultivationAction;
@@ -22,14 +25,25 @@ export interface Props {
   onPerformedCultivationActionDeleted?: (performedCultivationActionId: string) => void;
 }
 
-export interface State {
+/**
+ * Interface representing component state
+ */
+interface State {
   performedCultivationAction?: PerformedCultivationAction;
   redirect: boolean;
   saving: boolean;
   messageVisible: boolean;
 }
 
+/**
+ * React component for edit performed cultivation action view
+ */
 class EditPerformedCultivationAction extends React.Component<Props, State> {
+
+  /**
+   * Constructor
+   * @param props component properties
+   */
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -47,7 +61,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle method
    */
-  async componentDidMount() {
+  public async componentDidMount() {
     if (!this.props.keycloak) {
       return;
     }
@@ -64,7 +78,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
    * 
    * @param event event
    */
-  handeNameChange(event: React.FormEvent<HTMLInputElement>) {
+  private handeNameChange(event: React.FormEvent<HTMLInputElement>) {
     const performedCultivationAction = {
       id: this.state.performedCultivationAction!.id,
       name: [{
@@ -79,7 +93,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  async handleSubmit() {
+  private async handleSubmit() {
     if (!this.props.keycloak || !this.state.performedCultivationAction) {
       return;
     }
@@ -100,7 +114,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
   /**
    * Handle performedCultivationAction delete
    */
-  async handleDelete() {
+  private async handleDelete() {
     if (!this.props.keycloak) {
       return;
     }
@@ -116,10 +130,10 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
   /**
    * Render edit performedCultivationAction view
    */
-  render() {
+  public render() {
     if (!this.props.performedCultivationAction) {
       return (
-        <Grid style={{paddingTop: "100px"}} centered className="pieru">
+        <Grid style={{paddingTop: "100px"}} centered>
           <Loader active size="medium" />
         </Grid>
       );

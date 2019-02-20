@@ -14,7 +14,10 @@ import {
   Message
 } from "semantic-ui-react";
 
-export interface Props {
+/**
+ * Interface representing component properties
+ */
+interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   seedId: string;
   seed?: Seed;
@@ -22,14 +25,26 @@ export interface Props {
   onSeedDeleted?: (seedId: string) => void;
 }
 
-export interface State {
+/**
+ * Interface representing component state
+ */
+interface State {
   seed?: Seed;
   redirect: boolean;
   saving: boolean;
   messageVisible: boolean;
 }
 
+/**
+ * React component for edit seed view
+ */
 class EditSeed extends React.Component<Props, State> {
+
+  /**
+   * Constructor
+   * 
+   * @param props component properties
+   */
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -47,7 +62,7 @@ class EditSeed extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle method
    */
-  async componentDidMount() {
+  public async componentDidMount() {
     if (!this.props.keycloak) {
       return;
     }
@@ -65,7 +80,7 @@ class EditSeed extends React.Component<Props, State> {
    * 
    * @param event event
    */
-  handeNameChange(event: React.FormEvent<HTMLInputElement>) {
+  private handeNameChange(event: React.FormEvent<HTMLInputElement>) {
     const seed = {
       id: this.state.seed!.id,
       name: [{
@@ -80,7 +95,7 @@ class EditSeed extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  async handleSubmit() {
+  private async handleSubmit() {
     if (!this.props.keycloak || !this.state.seed) {
       return;
     }
@@ -100,7 +115,7 @@ class EditSeed extends React.Component<Props, State> {
   /**
    * Handle seed delete
    */
-  async handleDelete() {
+  private async handleDelete() {
     if (!this.props.keycloak || !this.state.seed) {
       return;
     }
@@ -117,10 +132,10 @@ class EditSeed extends React.Component<Props, State> {
   /**
    * Render edit seed view
    */
-  render() {
+  public render() {
     if (!this.props.seed) {
       return (
-        <Grid style={{paddingTop: "100px"}} centered className="pieru">
+        <Grid style={{paddingTop: "100px"}} centered>
           <Loader active size="medium" />
         </Grid>
       );

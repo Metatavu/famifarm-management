@@ -14,7 +14,10 @@ import {
   Message
 } from "semantic-ui-react";
 
-export interface Props {
+/**
+ * Interface representing component properties
+ */
+interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   packageSizeId: string;
   packageSize?: PackageSize;
@@ -22,14 +25,26 @@ export interface Props {
   onPackageSizeDeleted?: (packageSizeId: string) => void;
 }
 
-export interface State {
+/**
+ * Interface representing component state
+ */
+interface State {
   packageSize?: PackageSize;
   redirect: boolean;
   saving: boolean;
   messageVisible: boolean;
 }
 
+/**
+ * React component for edit package size layout
+ */
 class EditPackageSize extends React.Component<Props, State> {
+
+  /**
+   * Constructor
+   * 
+   * @param props component properties
+   */
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -47,7 +62,7 @@ class EditPackageSize extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle method
    */
-  async componentDidMount() {
+  public async componentDidMount() {
     if (!this.props.keycloak) {
       return;
     }
@@ -65,7 +80,7 @@ class EditPackageSize extends React.Component<Props, State> {
    * 
    * @param event event
    */
-  handeNameChange(event: React.FormEvent<HTMLInputElement>) {
+  private handeNameChange(event: React.FormEvent<HTMLInputElement>) {
     const packageSize = {
       id: this.state.packageSize!.id,
       name: event.currentTarget.value
@@ -77,7 +92,7 @@ class EditPackageSize extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  async handleSubmit() {
+  private async handleSubmit() {
     if (!this.props.keycloak) {
       return;
     }
@@ -101,7 +116,7 @@ class EditPackageSize extends React.Component<Props, State> {
   /**
    * Handle packageSize delete
    */
-  async handleDelete() {
+  private async handleDelete() {
     if (!this.props.keycloak || !this.state.packageSize) {
       return;
     }
@@ -118,10 +133,10 @@ class EditPackageSize extends React.Component<Props, State> {
   /**
    * Render edit packageSize view
    */
-  render() {
+  public render() {
     if (!this.props.packageSize) {
       return (
-        <Grid style={{paddingTop: "100px"}} centered className="pieru">
+        <Grid style={{paddingTop: "100px"}} centered>
           <Loader active size="medium" />
         </Grid>
       );

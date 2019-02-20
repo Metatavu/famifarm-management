@@ -14,7 +14,10 @@ import {
   Message
 } from "semantic-ui-react";
 
-export interface Props {
+/**
+ * Interface representing component properties
+ */
+interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   teamId: string;
   team?: Team;
@@ -22,14 +25,25 @@ export interface Props {
   onTeamDeleted?: (teamId: string) => void;
 }
 
-export interface State {
+/**
+ * Interface representing component state
+ */
+interface State {
   team?: Team;
   redirect: boolean;
   saving: boolean;
   messageVisible: boolean;
 }
 
+/**
+ * React component for edit team view
+ */
 class EditTeam extends React.Component<Props, State> {
+
+  /**
+   * Constructor 
+   * @param props component properties
+   */
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -47,7 +61,7 @@ class EditTeam extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle method
    */
-  async componentDidMount() {
+  public async componentDidMount() {
     if (!this.props.keycloak) {
       return;
     }
@@ -64,7 +78,7 @@ class EditTeam extends React.Component<Props, State> {
    * 
    * @param event event
    */
-  handeNameChange(event: React.FormEvent<HTMLInputElement>) {
+  private handeNameChange(event: React.FormEvent<HTMLInputElement>) {
     const team = {
       id: this.state.team!.id,
       name: [{
@@ -79,7 +93,7 @@ class EditTeam extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  async handleSubmit() {
+  private async handleSubmit() {
     if (!this.props.keycloak || !this.state.team) {
       return;
     }
@@ -96,7 +110,7 @@ class EditTeam extends React.Component<Props, State> {
   /**
    * Handle team delete
    */
-  async handleDelete() {
+  private async handleDelete() {
     if (!this.props.keycloak || !this.state.team) {
       return;
     }
@@ -113,10 +127,10 @@ class EditTeam extends React.Component<Props, State> {
   /**
    * Render edit team view
    */
-  render() {
+  public render() {
     if (!this.props.team) {
       return (
-        <Grid style={{paddingTop: "100px"}} centered className="pieru">
+        <Grid style={{paddingTop: "100px"}} centered>
           <Loader active size="medium" />
         </Grid>
       );

@@ -14,7 +14,10 @@ import {
   Message
 } from "semantic-ui-react";
 
-export interface Props {
+/**
+ * Interface representing component properties
+ */
+interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   productionLineId: string;
   productionLine?: ProductionLine;
@@ -22,14 +25,25 @@ export interface Props {
   onProductionLineDeleted?: (productionLineId: string) => void;
 }
 
-export interface State {
+/**
+ * Interface representing component state
+ */
+interface State {
   productionLine?: ProductionLine;
   redirect: boolean;
   saving: boolean;
   messageVisible: boolean;
 }
 
+/**
+ * React component for edit production line view
+ */
 class EditProductionLine extends React.Component<Props, State> {
+
+  /**
+   * Constructor 
+   * @param props component properties
+   */
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -47,7 +61,7 @@ class EditProductionLine extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle method
    */
-  async componentDidMount() {
+  public async componentDidMount() {
     if (!this.props.keycloak) {
       return;
     }
@@ -65,7 +79,7 @@ class EditProductionLine extends React.Component<Props, State> {
    * 
    * @param event event
    */
-  handeLineNumberChange(event: React.FormEvent<HTMLInputElement>) {
+  private handeLineNumberChange(event: React.FormEvent<HTMLInputElement>) {
     const lineNumber = parseInt(event.currentTarget.value);
 
     if (isNaN(lineNumber)) {
@@ -84,7 +98,7 @@ class EditProductionLine extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  async handleSubmit() {
+  private async handleSubmit() {
     if (!this.props.keycloak || !this.state.productionLine) {
       return;
     }
@@ -104,7 +118,7 @@ class EditProductionLine extends React.Component<Props, State> {
   /**
    * Handle productionLine delete
    */
-  async handleDelete() {
+  private async handleDelete() {
     if (!this.props.keycloak || !this.state.productionLine) {
       return;
     }
@@ -121,10 +135,10 @@ class EditProductionLine extends React.Component<Props, State> {
   /**
    * Render edit productionLine view
    */
-  render() {
+  public render() {
     if (!this.props.productionLine) {
       return (
-        <Grid style={{paddingTop: "100px"}} centered className="pieru">
+        <Grid style={{paddingTop: "100px"}} centered>
           <Loader active size="medium" />
         </Grid>
       );

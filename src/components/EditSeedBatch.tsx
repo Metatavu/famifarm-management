@@ -6,7 +6,6 @@ import { Redirect } from 'react-router';
 import { DateInput } from 'semantic-ui-calendar-react';
 import strings from "src/localization/strings";
 
-
 import {
   Grid,
   Button,
@@ -17,7 +16,10 @@ import {
   InputOnChangeData
 } from "semantic-ui-react";
 
-export interface Props {
+/**
+ * Interface representing component properties
+ */
+interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   seedBatchId: string;
   seedBatch?: SeedBatch;
@@ -27,7 +29,10 @@ export interface Props {
   onSeedsFound?: (seeds: Seed[]) => void;
 }
 
-export interface State {
+/**
+ * Interface representing component state
+ */
+interface State {
   code: string;
   seedId: string;
   time: string;
@@ -38,7 +43,16 @@ export interface State {
   seeds: Seed[];
 }
 
+/**
+ * React component for edit seed batch view
+ */
 class EditSeedBatch extends React.Component<Props, State> {
+
+  /**
+   * Constructor
+   * 
+   * @param props component properties
+   */
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -60,7 +74,7 @@ class EditSeedBatch extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle method
    */
-  async componentDidMount() {
+  public async componentDidMount() {
     if (!this.props.keycloak) {
       return;
     }
@@ -84,7 +98,7 @@ class EditSeedBatch extends React.Component<Props, State> {
    * 
    * @param event event
    */
-  handeCodeChange(event: React.FormEvent<HTMLInputElement>) {
+  private handeCodeChange(event: React.FormEvent<HTMLInputElement>) {
     if (!this.state.seedBatch) {
       return;
     }
@@ -104,7 +118,7 @@ class EditSeedBatch extends React.Component<Props, State> {
    * @param e event
    * @param {value} value
    */
-  onSelectChange = (e: any, { value }: InputOnChangeData) => {
+  private onSelectChange = (e: any, { value }: InputOnChangeData) => {
     if (!this.state.seedBatch) {
       return;
     }
@@ -125,7 +139,7 @@ class EditSeedBatch extends React.Component<Props, State> {
    * @param event event
    * @param {name, value} name and value
    */
-  handleTimeChange = (event: any, {name, value} : any) => {
+  private handleTimeChange = (event: any, {name, value} : any) => {
     if (!this.state.seedBatch) {
       return;
     }
@@ -143,7 +157,7 @@ class EditSeedBatch extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  async handleSubmit() {
+  private async handleSubmit() {
     if (!this.props.keycloak || !this.state.seedBatch) {
       return;
     }
@@ -164,7 +178,7 @@ class EditSeedBatch extends React.Component<Props, State> {
   /**
    * Handle seedBatch delete
    */
-  async handleDelete() {
+  private async handleDelete() {
     if (!this.props.keycloak || !this.state.seedBatch) {
       return;
     }
@@ -181,10 +195,10 @@ class EditSeedBatch extends React.Component<Props, State> {
   /**
    * Render edit seedBatch view
    */
-  render() {
+  public render() {
     if (!this.props.seedBatch) {
       return (
-        <Grid style={{paddingTop: "100px"}} centered className="pieru">
+        <Grid style={{paddingTop: "100px"}} centered>
           <Loader active size="medium" />
         </Grid>
       );

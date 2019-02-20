@@ -24,6 +24,10 @@ interface State {
  */
 class BasicLayout extends React.Component<Props, State> {
 
+  /**
+   * Constructor
+   * @param props component properties 
+   */
   constructor(props: Props) {
     super(props);
     this.state = {
