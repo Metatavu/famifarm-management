@@ -133,7 +133,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
   public render() {
     if (!this.props.performedCultivationAction) {
       return (
-        <Grid style={{paddingTop: "100px"}} centered>
+        <Grid style={{paddingTop: "100px"}} centered >
           <Loader active size="medium" />
         </Grid>
       );
