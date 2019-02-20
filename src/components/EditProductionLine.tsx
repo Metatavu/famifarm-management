@@ -11,7 +11,8 @@ import {
   Loader,
   Form,
   Input,
-  Message
+  Message,
+  Confirm
 } from "semantic-ui-react";
 
 /**
@@ -33,6 +34,7 @@ interface State {
   redirect: boolean;
   saving: boolean;
   messageVisible: boolean;
+  open:boolean
 }
 
 /**
@@ -50,7 +52,8 @@ class EditProductionLine extends React.Component<Props, State> {
       productionLine: undefined,
       redirect: false,
       saving: false,
-      messageVisible: false
+      messageVisible: false,
+      open:false
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -155,7 +158,7 @@ class EditProductionLine extends React.Component<Props, State> {
             <h2>{this.props.productionLine!.lineNumber}</h2>
           </Grid.Column>
           <Grid.Column width={3} floated="right">
-            <Button className="danger-button" onClick={this.handleDelete}>{strings.delete}</Button>
+            <Button className="danger-button" onClick={()=>this.setState({open:true})}>{strings.delete}</Button>
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
@@ -185,6 +188,7 @@ class EditProductionLine extends React.Component<Props, State> {
           </Form>
           </Grid.Column>
         </Grid.Row>
+        <Confirm open={this.state.open} size={"mini"} content={strings.deleteConfirmationText+strings.productionLineNumber+" "+this.props.productionLine!.lineNumber} onCancel={()=>this.setState({open:false})} onConfirm={this.handleDelete} />
       </Grid>
     );
   }

@@ -54,5 +54,6 @@
   "packingEventText": "Packed {0} plants into {1} size boxes",
   "wastageEventHeader": "Wastage",
   "wastageEventText": "Wasted {0} plants",
-  "unknownEventHeader": "Unknown"
+  "unknownEventHeader": "Unknown",
+  "deleteConfirmationText": "Are you sure you want to delete: "
 }
