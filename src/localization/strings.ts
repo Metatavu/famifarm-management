@@ -78,6 +78,7 @@ export interface IStrings extends LocalizedStringsMethods {
   wastageReasons: string
   newWastageReason: string
   wastageReasonReason: string
+  deleteConfirmationText: string
 }
 
 const strings: IStrings = new LocalizedStrings({
