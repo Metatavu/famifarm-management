@@ -12,18 +12,30 @@ import {
   Input
 } from "semantic-ui-react";
 
+/**
+ * Interface representing component properties
+ */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   wastageReason?: WastageReason;
   onWastageReasonCreated?: (wastageReason: WastageReason) => void;
 }
 
+/**
+ * Interface representing component state
+ */
 interface State {
   reason?: LocalizedValue[];
   redirect: boolean;
 }
 
 class CreateWastageReason extends React.Component<Props, State> {
+
+  /**
+   * Constructor
+   * 
+   * @param props component properties
+   */
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -40,7 +52,7 @@ class CreateWastageReason extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  async handleSubmit() {
+  private async handleSubmit() {
     if (!this.props.keycloak) {
       return;
     }
@@ -58,7 +70,7 @@ class CreateWastageReason extends React.Component<Props, State> {
   /**
    * Render create wastageReason view
    */
-  render() {
+  public render() {
     if (this.state.redirect) {
       return <Redirect to="/wastageReasons" push={true} />;
     }
