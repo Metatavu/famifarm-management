@@ -73,6 +73,11 @@ export interface IStrings extends LocalizedStringsMethods {
   wastageEventText: string
 
   unknownEventHeader: string
+
+  wastageReason: string
+  wastageReasons: string
+  newWastageReason: string
+  wastageReasonReason: string
 }
 
 const strings: IStrings = new LocalizedStrings({

@@ -1,6 +1,6 @@
 import * as constants from '../constants'
 import { KeycloakInstance } from 'keycloak-js';
-import { Team, Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, Batch } from "famifarm-typescript-models";
+import { Team, Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, Batch, WastageReason } from "famifarm-typescript-models";
 
 export interface UserLogin {
   type: constants.USER_LOGIN;
@@ -157,6 +157,26 @@ export interface PerformedCultivationActionDeleted {
   performedCultivationActionId: string;
 }
 
+export interface WastageReasonsFound {
+  type: constants.WASTAGE_REASONS_FOUND;
+  wastageReasons: WastageReason[];
+}
+
+export interface WastageReasonSelected {
+  type: constants.WASTAGE_REASON_SELECTED;
+  wastageReason: WastageReason;
+}
+
+export interface WastageReasonCreated {
+  type: constants.WASTAGE_REASON_CREATED;
+  wastageReason: WastageReason;
+}
+
+export interface WastageReasonDeleted {
+  type: constants.WASTAGE_REASON_DELETED;
+  wastageReasonId: string;
+}
+
 
 export type AppAction = UserLogin | UserLogout | TeamsFound | TeamSelected | TeamCreated | TeamDeleted 
   | ProductsFound | ProductSelected | ProductCreated | ProductDeleted | PackageSizesFound 
@@ -164,7 +184,8 @@ export type AppAction = UserLogin | UserLogout | TeamsFound | TeamSelected | Tea
   | SeedSelected | SeedDeleted | ProductionLinesFound | ProductionLineSelected | ProductionLineCreated
   | ProductionLineDeleted | SeedBatchesFound | SeedBatchSelected | SeedBatchCreated | SeedBatchDeleted
   | PerformedCultivationActionsFound | PerformedCultivationActionSelected | PerformedCultivationActionCreated
-  | PerformedCultivationActionDeleted | BatchesFound;
+  | PerformedCultivationActionDeleted | BatchesFound | WastageReasonsFound | WastageReasonSelected 
+  | WastageReasonCreated | WastageReasonDeleted;
 
 export function userLogin(keycloak: KeycloakInstance, authenticated: boolean): UserLogin {
   return {
@@ -380,5 +401,33 @@ export function performedCultivationActionDeleted(performedCultivationActionId: 
   return {
     type: constants.PERFORMED_CULTIVATION_ACTION_DELETED,
     performedCultivationActionId: performedCultivationActionId
+  }
+}
+
+export function wastageReasonsFound(wastageReasons: WastageReason[]): WastageReasonsFound {
+  return {
+    type: constants.WASTAGE_REASONS_FOUND,
+    wastageReasons: wastageReasons
+  }
+}
+
+export function wastageReasonSelected(wastageReason: WastageReason): WastageReasonSelected {
+  return {
+    type: constants.WASTAGE_REASON_SELECTED,
+    wastageReason: wastageReason
+  }
+}
+
+export function wastageReasonCreated(wastageReason: WastageReason): WastageReasonCreated {
+  return {
+    type: constants.WASTAGE_REASON_CREATED,
+    wastageReason: wastageReason
+  }
+}
+
+export function wastageReasonDeleted(wastageReasonId: string): WastageReasonDeleted {
+  return {
+    type: constants.WASTAGE_REASON_DELETED,
+    wastageReasonId: wastageReasonId
   }
 }
