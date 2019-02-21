@@ -15,7 +15,7 @@ import {
 /**
  * Interface representing component properties
  */
-export interface Props {
+interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   wastageReasons?: WastageReason[];
   onWastageReasonsFound?: (wastageReasons: WastageReason[]) => void;
@@ -24,7 +24,7 @@ export interface Props {
 /**
  * Interface representing component state
  */
-export interface State {
+interface State {
   wastageReasons: WastageReason[];
 }
 
@@ -38,7 +38,7 @@ class WastageReasonsList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-        wastageReasons: []
+      wastageReasons: []
     };
   }
 
