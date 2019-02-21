@@ -12,17 +12,29 @@ import {
   Loader
 } from "semantic-ui-react";
 
+/**
+ * Interface representing component properties
+ */
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   wastageReasons?: WastageReason[];
   onWastageReasonsFound?: (wastageReasons: WastageReason[]) => void;
 }
 
+/**
+ * Interface representing component state
+ */
 export interface State {
   wastageReasons: WastageReason[];
 }
 
 class WastageReasonsList extends React.Component<Props, State> {
+  
+  /**
+   * Constructor
+   * 
+   * @param props component properties
+   */
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -33,7 +45,7 @@ class WastageReasonsList extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle event
    */
-  async componentDidMount() {
+  public async componentDidMount() {
     if (!this.props.keycloak) {
       return;
     }
@@ -47,7 +59,7 @@ class WastageReasonsList extends React.Component<Props, State> {
   /**
    * Render wastageReason list view
    */
-  render() {
+  public render() {
     if (!this.props.wastageReasons) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>

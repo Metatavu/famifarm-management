@@ -157,21 +157,33 @@ export interface PerformedCultivationActionDeleted {
   performedCultivationActionId: string;
 }
 
+/**
+ * Interface representing WastageReasonsFound action
+ */
 export interface WastageReasonsFound {
   type: constants.WASTAGE_REASONS_FOUND;
   wastageReasons: WastageReason[];
 }
 
+/**
+ * Interface representing WastageReasonSelected action
+ */
 export interface WastageReasonSelected {
   type: constants.WASTAGE_REASON_SELECTED;
   wastageReason: WastageReason;
 }
 
+/**
+ * Interface representing WastageReasonCreated action
+ */
 export interface WastageReasonCreated {
   type: constants.WASTAGE_REASON_CREATED;
   wastageReason: WastageReason;
 }
 
+/**
+ * Interface representing WastageReasonDeleted action
+ */
 export interface WastageReasonDeleted {
   type: constants.WASTAGE_REASON_DELETED;
   wastageReasonId: string;
@@ -404,6 +416,12 @@ export function performedCultivationActionDeleted(performedCultivationActionId: 
   }
 }
 
+/**
+ * Action wastageReasonsFound
+ * 
+ * @param wastageReasons array of wastage reasons
+ * @return { type, wastageReasons }
+ */
 export function wastageReasonsFound(wastageReasons: WastageReason[]): WastageReasonsFound {
   return {
     type: constants.WASTAGE_REASONS_FOUND,
@@ -411,6 +429,12 @@ export function wastageReasonsFound(wastageReasons: WastageReason[]): WastageRea
   }
 }
 
+/**
+ * Action wastageReasonSelected
+ * 
+ * @param wastageReason wastage reason
+ * @return { type, wastageReason }
+ */
 export function wastageReasonSelected(wastageReason: WastageReason): WastageReasonSelected {
   return {
     type: constants.WASTAGE_REASON_SELECTED,
@@ -418,6 +442,12 @@ export function wastageReasonSelected(wastageReason: WastageReason): WastageReas
   }
 }
 
+/**
+ * Action wastageReasonCreated
+ * 
+ * @param wastageReason wastage reason
+ * @return { type, wastageReason }
+ */
 export function wastageReasonCreated(wastageReason: WastageReason): WastageReasonCreated {
   return {
     type: constants.WASTAGE_REASON_CREATED,
@@ -425,6 +455,12 @@ export function wastageReasonCreated(wastageReason: WastageReason): WastageReaso
   }
 }
 
+/**
+ * Action wastageReasonDeleted
+ * 
+ * @param wastageReasonId wastage reason id
+ * @return { type, wastageReasonId }
+ */
 export function wastageReasonDeleted(wastageReasonId: string): WastageReasonDeleted {
   return {
     type: constants.WASTAGE_REASON_DELETED,
