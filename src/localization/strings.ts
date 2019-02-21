@@ -74,6 +74,10 @@ export interface IStrings extends LocalizedStringsMethods {
 
   unknownEventHeader: string
 
+  wastageReason: string
+  wastageReasons: string
+  newWastageReason: string
+  wastageReasonReason: string
   deleteConfirmationText: string
 }
 

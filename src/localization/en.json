@@ -55,5 +55,11 @@
   "wastageEventHeader": "Wastage",
   "wastageEventText": "Wasted {0} plants",
   "unknownEventHeader": "Unknown",
+
+  "wastageReason": "Wastage reason",
+  "wastageReasons": "Wastage reasons",
+  "newWastageReason": "New wastage reasons",
+  "wastageReasonReason": "Reason",
+  
   "deleteConfirmationText": "Are you sure you want to delete: "
 }

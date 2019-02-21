@@ -24,7 +24,10 @@ import {
   PERFORMED_CULTIVATION_ACTIONS_FOUND,
   PERFORMED_CULTIVATION_ACTION_DELETED,
   PERFORMED_CULTIVATION_ACTION_SELECTED, 
-  BATCHES_FOUND} from '../constants/index';
+  BATCHES_FOUND,
+  WASTAGE_REASONS_FOUND,
+  WASTAGE_REASON_DELETED,
+  WASTAGE_REASON_SELECTED} from '../constants/index';
 
 /**
  * Process action 
@@ -82,6 +85,12 @@ export function processAction(state: StoreState, action: AppAction): StoreState 
       return { ...state, performedCultivationAction: action.performedCultivationAction};
     case PERFORMED_CULTIVATION_ACTION_DELETED:
       return { ...state,  performedCultivationActions: (state.performedCultivationActions || []).filter((performedCultivationAction) => {return performedCultivationAction.id !== action.performedCultivationActionId})};
+    case WASTAGE_REASONS_FOUND:
+      return { ...state, wastageReasons: action.wastageReasons };
+    case WASTAGE_REASON_SELECTED:
+      return { ...state, wastageReason: action.wastageReason};
+    case WASTAGE_REASON_DELETED:
+      return { ...state,  wastageReasons: (state.wastageReasons || []).filter((wastageReason) => {return wastageReason.id !== action.wastageReasonId})};
     }
   return state;
 }
