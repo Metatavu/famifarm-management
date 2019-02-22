@@ -27,7 +27,8 @@ import {
   BATCHES_FOUND,
   WASTAGE_REASONS_FOUND,
   WASTAGE_REASON_DELETED,
-  WASTAGE_REASON_SELECTED} from '../constants/index';
+  WASTAGE_REASON_SELECTED,
+  PESTS_FOUND} from '../constants/index';
 
 /**
  * Process action 
@@ -91,6 +92,8 @@ export function processAction(state: StoreState, action: AppAction): StoreState 
       return { ...state, wastageReason: action.wastageReason};
     case WASTAGE_REASON_DELETED:
       return { ...state,  wastageReasons: (state.wastageReasons || []).filter((wastageReason) => {return wastageReason.id !== action.wastageReasonId})};
+    case PESTS_FOUND:
+      return { ...state, pests: action.pests}
     }
   return state;
 }
