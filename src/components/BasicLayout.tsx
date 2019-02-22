@@ -54,7 +54,6 @@ class BasicLayout extends React.Component<Props, State> {
    * Toggles selected language
    */
   private toggleLocale = () => {
-    console.log(this.props.locale)
     const currentLocale = strings.getLanguage();
     if (currentLocale === "fi") {
       strings.setLanguage("en");
@@ -78,7 +77,7 @@ class BasicLayout extends React.Component<Props, State> {
           <Menu.Item as={NavLink} to="/" header>
             {strings.managementHeaderText}
           </Menu.Item>
-          <h1 onClick={this.toggleLocale}>{this.props.locale === "fi" ? "In english" : "Suomeksi"}</h1>
+          <Menu.Item onClick={this.toggleLocale} position={"right"}>{this.props.locale === "fi" ? "In english" : "Suomeksi"}</Menu.Item> 
         </Menu>
         <div style={{marginTop: '0'}}>
           <Sidebar.Pushable>
