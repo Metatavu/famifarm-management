@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { WastageReason, LocalizedValue } from "famifarm-typescript-models";
+import { WastageReason, WastageReasonOpt, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -9,15 +9,14 @@ import {
   Grid,
   Button,
   Form,
-  Input
 } from "semantic-ui-react";
+import LocalizedValueInput from "./LocalizedValueInput";
 
 /**
  * Interface representing component properties
  */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  wastageReason?: WastageReason;
   onWastageReasonCreated?: (wastageReason: WastageReason) => void;
 }
 
@@ -25,8 +24,8 @@ interface Props {
  * Interface representing component state
  */
 interface State {
-  reason?: LocalizedValue[];
   redirect: boolean;
+  wastageReasonData: WastageReasonOpt
 }
 
 class CreateWastageReason extends React.Component<Props, State> {
@@ -39,10 +38,7 @@ class CreateWastageReason extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      reason: [{
-        language: "fi",
-        value: ""
-      }],
+      wastageReasonData: {},
       redirect: false
     };
 
@@ -57,13 +53,24 @@ class CreateWastageReason extends React.Component<Props, State> {
       return;
     }
 
-    const wastageReasonObject = {
-      reason: this.state.reason
+    const wastageReasonObject: WastageReason = {
+      reason: this.state.wastageReasonData.reason
     };
 
     const wastageReasonService = await Api.getWastageReasonsService(this.props.keycloak);
     wastageReasonService.createWastageReason(wastageReasonObject).then(() => {
       this.setState({redirect: true});
+    });
+  }
+
+  /**
+   * Updates reason text
+   * 
+   * @param reason localized entry representing reason
+   */
+  private updateReason = (reason: LocalizedEntry) => {
+    this.setState({
+      wastageReasonData: {...this.state.wastageReasonData, reason: reason}
     });
   }
 
@@ -87,10 +94,10 @@ class CreateWastageReason extends React.Component<Props, State> {
             <Form>
               <Form.Field required>
                 <label>{strings.wastageReasonReason}</label>
-                <Input 
-                  value={this.state.reason![0].value} 
-                  placeholder={strings.wastageReasonReason}
-                  onChange={(e) => this.setState({reason: [{language: "fi", value: e.currentTarget.value}]})}
+                <LocalizedValueInput 
+                  onValueChange={this.updateReason}
+                  value={this.state.wastageReasonData.reason}
+                  languages={["fi", "en"]}
                 />
               </Form.Field>
               <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>

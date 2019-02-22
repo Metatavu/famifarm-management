@@ -1,3 +1,4 @@
+import { Api } from ".";
 
 export class ReportsService {
 
@@ -14,9 +15,19 @@ export class ReportsService {
    * 
    * @summary Constructs report
    * @param type Report type
+   * @param fromTime From time of the report
+   * @param toTime To time of the report
   */
-  public getReport(type: string, ):Promise<string> {
+  public getReport(type: string, fromTime?: string, toTime?: string, ):Promise<string> {
     const url = new URL(`${this.basePath}/v1/reports/${encodeURIComponent(String(type))}`);
+    let queryParameters = new URLSearchParams();
+    if (fromTime !== undefined && fromTime !== null) {
+      queryParameters.set('fromTime', <any>fromTime);
+    }
+    if (toTime !== undefined && toTime !== null) {
+      queryParameters.set('toTime', <any>toTime);
+    }
+    url.search = queryParameters.toString();
     const options = {
       method: "get",
       headers: {
@@ -26,22 +37,8 @@ export class ReportsService {
     };
 
     return fetch(url.toString(), options).then((response) => {
-      return this.handleResponse(response);
+      return Api.handleResponse(response);
     });
-  }
-
-  /**
-   * Handle response from API
-   * 
-   * @param response response object
-   */
-  public handleResponse(response: any) {
-    switch (response.status) {
-      case 204:
-        return {};
-      default:
-        return response.json();
-    }
   }
 
 }

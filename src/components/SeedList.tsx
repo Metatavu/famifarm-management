@@ -11,6 +11,7 @@ import {
   Grid,
   Loader
 } from "semantic-ui-react";
+import LocalizedUtils from "src/localization/localizedutils";
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
@@ -65,7 +66,7 @@ class SeedsList extends React.Component<Props, State> {
               <Button className="submit-button">{strings.open}</Button>
             </NavLink>
           </List.Content>
-          <List.Header>{seed.name![0].value}</List.Header>
+          <List.Header>{LocalizedUtils.getLocalizedValue(seed.name)}</List.Header>
         </List.Item>
       );
     });

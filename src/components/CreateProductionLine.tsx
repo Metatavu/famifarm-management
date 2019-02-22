@@ -41,16 +41,9 @@ class CreateProductionLine extends React.Component<Props, State> {
     if (!this.props.keycloak) {
       return;
     }
-
-    const lineNumber = parseInt(this.state.lineNumber)
-
-    if (isNaN(lineNumber)) {
-      alert(strings.productionLineNotNumber);
-      return;
-    }
     
     const productionLineObject = {
-      lineNumber: lineNumber
+      lineNumber: this.state.lineNumber
     };
 
     const productionLineService = await Api.getProductionLinesService(this.props.keycloak);

@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { WastageReason } from "famifarm-typescript-models";
+import { WastageReason, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -10,10 +10,11 @@ import {
   Button,
   Loader,
   Form,
-  Input,
   Message,
   Confirm
 } from "semantic-ui-react";
+import LocalizedValueInput from "./LocalizedValueInput";
+import LocalizedUtils from "src/localization/localizedutils";
 
 /**
  * Interface representing component properties
@@ -111,9 +112,7 @@ class EditWastageReason extends React.Component<Props, State> {
 
     this.setState({saving: true});
     wastageReasonsService.updateWastageReason(this.state.wastageReason, this.state.wastageReason.id || "");
-    this.setState({saving: false});
-
-    this.setState({messageVisible: true});
+    this.setState({saving: false, messageVisible: true});
     setTimeout(() => {
       this.setState({messageVisible: false});
     }, 3000);
@@ -137,6 +136,17 @@ class EditWastageReason extends React.Component<Props, State> {
   }
 
   /**
+   * Updates reason text
+   * 
+   * @param reason localized entry representing reason
+   */
+  private updateReason = (reason: LocalizedEntry) => {
+    this.setState({
+      wastageReason: {...this.state.wastageReason, reason: reason}
+    });
+  }
+
+  /**
    * Render edit wastageReason view
    */
   public render() {
@@ -156,7 +166,7 @@ class EditWastageReason extends React.Component<Props, State> {
       <Grid>
         <Grid.Row className="content-page-header-row">
           <Grid.Column width={6}>
-            <h2>{this.props.wastageReason.reason![0].value}</h2>
+            <h2>{LocalizedUtils.getLocalizedValue(this.state.wastageReason ? this.state.wastageReason.reason : undefined)}</h2>
           </Grid.Column>
           <Grid.Column width={3} floated="right">
             <Button className="danger-button" onClick={()=>this.setState({open:true})}>{strings.delete}</Button>
@@ -167,10 +177,10 @@ class EditWastageReason extends React.Component<Props, State> {
           <Form>
           <Form.Field required>
             <label>{strings.wastageReasonReason}</label>
-            <Input 
-              value={this.state.wastageReason && this.state.wastageReason.reason![0].value} 
-              placeholder={strings.wastageReasonReason}
-              onChange={this.handeReasonChange}
+            <LocalizedValueInput 
+              onValueChange={this.updateReason}
+              value={this.state.wastageReason ? this.state.wastageReason.reason : undefined}
+              languages={["fi", "en"]}
             />
           </Form.Field>
             <Message

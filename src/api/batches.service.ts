@@ -1,4 +1,5 @@
 import { Batch } from "famifarm-typescript-models";
+import { Api } from ".";
 
 export class BatchesService {
 
@@ -28,7 +29,7 @@ export class BatchesService {
     };
 
     return fetch(url.toString(), options).then((response) => {
-      return this.handleResponse(response);
+      return Api.handleResponse(response);
     });
   }
 
@@ -49,7 +50,7 @@ export class BatchesService {
     };
 
     return fetch(url.toString(), options).then((response) => {
-      return this.handleResponse(response);
+      return Api.handleResponse(response);
     });
   }
 
@@ -70,7 +71,7 @@ export class BatchesService {
     };
 
     return fetch(url.toString(), options).then((response) => {
-      return this.handleResponse(response);
+      return Api.handleResponse(response);
     });
   }
 
@@ -88,19 +89,19 @@ export class BatchesService {
     const url = new URL(`${this.basePath}/v1/batches`);
     let queryParameters = new URLSearchParams();
     if (status !== undefined && status !== null) {
-        queryParameters.set('status', <any>status);
+      queryParameters.set('status', <any>status);
     }
     if (firstResult !== undefined && firstResult !== null) {
-        queryParameters.set('firstResult', <any>firstResult);
+      queryParameters.set('firstResult', <any>firstResult);
     }
     if (maxResult !== undefined && maxResult !== null) {
-        queryParameters.set('maxResult', <any>maxResult);
+      queryParameters.set('maxResult', <any>maxResult);
     }
     if (createdBefore !== undefined && createdBefore !== null) {
-        queryParameters.set('createdBefore', <any>createdBefore);
+      queryParameters.set('createdBefore', <any>createdBefore);
     }
     if (createdAfter !== undefined && createdAfter !== null) {
-        queryParameters.set('createdAfter', <any>createdAfter);
+      queryParameters.set('createdAfter', <any>createdAfter);
     }
     url.search = queryParameters.toString();
     const options = {
@@ -112,7 +113,7 @@ export class BatchesService {
     };
 
     return fetch(url.toString(), options).then((response) => {
-      return this.handleResponse(response);
+      return Api.handleResponse(response);
     });
   }
 
@@ -135,22 +136,8 @@ export class BatchesService {
     };
 
     return fetch(url.toString(), options).then((response) => {
-      return this.handleResponse(response);
+      return Api.handleResponse(response);
     });
-  }
-
-  /**
-   * Handle response from API
-   * 
-   * @param response response object
-   */
-  public handleResponse(response: any) {
-    switch (response.status) {
-      case 204:
-        return {};
-      default:
-        return response.json();
-    }
   }
 
 }

@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { PerformedCultivationAction, LocalizedValue } from "famifarm-typescript-models";
+import { PerformedCultivationAction, PerformedCultivationActionOpt, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -9,8 +9,8 @@ import {
   Grid,
   Button,
   Form,
-  Input
 } from "semantic-ui-react";
+import LocalizedValueInput from "./LocalizedValueInput";
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
@@ -19,7 +19,7 @@ export interface Props {
 }
 
 export interface State {
-  name?: LocalizedValue[];
+  performedCultivationActionData: PerformedCultivationActionOpt
   redirect: boolean;
 }
 
@@ -27,11 +27,8 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-        name: [{
-          language: "fi",
-          value: ""
-        }],
-        redirect: false
+      performedCultivationActionData: {},
+      redirect: false
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -45,13 +42,24 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
       return
     }
 
-    const performedCultivationActionObject = {
-      name: this.state.name
+    const performedCultivationActionObject: PerformedCultivationAction = {
+      name: this.state.performedCultivationActionData.name
     };
 
     const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
     performedCultivationActionService.createPerformedCultivationAction(performedCultivationActionObject).then(() => {
       this.setState({redirect: true});
+    });
+  }
+
+  /**
+   *  Updates performed cultivation action name
+   * 
+   * @param name localized entry representing name
+   */
+  updateName = (name: LocalizedEntry) => {
+    this.setState({
+      performedCultivationActionData: {...this.state.performedCultivationActionData, name: name}
     });
   }
 
@@ -74,10 +82,10 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
             <Form>
               <Form.Field required>
                 <label>{strings.performedCultivationActionName}</label>
-                <Input 
-                  value={this.state.name![0].value} 
-                  placeholder={strings.performedCultivationActionName} 
-                  onChange={(e) => this.setState({name: [{language: "fi", value: e.currentTarget.value}]})}
+                <LocalizedValueInput 
+                  onValueChange={this.updateName}
+                  value={this.state.performedCultivationActionData.name}
+                  languages={["fi", "en"]}
                 />
               </Form.Field>
               <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>

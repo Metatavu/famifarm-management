@@ -83,16 +83,9 @@ class EditProductionLine extends React.Component<Props, State> {
    * @param event event
    */
   private handeLineNumberChange(event: React.FormEvent<HTMLInputElement>) {
-    const lineNumber = parseInt(event.currentTarget.value);
-
-    if (isNaN(lineNumber)) {
-      alert(strings.productionLineNotNumber);
-      return;
-    }
-
     const productionLine = {
       id: this.state.productionLine!.id,
-      lineNumber: lineNumber
+      lineNumber: event.currentTarget.value
     };
 
     this.setState({productionLine: productionLine});

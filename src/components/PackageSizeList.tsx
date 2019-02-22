@@ -11,6 +11,7 @@ import {
   Grid,
   Loader
 } from "semantic-ui-react";
+import LocalizedUtils from "src/localization/localizedutils";
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
@@ -59,13 +60,13 @@ class PackageSizesList extends React.Component<Props, State> {
     const packageSizes = this.props.packageSizes.map((packageSize) => {
       const packageSizePath = `/packageSizes/${packageSize.id}`;
       return (
-        <List.Item>
+        <List.Item key={packageSize.id}>
           <List.Content floated='right'>
             <NavLink to={packageSizePath}>
               <Button className="submit-button">{strings.open}</Button>
             </NavLink>
           </List.Content>
-          <List.Header>{packageSize.name}</List.Header>
+          <List.Header>{LocalizedUtils.getLocalizedValue(packageSize.name)}</List.Header>
         </List.Item>
       );
     });
