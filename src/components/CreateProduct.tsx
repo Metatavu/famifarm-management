@@ -14,14 +14,20 @@ import {
 import LocalizedUtils from "src/localization/localizedutils";
 import LocalizedValueInput from "./LocalizedValueInput";
 
-export interface Props {
+/**
+ * Component props
+ */
+interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   packageSizes?: PackageSize[];
   onProductCreated?: (product: Product) => void;
   onPackageSizesFound?: (packageSizes: PackageSize[]) => void;
 }
 
-export interface State {
+/**
+ * Component state
+ */
+interface State {
   productData: ProductOpt,
   redirect: boolean;
 }

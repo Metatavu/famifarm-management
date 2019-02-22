@@ -7,13 +7,19 @@ import {
 } from "semantic-ui-react";
 import { LocalizedEntry } from "famifarm-typescript-models";
 
-export interface Props {
+/**
+ * Component props
+ */
+interface Props {
   value?: LocalizedEntry
   languages: string[]
   onValueChange: (value: LocalizedEntry) => void
 }
 
-export interface State {}
+/**
+ * Component state
+ */
+interface State {}
 
 class LocalizedValueInput extends React.Component<Props, State> {
 

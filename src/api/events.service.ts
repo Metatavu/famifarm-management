@@ -87,13 +87,13 @@ export class EventsService {
     const url = new URL(`${this.basePath}/v1/events`);
     let queryParameters = new URLSearchParams();
     if (firstResult !== undefined && firstResult !== null) {
-        queryParameters.set('firstResult', <any>firstResult);
+      queryParameters.set('firstResult', <any>firstResult);
     }
     if (maxResults !== undefined && maxResults !== null) {
-        queryParameters.set('maxResults', <any>maxResults);
+      queryParameters.set('maxResults', <any>maxResults);
     }
     if (batchId !== undefined && batchId !== null) {
-        queryParameters.set('batchId', <any>batchId);
+      queryParameters.set('batchId', <any>batchId);
     }
     url.search = queryParameters.toString();
     const options = {

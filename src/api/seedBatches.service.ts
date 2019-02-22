@@ -86,10 +86,10 @@ export class SeedBatchesService {
     const url = new URL(`${this.basePath}/v1/seedBatches`);
     let queryParameters = new URLSearchParams();
     if (firstResult !== undefined && firstResult !== null) {
-        queryParameters.set('firstResult', <any>firstResult);
+      queryParameters.set('firstResult', <any>firstResult);
     }
     if (maxResults !== undefined && maxResults !== null) {
-        queryParameters.set('maxResults', <any>maxResults);
+      queryParameters.set('maxResults', <any>maxResults);
     }
     url.search = queryParameters.toString();
     const options = {

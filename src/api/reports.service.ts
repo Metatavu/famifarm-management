@@ -22,10 +22,10 @@ export class ReportsService {
     const url = new URL(`${this.basePath}/v1/reports/${encodeURIComponent(String(type))}`);
     let queryParameters = new URLSearchParams();
     if (fromTime !== undefined && fromTime !== null) {
-        queryParameters.set('fromTime', <any>fromTime);
+      queryParameters.set('fromTime', <any>fromTime);
     }
     if (toTime !== undefined && toTime !== null) {
-        queryParameters.set('toTime', <any>toTime);
+      queryParameters.set('toTime', <any>toTime);
     }
     url.search = queryParameters.toString();
     const options = {

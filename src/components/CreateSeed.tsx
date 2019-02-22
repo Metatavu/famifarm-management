@@ -12,12 +12,18 @@ import {
 } from "semantic-ui-react";
 import LocalizedValueInput from "./LocalizedValueInput";
 
+/**
+ * Component props
+ */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   seed?: Seed;
   onSeedCreated?: (seed: Seed) => void;
 }
 
+/**
+ * Component state
+ */
 interface State {
   seedData: SeedOpt
   redirect: boolean;

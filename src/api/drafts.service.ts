@@ -65,10 +65,10 @@ export class DraftsService {
     const url = new URL(`${this.basePath}/v1/drafts`);
     let queryParameters = new URLSearchParams();
     if (userId !== undefined && userId !== null) {
-        queryParameters.set('userId', <any>userId);
+      queryParameters.set('userId', <any>userId);
     }
     if (type !== undefined && type !== null) {
-        queryParameters.set('type', <any>type);
+      queryParameters.set('type', <any>type);
     }
     url.search = queryParameters.toString();
     const options = {
