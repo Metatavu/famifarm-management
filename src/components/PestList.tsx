@@ -13,13 +13,19 @@ import {
 } from "semantic-ui-react";
 import LocalizedUtils from "src/localization/localizedutils";
 
-export interface Props {
+/**
+ * Component props
+ */
+interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   pests?: Pest[];
   onPestsFound?: (pests: Pest[]) => void;
 }
 
-export interface State {
+/**
+ * Component state
+ */
+interface State {
   pests: Pest[];
 }
 
@@ -34,7 +40,7 @@ class PestsList extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle event
    */
-  async componentDidMount() {
+  public async componentDidMount() {
     if (!this.props.keycloak) {
       return;
     }
@@ -48,7 +54,7 @@ class PestsList extends React.Component<Props, State> {
   /**
    * Render pest list view
    */
-  render() {
+  public render() {
     if (!this.props.pests) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
