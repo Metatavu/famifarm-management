@@ -1,5 +1,5 @@
 import { KeycloakInstance } from "keycloak-js";
-import { Team, Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, Batch, WastageReason } from "famifarm-typescript-models";
+import { Team, Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, Batch, WastageReason, Pest } from "famifarm-typescript-models";
 
 export interface StoreState {
   keycloak?: KeycloakInstance
@@ -21,4 +21,5 @@ export interface StoreState {
   batches: Batch[]
   wastageReason: WastageReason
   wastageReasons: WastageReason[]
+  pests: Pest[]
 }

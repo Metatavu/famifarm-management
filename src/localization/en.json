@@ -61,5 +61,8 @@
   "newWastageReason": "New wastage reasons",
   "wastageReasonReason": "Reason",
   
-  "deleteConfirmationText": "Are you sure you want to delete: "
+  "deleteConfirmationText": "Are you sure you want to delete: {0}",
+  "pests": "Pests",
+  "newPest": "New pest",
+  "pestName": "Name"
 }
