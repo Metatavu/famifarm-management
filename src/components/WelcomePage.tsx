@@ -34,6 +34,9 @@ import EditProductionLine from "src/containers/EditProductionLine";
 import EditSeedBatch from "src/containers/EditSeedBatch";
 import BatchList from "src/containers/BatchList";
 import BatchView from "./BatchView";
+import WastageReasonList from "src/containers/WastageReasonList";
+import EditWastageReason from "src/containers/EditWastageReason";
+import CreateWastageReason from "src/containers/CreateWastageReason";
 
 export interface Props {
   authenticated: boolean,
@@ -94,6 +97,9 @@ class WelcomePage extends React.Component<Props, any> {
     },{
       "text": strings.performedCultivationActions,
       "route": "/performedCultivationActions"
+    },{
+      "text": strings.wastageReasons,
+      "route": "/wastageReasons"
     }];
 
     const sideBarNavigation = navigationRoutes.map((navigationRoute, index) => {
@@ -338,6 +344,34 @@ class WelcomePage extends React.Component<Props, any> {
                   <EditPerformedCultivationAction
                     keycloak={this.state.keycloak}
                     performedCultivationActionId={props.match.params.createPerformedCultivationActionId as string}
+                  />
+                )}
+              />
+              <Route
+                path="/wastageReasons"
+                exact={true}
+                render={props => (
+                  <WastageReasonList
+                    keycloak={this.state.keycloak}
+                  />
+                )}
+              />
+              <Route
+                path="/wastageReasons/:wastageReasonId"
+                exact={true}
+                render={props => (
+                    <EditWastageReason
+                      keycloak={this.state.keycloak}
+                      wastageReasonId={props.match.params.wastageReasonId as string}
+                    />
+                )}
+              />
+              <Route
+                path="/createWastageReason"
+                exact={true}
+                render={props => (
+                  <CreateWastageReason
+                    keycloak={this.state.keycloak}
                   />
                 )}
               />

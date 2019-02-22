@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { Product, PackageSize } from "famifarm-typescript-models";
+import { Product, PackageSize, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -10,11 +10,12 @@ import {
   Button,
   Loader,
   Form,
-  Input,
   Message,
   InputOnChangeData,
   Confirm
 } from "semantic-ui-react";
+import LocalizedUtils from "src/localization/localizedutils";
+import LocalizedValueInput from "./LocalizedValueInput";
 
 /**
  * Interface representing component properties
@@ -100,7 +101,7 @@ class EditProduct extends React.Component<Props, State> {
         language: "fi",
         value: event.currentTarget.value
       }],
-      defaultPackageSize: this.state.product!.defaultPackageSize
+      defaultPackageSizeId: this.state.product!.defaultPackageSizeId
     };
 
     this.setState({product: product});
@@ -143,20 +144,28 @@ class EditProduct extends React.Component<Props, State> {
     });
   }
 
+
   /**
-   * Handle select change
+   *  Updates performed cultivation action name
+   * 
+   * @param name localized entry representing name
+   */
+  updateName = (name: LocalizedEntry) => {
+    this.setState({
+      product: {...this.state.product, name: name}
+    });
+  }
+
+  /**
+   * Handle package size select change
    * 
    * @param e event
    * @param {value} value
    */
-  private onSelectChange = (e: any, { value }: InputOnChangeData) => {
-    const product = {
-      id: this.state.product!.id,
-      name: this.state.product!.name,
-      defaultPackageSize: value
-    };
-
-    this.setState({product: product});
+  private onPackageSizeChange = (e: any, { value }: InputOnChangeData) => {
+    this.setState({
+      product: {...this.state.product, defaultPackageSizeId: value}
+    });
   }
 
   /**
@@ -178,7 +187,7 @@ class EditProduct extends React.Component<Props, State> {
     const packageSizeOptions = (this.props.packageSizes || []).map((packageSize) => {
       return {
         key: packageSize.id,
-        text: packageSize.name,
+        text: LocalizedUtils.getLocalizedValue(packageSize.name),
         value: packageSize.id
       };
     });
@@ -187,7 +196,7 @@ class EditProduct extends React.Component<Props, State> {
       <Grid>
         <Grid.Row className="content-page-header-row">
           <Grid.Column width={6}>
-            <h2>{this.props.product!.name![0].value}</h2>
+            <h2>{LocalizedUtils.getLocalizedValue(this.state.product ? this.state.product.name : undefined)}</h2>
           </Grid.Column>
           <Grid.Column width={3} floated="right">
             <Button className="danger-button" onClick={() => this.setState({open:true})}>{strings.delete}</Button>
@@ -198,18 +207,18 @@ class EditProduct extends React.Component<Props, State> {
           <Form>
           <Form.Field required>
             <label>{strings.productName}</label>
-            <Input 
-              value={this.state.product && this.state.product!.name![0].value} 
-              placeholder={strings.productName}
-              onChange={this.handeNameChange}
+            <LocalizedValueInput 
+              onValueChange={this.updateName}
+              value={this.state.product ? this.state.product.name : undefined}
+              languages={["fi", "en"]}
             />
             <Form.Select 
               fluid 
               label={strings.packageSize} 
               options={packageSizeOptions} 
               placeholder={strings.packageSize} 
-              onChange={this.onSelectChange}
-              defaultValue={this.props.product ? this.props.product.defaultPackageSize : ""}
+              onChange={this.onPackageSizeChange}
+              value={this.state.product ? this.state.product.defaultPackageSizeId : undefined}
             />
           </Form.Field>
             <Message

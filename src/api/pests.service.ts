@@ -1,7 +1,7 @@
-import { PerformedCultivationAction } from "famifarm-typescript-models";
+import { Pest } from "famifarm-typescript-models";
 import { Api } from ".";
 
-export class PerformedCultivationActionsService {
+export class PestsService {
 
   private token: string;
   private basePath: string;
@@ -14,11 +14,11 @@ export class PerformedCultivationActionsService {
 
   /**
    * 
-   * @summary Create new performed cultivation action
-   * @param body Wastage reason to be added
+   * @summary Create new pest
+   * @param body Pest to be added
   */
-  public createPerformedCultivationAction(body: PerformedCultivationAction, ):Promise<PerformedCultivationAction> {
-    const url = new URL(`${this.basePath}/v1/performedCultivationActions`);
+  public createPest(body: Pest, ):Promise<Pest> {
+    const url = new URL(`${this.basePath}/v1/pests`);
     const options = {
       method: "post",
       headers: {
@@ -36,11 +36,11 @@ export class PerformedCultivationActionsService {
 
   /**
    * 
-   * @summary Deletes a performed cultivation action
-   * @param performedCultivationActionId PerformedCultivationActionId
+   * @summary Deletes a pest
+   * @param pestId Pest id
   */
-  public deletePerformedCultivationAction(performedCultivationActionId: string, ):Promise<any> {
-    const url = new URL(`${this.basePath}/v1/performedCultivationActions/${encodeURIComponent(String(performedCultivationActionId))}`);
+  public deletePest(pestId: string, ):Promise<any> {
+    const url = new URL(`${this.basePath}/v1/pests/${encodeURIComponent(String(pestId))}`);
     const options = {
       method: "delete",
       headers: {
@@ -57,11 +57,11 @@ export class PerformedCultivationActionsService {
 
   /**
    * 
-   * @summary Find a performed cultivation action
-   * @param performedCultivationActionId Wastage reason id
+   * @summary Find a pest
+   * @param pestId Pest id
   */
-  public findPerformedCultivationAction(performedCultivationActionId: string, ):Promise<PerformedCultivationAction> {
-    const url = new URL(`${this.basePath}/v1/performedCultivationActions/${encodeURIComponent(String(performedCultivationActionId))}`);
+  public findPest(pestId: string, ):Promise<Pest> {
+    const url = new URL(`${this.basePath}/v1/pests/${encodeURIComponent(String(pestId))}`);
     const options = {
       method: "get",
       headers: {
@@ -78,12 +78,12 @@ export class PerformedCultivationActionsService {
 
   /**
    * 
-   * @summary List all performed cultivation actions
+   * @summary List all pests
    * @param firstResult First index of results to be returned
    * @param maxResults How many items to return at one time
   */
-  public listPerformedCultivationActions(firstResult?: number, maxResults?: number, ):Promise<Array<PerformedCultivationAction>> {
-    const url = new URL(`${this.basePath}/v1/performedCultivationActions`);
+  public listPests(firstResult?: number, maxResults?: number, ):Promise<Array<Pest>> {
+    const url = new URL(`${this.basePath}/v1/pests`);
     let queryParameters = new URLSearchParams();
     if (firstResult !== undefined && firstResult !== null) {
       queryParameters.set('firstResult', <any>firstResult);
@@ -108,12 +108,12 @@ export class PerformedCultivationActionsService {
 
   /**
    * 
-   * @summary Updates a performed cultivation action
+   * @summary Updates a pest
    * @param body Request payload
-   * @param performedCultivationActionId Wastage reason id
+   * @param pestId Pest id
   */
-  public updatePerformedCultivationAction(body: PerformedCultivationAction, performedCultivationActionId: string, ):Promise<PerformedCultivationAction> {
-    const url = new URL(`${this.basePath}/v1/performedCultivationActions/${encodeURIComponent(String(performedCultivationActionId))}`);
+  public updatePest(body: Pest, pestId: string, ):Promise<Pest> {
+    const url = new URL(`${this.basePath}/v1/pests/${encodeURIComponent(String(pestId))}`);
     const options = {
       method: "put",
       headers: {

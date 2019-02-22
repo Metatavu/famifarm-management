@@ -1,6 +1,6 @@
 import * as constants from '../constants'
 import { KeycloakInstance } from 'keycloak-js';
-import { Team, Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, Batch } from "famifarm-typescript-models";
+import { Team, Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, Batch, WastageReason } from "famifarm-typescript-models";
 
 export interface UserLogin {
   type: constants.USER_LOGIN;
@@ -164,6 +164,38 @@ export interface LocaleUpdate {
   locale: string
 }
 
+/**
+ * Interface representing WastageReasonsFound action
+ */
+export interface WastageReasonsFound {
+  type: constants.WASTAGE_REASONS_FOUND;
+  wastageReasons: WastageReason[];
+}
+
+/**
+ * Interface representing WastageReasonSelected action
+ */
+export interface WastageReasonSelected {
+  type: constants.WASTAGE_REASON_SELECTED;
+  wastageReason: WastageReason;
+}
+
+/**
+ * Interface representing WastageReasonCreated action
+ */
+export interface WastageReasonCreated {
+  type: constants.WASTAGE_REASON_CREATED;
+  wastageReason: WastageReason;
+}
+
+/**
+ * Interface representing WastageReasonDeleted action
+ */
+export interface WastageReasonDeleted {
+  type: constants.WASTAGE_REASON_DELETED;
+  wastageReasonId: string;
+}
+
 
 export type AppAction = UserLogin | UserLogout | TeamsFound | TeamSelected | TeamCreated | TeamDeleted 
   | ProductsFound | ProductSelected | ProductCreated | ProductDeleted | PackageSizesFound 
@@ -171,7 +203,8 @@ export type AppAction = UserLogin | UserLogout | TeamsFound | TeamSelected | Tea
   | SeedSelected | SeedDeleted | ProductionLinesFound | ProductionLineSelected | ProductionLineCreated
   | ProductionLineDeleted | SeedBatchesFound | SeedBatchSelected | SeedBatchCreated | SeedBatchDeleted
   | PerformedCultivationActionsFound | PerformedCultivationActionSelected | PerformedCultivationActionCreated
-  | PerformedCultivationActionDeleted | BatchesFound | LocaleUpdate;
+  | PerformedCultivationActionDeleted | LocaleUpdate | BatchesFound | WastageReasonsFound | WastageReasonSelected 
+  | WastageReasonCreated | WastageReasonDeleted;
 
 export function userLogin(keycloak: KeycloakInstance, authenticated: boolean): UserLogin {
   return {
@@ -398,5 +431,57 @@ export function localeUpdate(locale: string): LocaleUpdate {
   return {
     type: constants.LOCALE_UPDATE,
     locale: locale
+  }
+}
+
+/**
+ * Action wastageReasonsFound
+ * 
+ * @param wastageReasons array of wastage reasons
+ * @return { type, wastageReasons }
+ */
+export function wastageReasonsFound(wastageReasons: WastageReason[]): WastageReasonsFound {
+  return {
+    type: constants.WASTAGE_REASONS_FOUND,
+    wastageReasons: wastageReasons
+  }
+}
+
+/**
+ * Action wastageReasonSelected
+ * 
+ * @param wastageReason wastage reason
+ * @return { type, wastageReason }
+ */
+export function wastageReasonSelected(wastageReason: WastageReason): WastageReasonSelected {
+  return {
+    type: constants.WASTAGE_REASON_SELECTED,
+    wastageReason: wastageReason
+  }
+}
+
+/**
+ * Action wastageReasonCreated
+ * 
+ * @param wastageReason wastage reason
+ * @return { type, wastageReason }
+ */
+export function wastageReasonCreated(wastageReason: WastageReason): WastageReasonCreated {
+  return {
+    type: constants.WASTAGE_REASON_CREATED,
+    wastageReason: wastageReason
+  }
+}
+
+/**
+ * Action wastageReasonDeleted
+ * 
+ * @param wastageReasonId wastage reason id
+ * @return { type, wastageReasonId }
+ */
+export function wastageReasonDeleted(wastageReasonId: string): WastageReasonDeleted {
+  return {
+    type: constants.WASTAGE_REASON_DELETED,
+    wastageReasonId: wastageReasonId
   }
 }

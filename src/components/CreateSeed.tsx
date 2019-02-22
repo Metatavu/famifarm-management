@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { Seed, LocalizedValue } from "famifarm-typescript-models";
+import { Seed, SeedOpt, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -9,17 +9,23 @@ import {
   Grid,
   Button,
   Form,
-  Input
 } from "semantic-ui-react";
+import LocalizedValueInput from "./LocalizedValueInput";
 
+/**
+ * Component props
+ */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   seed?: Seed;
   onSeedCreated?: (seed: Seed) => void;
 }
 
+/**
+ * Component state
+ */
 interface State {
-  name?: LocalizedValue[];
+  seedData: SeedOpt
   redirect: boolean;
 }
 
@@ -27,11 +33,8 @@ class CreateSeed extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-        name: [{
-          language: "fi",
-          value: ""
-        }],
-        redirect: false
+      seedData: {},
+      redirect: false
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -45,13 +48,24 @@ class CreateSeed extends React.Component<Props, State> {
       return;
     }
 
-    const seedObject = {
-      name: this.state.name
+    const seedObject: Seed = {
+      name: this.state.seedData.name
     };
 
     const seedService = await Api.getSeedsService(this.props.keycloak);
     seedService.createSeed(seedObject).then(() => {
       this.setState({redirect: true});
+    });
+  }
+
+  /**
+   * Updates seed name
+   * 
+   * @param name localized entry representing name
+   */
+  updateName = (name: LocalizedEntry) => {
+    this.setState({
+      seedData: {...this.state.seedData, name: name}
     });
   }
 
@@ -73,14 +87,12 @@ class CreateSeed extends React.Component<Props, State> {
         <Grid.Row>
           <Grid.Column width={8}>
             <Form>
-              <Form.Field required>
-                <label>{strings.seedName}</label>
-                <Input 
-                  value={this.state.name![0].value} 
-                  placeholder={strings.seedName}
-                  onChange={(e) => this.setState({name: [{language: "fi", value: e.currentTarget.value}]})}
-                />
-              </Form.Field>
+              <label>{strings.seedName}</label>
+              <LocalizedValueInput 
+                onValueChange={this.updateName}
+                value={this.state.seedData.name}
+                languages={["fi", "en"]}
+              />
               <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
             </Form>
           </Grid.Column>

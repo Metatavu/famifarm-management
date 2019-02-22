@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { Product, LocalizedValue, PackageSize } from "famifarm-typescript-models";
+import { Product, PackageSize, ProductOpt, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "../localization/strings";
 
@@ -9,34 +9,35 @@ import {
   Grid,
   Button,
   Form,
-  Input,
   InputOnChangeData
 } from "semantic-ui-react";
+import LocalizedUtils from "src/localization/localizedutils";
+import LocalizedValueInput from "./LocalizedValueInput";
 
-export interface Props {
+/**
+ * Component props
+ */
+interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  product?: Product;
   packageSizes?: PackageSize[];
   onProductCreated?: (product: Product) => void;
   onPackageSizesFound?: (packageSizes: PackageSize[]) => void;
 }
 
-export interface State {
-  name?: LocalizedValue[];
+/**
+ * Component state
+ */
+interface State {
+  productData: ProductOpt,
   redirect: boolean;
-  defaultPackageSize: string;
 }
 
 class CreateProduct extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-        name: [{
-          language: "fi",
-          value: ""
-        }],
-        redirect: false,
-        defaultPackageSize: ""
+      redirect: false,
+      productData: {}
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -64,9 +65,9 @@ class CreateProduct extends React.Component<Props, State> {
       return;
     }
 
-    const productObject = {
-      name: this.state.name,
-      defaultPackageSize: this.state.defaultPackageSize
+    const productObject: Product = {
+      name: this.state.productData.name,
+      defaultPackageSizeId: this.state.productData.defaultPackageSizeId
     };
 
     const productsService = await Api.getProductsService(this.props.keycloak);
@@ -76,13 +77,26 @@ class CreateProduct extends React.Component<Props, State> {
   }
 
   /**
-   * Handle select change
+   * Handle default package size change
    * 
    * @param e event
    * @param {value} value
    */
-  onSelectChange = (e: any, { value }: InputOnChangeData) => {
-    this.setState({defaultPackageSize: value});
+  onUpdateDefaultPackageSize = (e: any, { value }: InputOnChangeData) => {
+    this.setState({
+      productData: {...this.state.productData, defaultPackageSizeId: value}
+    });
+}
+
+  /**
+   *  Updates performed cultivation action name
+   * 
+   * @param name localized entry representing name
+   */
+  updateName = (name: LocalizedEntry) => {
+    this.setState({
+      productData: {...this.state.productData, name: name}
+    });
   }
 
   /**
@@ -96,7 +110,7 @@ class CreateProduct extends React.Component<Props, State> {
     const packageSizeOptions = (this.props.packageSizes || []).map((packageSize) => {
       return {
         key: packageSize.id,
-        text: packageSize.name,
+        text: LocalizedUtils.getLocalizedValue(packageSize.name),
         value: packageSize.id
       };
     });
@@ -113,10 +127,10 @@ class CreateProduct extends React.Component<Props, State> {
             <Form>
               <Form.Field required>
                 <label>{strings.productName}</label>
-                <Input 
-                  value={this.state.name![0].value} 
-                  placeholder={strings.productName}
-                  onChange={(e) => this.setState({name: [{language: "fi", value: e.currentTarget.value}]})}
+                <LocalizedValueInput 
+                  onValueChange={this.updateName}
+                  value={this.state.productData.name}
+                  languages={["fi", "en"]}
                 />
               </Form.Field>
               <Form.Select 
@@ -124,7 +138,7 @@ class CreateProduct extends React.Component<Props, State> {
                 label={strings.packageSize} 
                 options={packageSizeOptions} 
                 placeholder={strings.packageSize} 
-                onChange={this.onSelectChange}
+                onChange={this.onUpdateDefaultPackageSize}
               />
               <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save} </Button>
             </Form>

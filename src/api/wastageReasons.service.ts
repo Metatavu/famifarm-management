@@ -1,4 +1,5 @@
 import { WastageReason } from "famifarm-typescript-models";
+import { Api } from ".";
 
 export class WastageReasonsService {
 
@@ -28,7 +29,7 @@ export class WastageReasonsService {
     };
 
     return fetch(url.toString(), options).then((response) => {
-      return this.handleResponse(response);
+      return Api.handleResponse(response);
     });
   }
 
@@ -49,7 +50,7 @@ export class WastageReasonsService {
     };
 
     return fetch(url.toString(), options).then((response) => {
-      return this.handleResponse(response);
+      return Api.handleResponse(response);
     });
   }
 
@@ -70,7 +71,7 @@ export class WastageReasonsService {
     };
 
     return fetch(url.toString(), options).then((response) => {
-      return this.handleResponse(response);
+      return Api.handleResponse(response);
     });
   }
 
@@ -85,10 +86,10 @@ export class WastageReasonsService {
     const url = new URL(`${this.basePath}/v1/wastageReasons`);
     let queryParameters = new URLSearchParams();
     if (firstResult !== undefined && firstResult !== null) {
-        queryParameters.set('firstResult', <any>firstResult);
+      queryParameters.set('firstResult', <any>firstResult);
     }
     if (maxResults !== undefined && maxResults !== null) {
-        queryParameters.set('maxResults', <any>maxResults);
+      queryParameters.set('maxResults', <any>maxResults);
     }
     url.search = queryParameters.toString();
     const options = {
@@ -100,7 +101,7 @@ export class WastageReasonsService {
     };
 
     return fetch(url.toString(), options).then((response) => {
-      return this.handleResponse(response);
+      return Api.handleResponse(response);
     });
   }
 
@@ -123,22 +124,8 @@ export class WastageReasonsService {
     };
 
     return fetch(url.toString(), options).then((response) => {
-      return this.handleResponse(response);
+      return Api.handleResponse(response);
     });
-  }
-
-  /**
-   * Handle response from API
-   * 
-   * @param response response object
-   */
-  public handleResponse(response: any) {
-    switch (response.status) {
-      case 204:
-        return {};
-      default:
-        return response.json();
-    }
   }
 
 }

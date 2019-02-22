@@ -40,6 +40,9 @@ class WelcomePage extends React.Component<Props, any> {
     },{
       "text": strings.performedCultivationActions,
       "link": "/performedCultivationActions"
+    },{
+      "text": strings.wastageReasons,
+      "link": "/wastageReasons"
     }];
   }
 
