@@ -156,6 +156,13 @@ export interface PerformedCultivationActionDeleted {
   type: constants.PERFORMED_CULTIVATION_ACTION_DELETED;
   performedCultivationActionId: string;
 }
+/**
+ * Locale update data
+ */
+export interface LocaleUpdate {
+  type: constants.LOCALE_UPDATE,
+  locale: string
+}
 
 
 export type AppAction = UserLogin | UserLogout | TeamsFound | TeamSelected | TeamCreated | TeamDeleted 
@@ -164,7 +171,7 @@ export type AppAction = UserLogin | UserLogout | TeamsFound | TeamSelected | Tea
   | SeedSelected | SeedDeleted | ProductionLinesFound | ProductionLineSelected | ProductionLineCreated
   | ProductionLineDeleted | SeedBatchesFound | SeedBatchSelected | SeedBatchCreated | SeedBatchDeleted
   | PerformedCultivationActionsFound | PerformedCultivationActionSelected | PerformedCultivationActionCreated
-  | PerformedCultivationActionDeleted | BatchesFound;
+  | PerformedCultivationActionDeleted | BatchesFound | LocaleUpdate;
 
 export function userLogin(keycloak: KeycloakInstance, authenticated: boolean): UserLogin {
   return {
@@ -380,5 +387,16 @@ export function performedCultivationActionDeleted(performedCultivationActionId: 
   return {
     type: constants.PERFORMED_CULTIVATION_ACTION_DELETED,
     performedCultivationActionId: performedCultivationActionId
+  }
+}
+/**
+ * Store update method for locale
+ * 
+ * @param locale locale
+ */
+export function localeUpdate(locale: string): LocaleUpdate {
+  return {
+    type: constants.LOCALE_UPDATE,
+    locale: locale
   }
 }

@@ -19,4 +19,5 @@ export interface StoreState {
   performedCultivationAction: PerformedCultivationAction
   performedCultivationActions: PerformedCultivationAction[]
   batches: Batch[]
+  locale: string
 }

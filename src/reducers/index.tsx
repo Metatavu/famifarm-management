@@ -24,7 +24,8 @@ import {
   PERFORMED_CULTIVATION_ACTIONS_FOUND,
   PERFORMED_CULTIVATION_ACTION_DELETED,
   PERFORMED_CULTIVATION_ACTION_SELECTED, 
-  BATCHES_FOUND} from '../constants/index';
+  BATCHES_FOUND,
+  LOCALE_UPDATE} from '../constants/index';
 
 /**
  * Process action 
@@ -82,6 +83,9 @@ export function processAction(state: StoreState, action: AppAction): StoreState 
       return { ...state, performedCultivationAction: action.performedCultivationAction};
     case PERFORMED_CULTIVATION_ACTION_DELETED:
       return { ...state,  performedCultivationActions: (state.performedCultivationActions || []).filter((performedCultivationAction) => {return performedCultivationAction.id !== action.performedCultivationActionId})};
+    case LOCALE_UPDATE:
+      const locale = action.locale;
+      return {...state, locale: locale};
     }
   return state;
 }

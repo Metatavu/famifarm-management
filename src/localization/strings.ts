@@ -78,7 +78,8 @@ export interface IStrings extends LocalizedStringsMethods {
 }
 
 const strings: IStrings = new LocalizedStrings({
-  en: require("./en.json")
+  en: require("./en.json"),
+  fi: require("./fi.json")
 });
 
 export default strings;

@@ -4,12 +4,19 @@ import 'semantic-ui-css/semantic.min.css';
 import './styles.css';
 import { Menu, Container, Icon, Sidebar } from "semantic-ui-react";
 import strings from "../localization/strings";
+import * as actions from "../actions";
+import { StoreState } from "../types/index";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
+
 
 /**
  * Interface representing component properties
  */
 interface Props {
-  sidebarItems: JSX.Element[]
+  sidebarItems: JSX.Element[],
+  onLocaleUpdate: (locale: string) => void
+  locale: string
 }
 
 /**
@@ -43,6 +50,20 @@ class BasicLayout extends React.Component<Props, State> {
       sidebarOpen: !this.state.sidebarOpen
     });
   }
+    /**
+   * Toggles selected language
+   */
+  private toggleLocale = () => {
+    console.log(this.props.locale)
+    const currentLocale = strings.getLanguage();
+    if (currentLocale === "fi") {
+      strings.setLanguage("en");
+      this.props.onLocaleUpdate("en");
+    } else {
+      strings.setLanguage("fi");
+      this.props.onLocaleUpdate("fi");
+    }
+  }
 
   /**
    * Render basic layout
@@ -57,6 +78,7 @@ class BasicLayout extends React.Component<Props, State> {
           <Menu.Item as={NavLink} to="/" header>
             {strings.managementHeaderText}
           </Menu.Item>
+          <h1 onClick={this.toggleLocale}>{this.props.locale === "fi" ? "In english" : "Suomeksi"}</h1>
         </Menu>
         <div style={{marginTop: '0'}}>
           <Sidebar.Pushable>
@@ -82,5 +104,28 @@ class BasicLayout extends React.Component<Props, State> {
     );
   }
 }
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+function mapStateToProps(state: StoreState) {
+  return {
+    locale: state.locale
+  };
+}
 
-export default BasicLayout;
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onLocaleUpdate: (locale: string) => dispatch(actions.localeUpdate(locale))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(BasicLayout);
+
+//export default BasicLayout;
