@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { Seed } from "famifarm-typescript-models";
+import { Seed, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -10,10 +10,10 @@ import {
   Button,
   Loader,
   Form,
-  Input,
   Message,
   Confirm
 } from "semantic-ui-react";
+import LocalizedValueInput from "./LocalizedValueInput";
 
 /**
  * Interface representing component properties
@@ -58,7 +58,6 @@ class EditSeed extends React.Component<Props, State> {
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handeNameChange = this.handeNameChange.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
   }
 
@@ -78,21 +77,16 @@ class EditSeed extends React.Component<Props, State> {
     });
   }
 
-  /**
-   * Handle name change
-   * 
-   * @param event event
-   */
-  private handeNameChange(event: React.FormEvent<HTMLInputElement>) {
-    const seed = {
-      id: this.state.seed!.id,
-      name: [{
-        language: "fi",
-        value: event.currentTarget.value
-      }]
-    };
 
-    this.setState({seed: seed});
+  /**
+   * Updates seed name
+   * 
+   * @param name localized entry representing name
+   */
+  updateName = (name: LocalizedEntry) => {
+    this.setState({
+      seed: {...this.state.seed, name: name}
+    });
   }
 
   /**
@@ -161,14 +155,14 @@ class EditSeed extends React.Component<Props, State> {
         <Grid.Row>
           <Grid.Column width={8}>
           <Form>
-          <Form.Field required>
-            <label>{strings.seedName}</label>
-            <Input 
-              value={this.state.seed && this.state.seed!.name![0].value} 
-              placeholder={strings.seedName}
-              onChange={this.handeNameChange}
-            />
-          </Form.Field>
+            <Form.Field required>
+              <label>{strings.seedName}</label>
+              <LocalizedValueInput 
+                onValueChange={this.updateName}
+                value={this.state.seed ? this.state.seed.name : undefined}
+                languages={["fi", "en"]}
+              />
+            </Form.Field>
             <Message
               success
               visible={this.state.messageVisible}
@@ -178,8 +172,7 @@ class EditSeed extends React.Component<Props, State> {
               className="submit-button" 
               onClick={this.handleSubmit} 
               type='submit'
-              loading={this.state.saving}
-            >
+              loading={this.state.saving} >
                 {strings.save}
             </Button>
           </Form>

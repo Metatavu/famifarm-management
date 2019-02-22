@@ -11,6 +11,7 @@ import {
   Grid,
   Loader
 } from "semantic-ui-react";
+import LocalizedUtils from "src/localization/localizedutils";
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
@@ -55,7 +56,7 @@ class PerformedCultivationActionsList extends React.Component<Props, State> {
         </Grid>
       );
     }
-
+    
     const performedCultivationActions = this.props.performedCultivationActions.map((performedCultivationAction) => {
       const performedCultivationActionPath = `/performedCultivationActions/${performedCultivationAction.id}`;
       return (
@@ -65,7 +66,7 @@ class PerformedCultivationActionsList extends React.Component<Props, State> {
               <Button className="submit-button">{strings.open}</Button>
             </NavLink>
           </List.Content>
-          <List.Header>{performedCultivationAction.name![0].value}</List.Header>
+          <List.Header>{LocalizedUtils.getLocalizedValue(performedCultivationAction.name)}</List.Header>
         </List.Item>
       );
     });

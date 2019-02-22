@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { PackageSize } from "famifarm-typescript-models";
+import { PackageSize, PackageSizeOpt, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "../localization/strings";
 
@@ -9,8 +9,8 @@ import {
   Grid,
   Button,
   Form,
-  Input
 } from "semantic-ui-react";
+import LocalizedValueInput from "./LocalizedValueInput";
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
@@ -19,7 +19,7 @@ export interface Props {
 }
 
 export interface State {
-  name: string;
+  packageSizeData: PackageSizeOpt;
   redirect: boolean;
 }
 
@@ -27,8 +27,8 @@ class EditPackageSize extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      name: "",
-      redirect: false
+      redirect: false,
+      packageSizeData: {}
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -42,19 +42,27 @@ class EditPackageSize extends React.Component<Props, State> {
       return;
     }
 
-    const packageSizeObject = {
-      name: this.state.name
-    };
     const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-    packageSizeService.createPackageSize(packageSizeObject).then(() => {
+    packageSizeService.createPackageSize(this.state.packageSizeData).then(() => {
       this.setState({redirect: true});
+    });
+  }
+
+  /**
+   * Updates the name of package size
+   * 
+   * @param name localized package size name
+   */
+  private updateName = (name: LocalizedEntry) => {
+    this.setState({
+      packageSizeData: {...this.state.packageSizeData, name: name}
     });
   }
 
   /**
    * Render edit view for package size
    */
-  render() {
+  public render() {
     if (this.state.redirect) {
       return <Redirect to="/packageSizes" push={true} />;
     }
@@ -70,10 +78,10 @@ class EditPackageSize extends React.Component<Props, State> {
             <Form>
               <Form.Field required>
                 <label>{strings.packageSizeName}</label>
-                <Input 
-                  value={this.state.name} 
-                  placeholder='Nimi' 
-                  onChange={(e) => this.setState({name: e.currentTarget.value})}
+                <LocalizedValueInput 
+                  onValueChange={this.updateName}
+                  value={this.state.packageSizeData.name}
+                  languages={["fi", "en"]}
                 />
               </Form.Field>
               <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>

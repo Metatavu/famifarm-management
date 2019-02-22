@@ -97,6 +97,9 @@ class WelcomePage extends React.Component<Props, any> {
     },{
       "text": strings.performedCultivationActions,
       "route": "/performedCultivationActions"
+    },{
+      "text": strings.wastageReasons,
+      "route": "/wastageReasons"
     }];
 
     const sideBarNavigation = navigationRoutes.map((navigationRoute, index) => {

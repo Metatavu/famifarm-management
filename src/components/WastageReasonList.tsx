@@ -11,6 +11,7 @@ import {
   Grid,
   Loader
 } from "semantic-ui-react";
+import LocalizedUtils from "src/localization/localizedutils";
 
 /**
  * Interface representing component properties
@@ -77,7 +78,7 @@ class WastageReasonsList extends React.Component<Props, State> {
               <Button className="submit-button">{strings.open}</Button>
             </NavLink>
           </List.Content>
-          <List.Header>{wastageReason.reason ? wastageReason.reason[0].value : wastageReason.id}</List.Header>
+          <List.Header>{LocalizedUtils.getLocalizedValue(wastageReason.reason)}</List.Header>
         </List.Item>
       );
     });

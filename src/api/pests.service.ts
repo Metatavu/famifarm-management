@@ -1,7 +1,7 @@
-import { SeedBatch } from "famifarm-typescript-models";
+import { Pest } from "famifarm-typescript-models";
 import { Api } from ".";
 
-export class SeedBatchesService {
+export class PestsService {
 
   private token: string;
   private basePath: string;
@@ -14,11 +14,11 @@ export class SeedBatchesService {
 
   /**
    * 
-   * @summary Create new seed batch
-   * @param body Wastage reason to be added
+   * @summary Create new pest
+   * @param body Pest to be added
   */
-  public createSeedBatch(body: SeedBatch, ):Promise<SeedBatch> {
-    const url = new URL(`${this.basePath}/v1/seedBatches`);
+  public createPest(body: Pest, ):Promise<Pest> {
+    const url = new URL(`${this.basePath}/v1/pests`);
     const options = {
       method: "post",
       headers: {
@@ -36,11 +36,11 @@ export class SeedBatchesService {
 
   /**
    * 
-   * @summary Deletes a seed batch
-   * @param seedBatchId SeedBatchId
+   * @summary Deletes a pest
+   * @param pestId Pest id
   */
-  public deleteSeedBatch(seedBatchId: string, ):Promise<any> {
-    const url = new URL(`${this.basePath}/v1/seedBatches/${encodeURIComponent(String(seedBatchId))}`);
+  public deletePest(pestId: string, ):Promise<any> {
+    const url = new URL(`${this.basePath}/v1/pests/${encodeURIComponent(String(pestId))}`);
     const options = {
       method: "delete",
       headers: {
@@ -57,11 +57,11 @@ export class SeedBatchesService {
 
   /**
    * 
-   * @summary Find a seed batch
-   * @param seedBatchId Wastage reason id
+   * @summary Find a pest
+   * @param pestId Pest id
   */
-  public findSeedBatch(seedBatchId: string, ):Promise<SeedBatch> {
-    const url = new URL(`${this.basePath}/v1/seedBatches/${encodeURIComponent(String(seedBatchId))}`);
+  public findPest(pestId: string, ):Promise<Pest> {
+    const url = new URL(`${this.basePath}/v1/pests/${encodeURIComponent(String(pestId))}`);
     const options = {
       method: "get",
       headers: {
@@ -78,12 +78,12 @@ export class SeedBatchesService {
 
   /**
    * 
-   * @summary List all seed batches
+   * @summary List all pests
    * @param firstResult First index of results to be returned
    * @param maxResults How many items to return at one time
   */
-  public listSeedBatches(firstResult?: number, maxResults?: number, ):Promise<Array<SeedBatch>> {
-    const url = new URL(`${this.basePath}/v1/seedBatches`);
+  public listPests(firstResult?: number, maxResults?: number, ):Promise<Array<Pest>> {
+    const url = new URL(`${this.basePath}/v1/pests`);
     let queryParameters = new URLSearchParams();
     if (firstResult !== undefined && firstResult !== null) {
         queryParameters.set('firstResult', <any>firstResult);
@@ -108,12 +108,12 @@ export class SeedBatchesService {
 
   /**
    * 
-   * @summary Updates a seed batch
+   * @summary Updates a pest
    * @param body Request payload
-   * @param seedBatchId Wastage reason id
+   * @param pestId Pest id
   */
-  public updateSeedBatch(body: SeedBatch, seedBatchId: string, ):Promise<SeedBatch> {
-    const url = new URL(`${this.basePath}/v1/seedBatches/${encodeURIComponent(String(seedBatchId))}`);
+  public updatePest(body: Pest, pestId: string, ):Promise<Pest> {
+    const url = new URL(`${this.basePath}/v1/pests/${encodeURIComponent(String(pestId))}`);
     const options = {
       method: "put",
       headers: {

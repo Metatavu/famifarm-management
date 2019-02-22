@@ -21,11 +21,27 @@ import { TeamsService } from './teams.service';
 export * from './wastageReasons.service';
 import { WastageReasonsService } from './wastageReasons.service';
 import { KeycloakInstance } from 'keycloak-js';
+import { DraftsService } from './drafts.service';
+import { PestsService } from './pests.service';
 
 const API_URL = process.env.REACT_APP_FAMIFARM_API_BASE_PATH || "http://localhost";
 
-export default new class Api {
-  
+export class Api {
+
+    /**
+   * Handles response from API
+   * 
+   * @param response response object
+   */
+  public static handleResponse(response: any) {
+    switch (response.status) {
+      case 204:
+        return {};
+      default:
+        return response.json();
+    }
+  }
+
   public async getBatchesService(keycloak: KeycloakInstance): Promise<BatchesService> {
     return new BatchesService(API_URL, await this.checkTokenValidity(keycloak));
   }
@@ -69,6 +85,15 @@ export default new class Api {
   public async getWastageReasonsService(keycloak: KeycloakInstance): Promise<WastageReasonsService> {
     return new WastageReasonsService(API_URL, await this.checkTokenValidity(keycloak));
   }
+
+  public async getDraftsService(keycloak: KeycloakInstance): Promise<DraftsService> {
+    return new DraftsService(API_URL, await this.checkTokenValidity(keycloak));
+  }
+
+
+  public async getPetsService(keycloak: KeycloakInstance): Promise<PestsService> {
+    return new PestsService(API_URL, await this.checkTokenValidity(keycloak));
+  }
   
   /**
    * Check validation of given keycloak's token
@@ -86,3 +111,5 @@ export default new class Api {
   }
 
 }
+
+export default new Api();

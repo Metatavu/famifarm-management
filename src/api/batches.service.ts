@@ -1,4 +1,5 @@
 import { Batch } from "famifarm-typescript-models";
+import { Api } from ".";
 
 export class BatchesService {
 
@@ -28,7 +29,7 @@ export class BatchesService {
     };
 
     return fetch(url.toString(), options).then((response) => {
-      return this.handleResponse(response);
+      return Api.handleResponse(response);
     });
   }
 
@@ -49,7 +50,7 @@ export class BatchesService {
     };
 
     return fetch(url.toString(), options).then((response) => {
-      return this.handleResponse(response);
+      return Api.handleResponse(response);
     });
   }
 
@@ -70,7 +71,7 @@ export class BatchesService {
     };
 
     return fetch(url.toString(), options).then((response) => {
-      return this.handleResponse(response);
+      return Api.handleResponse(response);
     });
   }
 
@@ -112,7 +113,7 @@ export class BatchesService {
     };
 
     return fetch(url.toString(), options).then((response) => {
-      return this.handleResponse(response);
+      return Api.handleResponse(response);
     });
   }
 
@@ -135,22 +136,8 @@ export class BatchesService {
     };
 
     return fetch(url.toString(), options).then((response) => {
-      return this.handleResponse(response);
+      return Api.handleResponse(response);
     });
-  }
-
-  /**
-   * Handle response from API
-   * 
-   * @param response response object
-   */
-  public handleResponse(response: any) {
-    switch (response.status) {
-      case 204:
-        return {};
-      default:
-        return response.json();
-    }
   }
 
 }

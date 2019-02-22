@@ -93,7 +93,7 @@ class BatchView extends React.Component<Props, State> {
         return <img style={iconStyle} src={harvestIcon} />
       case "PACKING":
         return <img style={iconStyle} src={packingIcon} />
-      case "WASTEAGE":
+      case "WASTAGE":
         return <Icon name="trash" />
       default:
         return <Icon name="question" />
@@ -131,7 +131,7 @@ class BatchView extends React.Component<Props, State> {
         return ( 
           <div>
             <h3 className="vertical-timeline-element-title">{strings.observationsEventHeader}</h3>
-            <p>{strings.formatString(strings.observationsEventText, String(eventData.luminance), String(eventData.weight), eventData.pests! )}</p>
+            <p>{strings.formatString(strings.observationsEventText, String(eventData.luminance), String(eventData.weight), "TÄHÄN PESTS" )}</p>
           </div> 
         );
       case "PLANTING":
@@ -154,11 +154,11 @@ class BatchView extends React.Component<Props, State> {
         eventData = event.data as PackingEventData;
         return ( 
           <div>
-            <h3 className="vertical-timeline-element-title">{strings.packingEventHeader}</h3>
-            <p>{strings.formatString(strings.packingEventText, String(eventData.packedAmount), String(eventData.packageSize))}</p>
+            <h3 className="vertical-timeline-element-title">{strings.packingEventHeader}</h3> 
+            <p>{strings.formatString(strings.packingEventText, String(eventData.packedAmount), String(eventData.packageSizeId))}</p>
           </div> 
         );
-      case "WASTEAGE":
+      case "WASTAGE":
         eventData = event.data as WastageEventData;
         return ( 
           <div>

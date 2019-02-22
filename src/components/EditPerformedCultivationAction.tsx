@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { PerformedCultivationAction } from "famifarm-typescript-models";
+import { PerformedCultivationAction, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -10,10 +10,10 @@ import {
   Button,
   Loader,
   Form,
-  Input,
   Message,
   Confirm
 } from "semantic-ui-react";
+import LocalizedValueInput from "./LocalizedValueInput";
 
 /**
  * Interface representing component properties
@@ -57,7 +57,6 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handeNameChange = this.handeNameChange.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
   }
 
@@ -77,20 +76,14 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
   }
 
   /**
-   * Handle name change
+   *  Updates performed cultivation action name
    * 
-   * @param event event
+   * @param name localized entry representing name
    */
-  private handeNameChange(event: React.FormEvent<HTMLInputElement>) {
-    const performedCultivationAction = {
-      id: this.state.performedCultivationAction!.id,
-      name: [{
-        language: "fi",
-        value: event.currentTarget.value
-      }]
-    };
-
-    this.setState({performedCultivationAction: performedCultivationAction});
+  updateName = (name: LocalizedEntry) => {
+    this.setState({
+      performedCultivationAction: {...this.state.performedCultivationAction, name: name}
+    });
   }
 
   /**
@@ -161,10 +154,10 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
           <Form>
           <Form.Field required>
             <label>{strings.performedCultivationActionName}</label>
-            <Input 
-              value={this.state.performedCultivationAction && this.state.performedCultivationAction!.name![0].value} 
-              placeholder={strings.performedCultivationActionName}
-              onChange={this.handeNameChange}
+            <LocalizedValueInput 
+              onValueChange={this.updateName}
+              value={this.state.performedCultivationAction ? this.state.performedCultivationAction.name : undefined}
+              languages={["fi", "en"]}
             />
           </Form.Field>
             <Message
