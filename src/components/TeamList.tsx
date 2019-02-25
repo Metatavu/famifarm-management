@@ -59,7 +59,7 @@ class TeamsList extends React.Component<Props, State> {
     const teams = this.props.teams.map((team) => {
       const teamPath = `/teams/${team.id}`;
       return (
-        <List.Item>
+        <List.Item key={team.id}>
           <List.Content floated='right'>
             <NavLink to={teamPath}>
               <Button className="submit-button">{strings.open}</Button>

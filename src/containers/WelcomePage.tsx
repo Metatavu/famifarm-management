@@ -13,7 +13,8 @@ import { KeycloakInstance } from "keycloak-js";
 export function mapStateToProps(state: StoreState) {
   return {
     authenticated: state.authenticated,
-    keycloak: state.keycloak
+    keycloak: state.keycloak,
+    locale: state.locale
   }
 }
 

@@ -28,6 +28,7 @@ import {
   WASTAGE_REASONS_FOUND,
   WASTAGE_REASON_DELETED,
   WASTAGE_REASON_SELECTED,
+  LOCALE_UPDATE,
   PESTS_FOUND} from '../constants/index';
 
 /**
@@ -86,6 +87,9 @@ export function processAction(state: StoreState, action: AppAction): StoreState 
       return { ...state, performedCultivationAction: action.performedCultivationAction};
     case PERFORMED_CULTIVATION_ACTION_DELETED:
       return { ...state,  performedCultivationActions: (state.performedCultivationActions || []).filter((performedCultivationAction) => {return performedCultivationAction.id !== action.performedCultivationActionId})};
+    case LOCALE_UPDATE:
+      const locale = action.locale;
+      return {...state, locale: locale};
     case WASTAGE_REASONS_FOUND:
       return { ...state, wastageReasons: action.wastageReasons };
     case WASTAGE_REASON_SELECTED:

@@ -19,6 +19,7 @@ export interface StoreState {
   performedCultivationAction: PerformedCultivationAction
   performedCultivationActions: PerformedCultivationAction[]
   batches: Batch[]
+  locale: string
   wastageReason: WastageReason
   wastageReasons: WastageReason[]
   pests: Pest[]

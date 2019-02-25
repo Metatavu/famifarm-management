@@ -4,6 +4,8 @@ import 'semantic-ui-css/semantic.min.css';
 import './styles.css';
 import { Menu, Container, Icon, Sidebar } from "semantic-ui-react";
 import strings from "../localization/strings";
+import ToggleLocalization from "../containers/ToggleLocalization";
+
 
 /**
  * Interface representing component properties
@@ -43,7 +45,6 @@ class BasicLayout extends React.Component<Props, State> {
       sidebarOpen: !this.state.sidebarOpen
     });
   }
-
   /**
    * Render basic layout
    */
@@ -51,12 +52,13 @@ class BasicLayout extends React.Component<Props, State> {
     return (
       <div>
         <Menu fixed='top' inverted style={{background: "#2AA255"}}>
-          <Menu.Item onClick={this.toggleSidebar} name="bars">
+          <Menu.Item onClick={this.toggleSidebar.bind(this)} name="bars">
             <Icon name="bars" />
           </Menu.Item>
           <Menu.Item as={NavLink} to="/" header>
             {strings.managementHeaderText}
           </Menu.Item>
+          <ToggleLocalization />
         </Menu>
         <div style={{marginTop: '0'}}>
           <Sidebar.Pushable>
@@ -82,5 +84,4 @@ class BasicLayout extends React.Component<Props, State> {
     );
   }
 }
-
 export default BasicLayout;

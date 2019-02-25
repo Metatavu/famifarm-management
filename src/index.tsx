@@ -11,7 +11,8 @@ import { AppAction } from './actions';
 import { Provider } from 'react-redux';
 
 const store = createStore<StoreState, AppAction, any, any>(processAction, {
-  authenticated: false
+  authenticated: false,
+  locale: "fi"
 });
 
 ReactDOM.render(
