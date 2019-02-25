@@ -60,7 +60,7 @@ class ProductsList extends React.Component<Props, State> {
     const products = this.props.products.map((product) => {
       const productPath = `/products/${product.id}`;
       return (
-        <List.Item>
+        <List.Item key={product.id}>
           <List.Content floated='right'>
             <NavLink to={productPath}>
               <Button className="submit-button">{strings.open}</Button>
