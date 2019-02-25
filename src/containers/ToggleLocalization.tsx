@@ -41,9 +41,6 @@ class ToggleLocalization extends React.Component<Props, State> {
     }
   }
   /**
- * Toggles selected language
- */
-  /**
    * Component did update lifecycle method
    * 
    * @param prevProps previous properties
@@ -56,6 +53,9 @@ class ToggleLocalization extends React.Component<Props, State> {
       this.setState({ languageChanged: true });
     }
   }
+  /**
+   * Toggles selected language
+   */
   private toggleLocale = () => {
     const currentLocale = strings.getLanguage();
     if (currentLocale === "fi") {
