@@ -66,7 +66,7 @@ class PestsList extends React.Component<Props, State> {
     const pests = this.props.pests.map((pest) => {
       const pestPath = `/pests/${pest.id}`;
       return (
-        <List.Item>
+        <List.Item key={pest.id}>
           <List.Content floated='right'>
             <NavLink to={pestPath}>
               <Button className="submit-button">{strings.open}</Button>

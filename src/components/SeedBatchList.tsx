@@ -59,7 +59,7 @@ class SeedBatchsList extends React.Component<Props, State> {
     const seedBatches = this.props.seedBatches.map((seedBatch) => {
       const seedBatchPath = `/seedBatches/${seedBatch.id}`;
       return (
-        <List.Item>
+        <List.Item key={seedBatch.id}>
           <List.Content floated='right'>
             <NavLink to={seedBatchPath}>
               <Button className="submit-button">{strings.open}</Button>

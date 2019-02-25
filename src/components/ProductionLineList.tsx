@@ -59,7 +59,7 @@ class ProductionLinesList extends React.Component<Props, State> {
     const productionLines = this.props.productionLines.map((productionLine) => {
       const productionLinePath = `/productionLines/${productionLine.id}`;
       return (
-        <List.Item>
+        <List.Item key={productionLine.id}>
           <List.Content floated='right'>
             <NavLink to={productionLinePath}>
               <Button className="submit-button">{strings.open}</Button>

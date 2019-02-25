@@ -72,7 +72,7 @@ class WastageReasonsList extends React.Component<Props, State> {
     const wastageReasons = this.props.wastageReasons.map((wastageReason) => {
       const wastageReasonPath = `/wastageReasons/${wastageReason.id}`;
       return (
-        <List.Item>
+        <List.Item key={wastageReason.id}>
           <List.Content floated='right'>
             <NavLink to={wastageReasonPath}>
               <Button className="submit-button">{strings.open}</Button>

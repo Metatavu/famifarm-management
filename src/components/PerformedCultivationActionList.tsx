@@ -60,7 +60,7 @@ class PerformedCultivationActionsList extends React.Component<Props, State> {
     const performedCultivationActions = this.props.performedCultivationActions.map((performedCultivationAction) => {
       const performedCultivationActionPath = `/performedCultivationActions/${performedCultivationAction.id}`;
       return (
-        <List.Item>
+        <List.Item key={performedCultivationAction.id}>
           <List.Content floated='right'>
             <NavLink to={performedCultivationActionPath}>
               <Button className="submit-button">{strings.open}</Button>

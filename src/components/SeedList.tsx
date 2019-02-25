@@ -60,7 +60,7 @@ class SeedsList extends React.Component<Props, State> {
     const seeds = this.props.seeds.map((seed) => {
       const seedPath = `/seeds/${seed.id}`;
       return (
-        <List.Item>
+        <List.Item key={seed.id}>
           <List.Content floated='right'>
             <NavLink to={seedPath}>
               <Button className="submit-button">{strings.open}</Button>
