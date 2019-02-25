@@ -52,7 +52,7 @@ class WelcomePage extends React.Component<Props, any> {
   render() {
     const links = this.getLinks().map((link) => {
       return (
-        <NavLink to={link.link}>
+        <NavLink key={link.link} to={link.link}>
           <Card
             className="content-card"
             header={link.text}
