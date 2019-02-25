@@ -37,6 +37,9 @@ import BatchView from "./BatchView";
 import WastageReasonList from "src/containers/WastageReasonList";
 import EditWastageReason from "src/containers/EditWastageReason";
 import CreateWastageReason from "src/containers/CreateWastageReason";
+import PestList from "src/containers/PestList";
+import EditPest from "./EditPest";
+import CreatePest from "./CreatePest";
 
 export interface Props {
   authenticated: boolean,
@@ -100,6 +103,9 @@ class WelcomePage extends React.Component<Props, any> {
     },{
       "text": strings.wastageReasons,
       "route": "/wastageReasons"
+    },{
+      "text": strings.pests,
+      "route": "/pests"
     }];
 
     const sideBarNavigation = navigationRoutes.map((navigationRoute, index) => {
@@ -259,6 +265,34 @@ class WelcomePage extends React.Component<Props, any> {
                 exact={true}
                 render={props => (
                   <CreateSeed
+                    keycloak={this.state.keycloak}
+                  />
+                )}
+              />
+              <Route
+                path="/pests"
+                exact={true}
+                render={props => (
+                  <PestList
+                    keycloak={this.state.keycloak}
+                  />
+                )}
+              />
+              <Route
+                path="/pests/:pestId"
+                exact={true}
+                render={props => (
+                    <EditPest
+                      keycloak={this.state.keycloak}
+                      pestId={props.match.params.pestId as string}
+                    />
+                )}
+              />
+              <Route
+                path="/createPest"
+                exact={true}
+                render={props => (
+                  <CreatePest
                     keycloak={this.state.keycloak}
                   />
                 )}

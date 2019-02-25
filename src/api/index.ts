@@ -171,7 +171,7 @@ export class Api {
    * @param keycloak keycloak instance
    * @returns promise of pests service authenticated with valid token 
    */
-  public async getPetsService(keycloak: KeycloakInstance): Promise<PestsService> {
+  public async getPestsService(keycloak: KeycloakInstance): Promise<PestsService> {
     return new PestsService(API_URL, await this.checkTokenValidity(keycloak));
   }
   

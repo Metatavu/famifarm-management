@@ -61,5 +61,8 @@
     "newWastageReason": "Uusi poisheitto syy",
     "wastageReasonReason": "Syy",
 
-    "deleteConfirmationText": "Oletko varma, että haluat poistaa: "
+    "deleteConfirmationText": "Oletko varma, että haluat poistaa: ",
+    "pests": "Loiset",
+    "newPest": "Uusi loinen",
+    "pestName": "Nimi"
   }

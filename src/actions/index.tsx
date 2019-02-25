@@ -1,6 +1,6 @@
 import * as constants from '../constants'
 import { KeycloakInstance } from 'keycloak-js';
-import { Team, Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, Batch, WastageReason } from "famifarm-typescript-models";
+import { Team, Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, Batch, WastageReason, Pest } from "famifarm-typescript-models";
 
 export interface UserLogin {
   type: constants.USER_LOGIN;
@@ -196,6 +196,11 @@ export interface WastageReasonDeleted {
   wastageReasonId: string;
 }
 
+export interface PestsFound {
+  type: constants.PESTS_FOUND;
+  pests: Pest[];
+}
+
 
 export type AppAction = UserLogin | UserLogout | TeamsFound | TeamSelected | TeamCreated | TeamDeleted 
   | ProductsFound | ProductSelected | ProductCreated | ProductDeleted | PackageSizesFound 
@@ -204,7 +209,7 @@ export type AppAction = UserLogin | UserLogout | TeamsFound | TeamSelected | Tea
   | ProductionLineDeleted | SeedBatchesFound | SeedBatchSelected | SeedBatchCreated | SeedBatchDeleted
   | PerformedCultivationActionsFound | PerformedCultivationActionSelected | PerformedCultivationActionCreated
   | PerformedCultivationActionDeleted | LocaleUpdate | BatchesFound | WastageReasonsFound | WastageReasonSelected 
-  | WastageReasonCreated | WastageReasonDeleted;
+  | WastageReasonCreated | WastageReasonDeleted| PestsFound;
 
 export function userLogin(keycloak: KeycloakInstance, authenticated: boolean): UserLogin {
   return {
@@ -431,6 +436,18 @@ export function localeUpdate(locale: string): LocaleUpdate {
   return {
     type: constants.LOCALE_UPDATE,
     locale: locale
+  }
+}
+
+/**
+ * Pests found action
+ * 
+ * @param pests list of pests
+ */
+export function pestsFound(pests: Pest[]): PestsFound {
+  return {
+    type: constants.PESTS_FOUND,
+    pests: pests
   }
 }
 
