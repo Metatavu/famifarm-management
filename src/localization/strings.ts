@@ -129,6 +129,13 @@ export interface IStrings extends LocalizedStringsMethods {
   goBack: string
   siteHeader: string
   siteSubHeader: string
+
+  reportDownloadHeader: string
+  reportTypeLabel: string
+  reportTypePlaceholder: string
+  reportTypeItemWASTAGE: string
+  reportTypeItemGROWTH_TIME: string
+  reportTypeItemYIELD: string
 }
 
 const strings: IStrings = new LocalizedStrings({

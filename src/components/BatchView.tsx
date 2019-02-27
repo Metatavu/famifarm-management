@@ -118,7 +118,7 @@ class BatchView extends React.Component<Props, State> {
             <h3 className="vertical-timeline-element-title">{strings.sowingEventHeader}</h3>
             <p>{strings.formatString(strings.sowingEventText, eventData.amount)}</p>
             <NavLink to={`/events/${event.id}`}><Button style={{float: "right"}}>{strings.editEventLink}</Button></NavLink>
-            <small>{strings.formatString(strings.remainingUnitsText, event.remainingUnits ? event.remainingUnits.toString() : "")}</small>
+            <small>{strings.formatString(strings.remainingUnitsText, event.remainingUnits ? event.remainingUnits.toString() : "0")}</small>
           </div> 
         );
       case "TABLE_SPREAD":
@@ -128,7 +128,7 @@ class BatchView extends React.Component<Props, State> {
             <h3 className="vertical-timeline-element-title">{strings.tablespreadEventHeader}</h3>
             <p>{strings.formatString(strings.tablespreadEventText, String(eventData.tableCount))}</p>
             <NavLink to={`/events/${event.id}`}><Button style={{float: "right"}}>{strings.editEventLink}</Button></NavLink>
-            <small>{strings.formatString(strings.remainingUnitsText, event.remainingUnits ? event.remainingUnits.toString() : "")}</small>
+            <small>{strings.formatString(strings.remainingUnitsText, event.remainingUnits ? event.remainingUnits.toString() : "0")}</small>
           </div> 
         );
       case "CULTIVATION_OBSERVATION":
@@ -138,7 +138,7 @@ class BatchView extends React.Component<Props, State> {
             <h3 className="vertical-timeline-element-title">{strings.observationsEventHeader}</h3>
             <p>{strings.formatString(strings.observationsEventText, String(eventData.luminance), String(eventData.weight))}</p>
             <NavLink to={`/events/${event.id}`}><Button style={{float: "right"}}>{strings.editEventLink}</Button></NavLink>
-            <small>{strings.formatString(strings.remainingUnitsText, event.remainingUnits ? event.remainingUnits.toString() : "")}</small>
+            <small>{strings.formatString(strings.remainingUnitsText, event.remainingUnits ? event.remainingUnits.toString() : "0")}</small>
           </div> 
         );
       case "PLANTING":
@@ -148,7 +148,7 @@ class BatchView extends React.Component<Props, State> {
             <h3 className="vertical-timeline-element-title">{strings.plantingEventHeader}</h3>
             <p>{strings.formatString(strings.plantingEventText, String(eventData.gutterCount), String(eventData.workerCount))}</p>
             <NavLink to={`/events/${event.id}`}><Button style={{float: "right"}}>{strings.editEventLink}</Button></NavLink>
-            <small>{strings.formatString(strings.remainingUnitsText, event.remainingUnits ? event.remainingUnits.toString() : "")}</small>
+            <small>{strings.formatString(strings.remainingUnitsText, event.remainingUnits ? event.remainingUnits.toString() : "0")}</small>
           </div> 
         );
       case "HARVEST":
@@ -158,7 +158,7 @@ class BatchView extends React.Component<Props, State> {
             <h3 className="vertical-timeline-element-title">{strings.harvestEventHeader}</h3>
             <p>{strings.formatString(strings.harvestEventText)}</p>
             <NavLink to={`/events/${event.id}`}><Button style={{float: "right"}}>{strings.editEventLink}</Button></NavLink>
-            <small>{strings.formatString(strings.remainingUnitsText, event.remainingUnits ? event.remainingUnits.toString() : "")}</small>
+            <small>{strings.formatString(strings.remainingUnitsText, event.remainingUnits ? event.remainingUnits.toString() : "0")}</small>
           </div> 
         );
       case "PACKING":
@@ -168,7 +168,7 @@ class BatchView extends React.Component<Props, State> {
             <h3 className="vertical-timeline-element-title">{strings.packingEventHeader}</h3> 
             <p>{strings.formatString(strings.packingEventText, String(eventData.packedAmount))}</p>
             <NavLink to={`/events/${event.id}`}><Button style={{float: "right"}}>{strings.editEventLink}</Button></NavLink>
-            <small>{strings.formatString(strings.remainingUnitsText, event.remainingUnits ? event.remainingUnits.toString() : "")}</small>
+            <small>{strings.formatString(strings.remainingUnitsText, event.remainingUnits ? event.remainingUnits.toString() : "0")}</small>
           </div> 
         );
       case "WASTAGE":
@@ -178,7 +178,7 @@ class BatchView extends React.Component<Props, State> {
             <h3 className="vertical-timeline-element-title">{strings.wastageEventHeader}</h3>
             <p>{strings.formatString(strings.wastageEventText, String(eventData.amount))}</p>
             <NavLink to={`/events/${event.id}`}><Button style={{float: "right"}}>{strings.editEventLink}</Button></NavLink>
-            <small>{strings.formatString(strings.remainingUnitsText, event.remainingUnits ? event.remainingUnits.toString() : "")}</small>
+            <small>{strings.formatString(strings.remainingUnitsText, event.remainingUnits ? event.remainingUnits.toString() : "0")}</small>
           </div> 
         );
       default:

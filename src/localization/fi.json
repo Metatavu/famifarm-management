@@ -110,5 +110,11 @@
     "labelAdditionalInformation": "Lisätiedot",
     "goBack": "Takasin",
     "siteHeader": "Famifarm Hallinta",
-    "siteSubHeader": "Täältä voit hallita Famifarm API - järjestelmän asetuksia ja tarkastella dataa."
+    "siteSubHeader": "Täältä voit hallita Famifarm API - järjestelmän asetuksia ja tarkastella dataa.",
+    "reportDownloadHeader": "Raportit",
+    "reportTypeLabel": "Raportin tyyppi",
+    "reportTypePlaceholder": "Valitse raporting tyyppi",
+    "reportTypeItemWASTAGE": "Poisheitto",
+    "reportTypeItemGROWTH_TIME": "Kasvuaika",
+    "reportTypeItemYIELD": "Saanti"
   }
