@@ -50,7 +50,8 @@ class ReportDownload extends React.Component<Props, State> {
     const reportTypeOptions = [ 
       "WASTAGE",
       "GROWTH_TIME",
-      "YIELD"].map((reportType) => {
+      "YIELD",
+      "PLANTING_YIELD"].map((reportType) => {
         return {
           key: reportType,
           value: reportType,

@@ -116,5 +116,6 @@
     "reportTypePlaceholder": "Valitse raporting tyyppi",
     "reportTypeItemWASTAGE": "Poisheitto",
     "reportTypeItemGROWTH_TIME": "Kasvuaika",
-    "reportTypeItemYIELD": "Saanti"
+    "reportTypeItemYIELD": "Saanti",
+    "reportTypeItemPLANTING_YIELD": "Istutussaanti"
   }
