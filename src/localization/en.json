@@ -116,5 +116,6 @@
   "reportTypePlaceholder": "Choose report type",
   "reportTypeItemWASTAGE": "Wastage",
   "reportTypeItemGROWTH_TIME": "Growth time",
-  "reportTypeItemYIELD": "Yield"
+  "reportTypeItemYIELD": "Yield",
+  "reportTypeItemPLANTING_YIELD": "Planting yield"
 }

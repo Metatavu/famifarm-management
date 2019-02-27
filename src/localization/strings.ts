@@ -136,6 +136,7 @@ export interface IStrings extends LocalizedStringsMethods {
   reportTypeItemWASTAGE: string
   reportTypeItemGROWTH_TIME: string
   reportTypeItemYIELD: string
+  reportTypeItemPLANTING_YIELD: string
 }
 
 const strings: IStrings = new LocalizedStrings({
