@@ -22,6 +22,7 @@ interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   batches?: Batch[];
   products?: Product[];
+  location?: any,
   onBatchesFound?: (batches: Batch[]) => void;
   onProductsFound?: (products: Product[]) => void;
 }
@@ -30,7 +31,9 @@ interface Props {
  * Interface representing component state
  */
 interface State {
-  batches: Batch[];
+  batches: Batch[]
+  status: string
+  loading: boolean
 }
 
 /**
@@ -40,29 +43,17 @@ class BatchList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      batches: []
+      batches: [],
+      status: "OPEN",
+      loading: false
     };
   }
 
   /**
    * Component did mount life-sycle event
    */
-  async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const [batchesService, productsService] = await Promise.all([
-      Api.getBatchesService(this.props.keycloak),
-      Api.getProductsService(this.props.keycloak)
-    ]);
-
-    batchesService.listBatches().then((batches) => {
-      this.props.onBatchesFound && this.props.onBatchesFound(batches);
-    });
-    productsService.listProducts().then((products) => {
-      this.props.onProductsFound && this.props.onProductsFound(products);
-    });
+  public async componentDidMount() {
+    this.updateBatches(this.state.status);
   }
 
   private getBatchName = (batch: Batch): string => {
@@ -71,14 +62,13 @@ class BatchList extends React.Component<Props, State> {
     const productName = batchProduct ? LocalizedUtils.getLocalizedValue(batchProduct.name) : batch.id;
     const batchDate = moment(batch.createdAt).format("DD.MM.YYYY");
     return `${productName} - ${batchDate}`;
-    
   }
 
   /**
    * Render batch list view
    */
   public render() {
-    if (!this.props.batches) {
+    if (this.state.loading) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
           <Loader active size="medium" />
@@ -86,7 +76,15 @@ class BatchList extends React.Component<Props, State> {
       );
     }
 
-    const batches = this.props.batches.map((batch) => {
+    const statusButtons = ["OPEN", "CLOSED", "NEGATIVE"].map((status: string) => {
+      return (
+        <Button onClick={() => this.handleButtonClick(status)} key={status} active={this.state.status === status} >
+          {strings.getString(`batchStatusButton${status}`, strings.getLanguage())}
+        </Button>
+      );
+    });
+
+    const batches = (this.props.batches || []).map((batch) => {
       return (
         <List.Item>
           <List.Content floated='right'>
@@ -105,6 +103,9 @@ class BatchList extends React.Component<Props, State> {
           <h2>{strings.batches}</h2>
         </Grid.Row>
         <Grid.Row>
+          {statusButtons}
+        </Grid.Row>
+        <Grid.Row>
           <Grid.Column>
             <List>
               {batches}
@@ -113,6 +114,36 @@ class BatchList extends React.Component<Props, State> {
         </Grid.Row>
       </Grid>
     );
+  }
+
+  /**
+   * Handles status button click
+   */
+  private handleButtonClick = (status: string) => {
+    this.setState({
+      status: status
+    });
+
+    this.updateBatches(status);
+  }
+
+  /**
+   * Updates batch list
+   */
+  private updateBatches = async (status: string) => {
+    if (!this.props.keycloak) {
+      return;
+    }
+    this.setState({loading: true});
+    const [batchesService, productsService] = await Promise.all([
+      Api.getBatchesService(this.props.keycloak),
+      Api.getProductsService(this.props.keycloak)
+    ]);
+
+    const [batches, products] = await Promise.all([batchesService.listBatches(status), productsService.listProducts()]);
+    this.props.onBatchesFound && this.props.onBatchesFound(batches);
+    this.props.onProductsFound && this.props.onProductsFound(products);
+    this.setState({loading: false})
   }
 }
 

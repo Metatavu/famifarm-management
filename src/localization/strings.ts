@@ -83,6 +83,52 @@ export interface IStrings extends LocalizedStringsMethods {
   pests: string
   newPest: string
   pestName: string
+
+  remainingUnitsText: string
+  batchStatusButtonOPEN: string
+  batchStatusButtonCLOSED: string
+  batchStatusButtonNEGATIVE: string
+
+  labelPhase: string
+  labelProductionLine: string
+  labelWastageReason: string
+  labelLocation: string
+  labelTableCount: string
+  labelCellType: string
+  labelSeedBatch: string
+  labelAmount: string
+  labelWorkerCount: string
+  labelGutterSize: string
+  labelGutterCount: string
+  labelCellCount: string
+  labelPackageSize: string
+  labelPackedAmount: string
+  labelTeam: string
+  labelHarvestType: string
+  labelPests: string
+  labelPerformedCultivationActions: string
+  labelWeight: string
+  labelLuminance: string
+  labelStartTime: string
+  labelEndTime: string
+  editEventHeader: string
+  deleteEventConfirmText: string
+  harvestTypeBAGGING: string
+  harvestTypeCUTTING: string
+  harvestTypeBOXING: string
+  cellTypeSMALL: string
+  cellTypeLARGE: string
+  phasePLANTING: string
+  phaseSOWING: string
+  phasePACKING: string
+  phaseTABLE_SPREAD: string
+  phaseCULTIVATION_OBSERVATION: string
+  phaseHARVEST: string
+  editEventLink: string
+  labelAdditionalInformation: string
+  goBack: string
+  siteHeader: string
+  siteSubHeader: string
 }
 
 const strings: IStrings = new LocalizedStrings({

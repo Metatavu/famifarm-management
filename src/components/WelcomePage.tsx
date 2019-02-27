@@ -40,6 +40,7 @@ import CreateWastageReason from "src/containers/CreateWastageReason";
 import PestList from "src/containers/PestList";
 import EditPest from "./EditPest";
 import CreatePest from "./CreatePest";
+import EditEvent from "./EditEvent";
 
 export interface Props {
   authenticated: boolean,
@@ -201,6 +202,16 @@ class WelcomePage extends React.Component<Props, any> {
                     <EditProduct
                       keycloak={this.state.keycloak}
                       productId={props.match.params.productId as string}
+                    />
+                )}
+              />
+              <Route
+                path="/events/:eventId"
+                exact={true}
+                render={props => (
+                    <EditEvent
+                      keycloak={this.state.keycloak}
+                      eventId={props.match.params.eventId as string}
                     />
                 )}
               />
