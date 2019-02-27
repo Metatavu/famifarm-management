@@ -136,7 +136,15 @@ class BatchView extends React.Component<Props, State> {
         return ( 
           <div>
             <h3 className="vertical-timeline-element-title">{strings.observationsEventHeader}</h3>
-            <p>{strings.formatString(strings.observationsEventText, String(eventData.luminance), String(eventData.weight))}</p>
+            {eventData.luminance && 
+              <p>{strings.formatString(strings.luminanceObservationText, String(eventData.luminance))}</p>
+            }
+            {eventData.weight && 
+              <p>{strings.formatString(strings.weightObservationText, String(eventData.weight))}</p>
+            }
+            {eventData.pestIds && eventData.pestIds.length > 0 && 
+              <p>{strings.pestObservationText}</p>
+            }
             <NavLink to={`/events/${event.id}`}><Button style={{float: "right"}}>{strings.editEventLink}</Button></NavLink>
             <small>{strings.formatString(strings.remainingUnitsText, event.remainingUnits ? event.remainingUnits.toString() : "0")}</small>
           </div> 

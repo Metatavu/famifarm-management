@@ -324,6 +324,7 @@ export default class EditEvent extends React.Component<Props, State> {
     return (
       <React.Fragment>
         <Form.Select label={strings.labelHarvestType} name="type" options={harvestTypeOptions} value={data.type} onChange={this.handleDataChange} />
+        <Form.Input label={strings.labelAmount} name="amount" type="number" value={data.amount} onChange={this.handleDataChange} />
         <Form.Select label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
         <Form.Select label={strings.labelTeam} name="teamId" options={teamOptions} value={data.teamId} onChange={this.handleDataChange} />
       </React.Fragment>

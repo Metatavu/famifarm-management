@@ -61,7 +61,10 @@ export interface IStrings extends LocalizedStringsMethods {
   plantingEventText: string
 
   observationsEventHeader: string
-  observationsEventText: string
+  luminanceObservationText: string
+  weightObservationText: string
+  pestObservationText: string
+
 
   harvestEventHeader: string
   harvestEventText: string
