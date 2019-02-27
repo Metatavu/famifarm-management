@@ -209,7 +209,10 @@ export default class EditEvent extends React.Component<Props, State> {
     this.setState({saving: true});
     const eventsService = await Api.getEventsService(this.props.keycloak);
     eventsService.updateEvent(this.state.event, this.state.event.id!);
-    this.setState({saving: false});
+    this.setState({saving: false, messageVisible: true});
+    setTimeout(() => {
+      this.setState({messageVisible: false});
+    }, 3000);
   }
 
   /**
@@ -475,6 +478,7 @@ export default class EditEvent extends React.Component<Props, State> {
         <Form.Select label={strings.labelWastageReason} name="reasonId" options={wastageReasonOptions} value={data.reasonId} onChange={this.handleDataChange} />
         <Form.Select label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
         <Form.Select label={strings.labelPhase} name="phase" options={phaseOptions} value={data.phase} onChange={this.handleDataChange} />
+        <Form.Input label={strings.labelAmount} name="amount" type="number" value={data.amount} onChange={this.handleDataChange} />
       </React.Fragment>
     );
   }

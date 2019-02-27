@@ -61,7 +61,7 @@
   "newWastageReason": "New wastage reasons",
   "wastageReasonReason": "Reason",
   
-  "deleteConfirmationText": "Are you sure you want to delete: {0}",
+  "deleteConfirmationText": "Are you sure you want to delete: ",
   "pests": "Pests",
   "newPest": "New pest",
   "pestName": "Name",
@@ -110,5 +110,11 @@
   "labelAdditionalInformation": "Additional information",
   "goBack": "Back",
   "siteHeader": "Famifarm Management",
-  "siteSubHeader": "Here you can manage the settings and view data from Famifarm API."
+  "siteSubHeader": "Here you can manage the settings and view data from Famifarm API.",
+  "reportDownloadHeader": "Reports",
+  "reportTypeLabel": "Report type",
+  "reportTypePlaceholder": "Choose report type",
+  "reportTypeItemWASTAGE": "Wastage",
+  "reportTypeItemGROWTH_TIME": "Growth time",
+  "reportTypeItemYIELD": "Yield"
 }

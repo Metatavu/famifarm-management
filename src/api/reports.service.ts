@@ -1,5 +1,3 @@
-import { Api } from ".";
-
 export class ReportsService {
 
   private token: string;
@@ -18,7 +16,7 @@ export class ReportsService {
    * @param fromTime From time of the report
    * @param toTime To time of the report
   */
-  public getReport(type: string, fromTime?: string, toTime?: string, ):Promise<string> {
+  public getReport(type: string, fromTime?: string, toTime?: string, ):Promise<Blob> {
     const url = new URL(`${this.basePath}/v1/reports/${encodeURIComponent(String(type))}`);
     let queryParameters = new URLSearchParams();
     if (fromTime !== undefined && fromTime !== null) {
@@ -37,7 +35,7 @@ export class ReportsService {
     };
 
     return fetch(url.toString(), options).then((response) => {
-      return Api.handleResponse(response);
+      return response.blob();
     });
   }
 

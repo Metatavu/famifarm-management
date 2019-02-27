@@ -41,6 +41,7 @@ import PestList from "src/containers/PestList";
 import EditPest from "./EditPest";
 import CreatePest from "./CreatePest";
 import EditEvent from "./EditEvent";
+import ReportDownload from "./ReportDownload";
 
 export interface Props {
   authenticated: boolean,
@@ -107,6 +108,9 @@ class WelcomePage extends React.Component<Props, any> {
     },{
       "text": strings.pests,
       "route": "/pests"
+    },{
+      "text": strings.reportDownloadHeader,
+      "route": "/reports"
     }];
 
     const sideBarNavigation = navigationRoutes.map((navigationRoute, index) => {
@@ -416,6 +420,15 @@ class WelcomePage extends React.Component<Props, any> {
                 exact={true}
                 render={props => (
                   <CreateWastageReason
+                    keycloak={this.state.keycloak}
+                  />
+                )}
+              />
+              <Route
+                path="/reports"
+                exact={true}
+                render={props => (
+                  <ReportDownload
                     keycloak={this.state.keycloak}
                   />
                 )}
