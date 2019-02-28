@@ -119,5 +119,8 @@
   "reportTypeItemWASTAGE": "Wastage",
   "reportTypeItemGROWTH_TIME": "Growth time",
   "reportTypeItemYIELD": "Yield",
-  "reportTypeItemPLANTING_YIELD": "Planting yield"
+  "reportTypeItemPLANTING_YIELD": "Planting yield",
+  "userManagementLink": "User management",
+  "accountUrl": "Account",
+  "logoutUrl": "Logout"
 }

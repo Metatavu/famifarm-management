@@ -111,14 +111,25 @@ class WelcomePage extends React.Component<Props, any> {
     },{
       "text": strings.reportDownloadHeader,
       "route": "/reports"
+    }, {
+      "text": strings.userManagementLink,
+      "route": process.env.REACT_APP_ACCOUNT_MANAGEMENT_URL,
+      "external": true
     }];
 
     const sideBarNavigation = navigationRoutes.map((navigationRoute, index) => {
+      const itemParams = navigationRoute.external ? {
+        href: navigationRoute.route,
+        as: "a"
+      } : {
+        to: navigationRoute.route,
+        as: NavLink
+      };
+
       return (
         <Menu.Item
           key={index} 
-          to={navigationRoute.route} 
-          as={NavLink}>
+          {...itemParams}>
           {navigationRoute.text}
         </Menu.Item>
       );

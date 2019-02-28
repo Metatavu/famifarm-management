@@ -5,6 +5,7 @@ import './styles.css';
 import { Menu, Container, Icon, Sidebar } from "semantic-ui-react";
 import strings from "../localization/strings";
 import ToggleLocalization from "../containers/ToggleLocalization";
+import LogoutButton from "src/containers/LogoutButton";
 
 
 /**
@@ -59,6 +60,7 @@ class BasicLayout extends React.Component<Props, State> {
             {strings.managementHeaderText}
           </Menu.Item>
           <ToggleLocalization />
+          <LogoutButton />
         </Menu>
         <div style={{marginTop: '0'}}>
           <Sidebar.Pushable>

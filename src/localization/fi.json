@@ -118,6 +118,9 @@
     "reportTypePlaceholder": "Valitse raporting tyyppi",
     "reportTypeItemWASTAGE": "Poisheitto",
     "reportTypeItemGROWTH_TIME": "Kasvuaika",
-    "reportTypeItemYIELD": "Saanti",
-    "reportTypeItemPLANTING_YIELD": "Istutussaanti"
+    "reportTypeItemYIELD": "Saanto",
+    "reportTypeItemPLANTING_YIELD": "Istutussaanto",
+    "userManagementLink": "Käyttäjähallinta",
+    "accountUrl": "Käyttäjätili",
+    "logoutUrl": "Kirjaudu ulos"
   }
