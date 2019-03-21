@@ -1,6 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import Api from "../api";
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";import Api from "../api";
 import { WastageReason, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
@@ -205,4 +208,28 @@ class EditWastageReason extends React.Component<Props, State> {
   }
 }
 
-export default EditWastageReason;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    wastageReasons: state.wastageReasons,
+    wastageReason: state.wastageReason
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onWastageReasonSelected: (wastageReason: WastageReason) => dispatch(actions.wastageReasonSelected(wastageReason)),
+    onWastageReasonDeleted: (wastageReasonId: string) => dispatch(actions.wastageReasonDeleted(wastageReasonId))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditWastageReason);

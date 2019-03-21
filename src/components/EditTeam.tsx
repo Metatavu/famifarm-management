@@ -1,6 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import Api from "../api";
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";import Api from "../api";
 import { Team } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
@@ -185,4 +188,28 @@ class EditTeam extends React.Component<Props, State> {
   }
 }
 
-export default EditTeam;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    teams: state.teams,
+    team: state.team
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onTeamSelected: (team: Team) => dispatch(actions.teamSelected(team)),
+    onTeamDeleted: (teamId: string) => dispatch(actions.teamDeleted(teamId))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditTeam);

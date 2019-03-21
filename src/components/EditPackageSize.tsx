@@ -1,6 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import Api from "../api";
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";import Api from "../api";
 import { PackageSize, PackageSizeOpt, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
@@ -183,4 +186,28 @@ class EditPackageSize extends React.Component<Props, State> {
   }
 }
 
-export default EditPackageSize;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    packageSizes: state.packageSizes,
+    packageSize: state.packageSize
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onPackageSizeSelected: (packageSize: PackageSize) => dispatch(actions.packageSizeSelected(packageSize)),
+    onPackageSizeDeleted: (packageSizeId: string) => dispatch(actions.packageSizeDeleted(packageSizeId))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditPackageSize);

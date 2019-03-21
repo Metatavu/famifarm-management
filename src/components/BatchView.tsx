@@ -63,11 +63,11 @@ class BatchView extends React.Component<Props, State> {
     this.setState({ loading: true });
     
     const eventsService = await Api.getEventsService(this.props.keycloak);
-    eventsService.listEvents(undefined, undefined, this.props.batchId).then((events) => {
-      this.setState({
-        batchEvents: events.sort((a, b) => moment(a.startTime).isAfter(moment(b.startTime)) ? 1 : -1), //TOOO: sort on server side
-        loading: false
-      });
+    const events = await eventsService.listEvents(undefined, undefined, this.props.batchId);
+    
+    this.setState({
+      batchEvents: events.sort((a, b) => moment(a.startTime).isAfter(moment(b.startTime)) ? 1 : -1), //TOOO: sort on server side
+      loading: false
     });
   }
 

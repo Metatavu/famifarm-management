@@ -1,5 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
 import { SeedBatch } from "famifarm-typescript-models";
@@ -22,7 +26,7 @@ export interface State {
   seedBatches: SeedBatch[];
 }
 
-class SeedBatchsList extends React.Component<Props, State> {
+class SeedBatchList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -90,4 +94,27 @@ class SeedBatchsList extends React.Component<Props, State> {
   }
 }
 
-export default SeedBatchsList;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    seedBatches: state.seedBatches,
+    seedBatch: state.seedBatch
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onSeedBatchesFound: (seedBatches: SeedBatch[]) => dispatch(actions.seedBatchesFound(seedBatches))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SeedBatchList);

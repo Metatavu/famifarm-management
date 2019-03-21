@@ -1,6 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import Api from "../api";
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";import Api from "../api";
 import { Seed, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
@@ -184,4 +187,28 @@ class EditSeed extends React.Component<Props, State> {
   }
 }
 
-export default EditSeed;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    seeds: state.seeds,
+    seed: state.seed
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onSeedSelected: (seed: Seed) => dispatch(actions.seedSelected(seed)),
+    onSeedDeleted: (seedId: string) => dispatch(actions.seedDeleted(seedId))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditSeed);

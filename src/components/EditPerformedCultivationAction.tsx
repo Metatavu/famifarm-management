@@ -1,6 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import Api from "../api";
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";import Api from "../api";
 import { PerformedCultivationAction, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
@@ -182,4 +185,28 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
   }
 }
 
-export default EditPerformedCultivationAction;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    performedCultivationActions: state.performedCultivationActions,
+    performedCultivationAction: state.performedCultivationAction
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onPerformedCultivationActionSelected: (performedCultivationAction: PerformedCultivationAction) => dispatch(actions.performedCultivationActionSelected(performedCultivationAction)),
+    onPerformedCultivationActionDeleted: (performedCultivationActionId: string) => dispatch(actions.performedCultivationActionDeleted(performedCultivationActionId))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditPerformedCultivationAction);

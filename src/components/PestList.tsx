@@ -1,5 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
 import { Pest } from "famifarm-typescript-models";
@@ -29,7 +33,7 @@ interface State {
   pests: Pest[];
 }
 
-class PestsList extends React.Component<Props, State> {
+class PestList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -97,4 +101,26 @@ class PestsList extends React.Component<Props, State> {
   }
 }
 
-export default PestsList;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    pests: state.pests
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onPestsFound: (pests: Pest[]) => dispatch(actions.pestsFound(pests))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(PestList);

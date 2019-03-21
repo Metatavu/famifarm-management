@@ -1,6 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import Api from "../api";
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";import Api from "../api";
 import { ProductionLine } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
@@ -187,4 +190,28 @@ class EditProductionLine extends React.Component<Props, State> {
   }
 }
 
-export default EditProductionLine;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    productionLines: state.productionLines,
+    productionLine: state.productionLine
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onProductionLineSelected: (productionLine: ProductionLine) => dispatch(actions.productionLineSelected(productionLine)),
+    onProductionLineDeleted: (productionLineId: string) => dispatch(actions.productionLineDeleted(productionLineId))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditProductionLine);

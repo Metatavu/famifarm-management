@@ -1,6 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import Api from "../api";
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";import Api from "../api";
 import { Product, PackageSize, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
@@ -243,4 +246,30 @@ class EditProduct extends React.Component<Props, State> {
   }
 }
 
-export default EditProduct;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    products: state.products,
+    product: state.product,
+    packageSizes: state.packageSizes
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onProductSelected: (product: Product) => dispatch(actions.productSelected(product)),
+    onProductDeleted: (productId: string) => dispatch(actions.productDeleted(productId)),
+    onPackageSizesFound: (packageSizes: PackageSize[]) => dispatch(actions.packageSizesFound(packageSizes))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditProduct);

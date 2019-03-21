@@ -1,5 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
 import { WastageReason } from "famifarm-typescript-models";
@@ -29,7 +33,7 @@ interface State {
   wastageReasons: WastageReason[];
 }
 
-class WastageReasonsList extends React.Component<Props, State> {
+class WastageReasonList extends React.Component<Props, State> {
   
   /**
    * Constructor
@@ -103,4 +107,27 @@ class WastageReasonsList extends React.Component<Props, State> {
   }
 }
 
-export default WastageReasonsList;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    wastageReasons: state.wastageReasons,
+    wastageReason: state.wastageReason
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onWastageReasonsFound: (wastageReasons: WastageReason[]) => dispatch(actions.wastageReasonsFound(wastageReasons))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(WastageReasonList);

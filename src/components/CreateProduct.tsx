@@ -1,5 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 import Api from "../api";
 import { Product, PackageSize, ProductOpt, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
@@ -149,4 +153,29 @@ class CreateProduct extends React.Component<Props, State> {
   }
 }
 
-export default CreateProduct;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    products: state.products,
+    product: state.product,
+    packageSizes: state.packageSizes
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onProductCreated: (product: Product) => dispatch(actions.productCreated(product)),
+    onPackageSizesFound: (packageSizes: PackageSize[]) => dispatch(actions.packageSizesFound(packageSizes))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreateProduct);

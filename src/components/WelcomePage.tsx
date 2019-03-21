@@ -1,14 +1,11 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
+import * as actions from "../actions";
+import { StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 import { BrowserRouter, Route, NavLink } from 'react-router-dom';
 import Root from './Root';
-import TeamList from '../containers/TeamList';
-import ProductList from '../containers/ProductList';
-import EditTeam from '../containers/EditTeam';
-import CreateTeam from '../containers/CreateTeam';
-import CreateProduct from '../containers/CreateProduct';
-import PackageSizeList from '../containers/PackageSizeList';
-import CreatePackageSize from '../containers/CreatePackageSize';
 import strings from "../localization/strings";
 
 import {
@@ -19,29 +16,36 @@ import {
 
 import BasicLayout from "./BasicLayout";
 import CreateSeed from "./CreateSeed";
-import ProductionLineList from "src/containers/ProductionLineList";
 import CreateProductionLine from "./CreateProductionLine";
-import SeedBatchList from "src/containers/SeedBatchList";
-import CreateSeedBatch from "src/containers/CreateSeedBatch";
-import PerformedCultivationActionList from "src/containers/PerformedCultivationActionList";
-import CreatePerformedCultivationAction from "src/containers/CreatePerformedCultivationAction";
-import EditPerformedCultivationAction from "src/containers/EditPerformedCultivationAction";
-import EditProduct from "src/containers/EditProduct";
-import EditPackageSize from "src/containers/EditPackageSize";
-import EditSeed from "src/containers/EditSeed";
-import EditProductionLine from "src/containers/EditProductionLine";
-import EditSeedBatch from "src/containers/EditSeedBatch";
 import BatchView from "./BatchView";
-import WastageReasonList from "src/containers/WastageReasonList";
-import EditWastageReason from "src/containers/EditWastageReason";
-import CreateWastageReason from "src/containers/CreateWastageReason";
-import PestList from "src/containers/PestList";
 import EditPest from "./EditPest";
 import CreatePest from "./CreatePest";
 import EditEvent from "./EditEvent";
 import ReportDownload from "./ReportDownload";
 import SeedList from "./SeedList";
 import BatchList from "./BatchList";
+import EditProduct from "./EditProduct";
+import EditPackageSize from "./EditPackageSize";
+import EditSeed from "./EditSeed";
+import PestList from "./PestList";
+import ProductionLineList from "./ProductionLineList";
+import EditProductionLine from "./EditProductionLine";
+import SeedBatchList from "./SeedBatchList";
+import EditSeedBatch from "./EditSeedBatch";
+import CreateSeedBatch from "./CreateSeedBatch";
+import PerformedCultivationActionList from "./PerformedCultivationActionList";
+import CreatePerformedCultivationAction from "./CreatePerformedCultivationAction";
+import EditPerformedCultivationAction from "./EditPerformedCultivationAction";
+import EditWastageReason from "./EditWastageReason";
+import WastageReasonList from "./WastageReasonList";
+import CreateWastageReason from "./CreateWastageReason";
+import TeamList from "./TeamList";
+import EditTeam from "./EditTeam";
+import CreateTeam from "./CreateTeam";
+import ProductList from "./ProductList";
+import CreateProduct from "./CreateProduct";
+import PackageSizeList from "./PackageSizeList";
+import CreatePackageSize from "./CreatePackageSize";
 
 export interface Props {
   authenticated: boolean,
@@ -459,4 +463,28 @@ class WelcomePage extends React.Component<Props, any> {
   }
 }
 
-export default WelcomePage;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    authenticated: state.authenticated,
+    keycloak: state.keycloak,
+    locale: state.locale
+  }
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onLogin: (keycloak: Keycloak.KeycloakInstance, authenticated: boolean) => dispatch(actions.userLogin(keycloak, authenticated))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(WelcomePage);
