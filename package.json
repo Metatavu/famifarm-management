@@ -1,5 +1,5 @@
 {
-  "name": "lab-ui",
+  "name": "famifarm-management",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -48,6 +48,7 @@
     "@types/react-router-dom": "^4.3.0",
     "@types/react-select": "^2.0.4",
     "@types/react-vertical-timeline-component": "^2.3.1",
+    "react-tsrules": "file:../react-tsrules",
     "typescript": "^3.0.1"
   }
 }

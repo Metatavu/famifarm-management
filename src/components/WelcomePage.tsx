@@ -9,7 +9,7 @@ import CreateTeam from '../containers/CreateTeam';
 import CreateProduct from '../containers/CreateProduct';
 import PackageSizeList from '../containers/PackageSizeList';
 import CreatePackageSize from '../containers/CreatePackageSize';
-import strings from "src/localization/strings";
+import strings from "../localization/strings";
 
 import {
   Grid,
@@ -18,7 +18,6 @@ import {
 } from "semantic-ui-react";
 
 import BasicLayout from "./BasicLayout";
-import SeedList from "src/containers/SeedList";
 import CreateSeed from "./CreateSeed";
 import ProductionLineList from "src/containers/ProductionLineList";
 import CreateProductionLine from "./CreateProductionLine";
@@ -42,6 +41,7 @@ import EditPest from "./EditPest";
 import CreatePest from "./CreatePest";
 import EditEvent from "./EditEvent";
 import ReportDownload from "./ReportDownload";
+import SeedList from "./SeedList";
 
 export interface Props {
   authenticated: boolean,

@@ -22,5 +22,15 @@ export interface StoreState {
   locale: string
   wastageReason: WastageReason
   wastageReasons: WastageReason[]
-  pests: Pest[]
+  pests: Pest[],
+  error: ErrorMessage
+}
+
+/**
+ * An interface describing an error message
+ */
+export interface ErrorMessage {
+  title?: string,
+  message?: string,
+  exception?: Error
 }

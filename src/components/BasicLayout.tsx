@@ -1,18 +1,22 @@
 import * as React from "react";
+import * as actions from "../actions";
 import { NavLink } from 'react-router-dom';
 import 'semantic-ui-css/semantic.min.css';
 import './styles.css';
-import { Menu, Container, Icon, Sidebar } from "semantic-ui-react";
+import { Menu, Container, Icon, Sidebar, Message } from "semantic-ui-react";
 import strings from "../localization/strings";
 import ToggleLocalization from "../containers/ToggleLocalization";
-import LogoutButton from "src/containers/LogoutButton";
-
+import LogoutButton from "../containers/LogoutButton";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 
 /**
  * Interface representing component properties
  */
 interface Props {
-  sidebarItems: JSX.Element[]
+  sidebarItems: JSX.Element[],
+  error?: ErrorMessage
 }
 
 /**
@@ -49,7 +53,7 @@ class BasicLayout extends React.Component<Props, State> {
   /**
    * Render basic layout
    */
-  render() {
+  public render() {
     return (
       <div>
         <Menu fixed='top' inverted style={{background: "#2AA255"}}>
@@ -76,7 +80,10 @@ class BasicLayout extends React.Component<Props, State> {
               {this.props.sidebarItems}
             </Sidebar>
             <Sidebar.Pusher>
-              <Container style={{minHeight: "100vh", paddingTop: '6em', paddingBottom: '3em'}}>
+              <Container style={{minHeight: "100vh", paddingTop: '6em', paddingBottom: '3em'}}> 
+                {
+                  this.renderError()
+                }
                 {this.props.children}
               </Container>
             </Sidebar.Pusher>
@@ -85,5 +92,40 @@ class BasicLayout extends React.Component<Props, State> {
       </div>
     );
   }
+
+  private renderError() {
+    if (!this.props.error) {
+      return null;
+    }
+
+    return <Message negative>
+      { this.props.error.title ? <Message.Header>{this.props.error.title}</Message.Header> : null }
+      <p>{ this.props.error.message ? this.props.error.message : "" }. { strings.errorRetryText } <a href="javascript:window.location.reload(true)">{ strings.errorRetryHere }</a></p>
+      <p>{ strings.errorSupportText }</p>
+    </Message>
+  }
+
 }
-export default BasicLayout;
+
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    error: state.error
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(BasicLayout);

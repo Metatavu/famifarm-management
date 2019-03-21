@@ -1,5 +1,4 @@
 {
-  "extends": [],
   "defaultSeverity": "warning",
   "linterOptions": {
     "exclude": [
@@ -7,5 +6,12 @@
       "node_modules/**/*.ts",
       "coverage/lcov-report/*.js"
     ]
+  },
+  "rulesDirectory": [
+    "node_modules/react-tsrules/src"
+  ],
+  "rules": {
+    "no-floating-promises": false,
+    "react-life-cycle-async-catch": true
   }
 }

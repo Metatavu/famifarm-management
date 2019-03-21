@@ -1,4 +1,10 @@
 {
+  "errorRetryText": "You can try to reload the page by",
+  "errorRetryHere": "clicking here",
+  "errorSupportText": "If the problem persists, contact support@metatavu.fi",
+  "defaultApiErrorTitle": "Connection error",
+  "defaultApiErrorMessage": "An unexpected error occurred in the server connection",
+
   "managementHeaderText": "Famifarm management",
   "save": "Save",
   "date": "Date",
