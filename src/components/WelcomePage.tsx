@@ -31,7 +31,6 @@ import EditPackageSize from "src/containers/EditPackageSize";
 import EditSeed from "src/containers/EditSeed";
 import EditProductionLine from "src/containers/EditProductionLine";
 import EditSeedBatch from "src/containers/EditSeedBatch";
-import BatchList from "src/containers/BatchList";
 import BatchView from "./BatchView";
 import WastageReasonList from "src/containers/WastageReasonList";
 import EditWastageReason from "src/containers/EditWastageReason";
@@ -42,6 +41,7 @@ import CreatePest from "./CreatePest";
 import EditEvent from "./EditEvent";
 import ReportDownload from "./ReportDownload";
 import SeedList from "./SeedList";
+import BatchList from "./BatchList";
 
 export interface Props {
   authenticated: boolean,
