@@ -5,6 +5,10 @@ import { Event, SowingEventData, TableSpreadEventData, CultivationObservationEve
 import { VerticalTimeline, VerticalTimelineElement }  from 'react-vertical-timeline-component';
 import 'react-vertical-timeline-component/style.min.css';
 import '../styles/batch-view.css';
+import * as actions from "../actions";
+import { StoreState } from "../types/index";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 
 import observationsIcon from "../gfx/icons/havainnot-icon.png"
 import sowingIcon from "../gfx/icons/kylvo-icon.png"
@@ -20,15 +24,17 @@ import {
   Button
 } from "semantic-ui-react";
 import * as moment from "moment";
-import strings from "src/localization/strings";
+import strings from "../localization/strings";
 import { NavLink } from "react-router-dom";
+import { ErrorMessage } from "../types";
 
 /**
  * Interface representing component properties
  */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  batchId: string;
+  batchId: string,
+  onError: (error: ErrorMessage) => void
 }
 
 
@@ -56,19 +62,27 @@ class BatchView extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      this.setState({ loading: true });
+      
+      const eventsService = await Api.getEventsService(this.props.keycloak);
+      const events = await eventsService.listEvents(undefined, undefined, this.props.batchId);
+      
+      this.setState({
+        batchEvents: events.sort((a, b) => moment(a.startTime).isAfter(moment(b.startTime)) ? 1 : -1), //TOOO: sort on server side
+        loading: false
+      });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
     }
-
-    this.setState({ loading: true });
-    
-    const eventsService = await Api.getEventsService(this.props.keycloak);
-    const events = await eventsService.listEvents(undefined, undefined, this.props.batchId);
-    
-    this.setState({
-      batchEvents: events.sort((a, b) => moment(a.startTime).isAfter(moment(b.startTime)) ? 1 : -1), //TOOO: sort on server side
-      loading: false
-    });
   }
 
   /**
@@ -238,4 +252,25 @@ class BatchView extends React.Component<Props, State> {
   }
 }
 
-export default BatchView;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(BatchView);

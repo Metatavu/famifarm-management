@@ -20,7 +20,8 @@ import LocalizedUtils from "src/localization/localizedutils";
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   performedCultivationActions?: PerformedCultivationAction[];
-  onPerformedCultivationActionsFound?: (performedCultivationActions: PerformedCultivationAction[]) => void;
+  onPerformedCultivationActionsFound?: (performedCultivationActions: PerformedCultivationAction[]) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 export interface State {
@@ -39,14 +40,22 @@ class PerformedCultivationActionList extends React.Component<Props, State> {
    * Component did mount life-sycle event
    */
   async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const performedCultivationActionServer = await Api.getPerformedCultivationActionsService(this.props.keycloak);
-    performedCultivationActionServer.listPerformedCultivationActions().then((performedCultivationActions) => {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const performedCultivationActionServer = await Api.getPerformedCultivationActionsService(this.props.keycloak);
+      const performedCultivationActions = await performedCultivationActionServer.listPerformedCultivationActions();
+      
       this.props.onPerformedCultivationActionsFound && this.props.onPerformedCultivationActionsFound(performedCultivationActions);
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -114,7 +123,8 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onPerformedCultivationActionsFound: (performedCultivationActions: PerformedCultivationAction[]) => dispatch(actions.performedCultivationActionsFound(performedCultivationActions))
+    onPerformedCultivationActionsFound: (performedCultivationActions: PerformedCultivationAction[]) => dispatch(actions.performedCultivationActionsFound(performedCultivationActions)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

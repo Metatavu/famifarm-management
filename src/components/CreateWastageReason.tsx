@@ -20,7 +20,8 @@ import LocalizedValueInput from "./LocalizedValueInput";
  */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  onWastageReasonCreated?: (wastageReason: WastageReason) => void;
+  onWastageReasonCreated?: (wastageReason: WastageReason) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 /**
@@ -52,18 +53,26 @@ class CreateWastageReason extends React.Component<Props, State> {
    * Handle form submit
    */
   private async handleSubmit() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const wastageReasonObject: WastageReason = {
-      reason: this.state.wastageReasonData.reason
-    };
-
-    const wastageReasonService = await Api.getWastageReasonsService(this.props.keycloak);
-    wastageReasonService.createWastageReason(wastageReasonObject).then(() => {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const wastageReasonObject: WastageReason = {
+        reason: this.state.wastageReasonData.reason
+      };
+  
+      const wastageReasonService = await Api.getWastageReasonsService(this.props.keycloak);
+      await wastageReasonService.createWastageReason(wastageReasonObject);
+      
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -131,7 +140,8 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onWastageReasonCreated: (wastageReason: WastageReason) => dispatch(actions.wastageReasonCreated(wastageReason))
+    onWastageReasonCreated: (wastageReason: WastageReason) => dispatch(actions.wastageReasonCreated(wastageReason)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

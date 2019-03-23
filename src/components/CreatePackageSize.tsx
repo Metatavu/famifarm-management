@@ -19,7 +19,8 @@ import LocalizedValueInput from "./LocalizedValueInput";
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   packageSize?: PackageSize;
-  onPackageSizeCreated?: (packageSize: PackageSize) => void;
+  onPackageSizeCreated?: (packageSize: PackageSize) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 export interface State {
@@ -41,15 +42,22 @@ class CreatePackageSize extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  async handleSubmit() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-    packageSizeService.createPackageSize(this.state.packageSizeData).then(() => {
+  private async handleSubmit() {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
+      await packageSizeService.createPackageSize(this.state.packageSizeData);
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -116,7 +124,8 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onPackageSizeCreated: (packageSize: PackageSize) => dispatch(actions.packageSizeCreated(packageSize))
+    onPackageSizeCreated: (packageSize: PackageSize) => dispatch(actions.packageSizeCreated(packageSize)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

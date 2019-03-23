@@ -19,7 +19,8 @@ import LocalizedUtils from "src/localization/localizedutils";
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   packageSizes?: PackageSize[];
-  onPackageSizesFound?: (packageSizes: PackageSize[]) => void;
+  onPackageSizesFound?: (packageSizes: PackageSize[]) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 export interface State {
@@ -38,14 +39,22 @@ class PackageSizeList extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   public async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-    packageSizeService.listPackageSizes().then((packageSizes) => {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
+      const packageSizes = await packageSizeService.listPackageSizes();
+  
       this.props.onPackageSizesFound && this.props.onPackageSizesFound(packageSizes);
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -113,7 +122,8 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onPackageSizesFound: (packageSizes: PackageSize[]) => dispatch(actions.packageSizesFound(packageSizes))
+    onPackageSizesFound: (packageSizes: PackageSize[]) => dispatch(actions.packageSizesFound(packageSizes)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

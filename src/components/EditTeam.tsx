@@ -26,7 +26,8 @@ interface Props {
   teamId: string;
   team?: Team;
   onTeamSelected?: (team: Team) => void;
-  onTeamDeleted?: (teamId: string) => void;
+  onTeamDeleted?: (teamId: string) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 /**
@@ -67,15 +68,23 @@ class EditTeam extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   public async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-    
-    const teamsService = await Api.getTeamsService(this.props.keycloak);
-    teamsService.findTeam(this.props.teamId).then((team) => {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+      
+      const teamsService = await Api.getTeamsService(this.props.keycloak);
+      const team = await teamsService.findTeam(this.props.teamId);
+      
       this.props.onTeamSelected && this.props.onTeamSelected(team);
       this.setState({team: team});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -116,17 +125,24 @@ class EditTeam extends React.Component<Props, State> {
    * Handle team delete
    */
   private async handleDelete() {
-    if (!this.props.keycloak || !this.state.team) {
-      return;
-    }
-    
-    const teamsService = await Api.getTeamsService(this.props.keycloak);
-    const id = this.state.team.id;
-
-    teamsService.deleteTeam(id!).then(() => {
+    try {
+      if (!this.props.keycloak || !this.state.team) {
+        return;
+      }
+      
+      const teamsService = await Api.getTeamsService(this.props.keycloak);
+      const id = this.state.team.id;
+      await teamsService.deleteTeam(id!);
+      
       this.props.onTeamDeleted && this.props.onTeamDeleted(id!);
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -208,7 +224,8 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onTeamSelected: (team: Team) => dispatch(actions.teamSelected(team)),
-    onTeamDeleted: (teamId: string) => dispatch(actions.teamDeleted(teamId))
+    onTeamDeleted: (teamId: string) => dispatch(actions.teamDeleted(teamId)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

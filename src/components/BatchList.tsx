@@ -59,7 +59,7 @@ class BatchList extends React.Component<Props, State> {
    */
   public async componentDidMount() {
     try {
-      this.updateBatches(this.state.status);
+      await this.updateBatches(this.state.status);
     } catch (e) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
@@ -99,7 +99,7 @@ class BatchList extends React.Component<Props, State> {
 
     const batches = (this.props.batches || []).map((batch) => {
       return (
-        <List.Item>
+        <List.Item key={batch.id}>
           <List.Content floated='right'>
             <NavLink to={`/batches/${batch.id}`}>
               <Button className="submit-button">{strings.open}</Button>
@@ -137,7 +137,13 @@ class BatchList extends React.Component<Props, State> {
       status: status
     });
 
-    this.updateBatches(status);
+    this.updateBatches(status).catch((err) => {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: err
+      });
+    });
   }
 
   /**

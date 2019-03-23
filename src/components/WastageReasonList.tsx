@@ -23,7 +23,8 @@ import LocalizedUtils from "src/localization/localizedutils";
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   wastageReasons?: WastageReason[];
-  onWastageReasonsFound?: (wastageReasons: WastageReason[]) => void;
+  onWastageReasonsFound?: (wastageReasons: WastageReason[]) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 /**
@@ -51,14 +52,22 @@ class WastageReasonList extends React.Component<Props, State> {
    * Component did mount life-sycle event
    */
   public async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const wastageReasonsService = await Api.getWastageReasonsService(this.props.keycloak);
-    wastageReasonsService.listWastageReasons().then((wastageReasons) => {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const wastageReasonsService = await Api.getWastageReasonsService(this.props.keycloak);
+      const wastageReasons = await wastageReasonsService.listWastageReasons();
+  
       this.props.onWastageReasonsFound && this.props.onWastageReasonsFound(wastageReasons);
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -126,7 +135,8 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onWastageReasonsFound: (wastageReasons: WastageReason[]) => dispatch(actions.wastageReasonsFound(wastageReasons))
+    onWastageReasonsFound: (wastageReasons: WastageReason[]) => dispatch(actions.wastageReasonsFound(wastageReasons)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

@@ -1,5 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
+import * as actions from "../actions";
+import { StoreState } from "../types/index";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 import Api from "../api";
 import { Pest, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
@@ -15,13 +19,15 @@ import {
 } from "semantic-ui-react";
 import LocalizedValueInput from "./LocalizedValueInput";
 import LocalizedUtils from "src/localization/localizedutils";
+import { ErrorMessage } from "src/types";
 
 /**
  * Interface representing component properties
  */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  pestId: string;
+  pestId: string,
+  onError: (error: ErrorMessage) => void
 }
 
 /**
@@ -63,15 +69,22 @@ class EditPest extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   public async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const pestsService = await Api.getPestsService(this.props.keycloak);
-
-    pestsService.findPest(this.props.pestId).then((pest) => {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const pestsService = await Api.getPestsService(this.props.keycloak);
+      const pest = await pestsService.findPest(this.props.pestId);
       this.setState({pest: pest});
-    });
+
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
 
@@ -90,36 +103,51 @@ class EditPest extends React.Component<Props, State> {
    * Handle form submit
    */
   private async handleSubmit() {
-    if (!this.props.keycloak || !this.state.pest) {
-      return;
+    try {
+      if (!this.props.keycloak || !this.state.pest) {
+        return;
+      }
+  
+      const pestsService = await Api.getPestsService(this.props.keycloak);
+  
+      this.setState({saving: true});
+      await pestsService.updatePest(this.state.pest, this.state.pest.id || "");
+      this.setState({saving: false});
+  
+      this.setState({messageVisible: true});
+      setTimeout(() => {
+        this.setState({messageVisible: false});
+      }, 3000);
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
     }
-
-    const pestsService = await Api.getPestsService(this.props.keycloak);
-
-    this.setState({saving: true});
-    pestsService.updatePest(this.state.pest, this.state.pest.id || "");
-    this.setState({saving: false});
-
-    this.setState({messageVisible: true});
-    setTimeout(() => {
-      this.setState({messageVisible: false});
-    }, 3000);
   }
 
   /**
    * Handle pest delete
    */
   private async handleDelete() {
-    if (!this.props.keycloak || !this.state.pest) {
-      return;
-    }
-
-    const pestsService = await Api.getPestsService(this.props.keycloak);
-    const id = this.state.pest.id || "";
-
-    pestsService.deletePest(id).then(() => {
+    try {
+      if (!this.props.keycloak || !this.state.pest) {
+        return;
+      }
+  
+      const pestsService = await Api.getPestsService(this.props.keycloak);
+      const id = this.state.pest.id || "";
+      await pestsService.deletePest(id);
+      
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -185,4 +213,25 @@ class EditPest extends React.Component<Props, State> {
   }
 }
 
-export default EditPest;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditPest);

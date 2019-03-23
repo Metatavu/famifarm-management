@@ -19,7 +19,8 @@ import {
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   team?: Team;
-  onTeamCreated?: (team: Team) => void;
+  onTeamCreated?: (team: Team) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 export interface State {
@@ -44,25 +45,32 @@ class CreateTeam extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  async handleSubmit() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const teamObject = {
-      name: this.state.name
-    };
-
-    const teamsService = await Api.getTeamsService(this.props.keycloak);
-    teamsService.createTeam(teamObject).then(() => {
+  private async handleSubmit() {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const teamObject = {
+        name: this.state.name
+      };
+  
+      const teamsService = await Api.getTeamsService(this.props.keycloak);
+      await teamsService.createTeam(teamObject);
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
    * Handle form submit
    */
-  render() {
+  public render() {
     if (this.state.redirect) {
       return <Redirect to="/teams" push={true} />;
     }
@@ -112,7 +120,8 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onTeamCreated: (team: Team) => dispatch(actions.teamCreated(team))
+    onTeamCreated: (team: Team) => dispatch(actions.teamCreated(team)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

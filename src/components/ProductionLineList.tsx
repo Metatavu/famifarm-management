@@ -19,7 +19,8 @@ import {
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   productionLines?: ProductionLine[];
-  onProductionLinesFound?: (productionLines: ProductionLine[]) => void;
+  onProductionLinesFound?: (productionLines: ProductionLine[]) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 export interface State {
@@ -37,21 +38,29 @@ class ProductionLineList extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle event
    */
-  async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const productionLinesService = await Api.getProductionLinesService(this.props.keycloak);
-    productionLinesService.listProductionLines().then((productionLines) => {
+  public async componentDidMount() {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const productionLinesService = await Api.getProductionLinesService(this.props.keycloak);
+      const productionLines = await productionLinesService.listProductionLines();
+      
       this.props.onProductionLinesFound && this.props.onProductionLinesFound(productionLines);
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
    * Render production line list view
    */
-  render() {
+  public render() {
     if (!this.props.productionLines) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
@@ -113,7 +122,8 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onProductionLinesFound: (productionLines: ProductionLine[]) => dispatch(actions.productionLinesFound(productionLines))
+    onProductionLinesFound: (productionLines: ProductionLine[]) => dispatch(actions.productionLinesFound(productionLines)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

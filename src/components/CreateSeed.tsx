@@ -22,7 +22,8 @@ import LocalizedValueInput from "./LocalizedValueInput";
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   seed?: Seed;
-  onSeedCreated?: (seed: Seed) => void;
+  onSeedCreated?: (seed: Seed) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 /**
@@ -47,19 +48,26 @@ class CreateSeed extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  async handleSubmit() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const seedObject: Seed = {
-      name: this.state.seedData.name
-    };
-
-    const seedService = await Api.getSeedsService(this.props.keycloak);
-    seedService.createSeed(seedObject).then(() => {
+  private async handleSubmit() {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const seedObject: Seed = {
+        name: this.state.seedData.name
+      };
+  
+      const seedService = await Api.getSeedsService(this.props.keycloak);
+      await seedService.createSeed(seedObject);
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -125,7 +133,8 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onSeedCreated: (seed: Seed) => dispatch(actions.seedCreated(seed))
+    onSeedCreated: (seed: Seed) => dispatch(actions.seedCreated(seed)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

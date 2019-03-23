@@ -11,7 +11,7 @@
     "node_modules/react-tsrules/src"
   ],
   "rules": {
-    "no-floating-promises": false,
+    "no-floating-promises": true,
     "react-life-cycle-async-catch": true
   }
 }

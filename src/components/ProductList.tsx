@@ -20,7 +20,8 @@ import LocalizedUtils from "src/localization/localizedutils";
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   products?: Product[];
-  onProductsFound?: (products: Product[]) => void;
+  onProductsFound?: (products: Product[]) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 export interface State {
@@ -39,20 +40,28 @@ class ProductList extends React.Component<Props, State> {
    * Component did mount life-sycle event
    */
   async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const productsService = await Api.getProductsService(this.props.keycloak);
-    productsService.listProducts().then((products) => {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const productsService = await Api.getProductsService(this.props.keycloak);
+      const products = await productsService.listProducts();
+      
       this.props.onProductsFound && this.props.onProductsFound(products);
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
    * Render product list view
    */
-  render() {
+  public render() {
     if (!this.props.products) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
@@ -114,7 +123,8 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onProductsFound: (products: Product[]) => dispatch(actions.productsFound(products))
+    onProductsFound: (products: Product[]) => dispatch(actions.productsFound(products)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

@@ -23,7 +23,8 @@ interface Props {
   seedBatch?: SeedBatch;
   onSeedBatchCreated?: (seedBatch: SeedBatch) => void;
   seeds?: Seed[];
-  onSeedsFound?: (seeds: Seed[]) => void;
+  onSeedsFound?: (seeds: Seed[]) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 interface State {
@@ -49,15 +50,22 @@ class CreateSeedBatch extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle method
    */
-  async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const seedsService = await Api.getSeedsService(this.props.keycloak);
-    seedsService.listSeeds().then((seeds) => {
+  public async componentDidMount() {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const seedsService = await Api.getSeedsService(this.props.keycloak);
+      const seeds = await seedsService.listSeeds();
       this.props.onSeedsFound && this.props.onSeedsFound(seeds);
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -83,21 +91,29 @@ class CreateSeedBatch extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  async handleSubmit() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const seedBatchObject = {
-      code: this.state.code,
-      seedId: this.state.seedId,
-      time: this.state.time
-    };
-
-    const seedBatchService = await Api.getSeedBatchesService(this.props.keycloak);
-    seedBatchService.createSeedBatch(seedBatchObject).then(() => {
+  private async handleSubmit() {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const seedBatchObject = {
+        code: this.state.code,
+        seedId: this.state.seedId,
+        time: this.state.time
+      };
+  
+      const seedBatchService = await Api.getSeedBatchesService(this.props.keycloak);
+      await seedBatchService.createSeedBatch(seedBatchObject);
+  
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -180,7 +196,8 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onSeedBatchCreated: (seedBatch: SeedBatch) => dispatch(actions.seedBatchCreated(seedBatch)),
-    onSeedsFound: (seeds: Seed[]) => dispatch(actions.seedsFound(seeds))
+    onSeedsFound: (seeds: Seed[]) => dispatch(actions.seedsFound(seeds)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

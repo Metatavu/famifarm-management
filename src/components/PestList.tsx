@@ -23,7 +23,8 @@ import LocalizedUtils from "src/localization/localizedutils";
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   pests?: Pest[];
-  onPestsFound?: (pests: Pest[]) => void;
+  onPestsFound?: (pests: Pest[]) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 /**
@@ -45,14 +46,21 @@ class PestList extends React.Component<Props, State> {
    * Component did mount life-sycle event
    */
   public async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const pestsService = await Api.getPestsService(this.props.keycloak);
-    pestsService.listPests().then((pests) => {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const pestsService = await Api.getPestsService(this.props.keycloak);
+      const pests = await pestsService.listPests(); 
       this.props.onPestsFound && this.props.onPestsFound(pests);
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -119,7 +127,8 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onPestsFound: (pests: Pest[]) => dispatch(actions.pestsFound(pests))
+    onPestsFound: (pests: Pest[]) => dispatch(actions.pestsFound(pests)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

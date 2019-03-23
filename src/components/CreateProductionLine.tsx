@@ -19,7 +19,8 @@ import strings from "src/localization/strings";
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   productionLine?: ProductionLine;
-  onProductionLineCreated?: (productionLine: ProductionLine) => void;
+  onProductionLineCreated?: (productionLine: ProductionLine) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 interface State {
@@ -41,25 +42,33 @@ class CreateProductionLine extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  async handleSubmit() {
-    if (!this.props.keycloak) {
-      return;
-    }
-    
-    const productionLineObject = {
-      lineNumber: this.state.lineNumber
-    };
-
-    const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
-    productionLineService.createProductionLine(productionLineObject).then(() => {
+  private async handleSubmit() {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+      
+      const productionLineObject = {
+        lineNumber: this.state.lineNumber
+      };
+  
+      const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
+      await productionLineService.createProductionLine(productionLineObject);
+  
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
    * Render create production line view
    */
-  render() {
+  public render() {
     if (this.state.redirect) {
       return <Redirect to="/productionLines" push={true} />;
     }
@@ -110,7 +119,8 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onProductionLineCreated: (productionLine: ProductionLine) => dispatch(actions.productionLineCreated(productionLine))
+    onProductionLineCreated: (productionLine: ProductionLine) => dispatch(actions.productionLineCreated(productionLine)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

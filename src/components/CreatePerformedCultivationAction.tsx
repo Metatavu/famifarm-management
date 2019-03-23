@@ -19,7 +19,8 @@ import LocalizedValueInput from "./LocalizedValueInput";
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   performedCultivationAction?: PerformedCultivationAction;
-  onPerformedCultivationActionCreated?: (performedCultivationAction: PerformedCultivationAction) => void;
+  onPerformedCultivationActionCreated?: (performedCultivationAction: PerformedCultivationAction) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 export interface State {
@@ -41,19 +42,26 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  async handleSubmit() {
-    if (!this.props.keycloak) {
-      return
-    }
-
-    const performedCultivationActionObject: PerformedCultivationAction = {
-      name: this.state.performedCultivationActionData.name
-    };
-
-    const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
-    performedCultivationActionService.createPerformedCultivationAction(performedCultivationActionObject).then(() => {
+  public async handleSubmit() {
+    try {
+      if (!this.props.keycloak) {
+        return
+      }
+  
+      const performedCultivationActionObject: PerformedCultivationAction = {
+        name: this.state.performedCultivationActionData.name
+      };
+  
+      const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
+      await performedCultivationActionService.createPerformedCultivationAction(performedCultivationActionObject)
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -61,7 +69,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
    * 
    * @param name localized entry representing name
    */
-  updateName = (name: LocalizedEntry) => {
+  private updateName = (name: LocalizedEntry) => {
     this.setState({
       performedCultivationActionData: {...this.state.performedCultivationActionData, name: name}
     });
@@ -70,7 +78,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
   /**
    * Render create performed cultivation action view
    */
-  render() {
+  public render() {
     if (this.state.redirect) {
       return <Redirect to="/performedCultivationActions" push={true} />;
     }
@@ -120,7 +128,8 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onPerformedCultivationActionCreated: (performedCultivationAction: PerformedCultivationAction) => dispatch(actions.performedCultivationActionCreated(performedCultivationAction))
+    onPerformedCultivationActionCreated: (performedCultivationAction: PerformedCultivationAction) => dispatch(actions.performedCultivationActionCreated(performedCultivationAction)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

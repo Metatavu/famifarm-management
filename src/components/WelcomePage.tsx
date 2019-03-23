@@ -81,7 +81,7 @@ class WelcomePage extends React.Component<Props, any> {
   /**
    * Render welcome page view
    */
-  render() {
+  public render() {
     const navigationRoutes = [{
       "text": strings.batches,
       "route": "/batches"

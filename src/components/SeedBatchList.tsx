@@ -19,7 +19,8 @@ import {
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   seedBatches?: SeedBatch[];
-  onSeedBatchesFound?: (seedBatches: SeedBatch[]) => void;
+  onSeedBatchesFound?: (seedBatches: SeedBatch[]) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 export interface State {
@@ -37,21 +38,29 @@ class SeedBatchList extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle event
    */
-  async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const seedBatchService = await Api.getSeedBatchesService(this.props.keycloak);
-    seedBatchService.listSeedBatches().then((seedBatches) => {
+  public async componentDidMount() {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const seedBatchService = await Api.getSeedBatchesService(this.props.keycloak);
+      const seedBatches = await seedBatchService.listSeedBatches();
+      
       this.props.onSeedBatchesFound && this.props.onSeedBatchesFound(seedBatches);
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
    * Render seed batch list view
    */
-  render() {
+  public render() {
     if (!this.props.seedBatches) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
@@ -113,7 +122,8 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onSeedBatchesFound: (seedBatches: SeedBatch[]) => dispatch(actions.seedBatchesFound(seedBatches))
+    onSeedBatchesFound: (seedBatches: SeedBatch[]) => dispatch(actions.seedBatchesFound(seedBatches)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

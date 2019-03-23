@@ -30,7 +30,8 @@ interface Props {
   onSeedBatchSelected?: (seedBatch: SeedBatch) => void;
   onSeedBatchDeleted?: (seedBatchId: string) => void;
   seeds?: Seed[];
-  onSeedsFound?: (seeds: Seed[]) => void;
+  onSeedsFound?: (seeds: Seed[]) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 /**
@@ -81,22 +82,29 @@ class EditSeedBatch extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   public async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const seedBatchesService = await Api.getSeedBatchesService(this.props.keycloak);
-    const seedsService = await Api.getSeedsService(this.props.keycloak);
-
-    seedBatchesService.findSeedBatch(this.props.seedBatchId).then((seedBatch) => {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const seedBatchesService = await Api.getSeedBatchesService(this.props.keycloak);
+      const seedsService = await Api.getSeedsService(this.props.keycloak);
+  
+      const seedBatch = await seedBatchesService.findSeedBatch(this.props.seedBatchId);
       this.props.onSeedBatchSelected && this.props.onSeedBatchSelected(seedBatch);
       this.setState({seedBatch: seedBatch});
-    });
-
-    seedsService.listSeeds().then((seeds) => {
+  
+      const seeds = await seedsService.listSeeds();
+  
       this.props.onSeedsFound && this.props.onSeedsFound(seeds);
       this.setState({seeds: seeds});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -164,38 +172,53 @@ class EditSeedBatch extends React.Component<Props, State> {
    * Handle form submit
    */
   private async handleSubmit() {
-    if (!this.props.keycloak || !this.state.seedBatch) {
-      return;
+    try {
+      if (!this.props.keycloak || !this.state.seedBatch) {
+        return;
+      }
+  
+      const seedBatchesService = await Api.getSeedBatchesService(this.props.keycloak);
+  
+      this.setState({saving: true});
+      await seedBatchesService.updateSeedBatch(this.state.seedBatch, this.state.seedBatch.id || "");
+      this.props.onSeedBatchSelected && this.props.onSeedBatchSelected(this.state.seedBatch);
+      this.setState({saving: false});
+  
+      this.setState({messageVisible: true});
+      setTimeout(() => {
+        this.setState({messageVisible: false});
+      }, 3000);
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
     }
-
-    const seedBatchesService = await Api.getSeedBatchesService(this.props.keycloak);
-
-    this.setState({saving: true});
-    seedBatchesService.updateSeedBatch(this.state.seedBatch, this.state.seedBatch.id || "");
-    this.props.onSeedBatchSelected && this.props.onSeedBatchSelected(this.state.seedBatch);
-    this.setState({saving: false});
-
-    this.setState({messageVisible: true});
-    setTimeout(() => {
-      this.setState({messageVisible: false});
-    }, 3000);
   }
 
   /**
    * Handle seedBatch delete
    */
   private async handleDelete() {
-    if (!this.props.keycloak || !this.state.seedBatch) {
-      return;
-    }
-
-    const seedBatchesService = await Api.getSeedBatchesService(this.props.keycloak);
-    const id = this.state.seedBatch.id || "";
-
-    seedBatchesService.deleteSeedBatch(id).then(() => {
+    try {
+      if (!this.props.keycloak || !this.state.seedBatch) {
+        return;
+      }
+  
+      const seedBatchesService = await Api.getSeedBatchesService(this.props.keycloak);
+      const id = this.state.seedBatch.id || "";
+      await seedBatchesService.deleteSeedBatch(id);
+  
       this.props.onSeedBatchDeleted && this.props.onSeedBatchDeleted(id!);
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -304,7 +327,8 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onSeedBatchSelected: (seedBatch: SeedBatch) => dispatch(actions.seedBatchSelected(seedBatch)),
     onSeedBatchDeleted: (seedBatchId: string) => dispatch(actions.seedBatchDeleted(seedBatchId)),
-    onSeedsFound: (seeds: Seed[]) => dispatch(actions.seedsFound(seeds))
+    onSeedsFound: (seeds: Seed[]) => dispatch(actions.seedsFound(seeds)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

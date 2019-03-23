@@ -26,7 +26,8 @@ interface Props {
   productionLineId: string;
   productionLine?: ProductionLine;
   onProductionLineSelected?: (productionLine: ProductionLine) => void;
-  onProductionLineDeleted?: (productionLineId: string) => void;
+  onProductionLineDeleted?: (productionLineId: string) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 /**
@@ -68,16 +69,23 @@ class EditProductionLine extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   public async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
-
-    productionLineService.findProductionLine(this.props.productionLineId).then((productionLine) => {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
+      const productionLine = await productionLineService.findProductionLine(this.props.productionLineId);
+  
       this.props.onProductionLineSelected && this.props.onProductionLineSelected(productionLine);
       this.setState({productionLine: productionLine});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -98,37 +106,53 @@ class EditProductionLine extends React.Component<Props, State> {
    * Handle form submit
    */
   private async handleSubmit() {
-    if (!this.props.keycloak || !this.state.productionLine) {
-      return;
+    try {
+      if (!this.props.keycloak || !this.state.productionLine) {
+        return;
+      }
+  
+      const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
+  
+      this.setState({saving: true});
+      await productionLineService.updateProductionLine(this.state.productionLine, this.state.productionLine.id || "");
+      this.setState({saving: false});
+  
+      this.setState({messageVisible: true});
+      setTimeout(() => {
+        this.setState({messageVisible: false});
+      }, 3000);
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
     }
-
-    const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
-
-    this.setState({saving: true});
-    productionLineService.updateProductionLine(this.state.productionLine, this.state.productionLine.id || "");
-    this.setState({saving: false});
-
-    this.setState({messageVisible: true});
-    setTimeout(() => {
-      this.setState({messageVisible: false});
-    }, 3000);
   }
 
   /**
    * Handle productionLine delete
    */
   private async handleDelete() {
-    if (!this.props.keycloak || !this.state.productionLine) {
-      return;
-    }
-
-    const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
-    const id = this.state.productionLine.id || "";
-
-    productionLineService.deleteProductionLine(id).then(() => {
+    try {
+      if (!this.props.keycloak || !this.state.productionLine) {
+        return;
+      }
+  
+      const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
+      const id = this.state.productionLine.id || "";
+  
+      await productionLineService.deleteProductionLine(id);
+      
       this.props.onProductionLineDeleted && this.props.onProductionLineDeleted(id);
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -210,7 +234,8 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onProductionLineSelected: (productionLine: ProductionLine) => dispatch(actions.productionLineSelected(productionLine)),
-    onProductionLineDeleted: (productionLineId: string) => dispatch(actions.productionLineDeleted(productionLineId))
+    onProductionLineDeleted: (productionLineId: string) => dispatch(actions.productionLineDeleted(productionLineId)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

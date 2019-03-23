@@ -26,7 +26,8 @@ interface Props {
   performedCultivationActionId: string;
   performedCultivationAction?: PerformedCultivationAction;
   onPerformedCultivationActionSelected?: (performedCultivationAction: PerformedCultivationAction) => void;
-  onPerformedCultivationActionDeleted?: (performedCultivationActionId: string) => void;
+  onPerformedCultivationActionDeleted?: (performedCultivationActionId: string) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 /**
@@ -67,15 +68,23 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   public async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-    
-    const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
-    performedCultivationActionService.findPerformedCultivationAction(this.props.performedCultivationActionId).then((performedCultivationAction) => {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+      
+      const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
+      const performedCultivationAction = await performedCultivationActionService.findPerformedCultivationAction(this.props.performedCultivationActionId);
       this.props.onPerformedCultivationActionSelected && this.props.onPerformedCultivationActionSelected(performedCultivationAction);
       this.setState({performedCultivationAction: performedCultivationAction});
-    });
+
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -93,37 +102,53 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
    * Handle form submit
    */
   private async handleSubmit() {
-    if (!this.props.keycloak || !this.state.performedCultivationAction) {
-      return;
+    try {
+      if (!this.props.keycloak || !this.state.performedCultivationAction) {
+        return;
+      }
+  
+      this.setState({saving: true});
+  
+      const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
+      await performedCultivationActionService.updatePerformedCultivationAction(this.state.performedCultivationAction, this.state.performedCultivationAction.id!);
+      
+      this.setState({saving: false});
+  
+      this.setState({messageVisible: true});
+      setTimeout(() => {
+        this.setState({messageVisible: false});
+      }, 3000);
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
     }
-
-    this.setState({saving: true});
-
-    const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
-    performedCultivationActionService.updatePerformedCultivationAction(this.state.performedCultivationAction, this.state.performedCultivationAction.id!);
-    
-    this.setState({saving: false});
-
-    this.setState({messageVisible: true});
-    setTimeout(() => {
-      this.setState({messageVisible: false});
-    }, 3000);
   }
 
   /**
    * Handle performedCultivationAction delete
    */
   private async handleDelete() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const id = this.state.performedCultivationAction!.id;
-    const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
-    performedCultivationActionService.deletePerformedCultivationAction(id!).then(() => {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const id = this.state.performedCultivationAction!.id;
+      const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
+      await performedCultivationActionService.deletePerformedCultivationAction(id!);
+  
       this.props.onPerformedCultivationActionDeleted && this.props.onPerformedCultivationActionDeleted(id!);
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -205,7 +230,8 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onPerformedCultivationActionSelected: (performedCultivationAction: PerformedCultivationAction) => dispatch(actions.performedCultivationActionSelected(performedCultivationAction)),
-    onPerformedCultivationActionDeleted: (performedCultivationActionId: string) => dispatch(actions.performedCultivationActionDeleted(performedCultivationActionId))
+    onPerformedCultivationActionDeleted: (performedCultivationActionId: string) => dispatch(actions.performedCultivationActionDeleted(performedCultivationActionId)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
   };
 }
 
