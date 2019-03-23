@@ -219,7 +219,7 @@ class BatchView extends React.Component<Props, State> {
     if (this.state.loading) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
-          <Loader active size="medium" />
+          <Loader inline active size="medium" />
         </Grid>
       );
     }
