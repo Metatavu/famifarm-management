@@ -4,7 +4,7 @@ import * as actions from "../actions";
 import { StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import { BrowserRouter, Route, NavLink } from 'react-router-dom';
+import { Route, NavLink } from 'react-router-dom';
 import Root from './Root';
 import strings from "../localization/strings";
 
@@ -454,11 +454,9 @@ class WelcomePage extends React.Component<Props, any> {
     );
 
     return (
-      <BrowserRouter>
-        <div>
-          {appContent}
-        </div>
-      </BrowserRouter>
+      <div>
+        {appContent}
+      </div>
     );
   }
 }

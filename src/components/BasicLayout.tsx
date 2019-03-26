@@ -16,7 +16,8 @@ import { Dispatch } from "redux";
  */
 interface Props {
   sidebarItems: JSX.Element[],
-  error?: ErrorMessage
+  error?: ErrorMessage,
+  onError: (error: ErrorMessage) => void
 }
 
 /**
@@ -40,6 +41,20 @@ class BasicLayout extends React.Component<Props, State> {
     this.state = {
       sidebarOpen: false
     }
+  }
+  
+  /**
+   * Component did catch life-cycle event 
+   * 
+   * @param error error
+   * @param errorInfo error info
+   */
+  public componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    this.props.onError({
+      message: strings.defaultErrorMessage,
+      title: strings.defaultErrorTitle,
+      exception: error
+    });
   }
 
   /**
@@ -125,6 +140,7 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
   };
 }
 
