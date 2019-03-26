@@ -8,7 +8,7 @@
     ]
   },
   "rulesDirectory": [
-    "node_modules/react-tsrules/src"
+    "node_modules/metatavu-react-tsrules/dist"
   ],
   "rules": {
     "no-floating-promises": true,

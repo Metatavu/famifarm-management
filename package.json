@@ -48,7 +48,7 @@
     "@types/react-router-dom": "^4.3.0",
     "@types/react-select": "^2.0.4",
     "@types/react-vertical-timeline-component": "^2.3.1",
-    "react-tsrules": "file:../react-tsrules",
+    "metatavu-react-tsrules": "0.0.1",
     "typescript": "^3.0.1"
   }
 }
