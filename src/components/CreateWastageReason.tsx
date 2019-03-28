@@ -1,6 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import Api from "../api";
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";import Api from "../api";
 import { WastageReason, WastageReasonOpt, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
@@ -17,7 +20,8 @@ import LocalizedValueInput from "./LocalizedValueInput";
  */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  onWastageReasonCreated?: (wastageReason: WastageReason) => void;
+  onWastageReasonCreated?: (wastageReason: WastageReason) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 /**
@@ -49,18 +53,26 @@ class CreateWastageReason extends React.Component<Props, State> {
    * Handle form submit
    */
   private async handleSubmit() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const wastageReasonObject: WastageReason = {
-      reason: this.state.wastageReasonData.reason
-    };
-
-    const wastageReasonService = await Api.getWastageReasonsService(this.props.keycloak);
-    wastageReasonService.createWastageReason(wastageReasonObject).then(() => {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const wastageReasonObject: WastageReason = {
+        reason: this.state.wastageReasonData.reason
+      };
+  
+      const wastageReasonService = await Api.getWastageReasonsService(this.props.keycloak);
+      await wastageReasonService.createWastageReason(wastageReasonObject);
+      
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -109,4 +121,28 @@ class CreateWastageReason extends React.Component<Props, State> {
   }
 }
 
-export default CreateWastageReason;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    wastageReasons: state.wastageReasons,
+    wastageReason: state.wastageReason
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onWastageReasonCreated: (wastageReason: WastageReason) => dispatch(actions.wastageReasonCreated(wastageReason)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreateWastageReason);

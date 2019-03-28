@@ -1,6 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import Api from "../api";
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";import Api from "../api";
 import { NavLink } from 'react-router-dom';
 import { PackageSize } from "famifarm-typescript-models";
 import strings from "src/localization/strings";
@@ -16,14 +19,15 @@ import LocalizedUtils from "src/localization/localizedutils";
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   packageSizes?: PackageSize[];
-  onPackageSizesFound?: (packageSizes: PackageSize[]) => void;
+  onPackageSizesFound?: (packageSizes: PackageSize[]) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 export interface State {
   packageSizes: PackageSize[];
 }
 
-class PackageSizesList extends React.Component<Props, State> {
+class PackageSizeList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -34,15 +38,23 @@ class PackageSizesList extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle method
    */
-  async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-    packageSizeService.listPackageSizes().then((packageSizes) => {
+  public async componentDidMount() {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
+      const packageSizes = await packageSizeService.listPackageSizes();
+  
       this.props.onPackageSizesFound && this.props.onPackageSizesFound(packageSizes);
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -52,7 +64,7 @@ class PackageSizesList extends React.Component<Props, State> {
     if (!this.props.packageSizes) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
-          <Loader active size="medium" />
+          <Loader inline active size="medium" />
         </Grid>
       );
     }
@@ -91,4 +103,28 @@ class PackageSizesList extends React.Component<Props, State> {
   }
 }
 
-export default PackageSizesList;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    packageSizes: state.packageSizes,
+    packageSize: state.packageSize
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onPackageSizesFound: (packageSizes: PackageSize[]) => dispatch(actions.packageSizesFound(packageSizes)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(PackageSizeList);

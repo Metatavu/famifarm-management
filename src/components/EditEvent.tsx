@@ -5,6 +5,10 @@ import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, 
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 import { DateTimeInput } from 'semantic-ui-calendar-react';
+import * as actions from "../actions";
+import { StoreState } from "../types/index";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 
 import {
   Grid,
@@ -18,13 +22,15 @@ import {
 } from "semantic-ui-react";
 import LocalizedUtils from "src/localization/localizedutils";
 import * as moment from "moment";
+import { ErrorMessage } from "src/types";
 
 /**
  * Interface representing component properties
  */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  eventId: string
+  eventId: string,
+  onError: (error: ErrorMessage) => void
 }
 
 /**
@@ -49,7 +55,7 @@ interface State {
 /**
  * React component for edit event view
  */
-export default class EditEvent extends React.Component<Props, State> {
+class EditEvent extends React.Component<Props, State> {
 
   /**
    * Constructor
@@ -71,18 +77,26 @@ export default class EditEvent extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   public async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      this.setState({loading: true});
+      const eventsService = await Api.getEventsService(this.props.keycloak);
+      const event = await eventsService.findEvent(this.props.eventId);
 
-    this.setState({loading: true});
-    const eventsService = await Api.getEventsService(this.props.keycloak);
-    eventsService.findEvent(this.props.eventId).then((event) => {
       this.setState({
         event: event,
         loading: false
       });
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -92,7 +106,7 @@ export default class EditEvent extends React.Component<Props, State> {
     if (this.state.loading) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
-          <Loader active size="medium" />
+          <Loader inline active size="medium" />
         </Grid>
       );
     }
@@ -202,33 +216,49 @@ export default class EditEvent extends React.Component<Props, State> {
    * Handle form submit
    */
   private handleSubmit = async () => {
-    if (!this.props.keycloak || !this.state.event) {
-      return;
+    try {
+      if (!this.props.keycloak || !this.state.event) {
+        return;
+      }
+  
+      this.setState({saving: true});
+      const eventsService = await Api.getEventsService(this.props.keycloak);
+      await eventsService.updateEvent(this.state.event, this.state.event.id!);
+      this.setState({saving: false, messageVisible: true});
+      setTimeout(() => {
+        this.setState({messageVisible: false});
+      }, 3000);
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
     }
-
-    this.setState({saving: true});
-    const eventsService = await Api.getEventsService(this.props.keycloak);
-    eventsService.updateEvent(this.state.event, this.state.event.id!);
-    this.setState({saving: false, messageVisible: true});
-    setTimeout(() => {
-      this.setState({messageVisible: false});
-    }, 3000);
   }
 
   /**
    * Handle product delete
    */
   private handleDelete = async () => {
-    if (!this.props.keycloak || !this.state.event) {
-      return;
-    }
-
-    const eventsService = await Api.getEventsService(this.props.keycloak);
-    const id = this.state.event.id || "";
-
-    eventsService.deleteEvent(id).then(() => {
+    try {
+      if (!this.props.keycloak || !this.state.event) {
+        return;
+      }
+  
+      const eventsService = await Api.getEventsService(this.props.keycloak);
+      const id = this.state.event.id || "";
+  
+      await eventsService.deleteEvent(id);
+      
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -258,7 +288,14 @@ export default class EditEvent extends React.Component<Props, State> {
    */
   private renderCultivationObservationDataForm = (data: CultivationObservationEventData) => {
     if (!this.state.performedCultivationActions || !this.state.pests) {
-      this.loadCultivationObservationData();
+      this.loadCultivationObservationData().catch((e) => {
+        this.props.onError({
+          message: strings.defaultApiErrorMessage,
+          title: strings.defaultApiErrorTitle,
+          exception: e
+        });
+      });
+
       return;
     }
 
@@ -293,7 +330,14 @@ export default class EditEvent extends React.Component<Props, State> {
    */
   private renderHarvesDataForm = (data: HarvestEventData) => {
     if (!this.state.teams || !this.state.productionLines) {
-      this.loadHarvestData();
+      this.loadHarvestData().catch((e) => {
+        this.props.onError({
+          message: strings.defaultApiErrorMessage,
+          title: strings.defaultApiErrorTitle,
+          exception: e
+        });
+      });
+
       return;
     }
 
@@ -336,7 +380,14 @@ export default class EditEvent extends React.Component<Props, State> {
    */
   private renderPackingDataForm = (data: PackingEventData) => {
     if (!this.state.packageSizes) {
-      this.loadPackingData();
+      this.loadPackingData().catch((e) => {
+        this.props.onError({
+          message: strings.defaultApiErrorMessage,
+          title: strings.defaultApiErrorTitle,
+          exception: e
+        });
+      });
+
       return;
     }
 
@@ -361,7 +412,14 @@ export default class EditEvent extends React.Component<Props, State> {
    */
   private renderPlantingDataForm = (data: PlantingEventData) => {
     if (!this.state.productionLines) {
-      this.loadPlantingData();
+      this.loadPlantingData().catch((e) => {
+        this.props.onError({
+          message: strings.defaultApiErrorMessage,
+          title: strings.defaultApiErrorTitle,
+          exception: e
+        });
+      });
+
       return;
     }
 
@@ -389,7 +447,14 @@ export default class EditEvent extends React.Component<Props, State> {
    */
   private renderSowingDataForm = (data: SowingEventData) => {
     if (!this.state.productionLines || !this.state.seedBatches) {
-      this.loadSowingData();
+      this.loadSowingData().catch((e) => {
+        this.props.onError({
+          message: strings.defaultApiErrorMessage,
+          title: strings.defaultApiErrorTitle,
+          exception: e
+        });
+      });
+
       return;
     }
 
@@ -446,7 +511,14 @@ export default class EditEvent extends React.Component<Props, State> {
    */
   private renderWastageDataForm = (data: WastageEventData) => {
     if (!this.state.productionLines || !this.state.wastageReasons) {
-      this.loadWastageData();
+      this.loadWastageData().catch((e) => {
+        this.props.onError({
+          message: strings.defaultApiErrorMessage,
+          title: strings.defaultApiErrorTitle,
+          exception: e
+        });
+      });
+
       return;
     }
 
@@ -624,3 +696,26 @@ export default class EditEvent extends React.Component<Props, State> {
     });
   }
 }
+
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditEvent);

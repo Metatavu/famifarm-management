@@ -3,7 +3,11 @@ import * as Keycloak from 'keycloak-js';
 import Api from "../api";
 import { Pest, PestOpt, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
-import strings from "src/localization/strings";
+import strings from "../localization/strings";
+import * as actions from "../actions";
+import { StoreState, ErrorMessage } from "../types/index";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 
 import {
   Grid,
@@ -17,7 +21,8 @@ import LocalizedValueInput from "./LocalizedValueInput";
  */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  pest?: Pest;
+  pest?: Pest,
+  onError: (error: ErrorMessage) => void
 }
 
 /**
@@ -42,19 +47,27 @@ class CreatePest extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  async handleSubmit() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const pestObject: Pest = {
-      name: this.state.pestData.name
-    };
-
-    const pestService = await Api.getPestsService(this.props.keycloak);
-    pestService.createPest(pestObject).then(() => {
+  private async handleSubmit() {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const pestObject: Pest = {
+        name: this.state.pestData.name
+      };
+  
+      const pestService = await Api.getPestsService(this.props.keycloak);
+      await pestService.createPest(pestObject);
+      
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -101,4 +114,25 @@ class CreatePest extends React.Component<Props, State> {
   }
 }
 
-export default CreatePest;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreatePest);

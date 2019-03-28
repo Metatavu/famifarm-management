@@ -1,4 +1,12 @@
 {
+    "errorRetryText": "Voit yrittää sivun latausta uudestaan klikkaamalla",
+    "errorRetryHere": "tästä",
+    "errorSupportText": "Mikäli ongelma toistuu, ota yhteyttä support@metatavu.fi -osoitteeseen",
+    "defaultErrorTitle": "Virhe",
+    "defaultErrorMessage": "Odottamaton virhe tapahtui",
+    "defaultApiErrorTitle": "Yhteysvirhe",
+    "defaultApiErrorMessage": "Palvelinyhteydessä tapahtui odottamaton virhe",
+
     "managementHeaderText": "Famifarm hallinta",
     "save": "Tallenna",
     "date": "Päivämäärä",

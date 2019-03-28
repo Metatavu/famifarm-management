@@ -1,5 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
 import { Pest } from "famifarm-typescript-models";
@@ -19,7 +23,8 @@ import LocalizedUtils from "src/localization/localizedutils";
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   pests?: Pest[];
-  onPestsFound?: (pests: Pest[]) => void;
+  onPestsFound?: (pests: Pest[]) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 /**
@@ -29,7 +34,7 @@ interface State {
   pests: Pest[];
 }
 
-class PestsList extends React.Component<Props, State> {
+class PestList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -41,14 +46,21 @@ class PestsList extends React.Component<Props, State> {
    * Component did mount life-sycle event
    */
   public async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const pestsService = await Api.getPestsService(this.props.keycloak);
-    pestsService.listPests().then((pests) => {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const pestsService = await Api.getPestsService(this.props.keycloak);
+      const pests = await pestsService.listPests(); 
       this.props.onPestsFound && this.props.onPestsFound(pests);
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -58,7 +70,7 @@ class PestsList extends React.Component<Props, State> {
     if (!this.props.pests) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
-          <Loader active size="medium" />
+          <Loader inline active size="medium" />
         </Grid>
       );
     }
@@ -97,4 +109,27 @@ class PestsList extends React.Component<Props, State> {
   }
 }
 
-export default PestsList;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    pests: state.pests
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onPestsFound: (pests: Pest[]) => dispatch(actions.pestsFound(pests)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(PestList);

@@ -1,6 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import Api from "../api";
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";import Api from "../api";
 import { Seed, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
@@ -23,7 +26,8 @@ interface Props {
   seedId: string;
   seed?: Seed;
   onSeedSelected?: (seed: Seed) => void;
-  onSeedDeleted?: (seedId: string) => void;
+  onSeedDeleted?: (seedId: string) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 /**
@@ -65,16 +69,23 @@ class EditSeed extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   public async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const seedsService = await Api.getSeedsService(this.props.keycloak);
-
-    seedsService.findSeed(this.props.seedId).then((seed) => {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const seedsService = await Api.getSeedsService(this.props.keycloak);
+      const seed = await seedsService.findSeed(this.props.seedId);
+      
       this.props.onSeedSelected && this.props.onSeedSelected(seed);
       this.setState({seed: seed});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
 
@@ -93,37 +104,52 @@ class EditSeed extends React.Component<Props, State> {
    * Handle form submit
    */
   private async handleSubmit() {
-    if (!this.props.keycloak || !this.state.seed) {
-      return;
+    try {
+      if (!this.props.keycloak || !this.state.seed) {
+        return;
+      }
+  
+      const seedsService = await Api.getSeedsService(this.props.keycloak);
+  
+      this.setState({saving: true});
+      await seedsService.updateSeed(this.state.seed, this.state.seed.id || "");
+      this.setState({saving: false});
+  
+      this.setState({messageVisible: true});
+      setTimeout(() => {
+        this.setState({messageVisible: false});
+      }, 3000);
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
     }
-
-    const seedsService = await Api.getSeedsService(this.props.keycloak);
-
-    this.setState({saving: true});
-    seedsService.updateSeed(this.state.seed, this.state.seed.id || "");
-    this.setState({saving: false});
-
-    this.setState({messageVisible: true});
-    setTimeout(() => {
-      this.setState({messageVisible: false});
-    }, 3000);
   }
 
   /**
    * Handle seed delete
    */
   private async handleDelete() {
-    if (!this.props.keycloak || !this.state.seed) {
-      return;
-    }
-
-    const seedsService = await Api.getSeedsService(this.props.keycloak);
-    const id = this.state.seed.id || "";
-
-    seedsService.deleteSeed(id).then(() => {
+    try {
+      if (!this.props.keycloak || !this.state.seed) {
+        return;
+      }
+  
+      const seedsService = await Api.getSeedsService(this.props.keycloak);
+      const id = this.state.seed.id || "";
+      await seedsService.deleteSeed(id)
+  
       this.props.onSeedDeleted && this.props.onSeedDeleted(id);
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -133,7 +159,7 @@ class EditSeed extends React.Component<Props, State> {
     if (!this.props.seed) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
-          <Loader active size="medium" />
+          <Loader inline active size="medium" />
         </Grid>
       );
     }
@@ -184,4 +210,29 @@ class EditSeed extends React.Component<Props, State> {
   }
 }
 
-export default EditSeed;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    seeds: state.seeds,
+    seed: state.seed
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onSeedSelected: (seed: Seed) => dispatch(actions.seedSelected(seed)),
+    onSeedDeleted: (seedId: string) => dispatch(actions.seedDeleted(seedId)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditSeed);

@@ -1,5 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
 import { WastageReason } from "famifarm-typescript-models";
@@ -19,7 +23,8 @@ import LocalizedUtils from "src/localization/localizedutils";
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   wastageReasons?: WastageReason[];
-  onWastageReasonsFound?: (wastageReasons: WastageReason[]) => void;
+  onWastageReasonsFound?: (wastageReasons: WastageReason[]) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 /**
@@ -29,7 +34,7 @@ interface State {
   wastageReasons: WastageReason[];
 }
 
-class WastageReasonsList extends React.Component<Props, State> {
+class WastageReasonList extends React.Component<Props, State> {
   
   /**
    * Constructor
@@ -47,14 +52,22 @@ class WastageReasonsList extends React.Component<Props, State> {
    * Component did mount life-sycle event
    */
   public async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const wastageReasonsService = await Api.getWastageReasonsService(this.props.keycloak);
-    wastageReasonsService.listWastageReasons().then((wastageReasons) => {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const wastageReasonsService = await Api.getWastageReasonsService(this.props.keycloak);
+      const wastageReasons = await wastageReasonsService.listWastageReasons();
+  
       this.props.onWastageReasonsFound && this.props.onWastageReasonsFound(wastageReasons);
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -64,7 +77,7 @@ class WastageReasonsList extends React.Component<Props, State> {
     if (!this.props.wastageReasons) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
-          <Loader active size="medium" />
+          <Loader inline active size="medium" />
         </Grid>
       );
     }
@@ -103,4 +116,28 @@ class WastageReasonsList extends React.Component<Props, State> {
   }
 }
 
-export default WastageReasonsList;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    wastageReasons: state.wastageReasons,
+    wastageReason: state.wastageReason
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onWastageReasonsFound: (wastageReasons: WastageReason[]) => dispatch(actions.wastageReasonsFound(wastageReasons)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(WastageReasonList);

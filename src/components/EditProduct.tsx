@@ -1,6 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import Api from "../api";
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";import Api from "../api";
 import { Product, PackageSize, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
@@ -27,7 +30,8 @@ interface Props {
   packageSizes?: PackageSize[];
   onProductSelected?: (product: Product) => void;
   onProductDeleted?: (productId: string) => void;
-  onPackageSizesFound?: (packageSizes: PackageSize[]) => void;
+  onPackageSizesFound?: (packageSizes: PackageSize[]) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 /**
@@ -72,21 +76,27 @@ class EditProduct extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   public async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-    const productsService = await Api.getProductsService(this.props.keycloak);
-
-    productsService.findProduct(this.props.productId).then((product) => {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
+      const productsService = await Api.getProductsService(this.props.keycloak);
+      const product = await productsService.findProduct(this.props.productId);
+  
       this.props.onProductSelected && this.props.onProductSelected(product);
       this.setState({product: product});
-    });
-
-    packageSizeService.listPackageSizes(0, 100).then((packageSizes) => {
+  
+      const packageSizes = await packageSizeService.listPackageSizes(0, 100);
       this.props.onPackageSizesFound && this.props.onPackageSizesFound(packageSizes);
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -111,20 +121,28 @@ class EditProduct extends React.Component<Props, State> {
    * Handle form submit
    */
   private async handleSubmit() {
-    if (!this.props.keycloak || !this.state.product) {
-      return;
+    try {
+      if (!this.props.keycloak || !this.state.product) {
+        return;
+      }
+  
+      const productsService = await Api.getProductsService(this.props.keycloak);
+  
+      this.setState({saving: true});
+      await productsService.updateProduct(this.state.product, this.state.product.id || "");
+      this.setState({saving: false});
+  
+      this.setState({messageVisible: true});
+      setTimeout(() => {
+        this.setState({messageVisible: false});
+      }, 3000);
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
     }
-
-    const productsService = await Api.getProductsService(this.props.keycloak);
-
-    this.setState({saving: true});
-    productsService.updateProduct(this.state.product, this.state.product.id || "");
-    this.setState({saving: false});
-
-    this.setState({messageVisible: true});
-    setTimeout(() => {
-      this.setState({messageVisible: false});
-    }, 3000);
   }
 
   /**
@@ -138,10 +156,10 @@ class EditProduct extends React.Component<Props, State> {
     const productsService = await Api.getProductsService(this.props.keycloak);
     const id = this.state.product.id || "";
 
-    productsService.deleteProduct(id).then(() => {
-      this.props.onProductDeleted && this.props.onProductDeleted(id!);
-      this.setState({redirect: true});
-    });
+    await productsService.deleteProduct(id);
+
+    this.props.onProductDeleted && this.props.onProductDeleted(id!);
+    this.setState({redirect: true});
   }
 
 
@@ -175,7 +193,7 @@ class EditProduct extends React.Component<Props, State> {
     if (!this.props.product) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
-          <Loader active size="medium" />
+          <Loader inline active size="medium" />
         </Grid>
       );
     }
@@ -243,4 +261,31 @@ class EditProduct extends React.Component<Props, State> {
   }
 }
 
-export default EditProduct;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    products: state.products,
+    product: state.product,
+    packageSizes: state.packageSizes
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onProductSelected: (product: Product) => dispatch(actions.productSelected(product)),
+    onProductDeleted: (productId: string) => dispatch(actions.productDeleted(productId)),
+    onPackageSizesFound: (packageSizes: PackageSize[]) => dispatch(actions.packageSizesFound(packageSizes)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditProduct);

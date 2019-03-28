@@ -3,6 +3,16 @@ import LocalizedStrings, {
 } from 'localized-strings';
 
 export interface IStrings extends LocalizedStringsMethods {
+
+  errorRetryText: string,
+  errorSupportText: string,
+  errorRetryHere: string,
+  defaultErrorTitle: string,
+  defaultErrorMessage: string,
+  defaultApiErrorTitle: string,
+  defaultApiErrorMessage: string,
+
+
   managementHeaderText: string;
   save: string;
   date: string;

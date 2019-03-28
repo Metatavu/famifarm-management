@@ -1,5 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
 import { SeedBatch } from "famifarm-typescript-models";
@@ -15,14 +19,15 @@ import {
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   seedBatches?: SeedBatch[];
-  onSeedBatchesFound?: (seedBatches: SeedBatch[]) => void;
+  onSeedBatchesFound?: (seedBatches: SeedBatch[]) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 export interface State {
   seedBatches: SeedBatch[];
 }
 
-class SeedBatchsList extends React.Component<Props, State> {
+class SeedBatchList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -33,25 +38,33 @@ class SeedBatchsList extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle event
    */
-  async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const seedBatchService = await Api.getSeedBatchesService(this.props.keycloak);
-    seedBatchService.listSeedBatches().then((seedBatches) => {
+  public async componentDidMount() {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const seedBatchService = await Api.getSeedBatchesService(this.props.keycloak);
+      const seedBatches = await seedBatchService.listSeedBatches();
+      
       this.props.onSeedBatchesFound && this.props.onSeedBatchesFound(seedBatches);
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
    * Render seed batch list view
    */
-  render() {
+  public render() {
     if (!this.props.seedBatches) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
-          <Loader active size="medium" />
+          <Loader inline active size="medium" />
         </Grid>
       );
     }
@@ -90,4 +103,28 @@ class SeedBatchsList extends React.Component<Props, State> {
   }
 }
 
-export default SeedBatchsList;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    seedBatches: state.seedBatches,
+    seedBatch: state.seedBatch
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onSeedBatchesFound: (seedBatches: SeedBatch[]) => dispatch(actions.seedBatchesFound(seedBatches)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SeedBatchList);

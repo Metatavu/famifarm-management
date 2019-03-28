@@ -29,7 +29,8 @@ import {
   WASTAGE_REASON_DELETED,
   WASTAGE_REASON_SELECTED,
   LOCALE_UPDATE,
-  PESTS_FOUND} from '../constants/index';
+  PESTS_FOUND,
+  ERROR_OCCURRED} from '../constants/index';
 
 /**
  * Process action 
@@ -98,6 +99,8 @@ export function processAction(state: StoreState, action: AppAction): StoreState 
       return { ...state,  wastageReasons: (state.wastageReasons || []).filter((wastageReason) => {return wastageReason.id !== action.wastageReasonId})};
     case PESTS_FOUND:
       return { ...state, pests: action.pests}
+    case ERROR_OCCURRED:
+    return { ...state, error: action.error}
     }
   return state;
 }

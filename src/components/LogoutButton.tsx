@@ -23,7 +23,7 @@ interface State {}
 /**
  * React component for logout menu item
  */
-class ToggleLocalization extends React.Component<Props, State> {
+class LogoutButton extends React.Component<Props, State> {
 
   /**
    * Constructor
@@ -79,4 +79,4 @@ function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return { };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ToggleLocalization);
+export default connect(mapStateToProps, mapDispatchToProps)(LogoutButton);

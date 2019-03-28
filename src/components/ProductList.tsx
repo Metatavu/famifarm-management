@@ -1,5 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
 import { Product } from "famifarm-typescript-models";
@@ -16,14 +20,15 @@ import LocalizedUtils from "src/localization/localizedutils";
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   products?: Product[];
-  onProductsFound?: (products: Product[]) => void;
+  onProductsFound?: (products: Product[]) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 export interface State {
   products: Product[];
 }
 
-class ProductsList extends React.Component<Props, State> {
+class ProductList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -35,24 +40,32 @@ class ProductsList extends React.Component<Props, State> {
    * Component did mount life-sycle event
    */
   async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const productsService = await Api.getProductsService(this.props.keycloak);
-    productsService.listProducts().then((products) => {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const productsService = await Api.getProductsService(this.props.keycloak);
+      const products = await productsService.listProducts();
+      
       this.props.onProductsFound && this.props.onProductsFound(products);
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
    * Render product list view
    */
-  render() {
+  public render() {
     if (!this.props.products) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
-          <Loader active size="medium" />
+          <Loader inline active size="medium" />
         </Grid>
       );
     }
@@ -91,4 +104,28 @@ class ProductsList extends React.Component<Props, State> {
   }
 }
 
-export default ProductsList;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    products: state.products,
+    product: state.product
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onProductsFound: (products: Product[]) => dispatch(actions.productsFound(products)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ProductList);

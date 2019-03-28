@@ -1,5 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 import Api from "../api";
 import { ProductionLine } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
@@ -15,7 +19,8 @@ import strings from "src/localization/strings";
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   productionLine?: ProductionLine;
-  onProductionLineCreated?: (productionLine: ProductionLine) => void;
+  onProductionLineCreated?: (productionLine: ProductionLine) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 interface State {
@@ -37,25 +42,33 @@ class CreateProductionLine extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  async handleSubmit() {
-    if (!this.props.keycloak) {
-      return;
-    }
-    
-    const productionLineObject = {
-      lineNumber: this.state.lineNumber
-    };
-
-    const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
-    productionLineService.createProductionLine(productionLineObject).then(() => {
+  private async handleSubmit() {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+      
+      const productionLineObject = {
+        lineNumber: this.state.lineNumber
+      };
+  
+      const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
+      await productionLineService.createProductionLine(productionLineObject);
+  
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
    * Render create production line view
    */
-  render() {
+  public render() {
     if (this.state.redirect) {
       return <Redirect to="/productionLines" push={true} />;
     }
@@ -87,4 +100,28 @@ class CreateProductionLine extends React.Component<Props, State> {
   }
 }
 
-export default CreateProductionLine;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    productionLines: state.productionLines,
+    productionLine: state.productionLine
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onProductionLineCreated: (productionLine: ProductionLine) => dispatch(actions.productionLineCreated(productionLine)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreateProductionLine);

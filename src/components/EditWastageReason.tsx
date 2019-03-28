@@ -1,6 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import Api from "../api";
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";import Api from "../api";
 import { WastageReason, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
@@ -24,7 +27,8 @@ interface Props {
   wastageReasonId: string;
   wastageReason?: WastageReason;
   onWastageReasonSelected?: (wastageReason: WastageReason) => void;
-  onWastageReasonDeleted?: (wastageReasonId: string) => void;
+  onWastageReasonDeleted?: (wastageReasonId: string) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 /**
@@ -67,16 +71,24 @@ class EditWastageReason extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   public async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const wastageReasonsService = await Api.getWastageReasonsService(this.props.keycloak);
-
-    wastageReasonsService.findWastageReason(this.props.wastageReasonId).then((wastageReason) => {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const wastageReasonsService = await Api.getWastageReasonsService(this.props.keycloak);
+  
+      const wastageReason = await wastageReasonsService.findWastageReason(this.props.wastageReasonId);
+      
       this.props.onWastageReasonSelected && this.props.onWastageReasonSelected(wastageReason);
       this.setState({wastageReason: wastageReason});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -104,35 +116,50 @@ class EditWastageReason extends React.Component<Props, State> {
    * Handle form submit
    */
   private async handleSubmit() {
-    if (!this.props.keycloak || !this.state.wastageReason) {
-      return;
+    try {
+      if (!this.props.keycloak || !this.state.wastageReason) {
+        return;
+      }
+  
+      const wastageReasonsService = await Api.getWastageReasonsService(this.props.keycloak);
+  
+      this.setState({saving: true});
+      await wastageReasonsService.updateWastageReason(this.state.wastageReason, this.state.wastageReason.id || "");
+      this.setState({saving: false, messageVisible: true});
+      setTimeout(() => {
+        this.setState({messageVisible: false});
+      }, 3000);
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
     }
-
-    const wastageReasonsService = await Api.getWastageReasonsService(this.props.keycloak);
-
-    this.setState({saving: true});
-    wastageReasonsService.updateWastageReason(this.state.wastageReason, this.state.wastageReason.id || "");
-    this.setState({saving: false, messageVisible: true});
-    setTimeout(() => {
-      this.setState({messageVisible: false});
-    }, 3000);
   }
 
   /**
    * Handle wastageReason delete
    */
   private async handleDelete() {
-    if (!this.props.keycloak || !this.state.wastageReason) {
-      return;
-    }
-
-    const wastageReasonsService = await Api.getWastageReasonsService(this.props.keycloak);
-    const id = this.state.wastageReason.id || "";
-
-    wastageReasonsService.deleteWastageReason(id).then(() => {
+    try {
+      if (!this.props.keycloak || !this.state.wastageReason) {
+        return;
+      }
+  
+      const wastageReasonsService = await Api.getWastageReasonsService(this.props.keycloak);
+      const id = this.state.wastageReason.id || "";
+      await wastageReasonsService.deleteWastageReason(id);
+      
       this.props.onWastageReasonDeleted && this.props.onWastageReasonDeleted(id);
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -153,7 +180,7 @@ class EditWastageReason extends React.Component<Props, State> {
     if (!this.props.wastageReason) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
-          <Loader active size="medium" />
+          <Loader inline active size="medium" />
         </Grid>
       );
     }
@@ -205,4 +232,29 @@ class EditWastageReason extends React.Component<Props, State> {
   }
 }
 
-export default EditWastageReason;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    wastageReasons: state.wastageReasons,
+    wastageReason: state.wastageReason
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onWastageReasonSelected: (wastageReason: WastageReason) => dispatch(actions.wastageReasonSelected(wastageReason)),
+    onWastageReasonDeleted: (wastageReasonId: string) => dispatch(actions.wastageReasonDeleted(wastageReasonId)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditWastageReason);

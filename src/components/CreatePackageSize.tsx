@@ -1,5 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 import Api from "../api";
 import { PackageSize, PackageSizeOpt, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
@@ -15,7 +19,8 @@ import LocalizedValueInput from "./LocalizedValueInput";
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   packageSize?: PackageSize;
-  onPackageSizeCreated?: (packageSize: PackageSize) => void;
+  onPackageSizeCreated?: (packageSize: PackageSize) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 export interface State {
@@ -23,7 +28,7 @@ export interface State {
   redirect: boolean;
 }
 
-class EditPackageSize extends React.Component<Props, State> {
+class CreatePackageSize extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -37,15 +42,22 @@ class EditPackageSize extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  async handleSubmit() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-    packageSizeService.createPackageSize(this.state.packageSizeData).then(() => {
+  private async handleSubmit() {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
+      await packageSizeService.createPackageSize(this.state.packageSizeData);
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -93,4 +105,28 @@ class EditPackageSize extends React.Component<Props, State> {
   }
 }
 
-export default EditPackageSize;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    packageSizes: state.packageSizes,
+    packageSize: state.packageSize
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onPackageSizeCreated: (packageSize: PackageSize) => dispatch(actions.packageSizeCreated(packageSize)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreatePackageSize);

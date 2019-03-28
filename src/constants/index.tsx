@@ -108,3 +108,7 @@ export type WASTAGE_REASON_DELETED = typeof WASTAGE_REASON_DELETED;
 
 export const PESTS_FOUND = "PESTS_FOUND";
 export type PESTS_FOUND = typeof PESTS_FOUND;
+
+export const ERROR_OCCURRED = "ERROR_OCCURRED";
+export type ERROR_OCCURRED = typeof ERROR_OCCURRED;
+

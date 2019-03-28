@@ -5,6 +5,10 @@ import { NavLink } from 'react-router-dom';
 import { Batch, Product } from "famifarm-typescript-models";
 import strings from "src/localization/strings";
 import * as moment from "moment";
+import * as actions from "../actions";
+import { StoreState, ErrorMessage } from "../types/index";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 
 import {
   List,
@@ -23,8 +27,9 @@ interface Props {
   batches?: Batch[];
   products?: Product[];
   location?: any,
-  onBatchesFound?: (batches: Batch[]) => void;
-  onProductsFound?: (products: Product[]) => void;
+  onBatchesFound?: (batches: Batch[]) => void,
+  onProductsFound?: (products: Product[]) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 /**
@@ -53,7 +58,15 @@ class BatchList extends React.Component<Props, State> {
    * Component did mount life-sycle event
    */
   public async componentDidMount() {
-    this.updateBatches(this.state.status);
+    try {
+      await this.updateBatches(this.state.status);
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   private getBatchName = (batch: Batch): string => {
@@ -71,7 +84,7 @@ class BatchList extends React.Component<Props, State> {
     if (this.state.loading) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
-          <Loader active size="medium" />
+          <Loader inline active size="medium" />
         </Grid>
       );
     }
@@ -86,7 +99,7 @@ class BatchList extends React.Component<Props, State> {
 
     const batches = (this.props.batches || []).map((batch) => {
       return (
-        <List.Item>
+        <List.Item key={batch.id}>
           <List.Content floated='right'>
             <NavLink to={`/batches/${batch.id}`}>
               <Button className="submit-button">{strings.open}</Button>
@@ -124,7 +137,13 @@ class BatchList extends React.Component<Props, State> {
       status: status
     });
 
-    this.updateBatches(status);
+    this.updateBatches(status).catch((err) => {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: err
+      });
+    });
   }
 
   /**
@@ -147,4 +166,29 @@ class BatchList extends React.Component<Props, State> {
   }
 }
 
-export default BatchList;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    products: state.products,
+    batches: state.batches
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onProductsFound: (products: Product[]) => dispatch(actions.productsFound(products)),
+    onBatchesFound: (batches: Batch[]) => dispatch(actions.batchesFound(batches)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(BatchList);

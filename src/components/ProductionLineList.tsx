@@ -1,5 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
 import { ProductionLine } from "famifarm-typescript-models";
@@ -15,14 +19,15 @@ import {
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   productionLines?: ProductionLine[];
-  onProductionLinesFound?: (productionLines: ProductionLine[]) => void;
+  onProductionLinesFound?: (productionLines: ProductionLine[]) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 export interface State {
   productionLines: ProductionLine[];
 }
 
-class ProductionLinesList extends React.Component<Props, State> {
+class ProductionLineList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -33,25 +38,33 @@ class ProductionLinesList extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle event
    */
-  async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const productionLinesService = await Api.getProductionLinesService(this.props.keycloak);
-    productionLinesService.listProductionLines().then((productionLines) => {
+  public async componentDidMount() {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const productionLinesService = await Api.getProductionLinesService(this.props.keycloak);
+      const productionLines = await productionLinesService.listProductionLines();
+      
       this.props.onProductionLinesFound && this.props.onProductionLinesFound(productionLines);
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
    * Render production line list view
    */
-  render() {
+  public render() {
     if (!this.props.productionLines) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
-          <Loader active size="medium" />
+          <Loader inline active size="medium" />
         </Grid>
       );
     }
@@ -90,4 +103,28 @@ class ProductionLinesList extends React.Component<Props, State> {
   }
 }
 
-export default ProductionLinesList;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    productionLines: state.productionLines,
+    productionLine: state.productionLine
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onProductionLinesFound: (productionLines: ProductionLine[]) => dispatch(actions.productionLinesFound(productionLines)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ProductionLineList);

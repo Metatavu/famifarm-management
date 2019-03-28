@@ -1,6 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import Api from "../api";
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";import Api from "../api";
 import { PackageSize, PackageSizeOpt, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
@@ -24,7 +27,8 @@ interface Props {
   packageSizeId: string;
   packageSize?: PackageSize;
   onPackageSizeSelected?: (packageSize: PackageSize) => void;
-  onPackageSizeDeleted?: (packageSizeId: string) => void;
+  onPackageSizeDeleted?: (packageSizeId: string) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 /**
@@ -66,51 +70,71 @@ class EditPackageSize extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   public async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-
-    packageSizeService.findPackageSize(this.props.packageSizeId).then((packageSize) => {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
+      const packageSize = await packageSizeService.findPackageSize(this.props.packageSizeId);
       this.props.onPackageSizeSelected && this.props.onPackageSizeSelected(packageSize);
       this.setState({packageSize: packageSize});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
    * Handle form submit
    */
   private async handleSubmit() {
-    if (!this.props.keycloak) {
-      return;
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const packageSizeObject = this.state.packageSize || {};
+      const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
+      this.setState({saving: true});
+      await packageSizeService.updatePackageSize(packageSizeObject, packageSizeObject.id || "");
+      this.setState({saving: false, messageVisible: true});
+      setTimeout(() => {
+        this.setState({messageVisible: false});
+      }, 3000);
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
     }
-
-    const packageSizeObject = this.state.packageSize || {};
-    const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-    this.setState({saving: true});
-    await packageSizeService.updatePackageSize(packageSizeObject, packageSizeObject.id || "");
-    this.setState({saving: false, messageVisible: true});
-    setTimeout(() => {
-      this.setState({messageVisible: false});
-    }, 3000);
   }
 
   /**
    * Handle packageSize delete
    */
   private async handleDelete() {
-    if (!this.props.keycloak || !this.state.packageSize) {
-      return;
-    }
-
-    const id = this.state.packageSize.id || "";
-    const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-
-    packageSizeService.deletePackageSize(id).then(() => {
+    try {
+      if (!this.props.keycloak || !this.state.packageSize) {
+        return;
+      }
+  
+      const id = this.state.packageSize.id || "";
+      const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
+      await packageSizeService.deletePackageSize(id);
       this.props.onPackageSizeDeleted && this.props.onPackageSizeDeleted(id!);
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
     /**
@@ -131,7 +155,7 @@ class EditPackageSize extends React.Component<Props, State> {
     if (!this.props.packageSize) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
-          <Loader active size="medium" />
+          <Loader inline active size="medium" />
         </Grid>
       );
     }
@@ -183,4 +207,29 @@ class EditPackageSize extends React.Component<Props, State> {
   }
 }
 
-export default EditPackageSize;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    packageSizes: state.packageSizes,
+    packageSize: state.packageSize
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onPackageSizeSelected: (packageSize: PackageSize) => dispatch(actions.packageSizeSelected(packageSize)),
+    onPackageSizeDeleted: (packageSizeId: string) => dispatch(actions.packageSizeDeleted(packageSizeId)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditPackageSize);

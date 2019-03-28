@@ -1,5 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 import Api from "../api";
 import { SeedBatch, Seed } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
@@ -19,7 +23,8 @@ interface Props {
   seedBatch?: SeedBatch;
   onSeedBatchCreated?: (seedBatch: SeedBatch) => void;
   seeds?: Seed[];
-  onSeedsFound?: (seeds: Seed[]) => void;
+  onSeedsFound?: (seeds: Seed[]) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 interface State {
@@ -45,15 +50,22 @@ class CreateSeedBatch extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle method
    */
-  async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const seedsService = await Api.getSeedsService(this.props.keycloak);
-    seedsService.listSeeds().then((seeds) => {
+  public async componentDidMount() {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const seedsService = await Api.getSeedsService(this.props.keycloak);
+      const seeds = await seedsService.listSeeds();
       this.props.onSeedsFound && this.props.onSeedsFound(seeds);
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -79,21 +91,29 @@ class CreateSeedBatch extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  async handleSubmit() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const seedBatchObject = {
-      code: this.state.code,
-      seedId: this.state.seedId,
-      time: this.state.time
-    };
-
-    const seedBatchService = await Api.getSeedBatchesService(this.props.keycloak);
-    seedBatchService.createSeedBatch(seedBatchObject).then(() => {
+  private async handleSubmit() {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const seedBatchObject = {
+        code: this.state.code,
+        seedId: this.state.seedId,
+        time: this.state.time
+      };
+  
+      const seedBatchService = await Api.getSeedBatchesService(this.props.keycloak);
+      await seedBatchService.createSeedBatch(seedBatchObject);
+  
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -155,4 +175,30 @@ class CreateSeedBatch extends React.Component<Props, State> {
   }
 }
 
-export default CreateSeedBatch;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    seedBatches: state.seedBatches,
+    seedBatch: state.seedBatch,
+    seeds: state.seeds
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onSeedBatchCreated: (seedBatch: SeedBatch) => dispatch(actions.seedBatchCreated(seedBatch)),
+    onSeedsFound: (seeds: Seed[]) => dispatch(actions.seedsFound(seeds)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreateSeedBatch);

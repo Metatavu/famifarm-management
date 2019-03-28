@@ -1,5 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 import Api from "../api";
 import { Product, PackageSize, ProductOpt, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
@@ -21,7 +25,8 @@ interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   packageSizes?: PackageSize[];
   onProductCreated?: (product: Product) => void;
-  onPackageSizesFound?: (packageSizes: PackageSize[]) => void;
+  onPackageSizesFound?: (packageSizes: PackageSize[]) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 /**
@@ -46,34 +51,49 @@ class CreateProduct extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle method
    */
-  async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
+  public async componentDidMount() {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
 
-    const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-    packageSizeService.listPackageSizes().then((packageSizes) => {
+      const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
+      const packageSizes = await packageSizeService.listPackageSizes();
       this.props.onPackageSizesFound && this.props.onPackageSizesFound(packageSizes);
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
    * Handle form submit
    */
-  async handleSubmit() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const productObject: Product = {
-      name: this.state.productData.name,
-      defaultPackageSizeId: this.state.productData.defaultPackageSizeId
-    };
-
-    const productsService = await Api.getProductsService(this.props.keycloak);
-    productsService.createProduct(productObject).then(() => {
+  private async handleSubmit() {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const productObject: Product = {
+        name: this.state.productData.name,
+        defaultPackageSizeId: this.state.productData.defaultPackageSizeId
+      };
+  
+      const productsService = await Api.getProductsService(this.props.keycloak);  
+      await productsService.createProduct(productObject);
+  
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -149,4 +169,30 @@ class CreateProduct extends React.Component<Props, State> {
   }
 }
 
-export default CreateProduct;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    products: state.products,
+    product: state.product,
+    packageSizes: state.packageSizes
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onProductCreated: (product: Product) => dispatch(actions.productCreated(product)),
+    onPackageSizesFound: (packageSizes: PackageSize[]) => dispatch(actions.packageSizesFound(packageSizes)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreateProduct);

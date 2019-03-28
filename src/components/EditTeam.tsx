@@ -1,6 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
-import Api from "../api";
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";import Api from "../api";
 import { Team } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
@@ -23,7 +26,8 @@ interface Props {
   teamId: string;
   team?: Team;
   onTeamSelected?: (team: Team) => void;
-  onTeamDeleted?: (teamId: string) => void;
+  onTeamDeleted?: (teamId: string) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 /**
@@ -64,15 +68,23 @@ class EditTeam extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   public async componentDidMount() {
-    if (!this.props.keycloak) {
-      return;
-    }
-    
-    const teamsService = await Api.getTeamsService(this.props.keycloak);
-    teamsService.findTeam(this.props.teamId).then((team) => {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+      
+      const teamsService = await Api.getTeamsService(this.props.keycloak);
+      const team = await teamsService.findTeam(this.props.teamId);
+      
       this.props.onTeamSelected && this.props.onTeamSelected(team);
       this.setState({team: team});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -113,17 +125,24 @@ class EditTeam extends React.Component<Props, State> {
    * Handle team delete
    */
   private async handleDelete() {
-    if (!this.props.keycloak || !this.state.team) {
-      return;
-    }
-    
-    const teamsService = await Api.getTeamsService(this.props.keycloak);
-    const id = this.state.team.id;
-
-    teamsService.deleteTeam(id!).then(() => {
+    try {
+      if (!this.props.keycloak || !this.state.team) {
+        return;
+      }
+      
+      const teamsService = await Api.getTeamsService(this.props.keycloak);
+      const id = this.state.team.id;
+      await teamsService.deleteTeam(id!);
+      
       this.props.onTeamDeleted && this.props.onTeamDeleted(id!);
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -133,7 +152,7 @@ class EditTeam extends React.Component<Props, State> {
     if (!this.props.team) {
       return (
         <Grid style={{paddingTop: "100px"}} centered >
-          <Loader active size="medium" />
+          <Loader inline active size="medium" />
         </Grid>
       );
     }
@@ -185,4 +204,29 @@ class EditTeam extends React.Component<Props, State> {
   }
 }
 
-export default EditTeam;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    teams: state.teams,
+    team: state.team
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onTeamSelected: (team: Team) => dispatch(actions.teamSelected(team)),
+    onTeamDeleted: (teamId: string) => dispatch(actions.teamDeleted(teamId)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditTeam);

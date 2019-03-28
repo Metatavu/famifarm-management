@@ -1,5 +1,9 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
+import * as actions from "../actions";
+import { ErrorMessage, StoreState } from "../types";
+import { connect } from "react-redux";
+import { Dispatch } from "redux";
 import Api from "../api";
 import { Seed, SeedOpt, LocalizedEntry } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
@@ -18,7 +22,8 @@ import LocalizedValueInput from "./LocalizedValueInput";
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   seed?: Seed;
-  onSeedCreated?: (seed: Seed) => void;
+  onSeedCreated?: (seed: Seed) => void,
+  onError: (error: ErrorMessage) => void
 }
 
 /**
@@ -43,19 +48,26 @@ class CreateSeed extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  async handleSubmit() {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    const seedObject: Seed = {
-      name: this.state.seedData.name
-    };
-
-    const seedService = await Api.getSeedsService(this.props.keycloak);
-    seedService.createSeed(seedObject).then(() => {
+  private async handleSubmit() {
+    try {
+      if (!this.props.keycloak) {
+        return;
+      }
+  
+      const seedObject: Seed = {
+        name: this.state.seedData.name
+      };
+  
+      const seedService = await Api.getSeedsService(this.props.keycloak);
+      await seedService.createSeed(seedObject);
       this.setState({redirect: true});
-    });
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 
   /**
@@ -102,4 +114,28 @@ class CreateSeed extends React.Component<Props, State> {
   }
 }
 
-export default CreateSeed;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+export function mapStateToProps(state: StoreState) {
+  return {
+    seeds: state.seeds,
+    seed: state.seed
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+  return {
+    onSeedCreated: (seed: Seed) => dispatch(actions.seedCreated(seed)),
+    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreateSeed);

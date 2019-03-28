@@ -1,6 +1,6 @@
 import * as React from "react";
 import { BrowserRouter, Route } from "react-router-dom";
-import WelcomePage from "../containers/WelcomePage";
+import WelcomePage from "./WelcomePage";
 
 class App extends React.Component {
 
