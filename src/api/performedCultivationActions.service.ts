@@ -1,6 +1,6 @@
 import { PerformedCultivationAction } from "famifarm-typescript-models";
+import * as URI from "urijs";
 import { Api } from ".";
-
 export class PerformedCultivationActionsService {
 
   private token: string;
@@ -18,7 +18,7 @@ export class PerformedCultivationActionsService {
    * @param body Wastage reason to be added
   */
   public createPerformedCultivationAction(body: PerformedCultivationAction, ):Promise<PerformedCultivationAction> {
-    const url = new URL(`${this.basePath}/v1/performedCultivationActions`);
+    const uri = new URI(`${this.basePath}/v1/performedCultivationActions`);
     const options = {
       method: "post",
       headers: {
@@ -28,7 +28,7 @@ export class PerformedCultivationActionsService {
       body: JSON.stringify(body)
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -40,7 +40,7 @@ export class PerformedCultivationActionsService {
    * @param performedCultivationActionId PerformedCultivationActionId
   */
   public deletePerformedCultivationAction(performedCultivationActionId: string, ):Promise<any> {
-    const url = new URL(`${this.basePath}/v1/performedCultivationActions/${encodeURIComponent(String(performedCultivationActionId))}`);
+    const uri = new URI(`${this.basePath}/v1/performedCultivationActions/${encodeURIComponent(String(performedCultivationActionId))}`);
     const options = {
       method: "delete",
       headers: {
@@ -49,7 +49,7 @@ export class PerformedCultivationActionsService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -61,7 +61,7 @@ export class PerformedCultivationActionsService {
    * @param performedCultivationActionId Wastage reason id
   */
   public findPerformedCultivationAction(performedCultivationActionId: string, ):Promise<PerformedCultivationAction> {
-    const url = new URL(`${this.basePath}/v1/performedCultivationActions/${encodeURIComponent(String(performedCultivationActionId))}`);
+    const uri = new URI(`${this.basePath}/v1/performedCultivationActions/${encodeURIComponent(String(performedCultivationActionId))}`);
     const options = {
       method: "get",
       headers: {
@@ -70,7 +70,7 @@ export class PerformedCultivationActionsService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -83,15 +83,13 @@ export class PerformedCultivationActionsService {
    * @param maxResults How many items to return at one time
   */
   public listPerformedCultivationActions(firstResult?: number, maxResults?: number, ):Promise<Array<PerformedCultivationAction>> {
-    const url = new URL(`${this.basePath}/v1/performedCultivationActions`);
-    let queryParameters = new URLSearchParams();
+    const uri = new URI(`${this.basePath}/v1/performedCultivationActions`);
     if (firstResult !== undefined && firstResult !== null) {
-      queryParameters.set('firstResult', <any>firstResult);
+        uri.addQuery('firstResult', <any>firstResult);
     }
     if (maxResults !== undefined && maxResults !== null) {
-      queryParameters.set('maxResults', <any>maxResults);
+        uri.addQuery('maxResults', <any>maxResults);
     }
-    url.search = queryParameters.toString();
     const options = {
       method: "get",
       headers: {
@@ -100,7 +98,7 @@ export class PerformedCultivationActionsService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -113,7 +111,7 @@ export class PerformedCultivationActionsService {
    * @param performedCultivationActionId Wastage reason id
   */
   public updatePerformedCultivationAction(body: PerformedCultivationAction, performedCultivationActionId: string, ):Promise<PerformedCultivationAction> {
-    const url = new URL(`${this.basePath}/v1/performedCultivationActions/${encodeURIComponent(String(performedCultivationActionId))}`);
+    const uri = new URI(`${this.basePath}/v1/performedCultivationActions/${encodeURIComponent(String(performedCultivationActionId))}`);
     const options = {
       method: "put",
       headers: {
@@ -123,7 +121,7 @@ export class PerformedCultivationActionsService {
       body: JSON.stringify(body)
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }

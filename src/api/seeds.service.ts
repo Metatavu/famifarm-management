@@ -1,6 +1,6 @@
 import { Seed } from "famifarm-typescript-models";
+import * as URI from "urijs";
 import { Api } from ".";
-
 export class SeedsService {
 
   private token: string;
@@ -18,7 +18,7 @@ export class SeedsService {
    * @param body Seed to be added
   */
   public createSeed(body: Seed, ):Promise<Seed> {
-    const url = new URL(`${this.basePath}/v1/seeds`);
+    const uri = new URI(`${this.basePath}/v1/seeds`);
     const options = {
       method: "post",
       headers: {
@@ -28,7 +28,7 @@ export class SeedsService {
       body: JSON.stringify(body)
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -40,7 +40,7 @@ export class SeedsService {
    * @param seedId Seed id
   */
   public deleteSeed(seedId: string, ):Promise<any> {
-    const url = new URL(`${this.basePath}/v1/seeds/${encodeURIComponent(String(seedId))}`);
+    const uri = new URI(`${this.basePath}/v1/seeds/${encodeURIComponent(String(seedId))}`);
     const options = {
       method: "delete",
       headers: {
@@ -49,7 +49,7 @@ export class SeedsService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -61,7 +61,7 @@ export class SeedsService {
    * @param seedId Seed id
   */
   public findSeed(seedId: string, ):Promise<Seed> {
-    const url = new URL(`${this.basePath}/v1/seeds/${encodeURIComponent(String(seedId))}`);
+    const uri = new URI(`${this.basePath}/v1/seeds/${encodeURIComponent(String(seedId))}`);
     const options = {
       method: "get",
       headers: {
@@ -70,7 +70,7 @@ export class SeedsService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -83,15 +83,13 @@ export class SeedsService {
    * @param maxResults How many items to return at one time
   */
   public listSeeds(firstResult?: number, maxResults?: number, ):Promise<Array<Seed>> {
-    const url = new URL(`${this.basePath}/v1/seeds`);
-    let queryParameters = new URLSearchParams();
+    const uri = new URI(`${this.basePath}/v1/seeds`);
     if (firstResult !== undefined && firstResult !== null) {
-      queryParameters.set('firstResult', <any>firstResult);
+        uri.addQuery('firstResult', <any>firstResult);
     }
     if (maxResults !== undefined && maxResults !== null) {
-      queryParameters.set('maxResults', <any>maxResults);
+        uri.addQuery('maxResults', <any>maxResults);
     }
-    url.search = queryParameters.toString();
     const options = {
       method: "get",
       headers: {
@@ -100,7 +98,7 @@ export class SeedsService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -113,7 +111,7 @@ export class SeedsService {
    * @param seedId Seed id
   */
   public updateSeed(body: Seed, seedId: string, ):Promise<Seed> {
-    const url = new URL(`${this.basePath}/v1/seeds/${encodeURIComponent(String(seedId))}`);
+    const uri = new URI(`${this.basePath}/v1/seeds/${encodeURIComponent(String(seedId))}`);
     const options = {
       method: "put",
       headers: {
@@ -123,7 +121,7 @@ export class SeedsService {
       body: JSON.stringify(body)
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
