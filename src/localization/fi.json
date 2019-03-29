@@ -17,6 +17,7 @@
     "packageSizes": "Pakkauskoot",
     "newPackageSize": "Uusi pakkauskoko",
     "packageSizeName": "Pakkauskoon nimi",
+    "packageSizeSize": "Pakkauskoon koko",
     "deletePackageSize": "Poista pakkauskoko",
     "product": "Tuote",
     "products": "Tuotteet",

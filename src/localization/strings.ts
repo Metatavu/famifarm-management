@@ -24,6 +24,7 @@ export interface IStrings extends LocalizedStringsMethods {
   packageSizes: string;
   newPackageSize: string;
   packageSizeName: string;
+  packageSizeSize: string;
 
   product: string;
   products: string;

@@ -14,7 +14,8 @@ import {
   Loader,
   Form,
   Message,
-  Confirm
+  Confirm,
+  Input
 } from "semantic-ui-react";
 import LocalizedValueInput from "./LocalizedValueInput";
 import LocalizedUtils from "src/localization/localizedutils";
@@ -137,7 +138,7 @@ class EditPackageSize extends React.Component<Props, State> {
     }
   }
 
-    /**
+  /**
    * Updates the name of package size
    * 
    * @param name localized package size name
@@ -145,6 +146,17 @@ class EditPackageSize extends React.Component<Props, State> {
   private updateName = (name: LocalizedEntry) => {
     this.setState({
       packageSize: {...this.state.packageSize, name: name}
+    });
+  }
+
+  /**
+   * Updates the name of package size
+   * 
+   * @param event event
+   */
+  private updateSize = (event: React.FormEvent<HTMLInputElement>) => {
+    this.setState({
+      packageSize: {...this.state.packageSize, size: parseInt(event.currentTarget.value) || 0 }
     });
   }
 
@@ -183,6 +195,14 @@ class EditPackageSize extends React.Component<Props, State> {
               onValueChange={this.updateName}
               value={this.state.packageSize ? this.state.packageSize.name : undefined}
               languages={["fi", "en"]}
+            />
+          </Form.Field>
+          <Form.Field>
+            <label>{strings.packageSizeSize}</label>
+            <Input 
+              value={this.state.packageSize && this.state.packageSize.size} 
+              placeholder={strings.packageSizeSize}
+              onChange={this.updateSize}
             />
           </Form.Field>
             <Message
