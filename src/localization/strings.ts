@@ -125,13 +125,14 @@ export interface IStrings extends LocalizedStringsMethods {
   labelLuminance: string
   labelStartTime: string
   labelEndTime: string
+  labelEventType: string
   editEventHeader: string
   deleteEventConfirmText: string
   harvestTypeBAGGING: string
   harvestTypeCUTTING: string
   harvestTypeBOXING: string
-  cellTypeSMALL: string
-  cellTypeLARGE: string
+  potTypeSMALL: string
+  potTypeLARGE: string
   phasePLANTING: string
   phaseSOWING: string
   phasePACKING: string
@@ -154,6 +155,8 @@ export interface IStrings extends LocalizedStringsMethods {
   userManagementLink: string
   accountUrl: string
   logoutUrl: string
+  newEvent: string
+  addEventHeader: string
 }
 
 const strings: IStrings = new LocalizedStrings({

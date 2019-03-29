@@ -104,13 +104,14 @@
   "labelLuminance" : "Luminance",
   "labelStartTime" : "Start",
   "labelEndTime" : "End",
+  "labelEventType": "Type",
   "editEventHeader" : "Edit event",
   "deleteEventConfirmText" : "Really delete event?",
   "harvestTypeBAGGING" : "Bagging",
   "harvestTypeCUTTING" : "Cutting",
   "harvestTypeBOXING" : "Boxing",
-  "cellTypeSMALL" : "Small",
-  "cellTypeLARGE" : "Large",
+  "potTypeSMALL" : "Small",
+  "potTypeLARGE" : "Large",
   "phasePLANTING" : "Planting",
   "phaseSOWING" : "Sowing",
   "phasePACKING" : "Packing",
@@ -131,5 +132,7 @@
   "reportTypeItemPLANTING_YIELD": "Planting yield",
   "userManagementLink": "User management",
   "accountUrl": "Account",
-  "logoutUrl": "Logout"
+  "logoutUrl": "Logout",
+  "newEvent": "Add event",
+  "addEventHeader": "Add event"
 }

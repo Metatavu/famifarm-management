@@ -248,6 +248,9 @@ class BatchView extends React.Component<Props, State> {
       <Grid>
         <Grid.Row className="content-page-header-row" style={{flex: 1,justifyContent: "space-between", paddingLeft: 10, paddingRight: 10}}>
           <h2>{ this.state.batchTitle || "" }</h2>
+          <NavLink to={`/createEvent/${this.props.batchId}`}>
+            <Button className="submit-button">{strings.newEvent}</Button>
+          </NavLink>
         </Grid.Row>
         <Grid.Row>
           <VerticalTimeline>

@@ -29,7 +29,7 @@ import { ErrorMessage } from "src/types";
  */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  eventId: string,
+  batchId: string,
   onError: (error: ErrorMessage) => void
 }
 
@@ -54,7 +54,7 @@ interface State {
 /**
  * React component for edit event view
  */
-class EditEvent extends React.Component<Props, State> {
+class CreateEvent extends React.Component<Props, State> {
 
   /**
    * Constructor
@@ -75,27 +75,16 @@ class EditEvent extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle method
    */
-  public async componentDidMount() {
-    try {
-      if (!this.props.keycloak) {
-        return;
+  public componentDidMount = () => {
+    this.setState({
+      event: {
+        batchId: this.props.batchId,
+        startTime: moment().toISOString(),
+        endTime: moment().toISOString(),
+        data: {},
+        type: "SOWING"
       }
-  
-      this.setState({loading: true});
-      const eventsService = await Api.getEventsService(this.props.keycloak);
-      const event = await eventsService.findEvent(this.props.eventId);
-
-      this.setState({
-        event: event,
-        loading: false
-      });
-    } catch (e) {
-      this.props.onError({
-        message: strings.defaultApiErrorMessage,
-        title: strings.defaultApiErrorTitle,
-        exception: e
-      });
-    }
+    });
   }
 
   /**
@@ -118,15 +107,25 @@ class EditEvent extends React.Component<Props, State> {
       return null;
     }
     const event: Event = this.state.event;
+    const eventTypeOptions = [
+      "SOWING",
+      "TABLE_SPREAD",
+      "PLANTING",
+      "CULTIVATION_OBSERVATION",
+      "HARVEST",
+      "PACKING"].map((eventType) => {
+      return {
+        key: eventType,
+        value: eventType,
+        text: strings[`phase${eventType}`]
+      };
+    });
 
     return (
       <Grid>
         <Grid.Row className="content-page-header-row">
           <Grid.Column width={6}>
-            <h2>{strings.editEventHeader}</h2>
-          </Grid.Column>
-          <Grid.Column width={3} floated="right">
-            <Button className="danger-button" onClick={() => this.setState({open:true})}>{strings.delete}</Button>
+            <h2>{strings.addEventHeader}</h2>
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
@@ -139,6 +138,10 @@ class EditEvent extends React.Component<Props, State> {
               <Form.Field>
                 <label>{strings.labelEndTime}</label>
                 <DateTimeInput dateTimeFormat="YYYY.MM.DD HH:mm" onChange={this.handleTimeChange} name="endTime" value={moment(event.endTime).format("YYYY.MM.DD HH:mm")} />
+              </Form.Field>
+              <Form.Field>
+                <label>{strings.labelEventType}</label>
+                <Form.Select name="type" options={eventTypeOptions} value={event.type} onChange={this.handleBaseChange} />
               </Form.Field>
               {this.renderEventDataForm(event)}
               <Form.TextArea label={strings.labelAdditionalInformation} onChange={this.handleBaseChange} name="additionalInformation" value={event.additionalInformation} />
@@ -222,7 +225,7 @@ class EditEvent extends React.Component<Props, State> {
   
       this.setState({saving: true});
       const eventsService = await Api.getEventsService(this.props.keycloak);
-      await eventsService.updateEvent(this.state.event, this.state.event.id!);
+      await eventsService.createEvent(this.state.event);
       this.setState({saving: false, messageVisible: true});
       setTimeout(() => {
         this.setState({messageVisible: false});
@@ -705,4 +708,4 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(EditEvent);
+export default connect(mapStateToProps, mapDispatchToProps)(CreateEvent);

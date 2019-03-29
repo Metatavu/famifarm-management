@@ -46,7 +46,13 @@ class SeedBatchList extends React.Component<Props, State> {
   
       const seedBatchService = await Api.getSeedBatchesService(this.props.keycloak);
       const seedBatches = await seedBatchService.listSeedBatches();
-      
+      seedBatches.sort((a, b) => {
+        let nameA = a.code || "";
+        let nameB = b.code || "";
+        if(nameA < nameB) { return -1; }
+        if(nameA > nameB) { return 1; }
+        return 0;
+      });
       this.props.onSeedBatchesFound && this.props.onSeedBatchesFound(seedBatches);
     } catch (e) {
       this.props.onError({

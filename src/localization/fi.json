@@ -104,13 +104,14 @@
     "labelLuminance" : "Valoisuus",
     "labelStartTime" : "Aloitus",
     "labelEndTime" : "Lopetus",
+    "labelEventType": "Tyyppi",
     "editEventHeader" : "Muokkaa tapahtumaa",
     "deleteEventConfirmText" : "Haluatko varmasti poistaa tapahtuman?",
     "harvestTypeBAGGING" : "Pussitus",
     "harvestTypeCUTTING" : "Leikkaus",
     "harvestTypeBOXING" : "Rasiointi",
-    "cellTypeSMALL" : "Pieni",
-    "cellTypeLARGE" : "Suuri",
+    "potTypeSMALL" : "Pieni",
+    "potTypeLARGE" : "Suuri",
     "phasePLANTING" : "Istutus",
     "phaseSOWING" : "Kylvö",
     "phasePACKING" : "Pakkaus",
@@ -131,5 +132,7 @@
     "reportTypeItemPLANTING_YIELD": "Istutussaanto",
     "userManagementLink": "Käyttäjähallinta",
     "accountUrl": "Käyttäjätili",
-    "logoutUrl": "Kirjaudu ulos"
+    "logoutUrl": "Kirjaudu ulos",
+    "newEvent": "Lisää tapahtuma",
+    "addEventHeader": "Lisää tapahtuma"
   }

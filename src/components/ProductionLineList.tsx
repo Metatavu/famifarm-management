@@ -46,7 +46,13 @@ class ProductionLineList extends React.Component<Props, State> {
   
       const productionLinesService = await Api.getProductionLinesService(this.props.keycloak);
       const productionLines = await productionLinesService.listProductionLines();
-      
+      productionLines.sort((a, b) => {
+        let nameA = a.lineNumber || "";
+        let nameB = b.lineNumber || "";
+        if(nameA < nameB) { return -1; }
+        if(nameA > nameB) { return 1; }
+        return 0;
+      });
       this.props.onProductionLinesFound && this.props.onProductionLinesFound(productionLines);
     } catch (e) {
       this.props.onError({
