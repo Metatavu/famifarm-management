@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
+import * as _ from "lodash";
 import Api from "../api";
 import { Event, SowingEventData, TableSpreadEventData, CultivationObservationEventData, PlantingEventData, HarvestEventData, PackingEventData, WastageEventData } from "famifarm-typescript-models";
 import { VerticalTimeline, VerticalTimelineElement }  from 'react-vertical-timeline-component';
@@ -27,6 +28,7 @@ import * as moment from "moment";
 import strings from "../localization/strings";
 import { NavLink } from "react-router-dom";
 import { ErrorMessage } from "../types";
+import LocalizedUtils from "src/localization/localizedutils";
 
 /**
  * Interface representing component properties
@@ -43,7 +45,8 @@ interface Props {
  */
 interface State {
   batchEvents: Event[]
-  loading: boolean
+  loading: boolean,
+  batchTitle?: string
 }
 
 /**
@@ -61,7 +64,7 @@ class BatchView extends React.Component<Props, State> {
   /**
    * Component did mount life-sycle method
    */
-  async componentDidMount() {
+  public async componentDidMount() {
     try {
       if (!this.props.keycloak) {
         return;
@@ -74,6 +77,7 @@ class BatchView extends React.Component<Props, State> {
       
       this.setState({
         batchEvents: events.sort((a, b) => moment(a.startTime).isAfter(moment(b.startTime)) ? 1 : -1), //TOOO: sort on server side
+        batchTitle: await this.resolveBatchTitle(events),
         loading: false
       });
     } catch (e) {
@@ -242,6 +246,9 @@ class BatchView extends React.Component<Props, State> {
 
     return (
       <Grid>
+        <Grid.Row className="content-page-header-row" style={{flex: 1,justifyContent: "space-between", paddingLeft: 10, paddingRight: 10}}>
+          <h2>{ this.state.batchTitle || "" }</h2>
+        </Grid.Row>
         <Grid.Row>
           <VerticalTimeline>
             {timelineElements}
@@ -249,6 +256,58 @@ class BatchView extends React.Component<Props, State> {
         </Grid.Row>
       </Grid>
     );
+  }
+
+  /**
+   * Resolves batch'es title
+   * 
+   * @param events batch events
+   * @return batch'es title
+   */
+  private async resolveBatchTitle(events: Event[]) {
+    if (!this.props.keycloak) {
+      return "";
+    }
+
+    const batchesService = await Api.getBatchesService(this.props.keycloak);
+    const productionLinesService = await Api.getProductionLinesService(this.props.keycloak);
+    const productsService = await Api.getProductsService(this.props.keycloak);
+
+    const batch = await batchesService.findBatch(this.props.batchId);
+    if (!batch) {
+      return "";
+    }
+
+    const product = await productsService.findProduct(batch.productId);
+    if (!product) {
+      return "";
+    }
+
+    const productionLineIds: string[] = _.uniq(events
+      .filter((event) => {
+        return event.type == "PLANTING";
+      })
+      .map((event) => {
+        const plantingData: PlantingEventData = (event as any).data;
+        return plantingData.productionLineId;
+      }))
+      .filter((productionLineId) => {
+        return !!productionLineId;
+      }) as string[];
+
+    const productionLines = await Promise.all(productionLineIds.map((productionLineId) => {
+      return productionLinesService.findProductionLine(productionLineId);
+    }));
+
+    const lineNumbers = productionLines
+      .filter((productionLine) => {
+        return !!productionLine.lineNumber;
+      })
+      .map((productionLine) => {
+        return productionLine.lineNumber!;
+      }).join(",");
+
+    return `${LocalizedUtils.getLocalizedValue(product.name)}${!lineNumbers ? "" : " - " + lineNumbers}`;
   }
 }
 
