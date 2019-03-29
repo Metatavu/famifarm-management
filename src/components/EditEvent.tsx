@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PackingEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, Team, ProductionLine, SeedBatch, WastageReason } from "famifarm-typescript-models";
+import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PackingEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, ProductionLine, SeedBatch, WastageReason } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 import { DateTimeInput } from 'semantic-ui-calendar-react';
@@ -45,7 +45,6 @@ interface State {
   event?: Event
   performedCultivationActions?: PerformedCultivationAction[]
   pests?: Pest[],
-  teams?: Team[],
   productionLines?: ProductionLine[]
   packageSizes?: PackageSize[]
   seedBatches?: SeedBatch[]
@@ -329,7 +328,7 @@ class EditEvent extends React.Component<Props, State> {
    * Renders harvest event form
    */
   private renderHarvesDataForm = (data: HarvestEventData) => {
-    if (!this.state.teams || !this.state.productionLines) {
+    if (!this.state.productionLines) {
       this.loadHarvestData().catch((e) => {
         this.props.onError({
           message: strings.defaultApiErrorMessage,
@@ -340,14 +339,6 @@ class EditEvent extends React.Component<Props, State> {
 
       return;
     }
-
-    const teamOptions = this.state.teams.map((team) => {
-      return {
-        key: team.id,
-        value: team.id,
-        text: LocalizedUtils.getLocalizedValue(team.name)
-      };
-    });
 
     const productionLineOptions = this.state.productionLines.map((productionLine) => {
       return {
@@ -368,9 +359,8 @@ class EditEvent extends React.Component<Props, State> {
     return (
       <React.Fragment>
         <Form.Select label={strings.labelHarvestType} name="type" options={harvestTypeOptions} value={data.type} onChange={this.handleDataChange} />
-        <Form.Input label={strings.labelAmount} name="amount" type="number" value={data.amount} onChange={this.handleDataChange} />
+        <Form.Input label={strings.labelGutterCount} name="amount" type="number" value={data.gutterCount} onChange={this.handleDataChange} />
         <Form.Select label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
-        <Form.Select label={strings.labelTeam} name="teamId" options={teamOptions} value={data.teamId} onChange={this.handleDataChange} />
       </React.Fragment>
     )
   }
@@ -401,7 +391,7 @@ class EditEvent extends React.Component<Props, State> {
 
     return (
       <React.Fragment>
-        <Form.Input label={strings.labelPackedAmount} name="packedAmount" type="number" value={data.packedAmount} onChange={this.handleDataChange} />
+        <Form.Input label={strings.labelPackedCount} name="packedAmount" type="number" value={data.packedCount} onChange={this.handleDataChange} />
         <Form.Select label={strings.labelPackageSize} name="packageSizeId" options={packageSizeOptions} value={data.packageSizeId} onChange={this.handleDataChange} />
       </React.Fragment>
     );
@@ -434,9 +424,9 @@ class EditEvent extends React.Component<Props, State> {
     return (
       <React.Fragment>
         <Form.Select label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
-        <Form.Input label={strings.labelCellCount} name="cellCount" type="number" value={data.cellCount} onChange={this.handleDataChange} />
+        <Form.Input label={strings.labelTrayCount} name="trayCount" type="number" value={data.trayCount} onChange={this.handleDataChange} />
         <Form.Input label={strings.labelGutterCount} name="gutterCount" type="number" value={data.gutterCount} onChange={this.handleDataChange} />
-        <Form.Input label={strings.labelGutterSize} name="gutterSize" type="number" value={data.gutterSize} onChange={this.handleDataChange} />
+        <Form.Input label={strings.labelGutterHoleCount} name="gutterSize" type="number" value={data.gutterHoleCount} onChange={this.handleDataChange} />
         <Form.Input label={strings.labelWorkerCount} name="workerCount" type="number" value={data.workerCount} onChange={this.handleDataChange} />
       </React.Fragment>
     );
@@ -487,7 +477,7 @@ class EditEvent extends React.Component<Props, State> {
         <Form.Input label={strings.labelAmount} name="amount" type="number" value={data.amount} onChange={this.handleDataChange} />
         <Form.Select label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
         <Form.Select label={strings.labelSeedBatch} name="seedBatchId" options={seedBatchOptions} value={data.seedBatchId} onChange={this.handleDataChange} />
-        <Form.Select label={strings.labelCellType} name="cellType" options={cellTypeOptions} value={data.cellType} onChange={this.handleDataChange} />
+        <Form.Select label={strings.labelPotType} name="cellType" options={cellTypeOptions} value={data.potType} onChange={this.handleDataChange} />
       </React.Fragment>
     );
   }
@@ -499,7 +489,7 @@ class EditEvent extends React.Component<Props, State> {
   private renderTableSpreadDataForm = (data: TableSpreadEventData) => {
     return (
       <React.Fragment>
-        <Form.Input label={strings.labelTableCount} name="tableCount" value={data.tableCount} onChange={this.handleDataChange} />
+        <Form.Input label={strings.labelTrayCount} name="tableCount" value={data.trayCount} onChange={this.handleDataChange} />
         <Form.Input label={strings.labelLocation} name="location" value={data.location} onChange={this.handleDataChange} />
       </React.Fragment>
     );
@@ -565,19 +555,16 @@ class EditEvent extends React.Component<Props, State> {
     }
 
     this.setState({loading: true});
-    const [teamsService, productionLinesService] = await Promise.all([
-      Api.getTeamsService(this.props.keycloak),
+    const [productionLinesService] = await Promise.all([
       Api.getProductionLinesService(this.props.keycloak)
     ]);
 
-    const [teams, productionLines] = await Promise.all([
-      teamsService.listTeams(),
+    const [productionLines] = await Promise.all([
       productionLinesService.listProductionLines()
     ]);
 
     this.setState({
       loading: false,
-      teams: teams,
       productionLines: productionLines
     });
   }

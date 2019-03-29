@@ -106,16 +106,15 @@ export interface IStrings extends LocalizedStringsMethods {
   labelProductionLine: string
   labelWastageReason: string
   labelLocation: string
-  labelTableCount: string
-  labelCellType: string
+  labelPotType: string
   labelSeedBatch: string
-  labelAmount: string
   labelWorkerCount: string
-  labelGutterSize: string
+  labelAmount: string
+  labelGutterHoleCount: string
   labelGutterCount: string
-  labelCellCount: string
+  labelTrayCount: string
   labelPackageSize: string
-  labelPackedAmount: string
+  labelPackedCount: string
   labelTeam: string
   labelHarvestType: string
   labelPests: string

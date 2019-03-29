@@ -140,7 +140,7 @@ class BatchView extends React.Component<Props, State> {
         return ( 
           <div>
             <h3 className="vertical-timeline-element-title">{strings.tablespreadEventHeader}</h3>
-            <p>{strings.formatString(strings.tablespreadEventText, String(eventData.tableCount))}</p>
+            <p>{strings.formatString(strings.tablespreadEventText, String(eventData.trayCount))}</p>
             <NavLink to={`/events/${event.id}`}><Button style={{float: "right"}}>{strings.editEventLink}</Button></NavLink>
             <small>{strings.formatString(strings.remainingUnitsText, event.remainingUnits ? event.remainingUnits.toString() : "0")}</small>
           </div> 
@@ -188,7 +188,7 @@ class BatchView extends React.Component<Props, State> {
         return ( 
           <div>
             <h3 className="vertical-timeline-element-title">{strings.packingEventHeader}</h3> 
-            <p>{strings.formatString(strings.packingEventText, String(eventData.packedAmount))}</p>
+            <p>{strings.formatString(strings.packingEventText, String(eventData.packedCount))}</p>
             <NavLink to={`/events/${event.id}`}><Button style={{float: "right"}}>{strings.editEventLink}</Button></NavLink>
             <small>{strings.formatString(strings.remainingUnitsText, event.remainingUnits ? event.remainingUnits.toString() : "0")}</small>
           </div> 
