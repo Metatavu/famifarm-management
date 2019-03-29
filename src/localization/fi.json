@@ -26,6 +26,7 @@
     "productionLines": "Tuotantolinjat",
     "newProductionLine": "Uusi tuotantolinja",
     "productionLineNumber": "Tuotantolinja numero",
+    "productionLineDefaultGutterHoleCount": "Oletus kourun reikämäärä",
     "productionLineNotNumber": "Tuotantolinja numero ei voi olla muuta kuin numero",
     "seed": "Siemen",
     "seeds": "Siemenet",

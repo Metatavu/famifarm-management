@@ -34,6 +34,7 @@ export interface IStrings extends LocalizedStringsMethods {
   productionLines: string;
   newProductionLine: string;
   productionLineNumber: string;
+  productionLineDefaultGutterHoleCount: string;
   productionLineNotNumber: string;
 
   seed: string;

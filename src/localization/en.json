@@ -26,6 +26,7 @@
   "productionLines": "Production lines",
   "newProductionLine": "New production line",
   "productionLineNumber": "Production line number",
+  "productionLineDefaultGutterHoleCount": "Default gutter hole count",
   "productionLineNotNumber": "Production line number cant be anything else than a number",
   "seed": "Seed",
   "seeds": "Seeds",
