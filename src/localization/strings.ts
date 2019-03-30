@@ -24,6 +24,7 @@ export interface IStrings extends LocalizedStringsMethods {
   packageSizes: string;
   newPackageSize: string;
   packageSizeName: string;
+  packageSizeSize: string;
 
   product: string;
   products: string;
@@ -34,6 +35,7 @@ export interface IStrings extends LocalizedStringsMethods {
   productionLines: string;
   newProductionLine: string;
   productionLineNumber: string;
+  productionLineDefaultGutterHoleCount: string;
   productionLineNotNumber: string;
 
   seed: string;
@@ -106,16 +108,15 @@ export interface IStrings extends LocalizedStringsMethods {
   labelProductionLine: string
   labelWastageReason: string
   labelLocation: string
-  labelTableCount: string
-  labelCellType: string
+  labelPotType: string
   labelSeedBatch: string
-  labelAmount: string
   labelWorkerCount: string
-  labelGutterSize: string
+  labelAmount: string
+  labelGutterHoleCount: string
   labelGutterCount: string
-  labelCellCount: string
+  labelTrayCount: string
   labelPackageSize: string
-  labelPackedAmount: string
+  labelPackedCount: string
   labelTeam: string
   labelHarvestType: string
   labelPests: string
@@ -124,13 +125,14 @@ export interface IStrings extends LocalizedStringsMethods {
   labelLuminance: string
   labelStartTime: string
   labelEndTime: string
+  labelEventType: string
   editEventHeader: string
   deleteEventConfirmText: string
   harvestTypeBAGGING: string
   harvestTypeCUTTING: string
   harvestTypeBOXING: string
-  cellTypeSMALL: string
-  cellTypeLARGE: string
+  potTypeSMALL: string
+  potTypeLARGE: string
   phasePLANTING: string
   phaseSOWING: string
   phasePACKING: string
@@ -153,6 +155,8 @@ export interface IStrings extends LocalizedStringsMethods {
   userManagementLink: string
   accountUrl: string
   logoutUrl: string
+  newEvent: string
+  addEventHeader: string
 }
 
 const strings: IStrings = new LocalizedStrings({

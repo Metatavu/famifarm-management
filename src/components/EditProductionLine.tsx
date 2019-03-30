@@ -62,6 +62,7 @@ class EditProductionLine extends React.Component<Props, State> {
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handeLineNumberChange = this.handeLineNumberChange.bind(this);
+    this.handeDefaultGutterHoleCountChange = this.handeDefaultGutterHoleCountChange.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
   }
 
@@ -94,12 +95,16 @@ class EditProductionLine extends React.Component<Props, State> {
    * @param event event
    */
   private handeLineNumberChange(event: React.FormEvent<HTMLInputElement>) {
-    const productionLine = {
-      id: this.state.productionLine!.id,
-      lineNumber: event.currentTarget.value
-    };
+    this.setState({productionLine: { ... this.state.productionLine, lineNumber: event.currentTarget.value }});
+  }
 
-    this.setState({productionLine: productionLine});
+  /**
+   * Handle line number change
+   * 
+   * @param event event
+   */
+  private handeDefaultGutterHoleCountChange(event: React.FormEvent<HTMLInputElement>) {
+    this.setState({productionLine: { ... this.state.productionLine, defaultGutterHoleCount: parseInt(event.currentTarget.value) || undefined }});
   }
 
   /**
@@ -190,6 +195,14 @@ class EditProductionLine extends React.Component<Props, State> {
               value={this.state.productionLine && this.state.productionLine!.lineNumber} 
               placeholder={strings.productionLineNumber}
               onChange={this.handeLineNumberChange}
+            />
+          </Form.Field>
+          <Form.Field>
+            <label>{strings.productionLineDefaultGutterHoleCount}</label>
+            <Input 
+              value={this.state.productionLine && this.state.productionLine.defaultGutterHoleCount} 
+              placeholder={strings.productionLineDefaultGutterHoleCount}
+              onChange={this.handeDefaultGutterHoleCountChange}
             />
           </Form.Field>
             <Message

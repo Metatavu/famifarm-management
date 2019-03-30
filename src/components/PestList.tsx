@@ -52,7 +52,14 @@ class PestList extends React.Component<Props, State> {
       }
   
       const pestsService = await Api.getPestsService(this.props.keycloak);
-      const pests = await pestsService.listPests(); 
+      const pests = await pestsService.listPests();
+      pests.sort((a, b) => {
+        let nameA = LocalizedUtils.getLocalizedValue(a.name)
+        let nameB = LocalizedUtils.getLocalizedValue(b.name)
+        if(nameA < nameB) { return -1; }
+        if(nameA > nameB) { return 1; }
+        return 0;
+      });
       this.props.onPestsFound && this.props.onPestsFound(pests);
     } catch (e) {
       this.props.onError({

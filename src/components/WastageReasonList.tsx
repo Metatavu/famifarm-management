@@ -59,7 +59,13 @@ class WastageReasonList extends React.Component<Props, State> {
   
       const wastageReasonsService = await Api.getWastageReasonsService(this.props.keycloak);
       const wastageReasons = await wastageReasonsService.listWastageReasons();
-  
+      wastageReasons.sort((a, b) => {
+        let nameA = LocalizedUtils.getLocalizedValue(a.reason)
+        let nameB = LocalizedUtils.getLocalizedValue(b.reason)
+        if(nameA < nameB) { return -1; }
+        if(nameA > nameB) { return 1; }
+        return 0;
+      });
       this.props.onWastageReasonsFound && this.props.onWastageReasonsFound(wastageReasons);
     } catch (e) {
       this.props.onError({

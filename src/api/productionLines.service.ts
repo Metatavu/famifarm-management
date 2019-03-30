@@ -1,6 +1,6 @@
 import { ProductionLine } from "famifarm-typescript-models";
+import * as URI from "urijs";
 import { Api } from ".";
-
 export class ProductionLinesService {
 
   private token: string;
@@ -18,7 +18,7 @@ export class ProductionLinesService {
    * @param body Wastage reason to be added
   */
   public createProductionLine(body: ProductionLine, ):Promise<ProductionLine> {
-    const url = new URL(`${this.basePath}/v1/productionLines`);
+    const uri = new URI(`${this.basePath}/v1/productionLines`);
     const options = {
       method: "post",
       headers: {
@@ -28,7 +28,7 @@ export class ProductionLinesService {
       body: JSON.stringify(body)
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -40,7 +40,7 @@ export class ProductionLinesService {
    * @param productionLineId ProductionLineId
   */
   public deleteProductionLine(productionLineId: string, ):Promise<any> {
-    const url = new URL(`${this.basePath}/v1/productionLines/${encodeURIComponent(String(productionLineId))}`);
+    const uri = new URI(`${this.basePath}/v1/productionLines/${encodeURIComponent(String(productionLineId))}`);
     const options = {
       method: "delete",
       headers: {
@@ -49,7 +49,7 @@ export class ProductionLinesService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -61,7 +61,7 @@ export class ProductionLinesService {
    * @param productionLineId Wastage reason id
   */
   public findProductionLine(productionLineId: string, ):Promise<ProductionLine> {
-    const url = new URL(`${this.basePath}/v1/productionLines/${encodeURIComponent(String(productionLineId))}`);
+    const uri = new URI(`${this.basePath}/v1/productionLines/${encodeURIComponent(String(productionLineId))}`);
     const options = {
       method: "get",
       headers: {
@@ -70,7 +70,7 @@ export class ProductionLinesService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -83,15 +83,13 @@ export class ProductionLinesService {
    * @param maxResults How many items to return at one time
   */
   public listProductionLines(firstResult?: number, maxResults?: number, ):Promise<Array<ProductionLine>> {
-    const url = new URL(`${this.basePath}/v1/productionLines`);
-    let queryParameters = new URLSearchParams();
+    const uri = new URI(`${this.basePath}/v1/productionLines`);
     if (firstResult !== undefined && firstResult !== null) {
-      queryParameters.set('firstResult', <any>firstResult);
+        uri.addQuery('firstResult', <any>firstResult);
     }
     if (maxResults !== undefined && maxResults !== null) {
-      queryParameters.set('maxResults', <any>maxResults);
+        uri.addQuery('maxResults', <any>maxResults);
     }
-    url.search = queryParameters.toString();
     const options = {
       method: "get",
       headers: {
@@ -100,7 +98,7 @@ export class ProductionLinesService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -113,7 +111,7 @@ export class ProductionLinesService {
    * @param productionLineId Wastage reason id
   */
   public updateProductionLine(body: ProductionLine, productionLineId: string, ):Promise<ProductionLine> {
-    const url = new URL(`${this.basePath}/v1/productionLines/${encodeURIComponent(String(productionLineId))}`);
+    const uri = new URI(`${this.basePath}/v1/productionLines/${encodeURIComponent(String(productionLineId))}`);
     const options = {
       method: "put",
       headers: {
@@ -123,7 +121,7 @@ export class ProductionLinesService {
       body: JSON.stringify(body)
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }

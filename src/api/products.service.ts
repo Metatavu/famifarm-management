@@ -1,6 +1,6 @@
 import { Product } from "famifarm-typescript-models";
+import * as URI from "urijs";
 import { Api } from ".";
-
 export class ProductsService {
 
   private token: string;
@@ -18,7 +18,7 @@ export class ProductsService {
    * @param body Product to be added
   */
   public createProduct(body: Product, ):Promise<Product> {
-    const url = new URL(`${this.basePath}/v1/products`);
+    const uri = new URI(`${this.basePath}/v1/products`);
     const options = {
       method: "post",
       headers: {
@@ -28,7 +28,7 @@ export class ProductsService {
       body: JSON.stringify(body)
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -40,7 +40,7 @@ export class ProductsService {
    * @param productId Product id
   */
   public deleteProduct(productId: string, ):Promise<any> {
-    const url = new URL(`${this.basePath}/v1/products/${encodeURIComponent(String(productId))}`);
+    const uri = new URI(`${this.basePath}/v1/products/${encodeURIComponent(String(productId))}`);
     const options = {
       method: "delete",
       headers: {
@@ -49,7 +49,7 @@ export class ProductsService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -61,7 +61,7 @@ export class ProductsService {
    * @param productId Product id
   */
   public findProduct(productId: string, ):Promise<Product> {
-    const url = new URL(`${this.basePath}/v1/products/${encodeURIComponent(String(productId))}`);
+    const uri = new URI(`${this.basePath}/v1/products/${encodeURIComponent(String(productId))}`);
     const options = {
       method: "get",
       headers: {
@@ -70,7 +70,7 @@ export class ProductsService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -83,15 +83,13 @@ export class ProductsService {
    * @param maxResults How many items to return at one time
   */
   public listProducts(firstResult?: number, maxResults?: number, ):Promise<Array<Product>> {
-    const url = new URL(`${this.basePath}/v1/products`);
-    let queryParameters = new URLSearchParams();
+    const uri = new URI(`${this.basePath}/v1/products`);
     if (firstResult !== undefined && firstResult !== null) {
-      queryParameters.set('firstResult', <any>firstResult);
+        uri.addQuery('firstResult', <any>firstResult);
     }
     if (maxResults !== undefined && maxResults !== null) {
-      queryParameters.set('maxResults', <any>maxResults);
+        uri.addQuery('maxResults', <any>maxResults);
     }
-    url.search = queryParameters.toString();
     const options = {
       method: "get",
       headers: {
@@ -100,7 +98,7 @@ export class ProductsService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -113,7 +111,7 @@ export class ProductsService {
    * @param productId Product id
   */
   public updateProduct(body: Product, productId: string, ):Promise<Product> {
-    const url = new URL(`${this.basePath}/v1/products/${encodeURIComponent(String(productId))}`);
+    const uri = new URI(`${this.basePath}/v1/products/${encodeURIComponent(String(productId))}`);
     const options = {
       method: "put",
       headers: {
@@ -123,7 +121,7 @@ export class ProductsService {
       body: JSON.stringify(body)
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }

@@ -1,6 +1,6 @@
 import { Draft } from "famifarm-typescript-models";
+import * as URI from "urijs";
 import { Api } from ".";
-
 export class DraftsService {
 
   private token: string;
@@ -18,7 +18,7 @@ export class DraftsService {
    * @param body Draft body
   */
   public createDraft(body: Draft, ):Promise<Draft> {
-    const url = new URL(`${this.basePath}/v1/drafts`);
+    const uri = new URI(`${this.basePath}/v1/drafts`);
     const options = {
       method: "post",
       headers: {
@@ -28,7 +28,7 @@ export class DraftsService {
       body: JSON.stringify(body)
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -40,7 +40,7 @@ export class DraftsService {
    * @param draftId Draft id
   */
   public deleteDraft(draftId: string, ):Promise<any> {
-    const url = new URL(`${this.basePath}/v1/drafts/${encodeURIComponent(String(draftId))}`);
+    const uri = new URI(`${this.basePath}/v1/drafts/${encodeURIComponent(String(draftId))}`);
     const options = {
       method: "delete",
       headers: {
@@ -49,7 +49,7 @@ export class DraftsService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -62,15 +62,13 @@ export class DraftsService {
    * @param type Type of draft
   */
   public listDrafts(userId: string, type: string, ):Promise<Array<Draft>> {
-    const url = new URL(`${this.basePath}/v1/drafts`);
-    let queryParameters = new URLSearchParams();
+    const uri = new URI(`${this.basePath}/v1/drafts`);
     if (userId !== undefined && userId !== null) {
-      queryParameters.set('userId', <any>userId);
+        uri.addQuery('userId', <any>userId);
     }
     if (type !== undefined && type !== null) {
-      queryParameters.set('type', <any>type);
+        uri.addQuery('type', <any>type);
     }
-    url.search = queryParameters.toString();
     const options = {
       method: "get",
       headers: {
@@ -79,7 +77,7 @@ export class DraftsService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }

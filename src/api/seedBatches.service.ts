@@ -1,6 +1,6 @@
 import { SeedBatch } from "famifarm-typescript-models";
+import * as URI from "urijs";
 import { Api } from ".";
-
 export class SeedBatchesService {
 
   private token: string;
@@ -18,7 +18,7 @@ export class SeedBatchesService {
    * @param body Wastage reason to be added
   */
   public createSeedBatch(body: SeedBatch, ):Promise<SeedBatch> {
-    const url = new URL(`${this.basePath}/v1/seedBatches`);
+    const uri = new URI(`${this.basePath}/v1/seedBatches`);
     const options = {
       method: "post",
       headers: {
@@ -28,7 +28,7 @@ export class SeedBatchesService {
       body: JSON.stringify(body)
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -40,7 +40,7 @@ export class SeedBatchesService {
    * @param seedBatchId SeedBatchId
   */
   public deleteSeedBatch(seedBatchId: string, ):Promise<any> {
-    const url = new URL(`${this.basePath}/v1/seedBatches/${encodeURIComponent(String(seedBatchId))}`);
+    const uri = new URI(`${this.basePath}/v1/seedBatches/${encodeURIComponent(String(seedBatchId))}`);
     const options = {
       method: "delete",
       headers: {
@@ -49,7 +49,7 @@ export class SeedBatchesService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -61,7 +61,7 @@ export class SeedBatchesService {
    * @param seedBatchId Wastage reason id
   */
   public findSeedBatch(seedBatchId: string, ):Promise<SeedBatch> {
-    const url = new URL(`${this.basePath}/v1/seedBatches/${encodeURIComponent(String(seedBatchId))}`);
+    const uri = new URI(`${this.basePath}/v1/seedBatches/${encodeURIComponent(String(seedBatchId))}`);
     const options = {
       method: "get",
       headers: {
@@ -70,7 +70,7 @@ export class SeedBatchesService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -83,15 +83,13 @@ export class SeedBatchesService {
    * @param maxResults How many items to return at one time
   */
   public listSeedBatches(firstResult?: number, maxResults?: number, ):Promise<Array<SeedBatch>> {
-    const url = new URL(`${this.basePath}/v1/seedBatches`);
-    let queryParameters = new URLSearchParams();
+    const uri = new URI(`${this.basePath}/v1/seedBatches`);
     if (firstResult !== undefined && firstResult !== null) {
-      queryParameters.set('firstResult', <any>firstResult);
+        uri.addQuery('firstResult', <any>firstResult);
     }
     if (maxResults !== undefined && maxResults !== null) {
-      queryParameters.set('maxResults', <any>maxResults);
+        uri.addQuery('maxResults', <any>maxResults);
     }
-    url.search = queryParameters.toString();
     const options = {
       method: "get",
       headers: {
@@ -100,7 +98,7 @@ export class SeedBatchesService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -113,7 +111,7 @@ export class SeedBatchesService {
    * @param seedBatchId Wastage reason id
   */
   public updateSeedBatch(body: SeedBatch, seedBatchId: string, ):Promise<SeedBatch> {
-    const url = new URL(`${this.basePath}/v1/seedBatches/${encodeURIComponent(String(seedBatchId))}`);
+    const uri = new URI(`${this.basePath}/v1/seedBatches/${encodeURIComponent(String(seedBatchId))}`);
     const options = {
       method: "put",
       headers: {
@@ -123,7 +121,7 @@ export class SeedBatchesService {
       body: JSON.stringify(body)
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }

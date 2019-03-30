@@ -47,7 +47,13 @@ class ProductList extends React.Component<Props, State> {
   
       const productsService = await Api.getProductsService(this.props.keycloak);
       const products = await productsService.listProducts();
-      
+      products.sort((a, b) => {
+        let nameA = LocalizedUtils.getLocalizedValue(a.name)
+        let nameB = LocalizedUtils.getLocalizedValue(b.name)
+        if(nameA < nameB) { return -1; }
+        if(nameA > nameB) { return 1; }
+        return 0;
+      });
       this.props.onProductsFound && this.props.onProductsFound(products);
     } catch (e) {
       this.props.onError({

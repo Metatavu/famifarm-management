@@ -1,6 +1,6 @@
 import { Event } from "famifarm-typescript-models";
+import * as URI from "urijs";
 import { Api } from ".";
-
 export class EventsService {
 
   private token: string;
@@ -18,7 +18,7 @@ export class EventsService {
    * @param body Event to be added
   */
   public createEvent(body: Event, ):Promise<Event> {
-    const url = new URL(`${this.basePath}/v1/events`);
+    const uri = new URI(`${this.basePath}/v1/events`);
     const options = {
       method: "post",
       headers: {
@@ -28,7 +28,7 @@ export class EventsService {
       body: JSON.stringify(body)
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -40,7 +40,7 @@ export class EventsService {
    * @param eventId Event id
   */
   public deleteEvent(eventId: string, ):Promise<any> {
-    const url = new URL(`${this.basePath}/v1/events/${encodeURIComponent(String(eventId))}`);
+    const uri = new URI(`${this.basePath}/v1/events/${encodeURIComponent(String(eventId))}`);
     const options = {
       method: "delete",
       headers: {
@@ -49,7 +49,7 @@ export class EventsService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -61,7 +61,7 @@ export class EventsService {
    * @param eventId Event id
   */
   public findEvent(eventId: string, ):Promise<Event> {
-    const url = new URL(`${this.basePath}/v1/events/${encodeURIComponent(String(eventId))}`);
+    const uri = new URI(`${this.basePath}/v1/events/${encodeURIComponent(String(eventId))}`);
     const options = {
       method: "get",
       headers: {
@@ -70,7 +70,7 @@ export class EventsService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -84,18 +84,16 @@ export class EventsService {
    * @param batchId Filter results by batch id
   */
   public listEvents(firstResult?: number, maxResults?: number, batchId?: string, ):Promise<Array<Event>> {
-    const url = new URL(`${this.basePath}/v1/events`);
-    let queryParameters = new URLSearchParams();
+    const uri = new URI(`${this.basePath}/v1/events`);
     if (firstResult !== undefined && firstResult !== null) {
-      queryParameters.set('firstResult', <any>firstResult);
+        uri.addQuery('firstResult', <any>firstResult);
     }
     if (maxResults !== undefined && maxResults !== null) {
-      queryParameters.set('maxResults', <any>maxResults);
+        uri.addQuery('maxResults', <any>maxResults);
     }
     if (batchId !== undefined && batchId !== null) {
-      queryParameters.set('batchId', <any>batchId);
+        uri.addQuery('batchId', <any>batchId);
     }
-    url.search = queryParameters.toString();
     const options = {
       method: "get",
       headers: {
@@ -104,7 +102,7 @@ export class EventsService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -117,7 +115,7 @@ export class EventsService {
    * @param eventId Event id
   */
   public updateEvent(body: Event, eventId: string, ):Promise<Event> {
-    const url = new URL(`${this.basePath}/v1/events/${encodeURIComponent(String(eventId))}`);
+    const uri = new URI(`${this.basePath}/v1/events/${encodeURIComponent(String(eventId))}`);
     const options = {
       method: "put",
       headers: {
@@ -127,7 +125,7 @@ export class EventsService {
       body: JSON.stringify(body)
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }

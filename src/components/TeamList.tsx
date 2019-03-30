@@ -15,6 +15,7 @@ import {
   Grid,
   Loader
 } from "semantic-ui-react";
+import LocalizedUtils from "src/localization/localizedutils";
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
@@ -46,6 +47,13 @@ class TeamList extends React.Component<Props, State> {
   
       const teamsService = await Api.getTeamsService(this.props.keycloak);
       const teams = await teamsService.listTeams();
+      teams.sort((a, b) => {
+        let nameA = LocalizedUtils.getLocalizedValue(a.name)
+        let nameB = LocalizedUtils.getLocalizedValue(b.name)
+        if(nameA < nameB) { return -1; }
+        if(nameA > nameB) { return 1; }
+        return 0;
+      });
       this.props.onTeamsFound && this.props.onTeamsFound(teams);
     } catch (e) {
       this.props.onError({
@@ -77,7 +85,7 @@ class TeamList extends React.Component<Props, State> {
               <Button className="submit-button">{strings.open}</Button>
             </NavLink>
           </List.Content>
-          <List.Header>{team.name![0].value}</List.Header>
+          <List.Header>{LocalizedUtils.getLocalizedValue(team.name)}</List.Header>
         </List.Item>
       );
     });

@@ -1,3 +1,5 @@
+import * as URI from "urijs";
+import { Api } from ".";
 export class ReportsService {
 
   private token: string;
@@ -16,16 +18,14 @@ export class ReportsService {
    * @param fromTime From time of the report
    * @param toTime To time of the report
   */
-  public getReport(type: string, fromTime?: string, toTime?: string, ):Promise<Blob> {
-    const url = new URL(`${this.basePath}/v1/reports/${encodeURIComponent(String(type))}`);
-    let queryParameters = new URLSearchParams();
+  public getReport(type: string, fromTime?: string, toTime?: string, ):Promise<string> {
+    const uri = new URI(`${this.basePath}/v1/reports/${encodeURIComponent(String(type))}`);
     if (fromTime !== undefined && fromTime !== null) {
-      queryParameters.set('fromTime', <any>fromTime);
+        uri.addQuery('fromTime', <any>fromTime);
     }
     if (toTime !== undefined && toTime !== null) {
-      queryParameters.set('toTime', <any>toTime);
+        uri.addQuery('toTime', <any>toTime);
     }
-    url.search = queryParameters.toString();
     const options = {
       method: "get",
       headers: {
@@ -34,8 +34,8 @@ export class ReportsService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
-      return response.blob();
+    return fetch(uri.toString(), options).then((response) => {
+      return Api.handleResponse(response);
     });
   }
 

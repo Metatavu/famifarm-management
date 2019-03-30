@@ -1,6 +1,6 @@
 import { Pest } from "famifarm-typescript-models";
+import * as URI from "urijs";
 import { Api } from ".";
-
 export class PestsService {
 
   private token: string;
@@ -18,7 +18,7 @@ export class PestsService {
    * @param body Pest to be added
   */
   public createPest(body: Pest, ):Promise<Pest> {
-    const url = new URL(`${this.basePath}/v1/pests`);
+    const uri = new URI(`${this.basePath}/v1/pests`);
     const options = {
       method: "post",
       headers: {
@@ -28,7 +28,7 @@ export class PestsService {
       body: JSON.stringify(body)
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -40,7 +40,7 @@ export class PestsService {
    * @param pestId Pest id
   */
   public deletePest(pestId: string, ):Promise<any> {
-    const url = new URL(`${this.basePath}/v1/pests/${encodeURIComponent(String(pestId))}`);
+    const uri = new URI(`${this.basePath}/v1/pests/${encodeURIComponent(String(pestId))}`);
     const options = {
       method: "delete",
       headers: {
@@ -49,7 +49,7 @@ export class PestsService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -61,7 +61,7 @@ export class PestsService {
    * @param pestId Pest id
   */
   public findPest(pestId: string, ):Promise<Pest> {
-    const url = new URL(`${this.basePath}/v1/pests/${encodeURIComponent(String(pestId))}`);
+    const uri = new URI(`${this.basePath}/v1/pests/${encodeURIComponent(String(pestId))}`);
     const options = {
       method: "get",
       headers: {
@@ -70,7 +70,7 @@ export class PestsService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -83,15 +83,13 @@ export class PestsService {
    * @param maxResults How many items to return at one time
   */
   public listPests(firstResult?: number, maxResults?: number, ):Promise<Array<Pest>> {
-    const url = new URL(`${this.basePath}/v1/pests`);
-    let queryParameters = new URLSearchParams();
+    const uri = new URI(`${this.basePath}/v1/pests`);
     if (firstResult !== undefined && firstResult !== null) {
-      queryParameters.set('firstResult', <any>firstResult);
+        uri.addQuery('firstResult', <any>firstResult);
     }
     if (maxResults !== undefined && maxResults !== null) {
-      queryParameters.set('maxResults', <any>maxResults);
+        uri.addQuery('maxResults', <any>maxResults);
     }
-    url.search = queryParameters.toString();
     const options = {
       method: "get",
       headers: {
@@ -100,7 +98,7 @@ export class PestsService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -113,7 +111,7 @@ export class PestsService {
    * @param pestId Pest id
   */
   public updatePest(body: Pest, pestId: string, ):Promise<Pest> {
-    const url = new URL(`${this.basePath}/v1/pests/${encodeURIComponent(String(pestId))}`);
+    const uri = new URI(`${this.basePath}/v1/pests/${encodeURIComponent(String(pestId))}`);
     const options = {
       method: "put",
       headers: {
@@ -123,7 +121,7 @@ export class PestsService {
       body: JSON.stringify(body)
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }

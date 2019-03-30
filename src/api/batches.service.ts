@@ -1,6 +1,6 @@
 import { Batch } from "famifarm-typescript-models";
+import * as URI from "urijs";
 import { Api } from ".";
-
 export class BatchesService {
 
   private token: string;
@@ -18,7 +18,7 @@ export class BatchesService {
    * @param body Batch to be added
   */
   public createBatch(body: Batch, ):Promise<Batch> {
-    const url = new URL(`${this.basePath}/v1/batches`);
+    const uri = new URI(`${this.basePath}/v1/batches`);
     const options = {
       method: "post",
       headers: {
@@ -28,7 +28,7 @@ export class BatchesService {
       body: JSON.stringify(body)
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -40,7 +40,7 @@ export class BatchesService {
    * @param batchId BatchId
   */
   public deleteBatch(batchId: string, ):Promise<any> {
-    const url = new URL(`${this.basePath}/v1/batches/${encodeURIComponent(String(batchId))}`);
+    const uri = new URI(`${this.basePath}/v1/batches/${encodeURIComponent(String(batchId))}`);
     const options = {
       method: "delete",
       headers: {
@@ -49,7 +49,7 @@ export class BatchesService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -61,7 +61,7 @@ export class BatchesService {
    * @param batchId Batch id
   */
   public findBatch(batchId: string, ):Promise<Batch> {
-    const url = new URL(`${this.basePath}/v1/batches/${encodeURIComponent(String(batchId))}`);
+    const uri = new URI(`${this.basePath}/v1/batches/${encodeURIComponent(String(batchId))}`);
     const options = {
       method: "get",
       headers: {
@@ -70,7 +70,7 @@ export class BatchesService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -80,30 +80,32 @@ export class BatchesService {
    * 
    * @summary List all batches
    * @param status Filters list by derived batch status.
+   * @param productId Filters list by product id
    * @param firstResult Where to start listing
    * @param maxResult How many items to return at one time
    * @param createdBefore Created before time
    * @param createdAfter Created after time
   */
-  public listBatches(status?: string, firstResult?: number, maxResult?: number, createdBefore?: string, createdAfter?: string, ):Promise<Array<Batch>> {
-    const url = new URL(`${this.basePath}/v1/batches`);
-    let queryParameters = new URLSearchParams();
+  public listBatches(status?: string, productId?: string, firstResult?: number, maxResult?: number, createdBefore?: string, createdAfter?: string, ):Promise<Array<Batch>> {
+    const uri = new URI(`${this.basePath}/v1/batches`);
     if (status !== undefined && status !== null) {
-      queryParameters.set('status', <any>status);
+        uri.addQuery('status', <any>status);
+    }
+    if (productId !== undefined && productId !== null) {
+        uri.addQuery('productId', <any>productId);
     }
     if (firstResult !== undefined && firstResult !== null) {
-      queryParameters.set('firstResult', <any>firstResult);
+        uri.addQuery('firstResult', <any>firstResult);
     }
     if (maxResult !== undefined && maxResult !== null) {
-      queryParameters.set('maxResult', <any>maxResult);
+        uri.addQuery('maxResult', <any>maxResult);
     }
     if (createdBefore !== undefined && createdBefore !== null) {
-      queryParameters.set('createdBefore', <any>createdBefore);
+        uri.addQuery('createdBefore', <any>createdBefore);
     }
     if (createdAfter !== undefined && createdAfter !== null) {
-      queryParameters.set('createdAfter', <any>createdAfter);
+        uri.addQuery('createdAfter', <any>createdAfter);
     }
-    url.search = queryParameters.toString();
     const options = {
       method: "get",
       headers: {
@@ -112,7 +114,7 @@ export class BatchesService {
       }
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }
@@ -125,7 +127,7 @@ export class BatchesService {
    * @param batchId Batch id
   */
   public updateBatch(body: Batch, batchId: string, ):Promise<Batch> {
-    const url = new URL(`${this.basePath}/v1/batches/${encodeURIComponent(String(batchId))}`);
+    const uri = new URI(`${this.basePath}/v1/batches/${encodeURIComponent(String(batchId))}`);
     const options = {
       method: "put",
       headers: {
@@ -135,7 +137,7 @@ export class BatchesService {
       body: JSON.stringify(body)
     };
 
-    return fetch(url.toString(), options).then((response) => {
+    return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
   }

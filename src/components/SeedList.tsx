@@ -47,6 +47,13 @@ class SeedsList extends React.Component<Props, State> {
 
       const seedsService = await Api.getSeedsService(this.props.keycloak);
       const seeds = await seedsService.listSeeds();
+      seeds.sort((a, b) => {
+        let nameA = LocalizedUtils.getLocalizedValue(a.name)
+        let nameB = LocalizedUtils.getLocalizedValue(b.name)
+        if(nameA < nameB) { return -1; }
+        if(nameA > nameB) { return 1; }
+        return 0;
+      });
       this.props.onSeedsFound && this.props.onSeedsFound(seeds);
     } catch (e) {
       this.props.onError({

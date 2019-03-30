@@ -46,6 +46,7 @@ import ProductList from "./ProductList";
 import CreateProduct from "./CreateProduct";
 import PackageSizeList from "./PackageSizeList";
 import CreatePackageSize from "./CreatePackageSize";
+import CreateEvent from "./CreateEvent";
 
 export interface Props {
   authenticated: boolean,
@@ -231,6 +232,16 @@ class WelcomePage extends React.Component<Props, any> {
                     <EditEvent
                       keycloak={this.state.keycloak}
                       eventId={props.match.params.eventId as string}
+                    />
+                )}
+              />
+              <Route
+                path="/createEvent/:batchId"
+                exact={true}
+                render={props => (
+                    <CreateEvent
+                      keycloak={this.state.keycloak}
+                      batchId={props.match.params.batchId as string}
                     />
                 )}
               />
