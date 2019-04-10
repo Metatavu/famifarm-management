@@ -152,6 +152,11 @@ export interface IStrings extends LocalizedStringsMethods {
   reportTypeItemGROWTH_TIME: string
   reportTypeItemYIELD: string
   reportTypeItemPLANTING_YIELD: string
+  reportTypeItemSOWED: string
+  reportTypeItemPLANTED: string
+  reportTypeItemSPREAD: string
+  reportTypeItemHARVESTED: string
+  reportTypeItemPACKED: string
   userManagementLink: string
   accountUrl: string
   logoutUrl: string
