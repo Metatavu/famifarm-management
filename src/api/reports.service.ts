@@ -1,5 +1,4 @@
 import * as URI from "urijs";
-import { Api } from ".";
 export class ReportsService {
 
   private token: string;
@@ -18,7 +17,7 @@ export class ReportsService {
    * @param fromTime From time of the report
    * @param toTime To time of the report
   */
-  public getReport(type: string, fromTime?: string, toTime?: string, ):Promise<string> {
+  public getReport(type: string, fromTime?: string, toTime?: string, ):Promise<Blob> {
     const uri = new URI(`${this.basePath}/v1/reports/${encodeURIComponent(String(type))}`);
     if (fromTime !== undefined && fromTime !== null) {
         uri.addQuery('fromTime', <any>fromTime);
@@ -35,7 +34,7 @@ export class ReportsService {
     };
 
     return fetch(uri.toString(), options).then((response) => {
-      return Api.handleResponse(response);
+      return response.blob();
     });
   }
 
