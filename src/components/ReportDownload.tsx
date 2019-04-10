@@ -51,13 +51,19 @@ class ReportDownload extends React.Component<Props, State> {
       "WASTAGE",
       "GROWTH_TIME",
       "YIELD",
-      "PLANTING_YIELD"].map((reportType) => {
-        return {
-          key: reportType,
-          value: reportType,
-          text: strings.getString(`reportTypeItem${reportType}`, strings.getLanguage())
-        };
-      });
+      "PLANTING_YIELD",
+      "SOWED",
+      "PLANTED",
+      "SPREAD",
+      "HARVESTED",
+      "PACKED"
+    ].map((reportType) => {
+      return {
+        key: reportType,
+        value: reportType,
+        text: strings.getString(`reportTypeItem${reportType}`, strings.getLanguage())
+      };
+    });
     
     return (
       <Grid>
