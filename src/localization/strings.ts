@@ -11,7 +11,8 @@ export interface IStrings extends LocalizedStringsMethods {
   defaultErrorMessage: string,
   defaultApiErrorTitle: string,
   defaultApiErrorMessage: string,
-
+  connectionErrorText: string,
+  connectionSuccessText: string
 
   managementHeaderText: string;
   save: string;

@@ -6,6 +6,8 @@
     "defaultErrorMessage": "Odottamaton virhe tapahtui",
     "defaultApiErrorTitle": "Yhteysvirhe",
     "defaultApiErrorMessage": "Palvelinyhteydessä tapahtui odottamaton virhe",
+    "connectionErrorText": "Virhe verkkoyhteydessä, tarkista internet yhteys ja yritä uudelleen.",
+    "connectionSuccessText": "Yhteys palautui.",
 
     "managementHeaderText": "Famifarm hallinta",
     "save": "Tallenna",

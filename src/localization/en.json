@@ -6,6 +6,8 @@
   "defaultErrorMessage": "Unexpected error occurred",
   "defaultApiErrorTitle": "Connection error",
   "defaultApiErrorMessage": "An unexpected error occurred in the server connection",
+  "connectionErrorText": "Error with network connections, check internet connection and try again.",
+  "connectionSuccessText": "Connection restored.",
 
   "managementHeaderText": "Famifarm management",
   "save": "Save",
