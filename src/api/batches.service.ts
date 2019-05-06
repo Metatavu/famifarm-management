@@ -1,4 +1,4 @@
-import { Batch } from "famifarm-typescript-models";
+import { Batch, BatchPhase } from "famifarm-typescript-models";
 import * as URI from "urijs";
 import { Api } from ".";
 export class BatchesService {
@@ -74,50 +74,53 @@ export class BatchesService {
       return Api.handleResponse(response);
     });
   }
+  
+ /**
+  * 
+  * @summary List all batches
+  * @param status Filters list by derived batch status.
+  * @param phase Filters list by phase
+  * @param productId Filters list by product id
+  * @param firstResult Where to start listing
+  * @param maxResult How many items to return at one time
+  * @param createdBefore Created before time
+  * @param createdAfter Created after time
+ */
+ public listBatches(status?: string, phase?: BatchPhase, productId?: string, firstResult?: number, maxResult?: number, createdBefore?: string, createdAfter?: string, ):Promise<Array<Batch>> {
+   const uri = new URI(`${this.basePath}/v1/batches`);
+   if (status !== undefined && status !== null) {
+       uri.addQuery('status', <any>status);
+   }
+   if (phase !== undefined && phase !== null) {
+       uri.addQuery('phase', <any>phase);
+   }
+   if (productId !== undefined && productId !== null) {
+       uri.addQuery('productId', <any>productId);
+   }
+   if (firstResult !== undefined && firstResult !== null) {
+       uri.addQuery('firstResult', <any>firstResult);
+   }
+   if (maxResult !== undefined && maxResult !== null) {
+       uri.addQuery('maxResult', <any>maxResult);
+   }
+   if (createdBefore !== undefined && createdBefore !== null) {
+       uri.addQuery('createdBefore', <any>createdBefore);
+   }
+   if (createdAfter !== undefined && createdAfter !== null) {
+       uri.addQuery('createdAfter', <any>createdAfter);
+   }
+   const options = {
+     method: "get",
+     headers: {
+       "Content-Type": "application/json",
+       "Authorization": `Bearer ${this.token}`
+     }
+   };
 
-
-  /**
-   * 
-   * @summary List all batches
-   * @param status Filters list by derived batch status.
-   * @param productId Filters list by product id
-   * @param firstResult Where to start listing
-   * @param maxResult How many items to return at one time
-   * @param createdBefore Created before time
-   * @param createdAfter Created after time
-  */
-  public listBatches(status?: string, productId?: string, firstResult?: number, maxResult?: number, createdBefore?: string, createdAfter?: string, ):Promise<Array<Batch>> {
-    const uri = new URI(`${this.basePath}/v1/batches`);
-    if (status !== undefined && status !== null) {
-        uri.addQuery('status', <any>status);
-    }
-    if (productId !== undefined && productId !== null) {
-        uri.addQuery('productId', <any>productId);
-    }
-    if (firstResult !== undefined && firstResult !== null) {
-        uri.addQuery('firstResult', <any>firstResult);
-    }
-    if (maxResult !== undefined && maxResult !== null) {
-        uri.addQuery('maxResult', <any>maxResult);
-    }
-    if (createdBefore !== undefined && createdBefore !== null) {
-        uri.addQuery('createdBefore', <any>createdBefore);
-    }
-    if (createdAfter !== undefined && createdAfter !== null) {
-        uri.addQuery('createdAfter', <any>createdAfter);
-    }
-    const options = {
-      method: "get",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${this.token}`
-      }
-    };
-
-    return fetch(uri.toString(), options).then((response) => {
-      return Api.handleResponse(response);
-    });
-  }
+   return fetch(uri.toString(), options).then((response) => {
+     return Api.handleResponse(response);
+   });
+ }
 
 
   /**

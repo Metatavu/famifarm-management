@@ -114,6 +114,9 @@ class BatchList extends React.Component<Props, State> {
       <Grid>
         <Grid.Row className="content-page-header-row" style={{flex: 1,justifyContent: "space-between", paddingLeft: 10, paddingRight: 10}}>
           <h2>{strings.batches}</h2>
+          <NavLink to="/createBatch">
+            <Button className="submit-button">{strings.newBatch}</Button>
+          </NavLink>
         </Grid.Row>
         <Grid.Row>
           {statusButtons}

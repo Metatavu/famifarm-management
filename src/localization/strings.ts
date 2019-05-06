@@ -62,7 +62,18 @@ export interface IStrings extends LocalizedStringsMethods {
   performedCultivationActionName: string;
   deletePerformedCultivationAction: string;
 
-  batches: string
+  batches: string,
+  newBatch: string,
+  editBatch: string,
+  batchPhase: string,
+  batchProduct: string,
+  batchNoEvents: string,
+  batchPhaseSOWING: string,
+  batchPhaseTABLE_SPREAD: string,
+  batchPhasePLANTING: string,
+  batchPhaseHARVEST: string,
+  batchPhasePACKING: string,
+  batchPhaseCOMPLETE: string,
 
   sowingEventHeader: string
   sowingEventText: string
