@@ -74,7 +74,9 @@ class BatchList extends React.Component<Props, State> {
     const batchProduct = products.find((product) => product.id === batch.productId);
     const productName = batchProduct ? LocalizedUtils.getLocalizedValue(batchProduct.name) : batch.id;
     const batchDate = moment(batch.createdAt).format("DD.MM.YYYY");
-    return `${productName} - ${batchDate}`;
+
+
+    return `${productName} - ${batchDate} ( ${strings[`batchPhase${batch.phase}`]})`;
   }
 
   /**

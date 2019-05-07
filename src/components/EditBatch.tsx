@@ -119,7 +119,7 @@ class EditBatch extends React.Component<Props, State> {
       <Grid>
         <Grid.Row className="content-page-header-row">
           <Grid.Column width={8}>
-            <h2>{strings.newBatch}</h2>
+            <h2>{strings.editBatch}</h2>
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
