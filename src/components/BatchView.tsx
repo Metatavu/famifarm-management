@@ -213,7 +213,7 @@ class BatchView extends React.Component<Props, State> {
             <h3 className="vertical-timeline-element-title">{strings.unknownEventHeader}</h3>
           </div> 
         );
-    }
+     }
   }
 
   /**
@@ -226,6 +226,33 @@ class BatchView extends React.Component<Props, State> {
           <Loader inline active size="medium" />
         </Grid>
       );
+    }
+
+    return (
+      <Grid>
+        <Grid.Row className="content-page-header-row" style={{flex: 1, paddingLeft: 10, paddingRight: 10}}>
+          <Grid.Column width={12}>
+          <h2>{ this.state.batchTitle || "" }</h2>
+          </Grid.Column>
+          <Grid.Column width={4} style={{ textAlign: "right" }}>
+            <NavLink to={`/editBatch/${this.props.batchId}`}>
+              <Button className="submit-button">{strings.editBatch}</Button>
+            </NavLink>
+            <NavLink to={`/createEvent/${this.props.batchId}`}>
+              <Button className="submit-button">{strings.newEvent}</Button>
+            </NavLink>
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row>
+          { this.renderEvents() } 
+        </Grid.Row>
+      </Grid>
+    );
+  }
+
+  private renderEvents() {
+    if (!this.state.batchEvents.length) {
+      return <div> { strings.batchNoEvents } </div>
     }
 
     const timelineElements = this.state.batchEvents.map((event) => {
@@ -244,21 +271,7 @@ class BatchView extends React.Component<Props, State> {
       );
     });
 
-    return (
-      <Grid>
-        <Grid.Row className="content-page-header-row" style={{flex: 1,justifyContent: "space-between", paddingLeft: 10, paddingRight: 10}}>
-          <h2>{ this.state.batchTitle || "" }</h2>
-          <NavLink to={`/createEvent/${this.props.batchId}`}>
-            <Button className="submit-button">{strings.newEvent}</Button>
-          </NavLink>
-        </Grid.Row>
-        <Grid.Row>
-          <VerticalTimeline>
-            {timelineElements}
-          </VerticalTimeline>
-        </Grid.Row>
-      </Grid>
-    );
+    return <VerticalTimeline> { timelineElements } </VerticalTimeline>
   }
 
   /**
