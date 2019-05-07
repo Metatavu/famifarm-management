@@ -74,7 +74,9 @@ class BatchList extends React.Component<Props, State> {
     const batchProduct = products.find((product) => product.id === batch.productId);
     const productName = batchProduct ? LocalizedUtils.getLocalizedValue(batchProduct.name) : batch.id;
     const batchDate = moment(batch.createdAt).format("DD.MM.YYYY");
-    return `${productName} - ${batchDate}`;
+
+
+    return `${productName} - ${batchDate} ( ${strings[`batchPhase${batch.phase}`]})`;
   }
 
   /**
@@ -114,6 +116,9 @@ class BatchList extends React.Component<Props, State> {
       <Grid>
         <Grid.Row className="content-page-header-row" style={{flex: 1,justifyContent: "space-between", paddingLeft: 10, paddingRight: 10}}>
           <h2>{strings.batches}</h2>
+          <NavLink to="/createBatch">
+            <Button className="submit-button">{strings.newBatch}</Button>
+          </NavLink>
         </Grid.Row>
         <Grid.Row>
           {statusButtons}

@@ -47,6 +47,8 @@ import CreateProduct from "./CreateProduct";
 import PackageSizeList from "./PackageSizeList";
 import CreatePackageSize from "./CreatePackageSize";
 import CreateEvent from "./CreateEvent";
+import CreateBatch from "./CreateBatch";
+import EditBatch from "./EditBatch";
 
 export interface Props {
   authenticated: boolean,
@@ -202,6 +204,25 @@ class WelcomePage extends React.Component<Props, any> {
                 exact={true}
                 render={props => (
                   <CreateTeam
+                    keycloak={this.state.keycloak}
+                  />
+                )}
+              />
+              <Route
+                path="/createBatch"
+                exact={true}
+                render={props => (
+                  <CreateBatch
+                    keycloak={this.state.keycloak}
+                  />
+                )}
+              />
+              <Route
+                path="/editBatch/:batchId"
+                exact={true}
+                render={props => (
+                  <EditBatch
+                    batchId={props.match.params.batchId as string}
                     keycloak={this.state.keycloak}
                   />
                 )}
