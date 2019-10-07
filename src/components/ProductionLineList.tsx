@@ -70,7 +70,7 @@ class ProductionLineList extends React.Component<Props, State> {
 
     const { productionLines } = this.props;
 
-    if (!this.props.productionLines) {
+    if (!productionLines) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
           <Loader inline active size="medium" />
