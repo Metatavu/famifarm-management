@@ -67,7 +67,10 @@ class ProductionLineList extends React.Component<Props, State> {
    * Render production line list view
    */
   public render() {
-    if (!this.props.productionLines) {
+
+    const { productionLines } = this.props;
+
+    if (!productionLines) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
           <Loader inline active size="medium" />
@@ -75,7 +78,7 @@ class ProductionLineList extends React.Component<Props, State> {
       );
     }
 
-    const productionLines = this.props.productionLines.map((productionLine) => {
+    const productionLineElements = productionLines.sort(this.compareProductionLines).map((productionLine) => {
       const productionLinePath = `/productionLines/${productionLine.id}`;
       return (
         <List.Item key={productionLine.id}>
@@ -100,12 +103,27 @@ class ProductionLineList extends React.Component<Props, State> {
         <Grid.Row>
           <Grid.Column>
             <List>
-              {productionLines}
+              {productionLineElements}
             </List>
           </Grid.Column>
         </Grid.Row>
       </Grid>
     );
+  }
+
+  /**
+   * Compares production lines by line number ignoring letters 
+   * 
+   * @param productionLine1 Production line to compare
+   * @param productionLine2 Production line  to compare
+   */
+  private compareProductionLines(productionLine1: ProductionLine, productionLine2: ProductionLine) {
+    const lineNumber1 = productionLine1.lineNumber;
+    const lineNumber2 = productionLine2.lineNumber;
+
+    const lineValue1 = lineNumber1 ? Number(lineNumber1.replace(/\D/g, "")) : Number.MAX_SAFE_INTEGER;
+    const lineValue2 = lineNumber2 ? Number(lineNumber2.replace(/\D/g, "")) : Number.MAX_SAFE_INTEGER;
+    return lineValue1 - lineValue2;
   }
 }
 
