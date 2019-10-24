@@ -17,6 +17,7 @@ import {
   Confirm
 } from "semantic-ui-react";
 import LocalizedValueInput from "./LocalizedValueInput";
+import { FormContainer } from "./FormContainer";
 
 /**
  * Interface representing component properties
@@ -172,7 +173,7 @@ class EditSeed extends React.Component<Props, State> {
       <Grid>
         <Grid.Row className="content-page-header-row">
           <Grid.Column width={6}>
-            <h2>{this.props.seed!.name![0].value}</h2>
+            <h2>{this.props.seed.name && this.props.seed.name[0] ? this.props.seed!.name![0].value : ""}</h2>
           </Grid.Column>
           <Grid.Column width={3} floated="right">
             <Button className="danger-button" onClick={()=>this.setState({open:true})}>{strings.delete}</Button>
@@ -180,7 +181,7 @@ class EditSeed extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={8}>
-          <Form>
+          <FormContainer>
             <Form.Field required>
               <label>{strings.seedName}</label>
               <LocalizedValueInput 
@@ -201,10 +202,10 @@ class EditSeed extends React.Component<Props, State> {
               loading={this.state.saving} >
                 {strings.save}
             </Button>
-          </Form>
+          </FormContainer>
           </Grid.Column>
         </Grid.Row>
-        <Confirm open={this.state.open} size={"mini"} content={strings.deleteConfirmationText+this.props.seed!.name![0].value} onCancel={()=>this.setState({open:false})} onConfirm={this.handleDelete} />
+        <Confirm open={this.state.open} size={"mini"} content={strings.deleteConfirmationText+(this.props.seed ? this.props.seed.name && this.props.seed.name[0] : "")} onCancel={()=>this.setState({open:false})} onConfirm={this.handleDelete} />
       </Grid>
     );
   }

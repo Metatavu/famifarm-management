@@ -15,6 +15,7 @@ import {
   Form,
   Input
 } from "semantic-ui-react";
+import { FormContainer } from "./FormContainer";
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
@@ -83,7 +84,7 @@ class CreateTeam extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={8}>
-            <Form>
+            <FormContainer>
               <Form.Field required>
                 <label>{strings.teamName}</label>
                 <Input 
@@ -93,7 +94,7 @@ class CreateTeam extends React.Component<Props, State> {
                 />
               </Form.Field>
               <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
-            </Form>
+            </FormContainer>
           </Grid.Column>
         </Grid.Row>
       </Grid>

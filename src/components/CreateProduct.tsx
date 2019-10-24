@@ -17,6 +17,7 @@ import {
 } from "semantic-ui-react";
 import LocalizedUtils from "src/localization/localizedutils";
 import LocalizedValueInput from "./LocalizedValueInput";
+import { FormContainer } from "./FormContainer";
 
 /**
  * Component props
@@ -144,7 +145,7 @@ class CreateProduct extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={8}>
-            <Form>
+            <FormContainer>
               <Form.Field required>
                 <label>{strings.productName}</label>
                 <LocalizedValueInput 
@@ -154,14 +155,15 @@ class CreateProduct extends React.Component<Props, State> {
                 />
               </Form.Field>
               <Form.Select 
-                fluid 
+                fluid
+                required 
                 label={strings.packageSize} 
                 options={packageSizeOptions} 
                 placeholder={strings.packageSize} 
                 onChange={this.onUpdateDefaultPackageSize}
               />
               <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save} </Button>
-            </Form>
+            </FormContainer>
           </Grid.Column>
         </Grid.Row>
       </Grid>

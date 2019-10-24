@@ -17,6 +17,7 @@ import {
   Message,
   Confirm
 } from "semantic-ui-react";
+import { FormContainer } from "./FormContainer";
 
 /**
  * Interface representing component properties
@@ -173,15 +174,15 @@ class EditTeam extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={8}>
-          <Form>
-          <Form.Field required>
-            <label>{strings.teamName}</label>
-            <Input 
-              value={this.state.team && this.state.team!.name![0].value} 
-              placeholder={strings.teamName}
-              onChange={this.handeNameChange}
-            />
-          </Form.Field>
+          <FormContainer>
+            <Form.Field required>
+              <label>{strings.teamName}</label>
+              <Input 
+                value={this.state.team && this.state.team!.name![0].value} 
+                placeholder={strings.teamName}
+                onChange={this.handeNameChange}
+              />
+            </Form.Field>
             <Message
               success
               visible={this.state.messageVisible}
@@ -193,9 +194,9 @@ class EditTeam extends React.Component<Props, State> {
               type='submit'
               loading={this.state.saving}
             >
-                {strings.save}
+              {strings.save}
             </Button>
-          </Form>
+          </FormContainer>
           </Grid.Column>
         </Grid.Row>
         <Confirm open={this.state.open} size={"mini"} content={strings.deleteConfirmationText + this.props.team!.name![0].value} onCancel={()=>this.setState({open:false})} onConfirm={this.handleDelete} />

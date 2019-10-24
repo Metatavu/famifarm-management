@@ -10,6 +10,7 @@ import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 import { Grid, Button, Form, Select, DropdownItemProps, DropdownProps, Loader } from "semantic-ui-react";
 import LocalizedUtils from "src/localization/localizedutils";
+import { FormContainer } from "./FormContainer";
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
@@ -124,7 +125,7 @@ class EditBatch extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={8}>
-            <Form>
+            <FormContainer>
               <Form.Field required>
                 <label>{strings.batchPhase}</label>
                 <Select options={ batchPhaseOptions } value={ this.state.phase } onChange={ this.onBatchPhaseChange }/>
@@ -134,7 +135,10 @@ class EditBatch extends React.Component<Props, State> {
                 <Select options={ productOptions } value={ this.state.productId || "" } onChange={ this.onBatchProductChange }/>
               </Form.Field>
               <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
-            </Form>
+              <Button onClick={() => this.setState({redirect: true})}>
+                {strings.goBack}
+              </Button>
+            </FormContainer>
           </Grid.Column>
         </Grid.Row>
       </Grid>

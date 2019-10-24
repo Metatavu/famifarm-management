@@ -23,7 +23,7 @@ export interface StoreState {
   wastageReason: WastageReason
   wastageReasons: WastageReason[]
   pests: Pest[],
-  error: ErrorMessage
+  error?: ErrorMessage
 }
 
 /**

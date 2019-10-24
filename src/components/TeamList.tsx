@@ -76,16 +76,18 @@ class TeamList extends React.Component<Props, State> {
       );
     }
 
-    const teams = this.props.teams.map((team) => {
+    const teams = this.props.teams.map((team, i) => {
       const teamPath = `/teams/${team.id}`;
       return (
-        <List.Item key={team.id}>
+        <List.Item style={i % 2 == 0 ? {backgroundColor: "#ddd"} : {}} key={team.id}>
           <List.Content floated='right'>
             <NavLink to={teamPath}>
               <Button className="submit-button">{strings.open}</Button>
             </NavLink>
           </List.Content>
-          <List.Header>{LocalizedUtils.getLocalizedValue(team.name)}</List.Header>
+          <List.Content>
+            <List.Header style={{paddingTop: "10px"}}>{LocalizedUtils.getLocalizedValue(team.name)}</List.Header>
+          </List.Content>
         </List.Item>
       );
     });
@@ -100,7 +102,7 @@ class TeamList extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
-            <List>
+            <List divided animated verticalAlign='middle'>
               {teams}
             </List>
           </Grid.Column>

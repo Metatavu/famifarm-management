@@ -76,16 +76,18 @@ class SeedsList extends React.Component<Props, State> {
       );
     }
 
-    const seeds = this.props.seeds.map((seed) => {
+    const seeds = this.props.seeds.map((seed, i) => {
       const seedPath = `/seeds/${seed.id}`;
       return (
-        <List.Item key={seed.id}>
+        <List.Item style={i % 2 == 0 ? {backgroundColor: "#ddd"} : {}} key={seed.id}>
           <List.Content floated='right'>
             <NavLink to={seedPath}>
               <Button className="submit-button">{strings.open}</Button>
             </NavLink>
           </List.Content>
-          <List.Header>{LocalizedUtils.getLocalizedValue(seed.name)}</List.Header>
+          <List.Content>
+            <List.Header style={{paddingTop: "10px"}}>{LocalizedUtils.getLocalizedValue(seed.name)}</List.Header>
+          </List.Content>
         </List.Item>
       );
     });
@@ -100,7 +102,7 @@ class SeedsList extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
-            <List>
+            <List divided animated verticalAlign='middle'>
               {seeds}
             </List>
           </Grid.Column>

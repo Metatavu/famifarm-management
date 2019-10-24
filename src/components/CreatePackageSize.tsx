@@ -13,8 +13,10 @@ import {
   Grid,
   Button,
   Form,
+  Input,
 } from "semantic-ui-react";
 import LocalizedValueInput from "./LocalizedValueInput";
+import { FormContainer } from "./FormContainer";
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
@@ -72,6 +74,17 @@ class CreatePackageSize extends React.Component<Props, State> {
   }
 
   /**
+   * Updates the name of package size
+   * 
+   * @param event event
+   */
+  private updateSize = (event: React.FormEvent<HTMLInputElement>) => {
+    this.setState({
+      packageSizeData: {...this.state.packageSizeData, size: parseInt(event.currentTarget.value) || 0 }
+    });
+  }
+
+  /**
    * Render edit view for package size
    */
   public render() {
@@ -87,7 +100,7 @@ class CreatePackageSize extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={8}>
-            <Form>
+            <FormContainer>
               <Form.Field required>
                 <label>{strings.packageSizeName}</label>
                 <LocalizedValueInput 
@@ -96,8 +109,16 @@ class CreatePackageSize extends React.Component<Props, State> {
                   languages={["fi", "en"]}
                 />
               </Form.Field>
+              <Form.Field required>
+                <label>{strings.packageSizeSize}</label>
+                <Input 
+                  value={this.state.packageSizeData && this.state.packageSizeData.size} 
+                  placeholder={strings.packageSizeSize}
+                  onChange={this.updateSize}
+                />
+              </Form.Field>
               <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
-            </Form>
+            </FormContainer>
           </Grid.Column>
         </Grid.Row>
       </Grid>

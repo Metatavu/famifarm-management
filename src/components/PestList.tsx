@@ -82,16 +82,18 @@ class PestList extends React.Component<Props, State> {
       );
     }
 
-    const pests = this.props.pests.map((pest) => {
+    const pests = this.props.pests.map((pest, i) => {
       const pestPath = `/pests/${pest.id}`;
       return (
-        <List.Item key={pest.id}>
+        <List.Item style={i % 2 == 0 ? {backgroundColor: "#ddd"} : {}} key={pest.id}>
           <List.Content floated='right'>
             <NavLink to={pestPath}>
               <Button className="submit-button">{strings.open}</Button>
             </NavLink>
           </List.Content>
-          <List.Header>{LocalizedUtils.getLocalizedValue(pest.name)}</List.Header>
+          <List.Content>
+            <List.Header style={{paddingTop: "10px"}}>{LocalizedUtils.getLocalizedValue(pest.name)}</List.Header>
+          </List.Content>
         </List.Item>
       );
     });
@@ -106,7 +108,7 @@ class PestList extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
-            <List>
+            <List divided animated verticalAlign='middle'>
               {pests}
             </List>
           </Grid.Column>

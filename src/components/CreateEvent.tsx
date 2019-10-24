@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PackingEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, ProductionLine, SeedBatch, WastageReason, Team } from "famifarm-typescript-models";
+import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PackingEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, ProductionLine, SeedBatch, WastageReason, Team, BatchPhase } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 import { DateTimeInput } from 'semantic-ui-calendar-react';
@@ -23,6 +23,9 @@ import {
 import LocalizedUtils from "src/localization/localizedutils";
 import * as moment from "moment";
 import { ErrorMessage } from "src/types";
+import { FormContainer } from "./FormContainer";
+
+const PHASES: BatchPhase[] = ["SOWING", "PLANTING", "TABLE_SPREAD", "HARVEST", "PACKING", "COMPLETE"];
 
 /**
  * Interface representing component properties
@@ -50,6 +53,7 @@ interface State {
   packageSizes?: PackageSize[]
   seedBatches?: SeedBatch[]
   wastageReasons?: WastageReason[]
+  batchEvents: Event[]
 }
 
 /**
@@ -69,23 +73,93 @@ class CreateEvent extends React.Component<Props, State> {
       redirect: false,
       saving: false,
       messageVisible: false,
-      open: false
+      open: false,
+      batchEvents: []
     };
   }
 
   /**
    * Component did mount life-sycle method
    */
-  public componentDidMount = () => {
+  public componentDidMount = async () => {
+    if (!this.props.keycloak) {
+      return;
+    }
+
+    this.setState({loading: true});
+
+    const eventsService = await Api.getEventsService(this.props.keycloak);
+    const events = await eventsService.listEvents(undefined, undefined, this.props.batchId);
+    let productionLineId = undefined;
+    const plantingEvent = events.find((event) => event.type == "PLANTING");
+    if (plantingEvent) {
+      let eventData = plantingEvent.data as PlantingEventData;
+      productionLineId = eventData.productionLineId;
+    } else {
+      const sowingEvent = events.find((event) => event.type == "SOWING");
+      if (sowingEvent) {
+        let eventData = sowingEvent.data as SowingEventData;
+        productionLineId = eventData.productionLineId;
+      }
+    }
+
+    const initialData: any = {
+      productionLineId: productionLineId
+    }
+
     this.setState({
+      batchEvents: events,
+      loading: false,
       event: {
         batchId: this.props.batchId,
         startTime: moment().toISOString(),
         endTime: moment().toISOString(),
-        data: {},
+        data: initialData,
         type: "SOWING"
       }
     });
+  }
+
+  public componentDidUpdate = (prevProps: Props, prevState: State) => {
+    const prevData = (prevState.event ? prevState.event.data : {}) as any;
+    const data = (this.state.event ? this.state.event.data : {}) as any;
+
+    if (data.productionLineId && data.productionLineId !== prevData.productionLineId) {
+      const selectedProductionLine = data.productionLineId ? (this.state.productionLines || []).find((p => p.id == data.productionLineId)) : undefined;
+      const defaultGutterHoleCount = selectedProductionLine ? selectedProductionLine.defaultGutterHoleCount : undefined;
+      if (defaultGutterHoleCount) {
+        data.gutterHoleCount = defaultGutterHoleCount;
+        const event = this.state.event;
+        if (!event) {
+          return;
+        }
+
+        event.data = data;
+        this.setState({
+          event: event
+        });
+      }
+    }
+
+
+  }
+
+  private updateDefaultHoleCount = () => {
+    const data = (this.state.event ? this.state.event.data : {}) as any;
+    const selectedProductionLine = data.productionLineId ? (this.state.productionLines || []).find((p => p.id == data.productionLineId)) : undefined;
+    const defaultGutterHoleCount = selectedProductionLine ? selectedProductionLine.defaultGutterHoleCount : undefined;
+    if (defaultGutterHoleCount) {
+      data.gutterHoleCount = defaultGutterHoleCount;
+      const event = this.state.event;
+      if (!event) {
+        return;
+      }
+
+      event.data = data;
+      this.setState({
+        event: event
+      });
+    }
   }
 
   /**
@@ -114,7 +188,8 @@ class CreateEvent extends React.Component<Props, State> {
       "PLANTING",
       "CULTIVATION_OBSERVATION",
       "HARVEST",
-      "PACKING"].map((eventType) => {
+      "PACKING",
+      "WASTAGE"].map((eventType) => {
       return {
         key: eventType,
         value: eventType,
@@ -131,8 +206,8 @@ class CreateEvent extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={8}>
-            <Form>
-              <Form.Field>
+            <FormContainer>
+              <Form.Field required>
                 <label>{strings.labelStartTime}</label>
                 <DateTimeInput dateTimeFormat="YYYY.MM.DD HH:mm" onChange={this.handleTimeChange} name="startTime" value={moment(event.startTime).format("YYYY.MM.DD HH:mm")} />
               </Form.Field>
@@ -140,10 +215,7 @@ class CreateEvent extends React.Component<Props, State> {
                 <label>{strings.labelEndTime}</label>
                 <DateTimeInput dateTimeFormat="YYYY.MM.DD HH:mm" onChange={this.handleTimeChange} name="endTime" value={moment(event.endTime).format("YYYY.MM.DD HH:mm")} />
               </Form.Field>
-              <Form.Field>
-                <label>{strings.labelEventType}</label>
-                <Form.Select name="type" options={eventTypeOptions} value={event.type} onChange={this.handleBaseChange} />
-              </Form.Field>
+              <Form.Select required label={strings.labelEventType} name="type" options={eventTypeOptions} value={event.type} onChange={this.handleBaseChange} />
               {this.renderEventDataForm(event)}
               <Form.TextArea label={strings.labelAdditionalInformation} onChange={this.handleBaseChange} name="additionalInformation" value={event.additionalInformation} />
               <Message
@@ -162,7 +234,7 @@ class CreateEvent extends React.Component<Props, State> {
               <Button onClick={() => this.setState({redirect: true})}>
                 {strings.goBack}
               </Button>
-            </Form>
+            </FormContainer>
           </Grid.Column>
         </Grid.Row>
         <Confirm open={this.state.open} size={"mini"} content={strings.deleteEventConfirmText} onCancel={()=>this.setState({open:false})} onConfirm={this.handleDelete} />
@@ -197,7 +269,7 @@ class CreateEvent extends React.Component<Props, State> {
     }
 
     eventData[name] = value;
-    this.setState({ event: eventData });
+    this.setState({ event: { ...eventData } });
   }
 
   /**
@@ -206,27 +278,141 @@ class CreateEvent extends React.Component<Props, State> {
    * @param event event
    */
   private handleDataChange = (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
-    const eventData = this.state.event;
+    const eventData = {...this.state.event} as any;
     if (!eventData) {
       return;
     }
 
+    eventData.data = {...this.state.event!.data};
     eventData.data[name] = value;
-    this.setState({ event: eventData });
+    this.setState({ event: { ...eventData } });
+  }
+
+  private sortProductionLines = (productionLines: ProductionLine[]) => {
+    return productionLines.sort((a, b) => {
+      let nameA = this.getStringsNumber(a.lineNumber)
+      let nameB = this.getStringsNumber(b.lineNumber)
+      if(nameA < nameB) { return -1; }
+      if(nameA > nameB) { return 1; }
+      return 0;
+    });
+  }
+
+  /**
+   * Get containing numbers in string
+   * 
+   * @param string string
+   * @returns Number
+   */
+  private getStringsNumber = (string ?: string) : Number => {
+    return string && string.match(/\d+/g) ? Number(string.match(/\d+/g)) : 0;
+  }
+
+
+  private getPhaseForEvent = (event: Event): BatchPhase | null => {
+    switch (event.type) {
+      case "SOWING":
+        return "TABLE_SPREAD";
+      case "TABLE_SPREAD":
+        return "PLANTING";
+      case "CULTIVATION_OBSERVATION":
+        return null;
+      case "PLANTING":
+        return "HARVEST";
+      case "HARVEST":
+        return "PACKING";
+      case "PACKING":
+        return "COMPLETE";
+      case "WASTAGE":
+        return null;
+      default:
+        return null;
+    }
   }
 
   /**
    * Handle form submit
    */
   private handleSubmit = async () => {
+    const { event } = this.state;
     try {
-      if (!this.props.keycloak || !this.state.event) {
+      if (!this.props.keycloak || !event) {
         return;
       }
-  
+
       this.setState({saving: true});
       const eventsService = await Api.getEventsService(this.props.keycloak);
-      await eventsService.createEvent(this.state.event);
+
+      const eventData = event.data as any;
+      let data = {};
+      switch (event.type) {
+        case "CULTIVATION_OBSERVATION":
+          data = {
+            luminance: eventData.luminance,
+            performedActionIds: eventData.performedActionIds,
+            pestIds: eventData.pestIds,
+            weight: eventData.weight
+          } as CultivationObservationEventData;
+        break;
+        case "HARVEST":
+          data = {
+            gutterCount: eventData.gutterCount,
+            productionLineId: eventData.productionLineId,
+            teamId: eventData.teamId,
+            type: eventData.type
+          } as HarvestEventData;
+        break;
+        case "PACKING":
+          data = {
+            packageSizeId: eventData.packageSizeId,
+            packedCount: eventData.packedCount
+          } as PackingEventData;
+        break;
+        case "PLANTING":
+          data = {
+            gutterCount: eventData.gutterCount,
+            gutterHoleCount: eventData.gutterHoleCount,
+            productionLineId: eventData.productionLineId, 
+            trayCount: eventData.trayCount,
+            workerCount: eventData.workerCount
+          } as PlantingEventData;
+        break;
+        case "SOWING":
+          data = {
+            amount: eventData.amount,
+            potType: eventData.potType,
+            productionLineId: eventData.productionLineId,
+            seedBatchId: eventData.seedBatchId
+          } as SowingEventData;
+        break;
+        case "TABLE_SPREAD":
+          data = {
+            location: "Taimialue",
+            trayCount: eventData.trayCount
+          } as TableSpreadEventData;
+        break;
+        case "WASTAGE":
+          data = {
+            amount: eventData.amount,
+            phase: eventData.phase,
+            productionLineId: eventData.productionLineId,
+            reasonId: eventData.reasonId
+          } as WastageEventData;
+        break;
+      }
+      event.data = data;
+      const createdEvent = await eventsService.createEvent(event);
+      const newEventPhase = this.getPhaseForEvent(createdEvent);
+      if (newEventPhase) {
+        const batchesService = await Api.getBatchesService(this.props.keycloak);
+        const currentBatch = await batchesService.findBatch(this.props.batchId);
+
+        if (PHASES.indexOf(newEventPhase) > PHASES.indexOf(currentBatch.phase || "SOWING")) {
+          currentBatch.phase = newEventPhase;
+          await batchesService.updateBatch(currentBatch, currentBatch.id!);
+        }
+      }
+
       this.setState({saving: false, messageVisible: true});
       setTimeout(() => {
         this.setState({messageVisible: false});
@@ -370,10 +556,10 @@ class CreateEvent extends React.Component<Props, State> {
 
     return (
       <React.Fragment>
-        <Form.Select label={strings.labelHarvestType} name="type" options={harvestTypeOptions} value={data.type} onChange={this.handleDataChange} />
-        <Form.Input label={strings.labelGutterCount} name="gutterCount" type="number" value={data.gutterCount} onChange={this.handleDataChange} />
-        <Form.Select label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
-        <Form.Select label={strings.labelTeam} name="teamId" options={teamOptions} value={data.teamId} onChange={this.handleDataChange} />
+        <Form.Select required label={strings.labelHarvestType} name="type" options={harvestTypeOptions} value={data.type} onChange={this.handleDataChange} />
+        <Form.Input  required label={strings.labelGutterCount} name="gutterCount" type="number" value={data.gutterCount} onChange={this.handleDataChange} />
+        <Form.Select required label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
+        <Form.Select required label={strings.labelTeam} name="teamId" options={teamOptions} value={data.teamId} onChange={this.handleDataChange} />
       </React.Fragment>
     )
   }
@@ -404,8 +590,8 @@ class CreateEvent extends React.Component<Props, State> {
 
     return (
       <React.Fragment>
-        <Form.Input label={strings.labelPackedCount} name="packedCount" type="number" value={data.packedCount} onChange={this.handleDataChange} />
-        <Form.Select label={strings.labelPackageSize} name="packageSizeId" options={packageSizeOptions} value={data.packageSizeId} onChange={this.handleDataChange} />
+        <Form.Input required label={strings.labelPackedCount} name="packedCount" type="number" value={data.packedCount} onChange={this.handleDataChange} />
+        <Form.Select required label={strings.labelPackageSize} name="packageSizeId" options={packageSizeOptions} value={data.packageSizeId} onChange={this.handleDataChange} />
       </React.Fragment>
     );
   }
@@ -436,11 +622,11 @@ class CreateEvent extends React.Component<Props, State> {
 
     return (
       <React.Fragment>
-        <Form.Select label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
-        <Form.Input label={strings.labelTrayCount} name="trayCount" type="number" value={data.trayCount} onChange={this.handleDataChange} />
-        <Form.Input label={strings.labelGutterCount} name="gutterCount" type="number" value={data.gutterCount} onChange={this.handleDataChange} />
-        <Form.Input label={strings.labelGutterHoleCount} name="gutterHoleCount" type="number" value={data.gutterHoleCount} onChange={this.handleDataChange} />
-        <Form.Input label={strings.labelWorkerCount} name="workerCount" type="number" value={data.workerCount} onChange={this.handleDataChange} />
+        <Form.Select required label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
+        <Form.Input required label={strings.labelTrayCount} name="trayCount" type="number" value={data.trayCount} onChange={this.handleDataChange} />
+        <Form.Input required label={strings.labelGutterCount} name="gutterCount" type="number" value={data.gutterCount} onChange={this.handleDataChange} />
+        <Form.Input required label={strings.labelGutterHoleCount} name="gutterHoleCount" type="number" value={data.gutterHoleCount} onChange={this.handleDataChange} />
+        <Form.Input required label={strings.labelWorkerCount} name="workerCount" type="number" value={data.workerCount} onChange={this.handleDataChange} />
       </React.Fragment>
     );
   }
@@ -487,10 +673,10 @@ class CreateEvent extends React.Component<Props, State> {
 
     return (
       <React.Fragment>
-        <Form.Input label={strings.labelAmount} name="amount" type="number" value={data.amount} onChange={this.handleDataChange} />
-        <Form.Select label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
-        <Form.Select label={strings.labelSeedBatch} name="seedBatchId" options={seedBatchOptions} value={data.seedBatchId} onChange={this.handleDataChange} />
-        <Form.Select label={strings.labelPotType} name="potType" options={potTypeOptions} value={data.potType} onChange={this.handleDataChange} />
+        <Form.Input required label={strings.labelAmount} name="amount" type="number" value={data.amount} onChange={this.handleDataChange} />
+        <Form.Select required label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
+        <Form.Select required label={strings.labelSeedBatch} name="seedBatchId" options={seedBatchOptions} value={data.seedBatchId} onChange={this.handleDataChange} />
+        <Form.Select required label={strings.labelPotType} name="potType" options={potTypeOptions} value={data.potType} onChange={this.handleDataChange} />
       </React.Fragment>
     );
   }
@@ -502,8 +688,7 @@ class CreateEvent extends React.Component<Props, State> {
   private renderTableSpreadDataForm = (data: TableSpreadEventData) => {
     return (
       <React.Fragment>
-        <Form.Input label={strings.labelTrayCount} name="trayCount" value={data.trayCount} onChange={this.handleDataChange} />
-        <Form.Input label={strings.labelLocation} name="location" value={data.location} onChange={this.handleDataChange} />
+        <Form.Input required label={strings.labelTrayCount} name="trayCount" value={data.trayCount} onChange={this.handleDataChange} />
       </React.Fragment>
     );
   }
@@ -551,10 +736,10 @@ class CreateEvent extends React.Component<Props, State> {
 
     return (
       <React.Fragment>
-        <Form.Select label={strings.labelWastageReason} name="reasonId" options={wastageReasonOptions} value={data.reasonId} onChange={this.handleDataChange} />
+        <Form.Select required label={strings.labelWastageReason} name="reasonId" options={wastageReasonOptions} value={data.reasonId} onChange={this.handleDataChange} />
         <Form.Select label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
         <Form.Select label={strings.labelPhase} name="phase" options={phaseOptions} value={data.phase} onChange={this.handleDataChange} />
-        <Form.Input label={strings.labelAmount} name="amount" type="number" value={data.amount} onChange={this.handleDataChange} />
+        <Form.Input required label={strings.labelAmount} name="amount" type="number" value={data.amount} onChange={this.handleDataChange} />
       </React.Fragment>
     );
   }
@@ -581,8 +766,10 @@ class CreateEvent extends React.Component<Props, State> {
     this.setState({
       teams: teams,
       loading: false,
-      productionLines: productionLines
+      productionLines: this.sortProductionLines(productionLines)
     });
+
+    this.updateDefaultHoleCount();
   }
 
   /**
@@ -643,8 +830,10 @@ class CreateEvent extends React.Component<Props, State> {
 
     this.setState({
       loading: false,
-      productionLines: productionLines
+      productionLines: this.sortProductionLines(productionLines)
     });
+
+    this.updateDefaultHoleCount();
   }
 
   /**
@@ -669,8 +858,10 @@ class CreateEvent extends React.Component<Props, State> {
     this.setState({
       loading: false,
       seedBatches: seedBatches,
-      productionLines: productionLines
+      productionLines: this.sortProductionLines(productionLines)
     });
+
+    this.updateDefaultHoleCount();
   }
 
   /**
@@ -695,8 +886,10 @@ class CreateEvent extends React.Component<Props, State> {
     this.setState({
       loading: false,
       wastageReasons: wastageReasons,
-      productionLines: productionLines
+      productionLines: this.sortProductionLines(productionLines)
     });
+
+    this.updateDefaultHoleCount();
   }
 }
 

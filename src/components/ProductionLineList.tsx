@@ -46,9 +46,10 @@ class ProductionLineList extends React.Component<Props, State> {
   
       const productionLinesService = await Api.getProductionLinesService(this.props.keycloak);
       const productionLines = await productionLinesService.listProductionLines();
+
       productionLines.sort((a, b) => {
-        let nameA = a.lineNumber || "";
-        let nameB = b.lineNumber || "";
+        let nameA = this.getStringsNumber(a.lineNumber)
+        let nameB = this.getStringsNumber(b.lineNumber)
         if(nameA < nameB) { return -1; }
         if(nameA > nameB) { return 1; }
         return 0;
@@ -61,6 +62,16 @@ class ProductionLineList extends React.Component<Props, State> {
         exception: e
       });
     }
+  }
+
+  /**
+   * Get containing numbers in string
+   * 
+   * @param string string
+   * @returns Number
+   */
+  private getStringsNumber = (string ?: string) : Number => {
+    return string && string.match(/\d+/g) ? Number(string.match(/\d+/g)) : 0;
   }
 
   /**
@@ -78,16 +89,18 @@ class ProductionLineList extends React.Component<Props, State> {
       );
     }
 
-    const productionLineElements = productionLines.sort(this.compareProductionLines).map((productionLine) => {
+    const productionLineElements = productionLines.sort(this.compareProductionLines).map((productionLine, i) => {
       const productionLinePath = `/productionLines/${productionLine.id}`;
       return (
-        <List.Item key={productionLine.id}>
+        <List.Item style={i % 2 == 0 ? {backgroundColor: "#ddd"} : {}} key={productionLine.id}>
           <List.Content floated='right'>
             <NavLink to={productionLinePath}>
               <Button className="submit-button">{strings.open}</Button>
             </NavLink>
           </List.Content>
-          <List.Header>{productionLine.lineNumber}</List.Header>
+          <List.Content>
+            <List.Header style={{paddingTop: "10px"}}>{productionLine.lineNumber}</List.Header>
+          </List.Content>
         </List.Item>
       );
     });
@@ -102,7 +115,7 @@ class ProductionLineList extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
-            <List>
+            <List divided animated verticalAlign='middle'>
               {productionLineElements}
             </List>
           </Grid.Column>

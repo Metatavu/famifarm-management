@@ -15,6 +15,7 @@ import {
   Input
 } from "semantic-ui-react";
 import strings from "src/localization/strings";
+import { FormContainer } from "./FormContainer";
 
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
@@ -24,8 +25,9 @@ interface Props {
 }
 
 interface State {
-  lineNumber: string;
-  redirect: boolean;
+  lineNumber: string
+  defaultGutterHoleCount?: number
+  redirect: boolean
 }
 
 class CreateProductionLine extends React.Component<Props, State> {
@@ -37,6 +39,15 @@ class CreateProductionLine extends React.Component<Props, State> {
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  /**
+   * Handle line number change
+   * 
+   * @param event event
+   */
+  private handeDefaultGutterHoleCountChange(event: React.FormEvent<HTMLInputElement>) {
+    this.setState({defaultGutterHoleCount: parseInt(event.currentTarget.value) || undefined });
   }
 
   /**
@@ -82,7 +93,7 @@ class CreateProductionLine extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={8}>
-            <Form>
+            <FormContainer>
               <Form.Field required>
                 <label>{strings.productionLineNumber}</label>
                 <Input 
@@ -91,8 +102,16 @@ class CreateProductionLine extends React.Component<Props, State> {
                   onChange={(e) => this.setState({lineNumber: e.currentTarget.value})}
                 />
               </Form.Field>
+              <Form.Field>
+                <label>{strings.productionLineDefaultGutterHoleCount}</label>
+                <Input 
+                  value={this.state.defaultGutterHoleCount} 
+                  placeholder={strings.productionLineDefaultGutterHoleCount}
+                  onChange={this.handeDefaultGutterHoleCountChange}
+                />
+              </Form.Field>
               <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
-            </Form>
+            </FormContainer>
           </Grid.Column>
         </Grid.Row>
       </Grid>

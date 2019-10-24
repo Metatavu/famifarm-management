@@ -127,6 +127,7 @@ class WelcomePage extends React.Component<Props, any> {
     const sideBarNavigation = navigationRoutes.map((navigationRoute, index) => {
       const itemParams = navigationRoute.external ? {
         href: navigationRoute.route,
+        target: "blank",
         as: "a"
       } : {
         to: navigationRoute.route,

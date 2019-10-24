@@ -4,8 +4,8 @@
   "errorSupportText": "If the problem persists, contact support@metatavu.fi",
   "defaultErrorTitle": "Error",
   "defaultErrorMessage": "Unexpected error occurred",
-  "defaultApiErrorTitle": "Connection error",
-  "defaultApiErrorMessage": "An unexpected error occurred in the server connection",
+  "defaultApiErrorTitle": "Unexpected error",
+  "defaultApiErrorMessage": "An unexpected error occurred. It is possible that required information was missing or there was a problem with internet connection.",
   "connectionErrorText": "Error with network connections, check internet connection and try again.",
   "connectionSuccessText": "Connection restored.",
 
@@ -57,7 +57,7 @@
   "batchProduct": "Product",
   "batchNoEvents": "Batch has no events.",
   "batchPhaseSOWING": "Sowing",
-  "batchPhaseTABLE_SPREAD": "Spreading to tables",
+  "batchPhaseTABLE_SPREAD": "Trays to nursery",
   "batchPhasePLANTING": "Planting",
   "batchPhaseHARVEST": "Harvest",
   "batchPhasePACKING": "Packing",
@@ -65,8 +65,8 @@
 
   "sowingEventHeader": "Sowing",
   "sowingEventText": "Sowed {0} units",
-  "tablespreadEventHeader": "Spreading to tables",
-  "tablespreadEventText": "Spread {0} trays to tables",
+  "tablespreadEventHeader": "Trays to nursery",
+  "tablespreadEventText": "Moved {0} trays to nursery",
   "plantingEventHeader": "Planting",
   "plantingEventText": "Planted {0} gutters using {1} workers",
   "observationsEventHeader": "Observation",
@@ -91,7 +91,8 @@
   "newPest": "New pest",
   "pestName": "Name",
 
-  "remainingUnitsText": "Remaining {0} units",
+  "remainingUnitsText": "Remaining {0} plants",
+  "processedUnitsText": "Processed {0} plants",
   "batchStatusButtonOPEN": "Open",
   "batchStatusButtonCLOSED": "Closed",
   "batchStatusButtonNEGATIVE": "Error",
@@ -128,9 +129,10 @@
   "phasePLANTING" : "Planting",
   "phaseSOWING" : "Sowing",
   "phasePACKING" : "Packing",
-  "phaseTABLE_SPREAD" : "Spreading",
+  "phaseTABLE_SPREAD" : "Trays to nursery",
   "phaseCULTIVATION_OBSERVATION" : "Observations",
   "phaseHARVEST" : "Harvesting",
+  "phaseWASTAGE": "Wastage",
   "editEventLink": "Edit",
   "labelAdditionalInformation": "Additional information",
   "goBack": "Back",
@@ -152,5 +154,8 @@
   "accountUrl": "Account",
   "logoutUrl": "Logout",
   "newEvent": "Add event",
-  "addEventHeader": "Add event"
+  "addEventHeader": "Add event",
+  "missingRequiredFieldError": "Fill all required fields and try again.",
+  "logPhaseWastage": "Log wastage",
+  "logPhaseWastageHeader": "Log phase wastage"
 }
