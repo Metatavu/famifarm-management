@@ -136,6 +136,9 @@ class BatchView extends React.Component<Props, State> {
     }
   }
 
+  /**
+   * Handles log wastage button click
+   */
   private handleLogWastageClick = (event: Event) => {
     let loss = 0;
     let phase: EventType = "SOWING";
@@ -189,6 +192,9 @@ class BatchView extends React.Component<Props, State> {
     }
   } 
 
+  /**
+   * Gets total number of processed units from batch during phase
+   */
   private getProcessedCount = (phase: BatchPhase) => {
     const { batchEvents } = this.state;
     switch (phase) {
@@ -207,17 +213,24 @@ class BatchView extends React.Component<Props, State> {
     return 0;
   }
 
+  /**
+   * Gets total number of sowed units from list of events
+   */
   private getSowedCount = (batchEvents: Event[]) => {
     let count = 0;
     const sowingEvents = batchEvents.filter((event) => event.type == "SOWING");
     for (let i = 0; i < sowingEvents.length; i++) {
+      let potTypeCount = (sowingEvents[i].data as SowingEventData).potType == "SMALL" ? 54 : 35;
       let eventData = sowingEvents[i].data as SowingEventData;
       eventData.productionLineId
-      count += eventData.amount || 0;
+      count += eventData.amount ? eventData.amount * potTypeCount : 0;
     }
     return count;
   }
 
+  /**
+   * Gets total number of unit spread to tables from list of events
+   */
   private getTableSpreadCount = (batchEvents: Event[]) => {
     const sowingEvent = batchEvents.find((event) => event.type == "SOWING");
     if (!sowingEvent) {
@@ -235,6 +248,9 @@ class BatchView extends React.Component<Props, State> {
     return Math.round(count);
   }
 
+  /**
+   * Gets total number of planted units from list of events
+   */
   private getPlantedCount = (batchEvents: Event[]) => {
     let count = 0;
     const plantingEvents = batchEvents.filter((event) => event.type == "PLANTING");
@@ -246,6 +262,9 @@ class BatchView extends React.Component<Props, State> {
     return Math.round(count);
   }
 
+  /**
+   * Gets total number of havested units from list of events
+   */
   private getHarvestedCount = (batchEvents: Event[]) => {
     let totalWeightedSize = 0;
     let totalGutterCount = 0;
@@ -266,6 +285,9 @@ class BatchView extends React.Component<Props, State> {
     return Math.round(gutterHoleCount * harvestedGutterCount);
   }
 
+  /**
+   * Gets total number of packed units from list of events
+   */
   private getPackedCount = (batchEvents: Event[]) => {
     let count = 0;
     const packingEvents = batchEvents.filter((event) => event.type == "PACKING");
@@ -280,10 +302,13 @@ class BatchView extends React.Component<Props, State> {
     return Math.round(count);
   }
 
+  /**
+   * Gets processed count from single event
+   */
   private getSingleProcessedCount = (event: Event) => {
     switch (event.type) {
       case "SOWING":
-        return (event.data as SowingEventData).amount;
+        return this.getSingleSowedCount(event);
       case "TABLE_SPREAD":
         return this.getSingleTableSpreadCount(event);
       case "CULTIVATION_OBSERVATION":
@@ -301,6 +326,21 @@ class BatchView extends React.Component<Props, State> {
     }
   }
 
+  /**
+   * Gets processed count from single sowing event
+   */
+  private getSingleSowedCount = (event: Event) => {
+    const eventData = event.data as SowingEventData;
+
+    const potTypeCount = eventData.potType == "SMALL" ? 54 : 35;
+    const count = (eventData.amount || 0)  * potTypeCount;
+
+    return Math.round(count);
+  }
+
+  /**
+   * Gets processed count from single table spread event
+   */
   private getSingleTableSpreadCount = (event: Event) => {
     const sowingEvent = this.state.batchEvents.find((e) => e.type == "SOWING");
     if (!sowingEvent) {
@@ -314,6 +354,9 @@ class BatchView extends React.Component<Props, State> {
     return Math.round(count);
   }
 
+  /**
+   * Gets processed count from single planting event
+   */
   private getSinglePlantedCount = (event: Event) => {
     const eventData = event.data as PlantingEventData;
     const count = (eventData.gutterCount || 0) * (eventData.gutterHoleCount || 0);
@@ -321,6 +364,9 @@ class BatchView extends React.Component<Props, State> {
     return Math.round(count);
   }
 
+  /**
+   * Gets processed count from single harvest event
+   */
   private getSingleHarvestedCount = (event: Event) => {
     let totalWeightedSize = 0;
     let totalGutterCount = 0;
@@ -338,6 +384,9 @@ class BatchView extends React.Component<Props, State> {
     return Math.round(gutterHoleCount * harvestedGutterCount);
   }
 
+  /**
+   * Gets processed count from single packing event
+   */
   private getSinglePackedCount = (event: Event) => {
     
     const eventData = event.data as PackingEventData;
