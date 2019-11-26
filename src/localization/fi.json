@@ -63,7 +63,7 @@
     "batchPhasePACKING": "Pakkaus",
     "batchPhaseCOMPLETE": "Valmis",
     "sowingEventHeader": "Kylvö",
-    "sowingEventText": "Kylvetty {0} yksikköä",
+    "sowingEventText": "Kylvetty {0} kennoa",
     "tablespreadEventHeader": "Levitys pöydille",
     "tablespreadEventText": "Levitetty {0} kennoa pöydille",
     "plantingEventHeader": "Istutus",

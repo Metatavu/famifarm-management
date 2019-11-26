@@ -673,7 +673,7 @@ class CreateEvent extends React.Component<Props, State> {
 
     return (
       <React.Fragment>
-        <Form.Input required label={strings.labelAmount} name="amount" type="number" value={data.amount} onChange={this.handleDataChange} />
+        <Form.Input required label={strings.labelTrayCount} name="amount" type="number" value={data.amount} onChange={this.handleDataChange} />
         <Form.Select required label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
         <Form.Select required label={strings.labelSeedBatch} name="seedBatchId" options={seedBatchOptions} value={data.seedBatchId} onChange={this.handleDataChange} />
         <Form.Select required label={strings.labelPotType} name="potType" options={potTypeOptions} value={data.potType} onChange={this.handleDataChange} />

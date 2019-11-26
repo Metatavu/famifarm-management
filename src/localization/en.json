@@ -64,7 +64,7 @@
   "batchPhaseCOMPLETE": "Complete",
 
   "sowingEventHeader": "Sowing",
-  "sowingEventText": "Sowed {0} units",
+  "sowingEventText": "Sowed {0} trays",
   "tablespreadEventHeader": "Trays to nursery",
   "tablespreadEventText": "Moved {0} trays to nursery",
   "plantingEventHeader": "Planting",
