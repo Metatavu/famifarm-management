@@ -29,8 +29,10 @@ export interface IStrings extends LocalizedStringsMethods {
 
   product: string;
   products: string;
+  allProducts: string;
   newProduct: string;
   productName: string;
+  selectProduct: string;
   
   productionLine: string;
   productionLines: string;
