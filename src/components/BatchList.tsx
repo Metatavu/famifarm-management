@@ -7,19 +7,20 @@ import strings from "src/localization/strings";
 import * as moment from "moment";
 import * as actions from "../actions";
 import { StoreState, ErrorMessage } from "../types/index";
-import DatePicker from "react-date-picker";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import Dropdown, { Option } from 'react-dropdown';
-import 'react-dropdown/style.css';
 
 import {
   List,
   Button,
   Grid,
   Loader,
-  Label
+  Label,
+  Form,
+  InputOnChangeData,
+  TextAreaProps
 } from "semantic-ui-react";
+import { DateInput } from 'semantic-ui-calendar-react';
 import LocalizedUtils from "src/localization/localizedutils";
 
 
@@ -41,7 +42,7 @@ interface Props {
  */
 interface State {
   batches: Batch[]
-  date?: Date
+  date?: string
   selectedProduct?: string
   selectedProductName?: string
   status: string
@@ -135,12 +136,18 @@ class BatchList extends React.Component<Props, State> {
           </NavLink>
         </Grid.Row>
         <Grid.Row>
-          <div style={{ paddingRight: "2rem", paddingTop: "2rem", paddingBottom: "2rem" }}>
-            <DatePicker format="dd.MM.y" onChange={this.onChangeDate} value={this.state.date} />
-          </div>
-          <div style={{ paddingTop: "2rem", paddingBottom: "2rem" }}>
-            <Dropdown options={this.renderOptions()} onChange={this.onChangeProduct} value={ this.state.selectedProductName ? this.state.selectedProductName : strings.selectProduct } />
-          </div>
+          <Form>
+            <Form.Field>
+              <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem", paddingRight: "2rem"}}>
+                <label>{strings.date}</label>
+                <DateInput dateFormat="DD.MM.YYYY" onChange={this.onChangeDate} name="date" value={this.state.date ? moment(this.state.date).format("DD.MM.YYYY") : ""} />
+              </div>
+              <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem"}}>
+                <label>{strings.productName}</label>
+                <Form.Select name="product" options={this.renderOptions()} text={this.state.selectedProductName ? this.state.selectedProductName : strings.selectProduct} onChange={this.onChangeProduct} />
+              </div>
+            </Form.Field>
+          </Form>
         </Grid.Row>
         <Grid.Row>
           {statusButtons}
@@ -176,8 +183,8 @@ class BatchList extends React.Component<Props, State> {
   /**
    * Handles changing date
    */
-  private onChangeDate = async (date: Date) => {
-    await this.setState({date: date});
+  private onChangeDate = async (e: any, { value }: InputOnChangeData) => {
+    await this.setState({date: moment(value, "DD.MM.YYYY").toISOString()});
 
     await this.updateBatches(this.state.status).catch((err) => {
       this.props.onError({
@@ -191,10 +198,17 @@ class BatchList extends React.Component<Props, State> {
   /**
    * Handles changing selected product
    */
-  private onChangeProduct = async (product: Option) => {
+  private onChangeProduct = async (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
+    let productName = "";
+    if (this.props.products) {
+      let object = this.props.products.find(product => product.id === value);
+      if (object) {
+        productName = LocalizedUtils.getLocalizedValue(object.name) || "";
+      }
+    }
     await this.setState({
-      selectedProduct: product.value !== "" ? product.value : undefined,
-      selectedProductName: String(product.label) || ""
+      selectedProduct: value !== "" ? String(value) : undefined,
+      selectedProductName: productName
     });
 
     await this.updateBatches(this.state.status).catch((err) => {
@@ -211,13 +225,13 @@ class BatchList extends React.Component<Props, State> {
    */
   private renderOptions = () => {
     if (this.props.products) {
-      let options = [{label: strings.allProducts, value: ""}];
+      let options = [{text: strings.allProducts, value: ""}];
       for (let i = 0; i < this.props.products.length; i++) {
-        options.push({label: LocalizedUtils.getLocalizedValue(this.props.products[i].name) || "", value: this.props.products[i].id || ""});
+        options.push({text: LocalizedUtils.getLocalizedValue(this.props.products[i].name) || "", value: this.props.products[i].id || ""});
       }
       return options;
     } else {
-      return [""];
+      return [{text:"", value:""}];
     }
   }
 
