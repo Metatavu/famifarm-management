@@ -382,7 +382,7 @@ class CreateEvent extends React.Component<Props, State> {
             amount: eventData.amount,
             potType: eventData.potType,
             productionLineId: eventData.productionLineId,
-            seedBatchId: eventData.seedBatchId
+            seedBatchIds: eventData.seedBatchIds
           } as SowingEventData;
         break;
         case "TABLE_SPREAD":
@@ -675,7 +675,7 @@ class CreateEvent extends React.Component<Props, State> {
       <React.Fragment>
         <Form.Input required label={strings.labelTrayCount} name="amount" type="number" value={data.amount} onChange={this.handleDataChange} />
         <Form.Select required label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
-        <Form.Select required label={strings.labelSeedBatch} name="seedBatchId" options={seedBatchOptions} value={data.seedBatchId} onChange={this.handleDataChange} />
+        <Form.Select required label={strings.labelSeedBatch} name="seedBatchIds" options={seedBatchOptions} multiple value={data.seedBatchIds} onChange={this.handleDataChange} />
         <Form.Select required label={strings.labelPotType} name="potType" options={potTypeOptions} value={data.potType} onChange={this.handleDataChange} />
       </React.Fragment>
     );

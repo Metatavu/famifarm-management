@@ -79,7 +79,7 @@ class BatchList extends React.Component<Props, State> {
     const batchDate = moment(batch.createdAt).format("DD.MM.YYYY");
 
 
-    return `${productName} - ${batchDate} ( ${strings[`batchPhase${batch.phase}`]})`;
+    return `${productName} - ${batchDate} ( ${strings[`batchPhase${batch.phase}`]} ) ${batch.sowingLineNumbers || [].join(", ")}`;
   }
 
   /**
