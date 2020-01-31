@@ -7,15 +7,16 @@ import { Dispatch } from "redux";
 import Api from "../api";
 import { SeedBatch, Seed } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
-import { DateInput } from 'semantic-ui-calendar-react';
+import { DateInput } from 'semantic-ui-calendar-react';;
 import strings from "src/localization/strings";
+import { FormContainer } from "./FormContainer";
 
 import {
   Grid,
   Button,
-  Form,
   Input,
-  InputOnChangeData
+  InputOnChangeData,
+  Form
 } from "semantic-ui-react";
 
 interface Props {
@@ -141,21 +142,25 @@ class CreateSeedBatch extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={8}>
-            <Form>
+            <FormContainer>
               <Form.Field required>
                 <label>{strings.seedBatchCode}</label>
                 <Input 
-                  value={this.state.code} 
+                  value={this.state.code}
                   placeholder={strings.seedBatchCode}
                   onChange={(e) => this.setState({code: e.currentTarget.value})}
                 />
-                <Form.Select 
-                  fluid 
-                  label={strings.seed} 
-                  options={seedOptions} 
-                  placeholder={strings.seed}
-                  onChange={this.onSelectChange}
-                />
+              </Form.Field>
+              <Form.Select 
+                fluid
+                required
+                value={this.state.seedId}
+                label={strings.seed} 
+                options={seedOptions} 
+                placeholder={strings.seed}
+                onChange={this.onSelectChange}
+              />
+              <Form.Field required>
                 <label>{strings.seedBatchArrived}</label>
                 <DateInput
                   name="dateTime"
@@ -167,7 +172,7 @@ class CreateSeedBatch extends React.Component<Props, State> {
                 />
               </Form.Field>
               <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
-            </Form>
+            </FormContainer>
           </Grid.Column>
         </Grid.Row>
       </Grid>

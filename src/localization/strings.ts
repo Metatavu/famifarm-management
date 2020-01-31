@@ -112,6 +112,7 @@ export interface IStrings extends LocalizedStringsMethods {
   pestName: string
 
   remainingUnitsText: string
+  processedUnitsText: string
   batchStatusButtonOPEN: string
   batchStatusButtonCLOSED: string
   batchStatusButtonNEGATIVE: string
@@ -149,6 +150,7 @@ export interface IStrings extends LocalizedStringsMethods {
   phaseSOWING: string
   phasePACKING: string
   phaseTABLE_SPREAD: string
+  phaseWASTAGE: string,
   phaseCULTIVATION_OBSERVATION: string
   phaseHARVEST: string
   editEventLink: string
@@ -174,6 +176,10 @@ export interface IStrings extends LocalizedStringsMethods {
   logoutUrl: string
   newEvent: string
   addEventHeader: string
+
+  missingRequiredFieldError: string
+  logPhaseWastage: string
+  logPhaseWastageHeader: string
 }
 
 const strings: IStrings = new LocalizedStrings({

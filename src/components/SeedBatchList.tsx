@@ -75,16 +75,18 @@ class SeedBatchList extends React.Component<Props, State> {
       );
     }
 
-    const seedBatches = this.props.seedBatches.map((seedBatch) => {
+    const seedBatches = this.props.seedBatches.map((seedBatch, i) => {
       const seedBatchPath = `/seedBatches/${seedBatch.id}`;
       return (
-        <List.Item key={seedBatch.id}>
+        <List.Item style={i % 2 == 0 ? {backgroundColor: "#ddd"} : {}} key={seedBatch.id}>
           <List.Content floated='right'>
             <NavLink to={seedBatchPath}>
               <Button className="submit-button">{strings.open}</Button>
             </NavLink>
           </List.Content>
-          <List.Header>{seedBatch.code}</List.Header>
+          <List.Content>
+            <List.Header style={{paddingTop: "10px"}}>{seedBatch.code}</List.Header>
+          </List.Content>
         </List.Item>
       );
     });
@@ -99,7 +101,7 @@ class SeedBatchList extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
-            <List>
+            <List divided animated verticalAlign='middle'>
               {seedBatches}
             </List>
           </Grid.Column>

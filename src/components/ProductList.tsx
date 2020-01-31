@@ -76,16 +76,18 @@ class ProductList extends React.Component<Props, State> {
       );
     }
 
-    const products = this.props.products.map((product) => {
+    const products = this.props.products.map((product, i) => {
       const productPath = `/products/${product.id}`;
       return (
-        <List.Item key={product.id}>
+        <List.Item style={i % 2 == 0 ? {backgroundColor: "#ddd"} : {}} key={product.id}>
           <List.Content floated='right'>
             <NavLink to={productPath}>
               <Button className="submit-button">{strings.open}</Button>
             </NavLink>
           </List.Content>
-          <List.Header>{LocalizedUtils.getLocalizedValue(product.name)}</List.Header>
+          <List.Content>
+            <List.Header style={{paddingTop: "10px"}}>{LocalizedUtils.getLocalizedValue(product.name)}</List.Header>
+          </List.Content>
         </List.Item>
       );
     });
@@ -100,7 +102,7 @@ class ProductList extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
-            <List>
+            <List divided animated verticalAlign='middle'>
               {products}
             </List>
           </Grid.Column>

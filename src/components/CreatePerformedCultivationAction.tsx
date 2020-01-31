@@ -15,6 +15,7 @@ import {
   Form,
 } from "semantic-ui-react";
 import LocalizedValueInput from "./LocalizedValueInput";
+import { FormContainer } from "./FormContainer";
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
@@ -91,7 +92,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={8}>
-            <Form>
+            <FormContainer>
               <Form.Field required>
                 <label>{strings.performedCultivationActionName}</label>
                 <LocalizedValueInput 
@@ -101,7 +102,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
                 />
               </Form.Field>
               <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
-            </Form>
+            </FormContainer>
           </Grid.Column>
         </Grid.Row>
       </Grid>

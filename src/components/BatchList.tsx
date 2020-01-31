@@ -14,7 +14,8 @@ import {
   List,
   Button,
   Grid,
-  Loader
+  Loader,
+  Label
 } from "semantic-ui-react";
 import LocalizedUtils from "src/localization/localizedutils";
 
@@ -39,6 +40,7 @@ interface State {
   batches: Batch[]
   status: string
   loading: boolean
+  errorCount: number
 }
 
 /**
@@ -50,7 +52,8 @@ class BatchList extends React.Component<Props, State> {
     this.state = {
       batches: [],
       status: "OPEN",
-      loading: false
+      loading: false,
+      errorCount: 0
     };
   }
 
@@ -76,7 +79,7 @@ class BatchList extends React.Component<Props, State> {
     const batchDate = moment(batch.createdAt).format("DD.MM.YYYY");
 
 
-    return `${productName} - ${batchDate} ( ${strings[`batchPhase${batch.phase}`]})`;
+    return `${productName} - ${batchDate} ( ${strings[`batchPhase${batch.phase}`]} ) ${batch.sowingLineNumbers || [].join(", ")}`;
   }
 
   /**
@@ -95,19 +98,24 @@ class BatchList extends React.Component<Props, State> {
       return (
         <Button onClick={() => this.handleButtonClick(status)} key={status} active={this.state.status === status} >
           {strings.getString(`batchStatusButton${status}`, strings.getLanguage())}
+          {status === "NEGATIVE" && this.state.errorCount > 0 &&
+            <Label style={{position: "absolute", top: "5px"}} size="mini" circular color='red'>{this.state.errorCount}</Label>
+          }
         </Button>
       );
     });
 
-    const batches = (this.props.batches || []).map((batch) => {
+    const batches = (this.props.batches || []).map((batch, i) => {
       return (
-        <List.Item key={batch.id}>
+        <List.Item style={i % 2 == 0 ? {backgroundColor: "#ddd"} : {}} key={batch.id}>
           <List.Content floated='right'>
             <NavLink to={`/batches/${batch.id}`}>
               <Button className="submit-button">{strings.open}</Button>
             </NavLink>
           </List.Content>
-          <List.Header>{this.getBatchName(batch)}</List.Header>
+          <List.Content>
+            <List.Header style={{paddingTop: "10px"}}>{this.getBatchName(batch)}</List.Header>
+          </List.Content>
         </List.Item>
       );
     });
@@ -125,7 +133,7 @@ class BatchList extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
-            <List>
+            <List divided animated verticalAlign='middle'>
               {batches}
             </List>
           </Grid.Column>
@@ -164,10 +172,10 @@ class BatchList extends React.Component<Props, State> {
       Api.getProductsService(this.props.keycloak)
     ]);
 
-    const [batches, products] = await Promise.all([batchesService.listBatches(status), productsService.listProducts()]);
+    const [batches, products, errorBatches] = await Promise.all([batchesService.listBatches(status), productsService.listProducts(), batchesService.listBatches("NEGATIVE")]);
     this.props.onBatchesFound && this.props.onBatchesFound(batches);
     this.props.onProductsFound && this.props.onProductsFound(products);
-    this.setState({loading: false})
+    this.setState({loading: false, errorCount: errorBatches.length})
   }
 }
 

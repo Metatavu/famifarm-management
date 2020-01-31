@@ -207,7 +207,7 @@ export interface PestsFound {
  */
 export interface ErrorOccurred {
   type: constants.ERROR_OCCURRED;
-  error: ErrorMessage;
+  error?: ErrorMessage;
 }
 
 
@@ -517,7 +517,7 @@ export function wastageReasonDeleted(wastageReasonId: string): WastageReasonDele
  * @param error error
  * @return { type, error }
  */
-export function onErrorOccurred(error: ErrorMessage): ErrorOccurred {
+export function onErrorOccurred(error?: ErrorMessage): ErrorOccurred {
   return {
     type: constants.ERROR_OCCURRED,
     error: error

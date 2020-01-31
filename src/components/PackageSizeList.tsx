@@ -69,16 +69,18 @@ class PackageSizeList extends React.Component<Props, State> {
       );
     }
 
-    const packageSizes = this.props.packageSizes.map((packageSize) => {
+    const packageSizes = this.props.packageSizes.map((packageSize, i) => {
       const packageSizePath = `/packageSizes/${packageSize.id}`;
       return (
-        <List.Item key={packageSize.id}>
+        <List.Item style={i % 2 == 0 ? {backgroundColor: "#ddd"} : {}} key={packageSize.id}>
           <List.Content floated='right'>
             <NavLink to={packageSizePath}>
               <Button className="submit-button">{strings.open}</Button>
             </NavLink>
           </List.Content>
-          <List.Header>{LocalizedUtils.getLocalizedValue(packageSize.name)}</List.Header>
+          <List.Content>
+            <List.Header style={{paddingTop: "10px"}}>{LocalizedUtils.getLocalizedValue(packageSize.name)}</List.Header>
+          </List.Content>
         </List.Item>
       );
     });
@@ -93,7 +95,7 @@ class PackageSizeList extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
-            <List>
+            <List divided animated verticalAlign='middle'>
               {packageSizes}
             </List>
           </Grid.Column>

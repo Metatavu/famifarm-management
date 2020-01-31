@@ -19,6 +19,7 @@ import {
   InputOnChangeData,
   Confirm
 } from "semantic-ui-react";
+import { FormContainer } from "./FormContainer";
 
 /**
  * Interface representing component properties
@@ -257,32 +258,35 @@ class EditSeedBatch extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={8}>
-          <Form>
-          <Form.Field required>
-          <label>{strings.seedBatchCode}</label>
-          <Input 
-            value={this.state.seedBatch ? this.state.seedBatch.code : ""} 
-            placeholder={strings.seedBatchCode}
-            onChange={this.handeCodeChange}
-          />
-          <Form.Select 
-            fluid 
-            label={strings.seed} 
-            options={seedOptions} 
-            placeholder={strings.seed}
-            onChange={this.onSelectChange}
-            defaultValue={this.props.seedBatch ? this.props.seedBatch.seedId : ""}
-          />
-          <label>{strings.seedBatchArrived}</label>
-          <DateInput
-            name="dateTime"
-            placeholder={strings.date}
-            value={this.state.seedBatch ? this.state.seedBatch.time : ""}
-            iconPosition="left"
-            dateFormat="YYYY-MM-DDTHH:mmZ"
-            onChange={this.handleTimeChange}
-          />
-          </Form.Field>
+          <FormContainer>
+            <Form.Field required>
+              <label>{strings.seedBatchCode}</label>
+              <Input 
+                value={this.state.seedBatch ? this.state.seedBatch.code : ""} 
+                placeholder={strings.seedBatchCode}
+                onChange={this.handeCodeChange}
+              />
+            </Form.Field>
+            <Form.Select 
+              fluid
+              required 
+              label={strings.seed} 
+              options={seedOptions} 
+              placeholder={strings.seed}
+              onChange={this.onSelectChange}
+              defaultValue={this.props.seedBatch ? this.props.seedBatch.seedId : ""}
+            />
+            <Form.Field required>
+              <label>{strings.seedBatchArrived}</label>
+              <DateInput
+                name="dateTime"
+                placeholder={strings.date}
+                value={this.state.seedBatch ? this.state.seedBatch.time : ""}
+                iconPosition="left"
+                dateFormat="YYYY-MM-DDTHH:mmZ"
+                onChange={this.handleTimeChange}
+              />
+            </Form.Field>
             <Message
               success
               visible={this.state.messageVisible}
@@ -296,7 +300,7 @@ class EditSeedBatch extends React.Component<Props, State> {
             >
                 {strings.save}
             </Button>
-          </Form>
+          </FormContainer>
           </Grid.Column>
         </Grid.Row>
         <Confirm open={this.state.open} size={"mini"} content={strings.deleteConfirmationText +this.props.seedBatch!.code } onCancel={()=>this.setState({open:false})} onConfirm={this.handleDelete} />

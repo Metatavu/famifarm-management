@@ -46,9 +46,10 @@ class ProductionLineList extends React.Component<Props, State> {
   
       const productionLinesService = await Api.getProductionLinesService(this.props.keycloak);
       const productionLines = await productionLinesService.listProductionLines();
+
       productionLines.sort((a, b) => {
-        let nameA = a.lineNumber || "";
-        let nameB = b.lineNumber || "";
+        let nameA = this.getStringsNumber(a.lineNumber)
+        let nameB = this.getStringsNumber(b.lineNumber)
         if(nameA < nameB) { return -1; }
         if(nameA > nameB) { return 1; }
         return 0;
@@ -64,10 +65,23 @@ class ProductionLineList extends React.Component<Props, State> {
   }
 
   /**
+   * Get containing numbers in string
+   * 
+   * @param string string
+   * @returns Number
+   */
+  private getStringsNumber = (string ?: string) : Number => {
+    return string && string.match(/\d+/g) ? Number(string.match(/\d+/g)) : 0;
+  }
+
+  /**
    * Render production line list view
    */
   public render() {
-    if (!this.props.productionLines) {
+
+    const { productionLines } = this.props;
+
+    if (!productionLines) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
           <Loader inline active size="medium" />
@@ -75,16 +89,18 @@ class ProductionLineList extends React.Component<Props, State> {
       );
     }
 
-    const productionLines = this.props.productionLines.map((productionLine) => {
+    const productionLineElements = productionLines.sort(this.compareProductionLines).map((productionLine, i) => {
       const productionLinePath = `/productionLines/${productionLine.id}`;
       return (
-        <List.Item key={productionLine.id}>
+        <List.Item style={i % 2 == 0 ? {backgroundColor: "#ddd"} : {}} key={productionLine.id}>
           <List.Content floated='right'>
             <NavLink to={productionLinePath}>
               <Button className="submit-button">{strings.open}</Button>
             </NavLink>
           </List.Content>
-          <List.Header>{productionLine.lineNumber}</List.Header>
+          <List.Content>
+            <List.Header style={{paddingTop: "10px"}}>{productionLine.lineNumber}</List.Header>
+          </List.Content>
         </List.Item>
       );
     });
@@ -99,13 +115,28 @@ class ProductionLineList extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
-            <List>
-              {productionLines}
+            <List divided animated verticalAlign='middle'>
+              {productionLineElements}
             </List>
           </Grid.Column>
         </Grid.Row>
       </Grid>
     );
+  }
+
+  /**
+   * Compares production lines by line number ignoring letters 
+   * 
+   * @param productionLine1 Production line to compare
+   * @param productionLine2 Production line  to compare
+   */
+  private compareProductionLines(productionLine1: ProductionLine, productionLine2: ProductionLine) {
+    const lineNumber1 = productionLine1.lineNumber;
+    const lineNumber2 = productionLine2.lineNumber;
+
+    const lineValue1 = lineNumber1 ? Number(lineNumber1.replace(/\D/g, "")) : Number.MAX_SAFE_INTEGER;
+    const lineValue2 = lineNumber2 ? Number(lineNumber2.replace(/\D/g, "")) : Number.MAX_SAFE_INTEGER;
+    return lineValue1 - lineValue2;
   }
 }
 

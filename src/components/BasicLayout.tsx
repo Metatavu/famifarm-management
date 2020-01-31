@@ -17,7 +17,7 @@ import { Dispatch } from "redux";
 interface Props {
   sidebarItems: JSX.Element[],
   error?: ErrorMessage,
-  onError: (error: ErrorMessage) => void
+  onError: (error?: ErrorMessage) => void
 }
 
 /**
@@ -113,6 +113,10 @@ class BasicLayout extends React.Component<Props, State> {
       return null;
     }
 
+    setTimeout(() => {
+      this.props.onError(undefined);
+    }, 10000);
+
     return <Message negative>
       { this.props.error.title ? <Message.Header>{this.props.error.title}</Message.Header> : null }
       <p>{ this.props.error.message ? this.props.error.message : "" }. { strings.errorRetryText } <a href="javascript:window.location.reload(true)">{ strings.errorRetryHere }</a></p>
@@ -140,7 +144,7 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+    onError: (error?: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

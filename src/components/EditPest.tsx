@@ -20,6 +20,7 @@ import {
 import LocalizedValueInput from "./LocalizedValueInput";
 import LocalizedUtils from "src/localization/localizedutils";
 import { ErrorMessage } from "src/types";
+import { FormContainer } from "./FormContainer";
 
 /**
  * Interface representing component properties
@@ -178,7 +179,7 @@ class EditPest extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={8}>
-          <Form>
+          <FormContainer>
             <Form.Field required>
               <label>{strings.pestName}</label>
               <LocalizedValueInput 
@@ -199,7 +200,7 @@ class EditPest extends React.Component<Props, State> {
               loading={this.state.saving} >
                 {strings.save}
             </Button>
-          </Form>
+          </FormContainer>
           </Grid.Column>
         </Grid.Row>
         <Confirm

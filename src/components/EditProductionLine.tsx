@@ -17,6 +17,7 @@ import {
   Message,
   Confirm
 } from "semantic-ui-react";
+import { FormContainer } from "./FormContainer";
 
 /**
  * Interface representing component properties
@@ -188,37 +189,37 @@ class EditProductionLine extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={8}>
-          <Form>
-          <Form.Field required>
-            <label>{strings.productionLineNumber}</label>
-            <Input 
-              value={this.state.productionLine && this.state.productionLine!.lineNumber} 
-              placeholder={strings.productionLineNumber}
-              onChange={this.handeLineNumberChange}
-            />
-          </Form.Field>
-          <Form.Field>
-            <label>{strings.productionLineDefaultGutterHoleCount}</label>
-            <Input 
-              value={this.state.productionLine && this.state.productionLine.defaultGutterHoleCount} 
-              placeholder={strings.productionLineDefaultGutterHoleCount}
-              onChange={this.handeDefaultGutterHoleCountChange}
-            />
-          </Form.Field>
-            <Message
-              success
-              visible={this.state.messageVisible}
-              header={strings.savedSuccessfully}
-            />
-            <Button 
-              className="submit-button" 
-              onClick={this.handleSubmit} 
-              type='submit'
-              loading={this.state.saving}
-            >
-                {strings.save}
-            </Button>
-          </Form>
+            <FormContainer>
+              <Form.Field required>
+                <label>{strings.productionLineNumber}</label>
+                <Input 
+                  value={this.state.productionLine && this.state.productionLine!.lineNumber} 
+                  placeholder={strings.productionLineNumber}
+                  onChange={this.handeLineNumberChange}
+                />
+              </Form.Field>
+              <Form.Field>
+                <label>{strings.productionLineDefaultGutterHoleCount}</label>
+                <Input 
+                  value={this.state.productionLine && this.state.productionLine.defaultGutterHoleCount} 
+                  placeholder={strings.productionLineDefaultGutterHoleCount}
+                  onChange={this.handeDefaultGutterHoleCountChange}
+                />
+              </Form.Field>
+              <Message
+                success
+                visible={this.state.messageVisible}
+                header={strings.savedSuccessfully}
+              />
+              <Button 
+                className="submit-button" 
+                onClick={this.handleSubmit} 
+                type='submit'
+                loading={this.state.saving}
+              >
+                  {strings.save}
+              </Button>
+            </FormContainer>
           </Grid.Column>
         </Grid.Row>
         <Confirm open={this.state.open} size={"mini"} content={strings.deleteConfirmationText+strings.productionLineNumber+" "+this.props.productionLine!.lineNumber} onCancel={()=>this.setState({open:false})} onConfirm={this.handleDelete} />

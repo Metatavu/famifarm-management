@@ -15,6 +15,7 @@ import {
   Form,
 } from "semantic-ui-react";
 import LocalizedValueInput from "./LocalizedValueInput";
+import { FormContainer } from "./FormContainer";
 
 /**
  * Component props
@@ -98,15 +99,17 @@ class CreatePest extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={8}>
-            <Form>
-              <label>{strings.pestName}</label>
-              <LocalizedValueInput 
-                onValueChange={this.updateName}
-                value={this.state.pestData.name}
-                languages={["fi", "en"]}
-              />
-              <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
-            </Form>
+            <FormContainer>
+              <Form.Field required>
+                <label>{strings.pestName}</label>
+                <LocalizedValueInput 
+                  onValueChange={this.updateName}
+                  value={this.state.pestData.name}
+                  languages={["fi", "en"]}
+                />
+                <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
+              </Form.Field>
+            </FormContainer>
           </Grid.Column>
         </Grid.Row>
       </Grid>

@@ -19,6 +19,7 @@ import {
 } from "semantic-ui-react";
 import LocalizedValueInput from "./LocalizedValueInput";
 import LocalizedUtils from "src/localization/localizedutils";
+import { FormContainer } from "./FormContainer";
 
 /**
  * Interface representing component properties
@@ -188,37 +189,37 @@ class EditPackageSize extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={8}>
-          <Form>
-          <Form.Field required>
-            <label>{strings.packageSizeName}</label>
-            <LocalizedValueInput 
-              onValueChange={this.updateName}
-              value={this.state.packageSize ? this.state.packageSize.name : undefined}
-              languages={["fi", "en"]}
-            />
-          </Form.Field>
-          <Form.Field>
-            <label>{strings.packageSizeSize}</label>
-            <Input 
-              value={this.state.packageSize && this.state.packageSize.size} 
-              placeholder={strings.packageSizeSize}
-              onChange={this.updateSize}
-            />
-          </Form.Field>
-            <Message
-              success
-              visible={this.state.messageVisible}
-              header={strings.savedSuccessfully}
-            />
-            <Button 
-              className="submit-button" 
-              onClick={this.handleSubmit} 
-              type='submit'
-              loading={this.state.saving}
-            >
-                {strings.save}
-            </Button>
-          </Form>
+            <FormContainer>
+              <Form.Field required>
+                <label>{strings.packageSizeName}</label>
+                <LocalizedValueInput 
+                  onValueChange={this.updateName}
+                  value={this.state.packageSize ? this.state.packageSize.name : undefined}
+                  languages={["fi", "en"]}
+                />
+              </Form.Field>
+              <Form.Field required>
+                <label>{strings.packageSizeSize}</label>
+                <Input 
+                  value={this.state.packageSize && this.state.packageSize.size} 
+                  placeholder={strings.packageSizeSize}
+                  onChange={this.updateSize}
+                />
+              </Form.Field>
+              <Message
+                success
+                visible={this.state.messageVisible}
+                header={strings.savedSuccessfully}
+              />
+              <Button 
+                className="submit-button" 
+                onClick={this.handleSubmit} 
+                type='submit'
+                loading={this.state.saving}
+              >
+                  {strings.save}
+              </Button>
+            </FormContainer>
           </Grid.Column>
         </Grid.Row>
         <Confirm open={this.state.open} size={"mini"} content={strings.deleteConfirmationText+this.props.packageSize!.name } onCancel={()=>this.setState({open:false})} onConfirm={this.handleDelete} />
