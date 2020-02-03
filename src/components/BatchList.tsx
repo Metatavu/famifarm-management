@@ -15,8 +15,12 @@ import {
   Button,
   Grid,
   Loader,
-  Label
+  Label,
+  Form,
+  InputOnChangeData,
+  TextAreaProps
 } from "semantic-ui-react";
+import { DateInput } from 'semantic-ui-calendar-react';
 import LocalizedUtils from "src/localization/localizedutils";
 
 
@@ -38,6 +42,9 @@ interface Props {
  */
 interface State {
   batches: Batch[]
+  date?: string
+  selectedProduct?: string
+  selectedProductName?: string
   status: string
   loading: boolean
   errorCount: number
@@ -129,6 +136,20 @@ class BatchList extends React.Component<Props, State> {
           </NavLink>
         </Grid.Row>
         <Grid.Row>
+          <Form>
+            <Form.Field>
+              <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem", paddingRight: "2rem"}}>
+                <label>{strings.date}</label>
+                <DateInput dateFormat="DD.MM.YYYY" onChange={this.onChangeDate} name="date" value={this.state.date ? moment(this.state.date).format("DD.MM.YYYY") : ""} />
+              </div>
+              <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem"}}>
+                <label>{strings.productName}</label>
+                <Form.Select name="product" options={this.renderOptions()} text={this.state.selectedProductName ? this.state.selectedProductName : strings.selectProduct} onChange={this.onChangeProduct} />
+              </div>
+            </Form.Field>
+          </Form>
+        </Grid.Row>
+        <Grid.Row>
           {statusButtons}
         </Grid.Row>
         <Grid.Row>
@@ -160,19 +181,81 @@ class BatchList extends React.Component<Props, State> {
   }
 
   /**
+   * Handles changing date
+   */
+  private onChangeDate = async (e: any, { value }: InputOnChangeData) => {
+    await this.setState({date: moment(value, "DD.MM.YYYY").toISOString()});
+
+    await this.updateBatches(this.state.status).catch((err) => {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: err
+      });
+    });
+  }
+
+  /**
+   * Handles changing selected product
+   */
+  private onChangeProduct = async (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
+    let productName = "";
+    if (this.props.products) {
+      let object = this.props.products.find(product => product.id === value);
+      if (object) {
+        productName = LocalizedUtils.getLocalizedValue(object.name) || "";
+      }
+    }
+    await this.setState({
+      selectedProduct: value !== "" ? String(value) : undefined,
+      selectedProductName: productName
+    });
+
+    await this.updateBatches(this.state.status).catch((err) => {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: err
+      });
+    });
+  }
+
+  /**
+   * Renders dropdown options
+   */
+  private renderOptions = () => {
+    if (this.props.products) {
+      let options = [{text: strings.allProducts, value: ""}];
+      for (let i = 0; i < this.props.products.length; i++) {
+        options.push({text: LocalizedUtils.getLocalizedValue(this.props.products[i].name) || "", value: this.props.products[i].id || ""});
+      }
+      return options;
+    } else {
+      return [{text:"", value:""}];
+    }
+  }
+
+  /**
    * Updates batch list
    */
   private updateBatches = async (status: string) => {
     if (!this.props.keycloak) {
       return;
     }
+
+    const createdBefore = this.state.date ? moment(this.state.date).endOf("day").toISOString() : undefined;
+    const createdAfter = this.state.date ? moment(this.state.date).startOf("day").toISOString() : undefined;
     this.setState({loading: true});
     const [batchesService, productsService] = await Promise.all([
       Api.getBatchesService(this.props.keycloak),
       Api.getProductsService(this.props.keycloak)
     ]);
 
-    const [batches, products, errorBatches] = await Promise.all([batchesService.listBatches(status), productsService.listProducts(), batchesService.listBatches("NEGATIVE")]);
+    const [batches, products, errorBatches] = await Promise.all([
+      batchesService.listBatches(status, undefined, this.state.selectedProduct, undefined, undefined, createdBefore, createdAfter),
+      productsService.listProducts(),
+      batchesService.listBatches("NEGATIVE")
+    ]);
     this.props.onBatchesFound && this.props.onBatchesFound(batches);
     this.props.onProductsFound && this.props.onProductsFound(products);
     this.setState({loading: false, errorCount: errorBatches.length})
