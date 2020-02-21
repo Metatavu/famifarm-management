@@ -158,5 +158,10 @@
     "addEventHeader": "Lisää tapahtuma",
     "missingRequiredFieldError": "Täytä kaikki pakolliset kentät ja yritä uudelleen.",
     "logPhaseWastage": "Kirjaa hävikki",
-    "logPhaseWastageHeader": "Kirjaa vaiheen hävikki"
+    "logPhaseWastageHeader": "Kirjaa vaiheen hävikki",
+    "deleteBatchConfirmText": "Haluatko varmasti poistaa erän?",
+    "deleteBatchButtonText": "Poista erä",
+    "batchDeletionError": "Erän poisto epäonnistui",
+    "batchDeletionSuccess": "Poistettu",
+    "batchDeletingInProgress": "Poistetaan..."
   }

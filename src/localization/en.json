@@ -159,5 +159,10 @@
   "addEventHeader": "Add event",
   "missingRequiredFieldError": "Fill all required fields and try again.",
   "logPhaseWastage": "Log wastage",
-  "logPhaseWastageHeader": "Log phase wastage"
+  "logPhaseWastageHeader": "Log phase wastage",
+  "deleteBatchConfirmText": "Are you sure that you want to delete batch?",
+  "deleteBatchButtonText": "Delete batch",
+  "batchDeletionError": "Deleting batch failed.",
+  "batchDeletionSuccess": "Deleted",
+  "batchDeletingInProgress": "Deleting..."
 }

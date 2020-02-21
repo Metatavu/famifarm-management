@@ -182,6 +182,11 @@ export interface IStrings extends LocalizedStringsMethods {
   missingRequiredFieldError: string
   logPhaseWastage: string
   logPhaseWastageHeader: string
+  deleteBatchConfirmText: string
+  deleteBatchButtonText: string
+  batchDeletionError: string
+  batchDeletionSuccess: string
+  batchDeletingInProgress: string
 }
 
 const strings: IStrings = new LocalizedStrings({

@@ -22,11 +22,12 @@ import {
   Grid,
   Loader,
   Icon,
-  Button
+  Button,
+  Confirm
 } from "semantic-ui-react";
 import * as moment from "moment";
 import strings from "../localization/strings";
-import { NavLink } from "react-router-dom";
+import { NavLink, Redirect } from "react-router-dom";
 import { ErrorMessage } from "../types";
 import LocalizedUtils from "src/localization/localizedutils";
 import LogWastageDialog from "./LogWastageDialog";
@@ -50,6 +51,9 @@ interface State {
   loading: boolean,
   batchTitle?: string
   phaseWastageInfo?: PhaseWastageInfo
+  deleteBatchConfirmOpen: boolean
+  deletionStatus: "NOT_DELETED" | "DELETING" | "DELETED",
+  deleted: boolean
 }
 
 interface PhaseWastageInfo {
@@ -69,7 +73,10 @@ class BatchView extends React.Component<Props, State> {
     this.state = {
       packageSizes: [],
       batchEvents: [],
-      loading: false
+      loading: false,
+      deleteBatchConfirmOpen: false,
+      deletionStatus: "NOT_DELETED",
+      deleted: false
     };
   }
 
@@ -82,7 +89,7 @@ class BatchView extends React.Component<Props, State> {
         return;
       }
   
-      this.setState({ loading: true });
+      this.setState({ deleted: false, loading: true });
       
       const packgeSizesService = await Api.getPackageSizesService(this.props.keycloak);
       const packageSizes = await packgeSizesService.listPackageSizes();
@@ -517,6 +524,9 @@ class BatchView extends React.Component<Props, State> {
    * Render edit batch view
    */
   public render() {
+    if (this.state.deleted) {
+      return (<Redirect to="/batches" />);
+    }
     if (this.state.loading) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
@@ -525,11 +535,33 @@ class BatchView extends React.Component<Props, State> {
       );
     }
 
+    let deleteConfirmText = "";
+    switch(this.state.deletionStatus) {
+      case "DELETED":
+        deleteConfirmText = strings.batchDeletionSuccess;
+      break;
+      case "DELETING":
+        deleteConfirmText = strings.batchDeletingInProgress;
+      break;
+      default:
+        deleteConfirmText = strings.deleteBatchConfirmText;
+      break;
+    }
+
     return (
       <Grid>
+        <Confirm 
+          open={this.state.deleteBatchConfirmOpen}
+          size={"mini"} 
+          content={deleteConfirmText}
+          onCancel={()=>this.setState({deleteBatchConfirmOpen:false})}
+          onConfirm={this.handleDelete} />
         <Grid.Row className="content-page-header-row" style={{flex: 1, paddingLeft: 10, paddingRight: 10}}>
           <Grid.Column width={12}>
           <h2>{ this.state.batchTitle || "" }</h2>
+          </Grid.Column>
+          <Grid.Column width={2} style={{ textAlign: "right" }}>
+            <Button onClick={this.promptDeleteBatch} negative>{strings.deleteBatchButtonText}</Button>
           </Grid.Column>
           <Grid.Column width={2} style={{ textAlign: "right" }}>
             <NavLink to={`/editBatch/${this.props.batchId}`}>
@@ -560,6 +592,48 @@ class BatchView extends React.Component<Props, State> {
         )}
       </Grid>
     );
+  }
+
+  /**
+   * Shows delete confirmation dialog
+   */
+  private promptDeleteBatch = () => {
+    this.setState({
+      deleteBatchConfirmOpen: true
+    });
+  }
+
+  /**
+   * Handles deletion of batch
+   */
+  private handleDelete = async() => {
+    if (!this.props.keycloak) {
+      return;
+    }
+
+    this.setState({
+      deletionStatus: "DELETING"
+    });
+
+    try {
+      const batchesService = await Api.getBatchesService(this.props.keycloak);
+      await batchesService.deleteBatch(this.props.batchId);
+      this.setState({
+        deletionStatus: "DELETED"
+      });
+      setTimeout(() => {
+        this.setState({
+          deleted: true
+        });
+      })
+    } catch(e) {
+      alert(strings.batchDeletionError);
+      this.setState({
+        deletionStatus: "NOT_DELETED",
+        deleteBatchConfirmOpen: false
+      });
+    }
+
   }
 
   private renderEvents() {
