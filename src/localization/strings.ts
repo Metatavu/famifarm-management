@@ -74,7 +74,6 @@ export interface IStrings extends LocalizedStringsMethods {
   batchPhaseTABLE_SPREAD: string,
   batchPhasePLANTING: string,
   batchPhaseHARVEST: string,
-  batchPhasePACKING: string,
   batchPhaseCOMPLETE: string,
 
   sowingEventHeader: string
@@ -94,9 +93,6 @@ export interface IStrings extends LocalizedStringsMethods {
 
   harvestEventHeader: string
   harvestEventText: string
-
-  packingEventHeader: string
-  packingEventText: string
 
   wastageEventHeader: string
   wastageEventText: string
@@ -150,7 +146,6 @@ export interface IStrings extends LocalizedStringsMethods {
   potTypeLARGE: string
   phasePLANTING: string
   phaseSOWING: string
-  phasePACKING: string
   phaseTABLE_SPREAD: string
   phaseWASTAGE: string,
   phaseCULTIVATION_OBSERVATION: string

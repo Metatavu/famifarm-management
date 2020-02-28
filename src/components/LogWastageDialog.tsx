@@ -124,7 +124,7 @@ class LogWastageDialog extends React.Component<Props, State> {
       };
     });
 
-    const phaseOptions = ['PLANTING', 'SOWING', 'PACKING', 'TABLE_SPREAD', 'CULTIVATION_OBSERVATION', 'HARVEST' ].map((phase) => {
+    const phaseOptions = ['PLANTING', 'SOWING', 'TABLE_SPREAD', 'CULTIVATION_OBSERVATION', 'HARVEST' ].map((phase) => {
       return {
         key: phase,
         value: phase,
