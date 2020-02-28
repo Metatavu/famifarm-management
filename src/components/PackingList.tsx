@@ -15,7 +15,6 @@ import {
   Button,
   Grid,
   Loader,
-  Label,
   Form,
   InputOnChangeData,
   TextAreaProps
@@ -47,7 +46,6 @@ interface State {
   selectedProduct?: string
   selectedProductName?: string
   selectedStatus?: PackingState
-  status: string
   loading: boolean
   errorCount: number
 }
@@ -60,7 +58,6 @@ class PackingList extends React.Component<Props, State> {
     super(props);
     this.state = {
       packings: [],
-      status: "OPEN",
       loading: false,
       errorCount: 0
     };
@@ -71,7 +68,7 @@ class PackingList extends React.Component<Props, State> {
    */
   public async componentDidMount() {
     try {
-      await this.updatePackings(this.state.status);
+      await this.updatePackings();
     } catch (e) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
@@ -102,16 +99,6 @@ class PackingList extends React.Component<Props, State> {
       );
     }
 
-    const statusButtons = ["OPEN", "CLOSED", "NEGATIVE"].map((status: string) => {
-      return (
-        <Button onClick={() => this.handleButtonClick(status)} key={status} active={this.state.status === status} >
-          {strings.getString(`packingStatusButton${status}`, strings.getLanguage())}
-          {status === "NEGATIVE" && this.state.errorCount > 0 &&
-            <Label style={{position: "absolute", top: "5px"}} size="mini" circular color='red'>{this.state.errorCount}</Label>
-          }
-        </Button>
-      );
-    });
 
     const packings = (this.props.packings || []).map((packing, i) => {
       return (
@@ -159,9 +146,6 @@ class PackingList extends React.Component<Props, State> {
           </Form>
         </Grid.Row>
         <Grid.Row>
-          {statusButtons}
-        </Grid.Row>
-        <Grid.Row>
           <Grid.Column>
             <List divided animated verticalAlign='middle'>
               {packings}
@@ -173,30 +157,13 @@ class PackingList extends React.Component<Props, State> {
   }
 
   /**
-   * Handles status button click
-   */
-  private handleButtonClick = (status: string) => {
-    this.setState({
-      status: status
-    });
-
-    this.updatePackings(status).catch((err) => {
-      this.props.onError({
-        message: strings.defaultApiErrorMessage,
-        title: strings.defaultApiErrorTitle,
-        exception: err
-      });
-    });
-  }
-
-  /**
    * Handles changing status
    */
   private onChangeStatus = async (e: any, { value }: InputOnChangeData) => {
-    const packingStatus:PackingState = value === "IN_STORE" ? "INSTORE" as PackingState: "REMOVED" as PackingState;
+    const packingStatus:PackingState = value as PackingState;
     await this.setState({selectedStatus: packingStatus});
 
-    await this.updatePackings(this.state.status).catch((err) => {
+    await this.updatePackings().catch((err) => {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -210,7 +177,7 @@ class PackingList extends React.Component<Props, State> {
   private onChangeDateAfter = async (e: any, { value }: InputOnChangeData) => {
     await this.setState({dateAfter: moment(value, "DD.MM.YYYY").toISOString()});
 
-    await this.updatePackings(this.state.status).catch((err) => {
+    await this.updatePackings().catch((err) => {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -225,7 +192,7 @@ class PackingList extends React.Component<Props, State> {
   private onChangeDateBefore = async (e: any, { value }: InputOnChangeData) => {
     await this.setState({dateBefore: moment(value, "DD.MM.YYYY").toISOString()});
 
-    await this.updatePackings(this.state.status).catch((err) => {
+    await this.updatePackings().catch((err) => {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -250,7 +217,7 @@ class PackingList extends React.Component<Props, State> {
       selectedProductName: productName
     });
 
-    await this.updatePackings(this.state.status).catch((err) => {
+    await this.updatePackings().catch((err) => {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -277,7 +244,7 @@ class PackingList extends React.Component<Props, State> {
   /**
    * Updates packings list
    */
-  private updatePackings = async (status: string) => {
+  private updatePackings = async () => {
     if (!this.props.keycloak) {
       return;
     }

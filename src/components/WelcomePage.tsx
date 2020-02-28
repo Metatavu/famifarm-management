@@ -50,6 +50,7 @@ import CreateEvent from "./CreateEvent";
 import CreateBatch from "./CreateBatch";
 import EditBatch from "./EditBatch";
 import PackingList from "./PackingList";
+import CreatePacking from "./CreatePacking";
 
 export interface Props {
   authenticated: boolean,
@@ -220,6 +221,13 @@ class WelcomePage extends React.Component<Props, any> {
                   <CreateTeam
                     keycloak={this.state.keycloak}
                   />
+                )}
+              />
+              <Route
+                path="/createPacking"
+                exact={true}
+                render={props => (
+                  <CreatePacking keycloak={this.state.keycloak}/>
                 )}
               />
               <Route

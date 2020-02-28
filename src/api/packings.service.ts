@@ -17,16 +17,18 @@ export class PackingsService {
     public createPacking(body:  Packing): Promise<Packing> {
         const uri = new URI(`${this.basePath}/v1/packings`);
         const options = {
-            method: "options",
+            method: "post",
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${this.token}`
             },
             body: JSON.stringify(body)
         };
-
+        console.log(body);
         return fetch(uri.toString(), options).then((response) => {
             return Api.handleResponse(response);
+        }).catch(e => {
+          console.log(e);
         });
     }
 
@@ -44,7 +46,7 @@ export class PackingsService {
         "Authorization": `Bearer ${this.token}`
       }
     };
-
+    
     return fetch(uri.toString(), options).then((response) => {
       return Api.handleResponse(response);
     });
