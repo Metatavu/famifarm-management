@@ -2,7 +2,7 @@ import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Packing, Product } from "famifarm-typescript-models";
+import { Packing, PackingState, Product } from "famifarm-typescript-models";
 import strings from "src/localization/strings";
 import * as moment from "moment";
 import * as actions from "../actions";
@@ -42,9 +42,11 @@ interface Props {
  */
 interface State {
   packings: Packing[]
-  date?: string
+  dateBefore?: string
+  dateAfter?: string
   selectedProduct?: string
   selectedProductName?: string
+  selectedStatus?: PackingState
   status: string
   loading: boolean
   errorCount: number
@@ -138,12 +140,20 @@ class PackingList extends React.Component<Props, State> {
           <Form>
             <Form.Field>
               <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem", paddingRight: "2rem"}}>
-                <label>{strings.date}</label>
-                <DateInput dateFormat="DD.MM.YYYY" onChange={this.onChangeDate} name="date" value={this.state.date ? moment(this.state.date).format("DD.MM.YYYY") : ""} />
+                <label>{strings.dateBefore}</label>
+                <DateInput dateFormat="DD.MM.YYYY" onChange={this.onChangeDateBefore} name="dateBefore" value={this.state.dateBefore ? moment(this.state.dateBefore).format("DD.MM.YYYY") : ""} />
               </div>
-              <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem"}}>
+              <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem", paddingRight: "2rem"}}>
+                <label>{strings.dateAfter}</label>
+                <DateInput dateFormat="DD.MM.YYYY" onChange={this.onChangeDateAfter} name="dateAfter" value={this.state.dateAfter ? moment(this.state.dateAfter).format("DD.MM.YYYY") : ""} />
+              </div>
+              <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem", paddingRight: "2rem"}}>
                 <label>{strings.productName}</label>
                 <Form.Select name="product" options={this.renderOptions()} text={this.state.selectedProductName ? this.state.selectedProductName : strings.selectProduct} onChange={this.onChangeProduct} />
+              </div>
+              <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem"}}>
+                <label>{strings.packingStatus}</label>
+                <Form.Select name="status" options={[{value: "IN_STORE", text: strings.packingStoreStatus}, {value: "REMOVED",  text: strings.packingRemovedStatus}]} text={this.state.selectedStatus ? this.state.selectedStatus: strings.selectPackingStatus} onChange={this.onChangeStatus} />
               </div>
             </Form.Field>
           </Form>
@@ -180,10 +190,40 @@ class PackingList extends React.Component<Props, State> {
   }
 
   /**
+   * Handles changing status
+   */
+  private onChangeStatus = async (e: any, { value }: InputOnChangeData) => {
+    const packingStatus:PackingState = value === "IN_STORE" ? "INSTORE" as PackingState: "REMOVED" as PackingState;
+    await this.setState({selectedStatus: packingStatus});
+
+    await this.updatePackings(this.state.status).catch((err) => {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: err
+      });
+    });
+  }
+  /**
    * Handles changing date
    */
-  private onChangeDate = async (e: any, { value }: InputOnChangeData) => {
-    await this.setState({date: moment(value, "DD.MM.YYYY").toISOString()});
+  private onChangeDateAfter = async (e: any, { value }: InputOnChangeData) => {
+    await this.setState({dateAfter: moment(value, "DD.MM.YYYY").toISOString()});
+
+    await this.updatePackings(this.state.status).catch((err) => {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: err
+      });
+    });
+  }
+
+  /**
+   * Handles changing date
+   */
+  private onChangeDateBefore = async (e: any, { value }: InputOnChangeData) => {
+    await this.setState({dateBefore: moment(value, "DD.MM.YYYY").toISOString()});
 
     await this.updatePackings(this.state.status).catch((err) => {
       this.props.onError({
@@ -248,14 +288,13 @@ class PackingList extends React.Component<Props, State> {
       Api.getProductsService(this.props.keycloak)
     ]);
 
-    const [packings, products, errorPackings] = await Promise.all([
-      packingsService.listPackings(undefined, undefined, undefined, undefined, undefined, undefined),
-      productsService.listProducts(),
-      packingsService.listPackings(-1)
+    const [packings, products] = await Promise.all([
+      packingsService.listPackings(undefined, undefined, this.state.selectedProduct, this.state.selectedStatus, this.state.dateBefore, this.state.dateAfter),
+      productsService.listProducts()
     ]);
     this.props.onPackingsFound && this.props.onPackingsFound(packings);
     this.props.onProductsFound && this.props.onProductsFound(products);
-    this.setState({loading: false, errorCount: errorPackings.length})
+    this.setState({loading: false})
   }
 }
 

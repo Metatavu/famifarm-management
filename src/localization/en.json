@@ -12,6 +12,8 @@
   "managementHeaderText": "Famifarm management",
   "save": "Save",
   "date": "Date",
+  "dateBefore": "Created before date",
+  "dateAfter": "Created after date",
   "open": "Open",
   "savedSuccessfully": "Saved successfully!",
   "delete": "Delete",
@@ -162,5 +164,9 @@
   "batchDeletionSuccess": "Deleted",
   "batchDeletingInProgress": "Deleting...",
   "packings": "Packings",
-  "newPacking": "New packing"
+  "newPacking": "New packing",
+  "packingStatus": "Packing state",
+  "packingRemovedStatus": "Removed",
+  "packingStoreStatus": "In store",
+  "selectPackingStatus": "Select packing status"
 }

@@ -12,6 +12,8 @@
     "managementHeaderText": "Famifarm hallinta",
     "save": "Tallenna",
     "date": "Päivämäärä",
+    "dateBefore": "Luotu ennen",
+    "dateAfter": "Luotu jälkeen",
     "open": "Avaa",
     "savedSuccessfully": "Tallennettu onnistuneesti!",
     "delete": "Poista",
@@ -25,7 +27,7 @@
     "products": "Tuotteet",
     "allProducts": "Kaikki tuotteet",
     "newProduct": "Uusi tuote",
-    "productName": "Tuote nimi",
+    "productName": "Tuotteen nimi",
     "selectProduct": "Valitse tuote",
     "productionLine": "Tuotantolinja",
     "productionLines": "Tuotantolinjat",
@@ -161,5 +163,9 @@
     "batchDeletionSuccess": "Poistettu",
     "batchDeletingInProgress": "Poistetaan...",
     "packings": "Pakkaukset",
-    "newPacking": "Uusi pakkaus"
+    "newPacking": "Uusi pakkaus",
+    "packingStatus": "Pakkauksen tilanne",
+    "packingRemovedStatus": "Poistunut",
+    "packingStoreStatus": "Varastossa",
+    "selectPackingStatus": "Valitse pakkauksen tila"
   }

@@ -17,6 +17,8 @@ export interface IStrings extends LocalizedStringsMethods {
   managementHeaderText: string;
   save: string;
   date: string;
+  dateAfter: string;
+  dateBefore: string;
   open: string;
   savedSuccessfully: string;
   delete: string;
@@ -185,6 +187,10 @@ export interface IStrings extends LocalizedStringsMethods {
 
   packings: string
   newPacking: string
+  packingStatus: string
+  packingStoreStatus: string
+  packingRemovedStatus: string
+  selectPackingStatus: string
 }
 
 const strings: IStrings = new LocalizedStrings({

@@ -8,7 +8,6 @@ export class PackingsService {
     constructor(basePath: string, token: string) {
         this.token = token;
         this.basePath = basePath;
-
     }
     
     /**
@@ -100,7 +99,7 @@ export class PackingsService {
         uri.addQuery('createdAfter', <any>createdAfter);
     }
     if (status !== undefined && status !== null) {
-        uri.addQuery("status", <any>status);
+        uri.addQuery("state", <any>status);
     }
     const options = {
       method: "get",
