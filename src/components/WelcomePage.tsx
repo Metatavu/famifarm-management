@@ -49,6 +49,7 @@ import CreatePackageSize from "./CreatePackageSize";
 import CreateEvent from "./CreateEvent";
 import CreateBatch from "./CreateBatch";
 import EditBatch from "./EditBatch";
+import PackingList from "./PackingList";
 
 export interface Props {
   authenticated: boolean,
@@ -88,6 +89,9 @@ class WelcomePage extends React.Component<Props, any> {
     const navigationRoutes = [{
       "text": strings.batches,
       "route": "/batches"
+    },{
+      "text": strings.packings,
+      "route": "/packings"
     },{
       "text": strings.teams,
       "route": "/teams"
@@ -176,6 +180,15 @@ class WelcomePage extends React.Component<Props, any> {
                 exact={true}
                 render={props => (
                   <BatchList
+                    keycloak={this.state.keycloak}
+                  />
+                )}
+              />
+              <Route
+                path="/packings"
+                exact={true}
+                render={props => (
+                  <PackingList
                     keycloak={this.state.keycloak}
                   />
                 )}

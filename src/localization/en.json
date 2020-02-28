@@ -160,5 +160,7 @@
   "deleteBatchButtonText": "Delete batch",
   "batchDeletionError": "Deleting batch failed.",
   "batchDeletionSuccess": "Deleted",
-  "batchDeletingInProgress": "Deleting..."
+  "batchDeletingInProgress": "Deleting...",
+  "packings": "Packings",
+  "newPacking": "New packing"
 }

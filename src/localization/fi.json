@@ -159,5 +159,7 @@
     "deleteBatchButtonText": "Poista erä",
     "batchDeletionError": "Erän poisto epäonnistui",
     "batchDeletionSuccess": "Poistettu",
-    "batchDeletingInProgress": "Poistetaan..."
+    "batchDeletingInProgress": "Poistetaan...",
+    "packings": "Pakkaukset",
+    "newPacking": "Uusi pakkaus"
   }

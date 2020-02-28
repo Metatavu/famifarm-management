@@ -82,7 +82,7 @@ export class PackingsService {
    * @param createdBefore Filter results by date
    * @param createdAfter Filter results by date
   */
-  public listEvents(firstResult?: number, maxResults?: number, productId?: string, status?: PackingState, createdBefore?: string, createdAfter?: string):Promise<Array<Packing>> {
+  public listPackings(firstResult?: number, maxResults?: number, productId?: string, status?: PackingState, createdBefore?: string, createdAfter?: string):Promise<Array<Packing>> {
     const uri = new URI(`${this.basePath}/v1/packings`);
     if (firstResult !== undefined && firstResult !== null) {
         uri.addQuery('firstResult', <any>firstResult);
@@ -122,7 +122,7 @@ export class PackingsService {
    * @param body Request payload
    * @param packingId Packing id
   */
-  public updateEvent(body: Packing, packingId: string, ):Promise<Packing> {
+  public updatePacking(body: Packing, packingId: string, ):Promise<Packing> {
     const uri = new URI(`${this.basePath}/v1/packings/${encodeURIComponent(String(packingId))}`);
     const options = {
       method: "put",

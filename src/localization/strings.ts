@@ -182,6 +182,9 @@ export interface IStrings extends LocalizedStringsMethods {
   batchDeletionError: string
   batchDeletionSuccess: string
   batchDeletingInProgress: string
+
+  packings: string
+  newPacking: string
 }
 
 const strings: IStrings = new LocalizedStrings({
