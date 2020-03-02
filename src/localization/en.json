@@ -168,5 +168,6 @@
   "packingStatus": "Packing state",
   "packingRemovedStatus": "Removed",
   "packingStoreStatus": "In store",
-  "selectPackingStatus": "Select packing status"
+  "selectPackingStatus": "Select packing status",
+  "editPacking": "Edit packing"
 }

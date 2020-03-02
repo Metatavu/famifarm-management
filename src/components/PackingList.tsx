@@ -99,7 +99,6 @@ class PackingList extends React.Component<Props, State> {
       );
     }
 
-
     const packings = (this.props.packings || []).map((packing, i) => {
       return (
         <List.Item style={i % 2 == 0 ? {backgroundColor: "#ddd"} : {}} key={packing.id}>

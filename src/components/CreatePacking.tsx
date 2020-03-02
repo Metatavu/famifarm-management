@@ -147,9 +147,13 @@ class CreatePacking extends React.Component<Props, State> {
         )
     }
 
+    /**
+     * Resolves localized name of the packing status
+     */
     private resolveStatusLocalizedName = () => {
         return this.state.packingStatus === "IN_STORE" ? strings.packingStoreStatus : strings.packingRemovedStatus;
     }
+
     /**
      * Event handler for product change 
      */
@@ -182,6 +186,7 @@ class CreatePacking extends React.Component<Props, State> {
     private onStatusChange = (event: any, { value }: InputOnChangeData) => {
         this.setState({packingStatus: value as PackingState})
     }
+    
     /**
      * Handles changing date
      */

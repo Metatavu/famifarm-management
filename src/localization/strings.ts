@@ -191,6 +191,7 @@ export interface IStrings extends LocalizedStringsMethods {
   packingStoreStatus: string
   packingRemovedStatus: string
   selectPackingStatus: string
+  editPacking: string
 }
 
 const strings: IStrings = new LocalizedStrings({

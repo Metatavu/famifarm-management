@@ -24,6 +24,7 @@ import EditEvent from "./EditEvent";
 import ReportDownload from "./ReportDownload";
 import SeedList from "./SeedList";
 import BatchList from "./BatchList";
+import EditPacking from "./EditPacking";
 import EditProduct from "./EditProduct";
 import EditPackageSize from "./EditPackageSize";
 import EditSeed from "./EditSeed";
@@ -212,6 +213,16 @@ class WelcomePage extends React.Component<Props, any> {
                     keycloak={this.state.keycloak}
                     teamId={props.match.params.teamId as string}
                   />
+                )}
+              />
+              <Route 
+                path="/packings/:packingId"
+                exact={true}
+                render={props => (
+                  <EditPacking
+                    keycloak={this.state.keycloak}
+                    packingId={props.match.params.packingId as string}
+                />
                 )}
               />
               <Route

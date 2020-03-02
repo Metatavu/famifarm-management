@@ -167,5 +167,6 @@
     "packingStatus": "Pakkauksen tilanne",
     "packingRemovedStatus": "Poistunut",
     "packingStoreStatus": "Varastossa",
-    "selectPackingStatus": "Valitse pakkauksen tila"
+    "selectPackingStatus": "Valitse pakkauksen tila",
+    "editPacking": "Muokkaa pakkausta"
   }
