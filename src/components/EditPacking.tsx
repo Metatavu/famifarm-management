@@ -8,7 +8,7 @@ import Api from "../api";
 import { KeycloakInstance } from "keycloak-js";
 import strings from "src/localization/strings";
 import LocalizedUtils from "src/localization/localizedutils";
-import { Grid, Button, Form, Select, Input, DropdownItemProps, DropdownProps, InputOnChangeData, Loader } from "semantic-ui-react";
+import { Grid, Button, Form, Select, Input, DropdownItemProps, DropdownProps, InputOnChangeData, Loader, Message, Confirm } from "semantic-ui-react";
 import { FormContainer } from "./FormContainer";
 import { DateInput } from 'semantic-ui-calendar-react';
 import * as moment from "moment";
@@ -31,6 +31,8 @@ export interface State {
   packedCount: number,
   loading: boolean,
   date: string,
+  messageVisible: boolean,
+  confirmOpen: boolean,
   redirect: boolean
 }
 
@@ -45,8 +47,10 @@ class EditPacking extends React.Component<Props, State> {
       packingStatus : "IN_STORE" as PackingState,
       packedCount : 0,
       loading : false,
-      date : moment(moment(), "YYYY.MM.DD HH:mm").toISOString(),
-      redirect : false
+      date : moment(moment(), "DD.MM.YYYY HH:mm").toISOString(),
+      messageVisible : false,
+      confirmOpen: false,
+      redirect: false
     }
     this.handleSubmit = this.handleSubmit.bind(this);
 }
@@ -102,9 +106,9 @@ class EditPacking extends React.Component<Props, State> {
         </Grid>
       );
     }
-
-    if (this.state.redirect && this.state.packing) {
-      return <Redirect to={`/packings/${this.state.packing.id}`} push={true} />;
+    
+    if (this.state.redirect) {
+      return <Redirect to="/packings" push={true} />;
     }
     
     const productOptions: DropdownItemProps[] = [{ key: "", value: "", text: "", }].concat(this.state.products.map((product) => {
@@ -151,17 +155,24 @@ class EditPacking extends React.Component<Props, State> {
                         <label>{strings.packingStatus}</label>
                         <Select options={ [{value:"IN_STORE", text: strings.packingStoreStatus}, {value: "REMOVED", text: strings.packingRemovedStatus}] } text={this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus} value={ this.state.packingStatus } onChange={ this.onStatusChange }></Select>
                     </Form.Field>
-                    <Form.Field required>
+                    <Form.Field>
                         <label>{strings.labelPackedCount}</label>
                         <Input type="number" value={ this.state.packedCount} onChange={ this.onPackedCountChange }></Input>
                     </Form.Field>
                     <Form.Field>
                         <DateInput dateFormat="DD.MM.YYYY" onChange={this.onChangeDate} name="date" value={ moment(this.state.date).format("DD.MM.YYYY") } />
                     </Form.Field>
+                    <Message
+                      success
+                      visible={this.state.messageVisible}
+                      header={strings.savedSuccessfully}
+                    />
                     <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
+                    <Button className="danger-button" onClick={() => this.setState({confirmOpen:true})}>{strings.delete}</Button>
                 </FormContainer>
             </Grid.Column>
         </Grid.Row>
+        <Confirm open={this.state.confirmOpen} size={"mini"} content={strings.deleteConfirmationText + this.state.productName + " - "+ this.state.date} onCancel={()=>this.setState({confirmOpen:false})} onConfirm={this.handleDelete} />
       </Grid>
     )
   }
@@ -210,12 +221,14 @@ class EditPacking extends React.Component<Props, State> {
     * Handles changing date
     */
     private onChangeDate = (e: any, { value }: InputOnChangeData) => {
-      this.setState({date: moment(value, "YYYY.MM.DD HH:mm").toISOString()});
+      this.setState({date: moment(value, "DD.MM.YYYY HH:mm").toISOString()});
   }
 
+  /**
+   * Submits an updated packing
+   */
   private handleSubmit = async () => {
     try {
-
       const updatedPacking: Packing  = {
         id : this.state.packing ? this.state.packing.id : undefined,
         productId: this.state.productId,
@@ -232,10 +245,10 @@ class EditPacking extends React.Component<Props, State> {
       const packingsService = await Api.getPackingsService(this.props.keycloak);
       await packingsService.updatePacking(updatedPacking, updatedPacking.id);
 
-      this.setState({
-        redirect: true
-      });
-
+      this.setState({messageVisible: true});
+      setTimeout(() => {
+        this.setState({messageVisible: false});
+      }, 3000);
     } catch (e) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
@@ -246,6 +259,33 @@ class EditPacking extends React.Component<Props, State> {
 
   } 
   
+  /**
+   * Deletes a packing
+   */
+  private handleDelete = async () => {
+    try {
+      const packingsService = await Api.getPackingsService(this.props.keycloak);
+      if (!this.state.packing) {
+        throw new Error("Packing is undefined");
+      }
+  
+      if (!this.state.packing.id) {
+        throw new Error("Packing id is undefined")
+      }
+
+      await packingsService.deletePacking(this.state.packing.id);
+
+      this.setState({redirect: true});
+
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
+
+  }
 }
  
 /**

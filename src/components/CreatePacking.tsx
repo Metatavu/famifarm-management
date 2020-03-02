@@ -40,7 +40,7 @@ class CreatePacking extends React.Component<Props, State> {
             packageSizes: [],
             loading: false,
             packedCount: 0,
-            date: moment(moment(), "YYYY.MM.DD HH:mm").toISOString(),
+            date: moment(moment(), "DD.MM.YYYY HH:mm").toISOString(),
             redirect: false
         }
 
@@ -86,9 +86,9 @@ class CreatePacking extends React.Component<Props, State> {
             );
           }
           
-          if (this.state.redirect) {
+        if (this.state.redirect) {
             return <Redirect to={`/packings/${this.state.packingId}`} push={true} />;
-          }
+        }
         const productOptions: DropdownItemProps[] = [{ key: "", value: "", text: "", }].concat(this.state.products.map((product) => {
             const id = product.id!;
             const name = LocalizedUtils.getLocalizedValue(product.name);
@@ -132,7 +132,7 @@ class CreatePacking extends React.Component<Props, State> {
                                 <label>{strings.packingStatus}</label>
                                 <Select options={ [{value:"IN_STORE", text: strings.packingStoreStatus}, {value: "REMOVED", text: strings.packingRemovedStatus}] } text={this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus} value={ this.state.packingStatus } onChange={ this.onStatusChange }></Select>
                             </Form.Field>
-                            <Form.Field required>
+                            <Form.Field>
                                 <label>{strings.labelPackedCount}</label>
                                 <Input type="number" value={ this.state.packedCount} onChange={ this.onPackedCountChange }></Input>
                             </Form.Field>
@@ -191,7 +191,7 @@ class CreatePacking extends React.Component<Props, State> {
      * Handles changing date
      */
     private onChangeDate = async (e: any, { value }: InputOnChangeData) => {
-        this.setState({date: moment(value, "YYYY.MM.DD HH:mm").toISOString()});
+        this.setState({date: moment(value, "DD.MM.YYYY HH:mm").toISOString()});
     }
     /**
      * Handle form submit
