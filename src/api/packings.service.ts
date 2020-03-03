@@ -24,11 +24,9 @@ export class PackingsService {
             },
             body: JSON.stringify(body)
         };
-        console.log(body);
+
         return fetch(uri.toString(), options).then((response) => {
             return Api.handleResponse(response);
-        }).catch(e => {
-          console.log(e);
         });
     }
 
