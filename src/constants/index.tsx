@@ -112,3 +112,5 @@ export type PESTS_FOUND = typeof PESTS_FOUND;
 export const ERROR_OCCURRED = "ERROR_OCCURRED";
 export type ERROR_OCCURRED = typeof ERROR_OCCURRED;
 
+export const PACKINGS_FOUND = "PACKINGS_FOUND";
+export type PACKINGS_FOUND = typeof PACKINGS_FOUND;

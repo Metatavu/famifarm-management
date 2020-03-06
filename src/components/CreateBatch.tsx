@@ -27,7 +27,7 @@ export interface State {
   products: Product[]
 }
 
-const PHASES: BatchPhase[] = ["SOWING", "PLANTING", "TABLE_SPREAD", "HARVEST", "PACKING", "COMPLETE"];
+const PHASES: BatchPhase[] = ["SOWING", "PLANTING", "TABLE_SPREAD", "HARVEST", "COMPLETE"];
 
 class CreateBatch extends React.Component<Props, State> {
   constructor(props: Props) {

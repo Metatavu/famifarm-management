@@ -12,6 +12,8 @@
   "managementHeaderText": "Famifarm management",
   "save": "Save",
   "date": "Date",
+  "dateBefore": "Created before date",
+  "dateAfter": "Created after date",
   "open": "Open",
   "savedSuccessfully": "Saved successfully!",
   "delete": "Delete",
@@ -62,7 +64,6 @@
   "batchPhaseTABLE_SPREAD": "Trays to nursery",
   "batchPhasePLANTING": "Planting",
   "batchPhaseHARVEST": "Harvest",
-  "batchPhasePACKING": "Packing",
   "batchPhaseCOMPLETE": "Complete",
 
   "sowingEventHeader": "Sowing",
@@ -77,8 +78,6 @@
   "pestObservationText": "Observed pests",
   "harvestEventHeader": "Harvest",
   "harvestEventText": "Harvested plants",
-  "packingEventHeader": "Packing",
-  "packingEventText": "Created {0} packages",
   "wastageEventHeader": "Wastage",
   "wastageEventText": "Wasted {0} plants",
   "unknownEventHeader": "Unknown",
@@ -130,7 +129,6 @@
   "potTypeLARGE" : "Large",
   "phasePLANTING" : "Planting",
   "phaseSOWING" : "Sowing",
-  "phasePACKING" : "Packing",
   "phaseTABLE_SPREAD" : "Trays to nursery",
   "phaseCULTIVATION_OBSERVATION" : "Observations",
   "phaseHARVEST" : "Harvesting",
@@ -164,5 +162,12 @@
   "deleteBatchButtonText": "Delete batch",
   "batchDeletionError": "Deleting batch failed.",
   "batchDeletionSuccess": "Deleted",
-  "batchDeletingInProgress": "Deleting..."
+  "batchDeletingInProgress": "Deleting...",
+  "packings": "Packings",
+  "newPacking": "New packing",
+  "packingStatus": "Packing state",
+  "packingRemovedStatus": "Removed",
+  "packingStoreStatus": "In store",
+  "selectPackingStatus": "Select packing status",
+  "editPacking": "Edit packing"
 }

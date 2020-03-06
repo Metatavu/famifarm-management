@@ -6,6 +6,7 @@ import {
   TEAMS_FOUND, 
   TEAM_SELECTED, 
   TEAM_DELETED,
+  PACKINGS_FOUND,
   PRODUCTS_FOUND, 
   PRODUCT_SELECTED, 
   PRODUCT_DELETED,
@@ -50,6 +51,8 @@ export function processAction(state: StoreState, action: AppAction): StoreState 
       return { ...state, team: action.team};
     case TEAM_DELETED:
       return { ...state,  teams: (state.teams || []).filter((team) => {return team.id !== action.teamId})};
+    case PACKINGS_FOUND:
+      return {...state, packings: action.packings};
     case PRODUCTS_FOUND:
       return { ...state, products: action.products };
     case BATCHES_FOUND:

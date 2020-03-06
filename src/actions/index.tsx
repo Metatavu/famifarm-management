@@ -1,6 +1,6 @@
 import * as constants from '../constants'
 import { KeycloakInstance } from 'keycloak-js';
-import { Team, Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, Batch, WastageReason, Pest } from "famifarm-typescript-models";
+import { Team, Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, Batch, WastageReason, Pest, Packing } from "famifarm-typescript-models";
 import { ErrorMessage } from '../types';
 
 export interface UserLogin {
@@ -31,6 +31,11 @@ export interface TeamCreated {
 export interface TeamDeleted {
   type: constants.TEAM_DELETED;
   teamId: string;
+}
+
+export interface PackingsFound {
+  type: constants.PACKINGS_FOUND;
+  packings: Packing[];
 }
 
 export interface ProductsFound {
@@ -218,7 +223,7 @@ export type AppAction = UserLogin | UserLogout | TeamsFound | TeamSelected | Tea
   | ProductionLineDeleted | SeedBatchesFound | SeedBatchSelected | SeedBatchCreated | SeedBatchDeleted
   | PerformedCultivationActionsFound | PerformedCultivationActionSelected | PerformedCultivationActionCreated
   | PerformedCultivationActionDeleted | LocaleUpdate | BatchesFound | WastageReasonsFound | WastageReasonSelected 
-  | WastageReasonCreated | WastageReasonDeleted| PestsFound | ErrorOccurred;
+  | WastageReasonCreated | WastageReasonDeleted| PestsFound | ErrorOccurred | PackingsFound;
 
 export function userLogin(keycloak: KeycloakInstance, authenticated: boolean): UserLogin {
   return {
@@ -259,6 +264,13 @@ export function teamDeleted(teamId: string): TeamDeleted {
   return {
     type: constants.TEAM_DELETED,
     teamId: teamId
+  }
+}
+
+export function packingsFound(packings: Packing[]): PackingsFound {
+  return {
+    type: constants.PACKINGS_FOUND,
+    packings: packings
   }
 }
 

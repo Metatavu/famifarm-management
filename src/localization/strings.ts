@@ -17,6 +17,8 @@ export interface IStrings extends LocalizedStringsMethods {
   managementHeaderText: string;
   save: string;
   date: string;
+  dateAfter: string;
+  dateBefore: string;
   open: string;
   savedSuccessfully: string;
   delete: string;
@@ -74,7 +76,6 @@ export interface IStrings extends LocalizedStringsMethods {
   batchPhaseTABLE_SPREAD: string,
   batchPhasePLANTING: string,
   batchPhaseHARVEST: string,
-  batchPhasePACKING: string,
   batchPhaseCOMPLETE: string,
 
   sowingEventHeader: string
@@ -94,9 +95,6 @@ export interface IStrings extends LocalizedStringsMethods {
 
   harvestEventHeader: string
   harvestEventText: string
-
-  packingEventHeader: string
-  packingEventText: string
 
   wastageEventHeader: string
   wastageEventText: string
@@ -150,7 +148,6 @@ export interface IStrings extends LocalizedStringsMethods {
   potTypeLARGE: string
   phasePLANTING: string
   phaseSOWING: string
-  phasePACKING: string
   phaseTABLE_SPREAD: string
   phaseWASTAGE: string,
   phaseCULTIVATION_OBSERVATION: string
@@ -187,6 +184,14 @@ export interface IStrings extends LocalizedStringsMethods {
   batchDeletionError: string
   batchDeletionSuccess: string
   batchDeletingInProgress: string
+
+  packings: string
+  newPacking: string
+  packingStatus: string
+  packingStoreStatus: string
+  packingRemovedStatus: string
+  selectPackingStatus: string
+  editPacking: string
 }
 
 const strings: IStrings = new LocalizedStrings({

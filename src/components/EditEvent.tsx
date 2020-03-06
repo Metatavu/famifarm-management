@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PackingEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, ProductionLine, SeedBatch, WastageReason, Team } from "famifarm-typescript-models";
+import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, ProductionLine, SeedBatch, WastageReason, Team } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 import { DateTimeInput } from 'semantic-ui-calendar-react';
@@ -265,12 +265,6 @@ class EditEvent extends React.Component<Props, State> {
             type: eventData.type
           } as HarvestEventData;
         break;
-        case "PACKING":
-          data = {
-            packageSizeId: eventData.packageSizeId,
-            packedCount: eventData.packedCount
-          } as PackingEventData;
-        break;
         case "PLANTING":
           data = {
             gutterCount: eventData.gutterCount,
@@ -352,8 +346,6 @@ class EditEvent extends React.Component<Props, State> {
         return this.renderCultivationObservationDataForm(event.data as CultivationObservationEventData);
       case "HARVEST":
         return this.renderHarvesDataForm(event.data as HarvestEventData);
-      case "PACKING":
-        return this.renderPackingDataForm(event.data as PackingEventData);
       case "PLANTING":
         return this.renderPlantingDataForm(event.data as PlantingEventData);
       case "SOWING":
@@ -455,38 +447,6 @@ class EditEvent extends React.Component<Props, State> {
         <Form.Select required label={strings.labelTeam} name="teamId" options={teamOptions} value={data.teamId} onChange={this.handleDataChange} />
       </React.Fragment>
     )
-  }
-
-  /**
-   * Renders packing event form
-   */
-  private renderPackingDataForm = (data: PackingEventData) => {
-    if (!this.state.packageSizes) {
-      this.loadPackingData().catch((e) => {
-        this.props.onError({
-          message: strings.defaultApiErrorMessage,
-          title: strings.defaultApiErrorTitle,
-          exception: e
-        });
-      });
-
-      return;
-    }
-
-    const packageSizeOptions = this.state.packageSizes.map((packageSize) => {
-      return {
-        key: packageSize.id,
-        value: packageSize.id,
-        text: LocalizedUtils.getLocalizedValue(packageSize.name)
-      }
-    });
-
-    return (
-      <React.Fragment>
-        <Form.Input required label={strings.labelPackedCount} name="packedCount" type="number" value={data.packedCount} onChange={this.handleDataChange} />
-        <Form.Select required label={strings.labelPackageSize} name="packageSizeId" options={packageSizeOptions} value={data.packageSizeId} onChange={this.handleDataChange} />
-      </React.Fragment>
-    );
   }
 
   /**
@@ -619,7 +579,7 @@ class EditEvent extends React.Component<Props, State> {
       };
     });
 
-    const phaseOptions = ['PLANTING', 'SOWING', 'PACKING', 'TABLE_SPREAD', 'CULTIVATION_OBSERVATION', 'HARVEST' ].map((phase) => {
+    const phaseOptions = ['PLANTING', 'SOWING', 'TABLE_SPREAD', 'CULTIVATION_OBSERVATION', 'HARVEST' ].map((phase) => {
       return {
         key: phase,
         value: phase,
@@ -686,24 +646,6 @@ class EditEvent extends React.Component<Props, State> {
       loading: false,
       pests: pests,
       performedCultivationActions: performedCultivationActions
-    });
-  }
-
-  /**
-   * Loads data required for packing event
-   */
-  private loadPackingData = async () => {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    this.setState({loading: true});
-    const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-    const packageSizes = await packageSizeService.listPackageSizes();
-
-    this.setState({
-      loading: false,
-      packageSizes: packageSizes
     });
   }
 

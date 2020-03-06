@@ -24,6 +24,7 @@ import EditEvent from "./EditEvent";
 import ReportDownload from "./ReportDownload";
 import SeedList from "./SeedList";
 import BatchList from "./BatchList";
+import EditPacking from "./EditPacking";
 import EditProduct from "./EditProduct";
 import EditPackageSize from "./EditPackageSize";
 import EditSeed from "./EditSeed";
@@ -49,6 +50,8 @@ import CreatePackageSize from "./CreatePackageSize";
 import CreateEvent from "./CreateEvent";
 import CreateBatch from "./CreateBatch";
 import EditBatch from "./EditBatch";
+import PackingList from "./PackingList";
+import CreatePacking from "./CreatePacking";
 
 export interface Props {
   authenticated: boolean,
@@ -88,6 +91,9 @@ class WelcomePage extends React.Component<Props, any> {
     const navigationRoutes = [{
       "text": strings.batches,
       "route": "/batches"
+    },{
+      "text": strings.packings,
+      "route": "/packings"
     },{
       "text": strings.teams,
       "route": "/teams"
@@ -181,6 +187,15 @@ class WelcomePage extends React.Component<Props, any> {
                 )}
               />
               <Route
+                path="/packings"
+                exact={true}
+                render={props => (
+                  <PackingList
+                    keycloak={this.state.keycloak}
+                  />
+                )}
+              />
+              <Route
                 path="/batches/:batchId"
                 exact={true}
                 render={props => (
@@ -200,6 +215,16 @@ class WelcomePage extends React.Component<Props, any> {
                   />
                 )}
               />
+              <Route 
+                path="/packings/:packingId"
+                exact={true}
+                render={props => (
+                  <EditPacking
+                    keycloak={this.state.keycloak}
+                    packingId={props.match.params.packingId as string}
+                />
+                )}
+              />
               <Route
                 path="/createTeam"
                 exact={true}
@@ -207,6 +232,13 @@ class WelcomePage extends React.Component<Props, any> {
                   <CreateTeam
                     keycloak={this.state.keycloak}
                   />
+                )}
+              />
+              <Route
+                path="/createPacking"
+                exact={true}
+                render={props => (
+                  <CreatePacking keycloak={this.state.keycloak}/>
                 )}
               />
               <Route

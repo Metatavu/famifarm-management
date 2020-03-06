@@ -23,6 +23,7 @@ import { WastageReasonsService } from './wastageReasons.service';
 import { KeycloakInstance } from 'keycloak-js';
 import { DraftsService } from './drafts.service';
 import { PestsService } from './pests.service';
+import { PackingsService } from './packings.service';
 
 const API_URL = process.env.REACT_APP_FAMIFARM_API_BASE_PATH || "http://localhost";
 
@@ -43,6 +44,16 @@ export class Api {
       default:
         return response.json();
     }
+  }
+  
+  /**
+   * Returns promise of packings service authenticated with valid token
+   * 
+   * @param keycloak keycloak instance
+   * @returns promise of packings service authenticated with valid token 
+   */
+  public async getPackingsService(keycloak: KeycloakInstance): Promise<PackingsService> {
+    return new PackingsService(API_URL, await this.checkTokenValidity(keycloak));
   }
 
   /**

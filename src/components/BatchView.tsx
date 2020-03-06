@@ -2,7 +2,7 @@ import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import * as _ from "lodash";
 import Api from "../api";
-import { Event, SowingEventData, TableSpreadEventData, CultivationObservationEventData, PlantingEventData, HarvestEventData, PackingEventData, WastageEventData, BatchPhase, PackageSize, EventType } from "famifarm-typescript-models";
+import { Event, SowingEventData, TableSpreadEventData, CultivationObservationEventData, PlantingEventData, HarvestEventData, WastageEventData, BatchPhase, PackageSize, EventType } from "famifarm-typescript-models";
 import { VerticalTimeline, VerticalTimelineElement }  from 'react-vertical-timeline-component';
 import 'react-vertical-timeline-component/style.min.css';
 import '../styles/batch-view.css';
@@ -15,7 +15,6 @@ import observationsIcon from "../gfx/icons/havainnot-icon.png"
 import sowingIcon from "../gfx/icons/kylvo-icon.png"
 import plantingIcon from "../gfx/icons/istutus-icon.png"
 import tablespreadIcon from "../gfx/icons/levitys-icon.png"
-import packingIcon from "../gfx/icons/pakkaaminen-icon.png"
 import harvestIcon from "../gfx/icons/sadonkorjuu-icon.png"
 
 import {
@@ -134,8 +133,6 @@ class BatchView extends React.Component<Props, State> {
         return <img style={iconStyle} src={plantingIcon} />
       case "HARVEST":
         return <img style={{...iconStyle, maxWidth: "50%", marginLeft: "25%"}} src={harvestIcon} />
-      case "PACKING":
-        return <img style={iconStyle} src={packingIcon} />
       case "WASTAGE":
         return <Icon style={{fontSize: "25px", paddingTop: "33%", textAlign: "center", width: "100%", color: "#2DA457"}} name="trash" />
       default:
@@ -164,10 +161,6 @@ class BatchView extends React.Component<Props, State> {
       case "HARVEST":
         phase = "HARVEST";
         loss = (event.remainingUnits || 0) - this.getProcessedCount("HARVEST");
-      break;
-      case "PACKING":
-        phase = "PACKING";
-        loss = event.remainingUnits || 0;
       break;
     }
 
@@ -213,8 +206,6 @@ class BatchView extends React.Component<Props, State> {
         return this.getPlantedCount(batchEvents);
       case "HARVEST":
         return this.getHarvestedCount(batchEvents);
-      case "PACKING":
-        return this.getPackedCount(batchEvents);
     }
 
     return 0;
@@ -293,23 +284,6 @@ class BatchView extends React.Component<Props, State> {
   }
 
   /**
-   * Gets total number of packed units from list of events
-   */
-  private getPackedCount = (batchEvents: Event[]) => {
-    let count = 0;
-    const packingEvents = batchEvents.filter((event) => event.type == "PACKING");
-    for (let i = 0; i < packingEvents.length; i++) {
-      let eventData = packingEvents[i].data as PackingEventData;
-      let packageSize = this.state.packageSizes.find((packageSize: PackageSize) => packageSize.id === eventData.packageSizeId);
-      if (!packageSize) {
-        continue;
-      }
-      count += (eventData.packedCount || 0) * (packageSize.size || 0);
-    }
-    return Math.round(count);
-  }
-
-  /**
    * Gets processed count from single event
    */
   private getSingleProcessedCount = (event: Event) => {
@@ -324,8 +298,6 @@ class BatchView extends React.Component<Props, State> {
         return this.getSinglePlantedCount(event);
       case "HARVEST":
         return this.getSingleHarvestedCount(event);
-      case "PACKING":
-        return this.getSinglePackedCount(event);
       case "WASTAGE":
         return (event.data as WastageEventData).amount;
       default:
@@ -389,22 +361,6 @@ class BatchView extends React.Component<Props, State> {
 
     const gutterHoleCount = totalWeightedSize == 0 || totalGutterCount == 0 ? 0 : totalWeightedSize / totalGutterCount;
     return Math.round(gutterHoleCount * harvestedGutterCount);
-  }
-
-  /**
-   * Gets processed count from single packing event
-   */
-  private getSinglePackedCount = (event: Event) => {
-    
-    const eventData = event.data as PackingEventData;
-    let packageSize = this.state.packageSizes.find((packageSize: PackageSize) => packageSize.id === eventData.packageSizeId);
-    if (!packageSize) {
-      return 0;
-    }
-
-    const count = (eventData.packedCount || 0) * (packageSize.size || 0);
-
-    return Math.round(count);
   }
 
   /**
@@ -479,19 +435,6 @@ class BatchView extends React.Component<Props, State> {
           <div>
             <h3 className="vertical-timeline-element-title">{strings.harvestEventHeader}</h3>
             <p>{strings.formatString(strings.harvestEventText)}</p>
-            <NavLink to={`/events/${event.id}`}><Button style={{float: "right"}}>{strings.editEventLink}</Button></NavLink>
-            {showLogWastage && <Button style={{float: "right"}} onClick={() => this.handleLogWastageClick(event)}>{strings.logPhaseWastage}</Button>}
-            <small>{strings.formatString(strings.remainingUnitsText, event.remainingUnits ? event.remainingUnits.toString() : "0")}</small>
-            <br/>
-            <small>{strings.formatString(strings.processedUnitsText, processedUnits ? processedUnits.toString() : "0")}</small>
-          </div> 
-        );
-      case "PACKING":
-        eventData = event.data as PackingEventData;
-        return ( 
-          <div>
-            <h3 className="vertical-timeline-element-title">{strings.packingEventHeader}</h3> 
-            <p>{strings.formatString(strings.packingEventText, String(eventData.packedCount))}</p>
             <NavLink to={`/events/${event.id}`}><Button style={{float: "right"}}>{strings.editEventLink}</Button></NavLink>
             {showLogWastage && <Button style={{float: "right"}} onClick={() => this.handleLogWastageClick(event)}>{strings.logPhaseWastage}</Button>}
             <small>{strings.formatString(strings.remainingUnitsText, event.remainingUnits ? event.remainingUnits.toString() : "0")}</small>
@@ -645,7 +588,7 @@ class BatchView extends React.Component<Props, State> {
       const isLastEvent = i === (this.state.batchEvents.length - 1);
       const startMoment = moment(event.startTime);
       const endMoment = moment(event.endTime);
-      const showLogWastage = isLastEvent && (event.type === "TABLE_SPREAD" || event.type === "PLANTING" || event.type === "HARVEST" || event.type === "PACKING");
+      const showLogWastage = isLastEvent && (event.type === "TABLE_SPREAD" || event.type === "PLANTING" || event.type === "HARVEST" );
       const dateString = startMoment.isSame(endMoment) ? startMoment.format("DD.MM.YYYY HH:mm") : `${moment(event.startTime).format("DD.MM.YYYY HH:mm")} - ${moment(event.endTime).format("DD.MM.YYYY HH:mm")}`;
       return (
         <VerticalTimelineElement
