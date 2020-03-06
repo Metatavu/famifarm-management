@@ -13,7 +13,8 @@ import {
   List,
   Button,
   Grid,
-  Loader
+  Loader,
+  Checkbox
 } from "semantic-ui-react";
 
 export interface Props {
@@ -24,14 +25,16 @@ export interface Props {
 }
 
 export interface State {
-  seedBatches: SeedBatch[];
+  seedBatches: SeedBatch[],
+  showPassive: boolean
 }
 
 class SeedBatchList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      seedBatches: []
+      seedBatches: [],
+      showPassive: true
     };
   }
 
@@ -98,6 +101,7 @@ class SeedBatchList extends React.Component<Props, State> {
           <NavLink to="/createSeedBatch">
             <Button className="submit-button">{strings.newSeedBatch}</Button>
           </NavLink>
+          <Checkbox checked={this.state.showPassive} onClick={() => this.setState({showPassive:!this.state.showPassive})} label='Show non-active seed batches' />
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
