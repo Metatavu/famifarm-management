@@ -82,7 +82,7 @@ export class SeedBatchesService {
    * @param firstResult First index of results to be returned
    * @param maxResults How many items to return at one time
   */
-  public listSeedBatches(firstResult?: number, maxResults?: number, active?: boolean ):Promise<Array<SeedBatch>> {
+  public listSeedBatches(firstResult?: number, maxResults?: number, showPassive?: boolean ):Promise<Array<SeedBatch>> {
     const uri = new URI(`${this.basePath}/v1/seedBatches`);
     if (firstResult !== undefined && firstResult !== null) {
       uri.addQuery('firstResult', <any>firstResult);
@@ -90,8 +90,8 @@ export class SeedBatchesService {
     if (maxResults !== undefined && maxResults !== null) {
       uri.addQuery('maxResults', <any>maxResults);
     }
-    if (active !== undefined && active !== null) {
-      uri.addQuery("active", <any>active);
+    if (showPassive !== undefined && showPassive !== null) {
+      uri.addQuery("includePassive", <any>showPassive);
     }
     const options = {
       method: "get",

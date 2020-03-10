@@ -192,6 +192,9 @@ export interface IStrings extends LocalizedStringsMethods {
   packingRemovedStatus: string
   selectPackingStatus: string
   editPacking: string
+
+  showPassiveSeedBatches: string
+  seedBatchState: string
 }
 
 const strings: IStrings = new LocalizedStrings({
