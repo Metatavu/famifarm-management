@@ -13,7 +13,8 @@ import {
   List,
   Button,
   Grid,
-  Loader
+  Loader,
+  Checkbox
 } from "semantic-ui-react";
 
 export interface Props {
@@ -24,14 +25,18 @@ export interface Props {
 }
 
 export interface State {
-  seedBatches: SeedBatch[];
+  seedBatches: SeedBatch[],
+  showPassive: boolean,
+  loading: boolean
 }
 
 class SeedBatchList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      seedBatches: []
+      seedBatches: [],
+      showPassive: false,
+      loading: false
     };
   }
 
@@ -43,9 +48,8 @@ class SeedBatchList extends React.Component<Props, State> {
       if (!this.props.keycloak) {
         return;
       }
-  
       const seedBatchService = await Api.getSeedBatchesService(this.props.keycloak);
-      const seedBatches = await seedBatchService.listSeedBatches();
+      const seedBatches = await seedBatchService.listSeedBatches(undefined, undefined, this.state.showPassive);
       seedBatches.sort((a, b) => {
         let nameA = a.code || "";
         let nameB = b.code || "";
@@ -67,6 +71,13 @@ class SeedBatchList extends React.Component<Props, State> {
    * Render seed batch list view
    */
   public render() {
+    if (this.state.loading) {
+      return (
+        <Grid style={{paddingTop: "100px"}} centered>
+          <Loader inline active size="medium" />
+        </Grid>
+      );
+    }
     if (!this.props.seedBatches) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
@@ -98,6 +109,7 @@ class SeedBatchList extends React.Component<Props, State> {
           <NavLink to="/createSeedBatch">
             <Button className="submit-button">{strings.newSeedBatch}</Button>
           </NavLink>
+          <Checkbox checked={this.state.showPassive} onChange={this.onShowPassiveChange} label={strings.showPassiveSeedBatches} />
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
@@ -108,6 +120,37 @@ class SeedBatchList extends React.Component<Props, State> {
         </Grid.Row>
       </Grid>
     );
+  }
+
+  private onShowPassiveChange = async () => {
+    const showPassive = !this.state.showPassive;
+    await this.setState({showPassive});
+    await this.updateSeedBatchesList().catch((err) => {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: err
+      });
+    });
+  }
+
+  private updateSeedBatchesList = async () => {
+    if (!this.props.keycloak) {
+      return;
+    }
+
+    this.setState({loading: true});
+    const seedBatchesService = Api.getSeedBatchesService(this.props.keycloak);
+    const seedBatches = await (await seedBatchesService).listSeedBatches(undefined, undefined, this.state.showPassive);
+    seedBatches.sort((a, b) => {
+      let nameA = a.code || "";
+      let nameB = b.code || "";
+      if(nameA < nameB) { return -1; }
+      if(nameA > nameB) { return 1; }
+      return 0;
+    });
+    this.props.onSeedBatchesFound && this.props.onSeedBatchesFound(seedBatches);
+    this.setState({loading: false})
   }
 }
 

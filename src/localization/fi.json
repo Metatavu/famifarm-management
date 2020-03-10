@@ -168,5 +168,7 @@
     "packingRemovedStatus": "Poistunut",
     "packingStoreStatus": "Varastossa",
     "selectPackingStatus": "Valitse pakkauksen tila",
-    "editPacking": "Muokkaa pakkausta"
+    "editPacking": "Muokkaa pakkausta",
+    "showPassiveSeedBatches": "Näytä ei-aktiiviset siemenerät",
+    "seedBatchState": "Siemenerä on aktiivinen"
   }

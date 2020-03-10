@@ -169,5 +169,7 @@
   "packingRemovedStatus": "Removed",
   "packingStoreStatus": "In store",
   "selectPackingStatus": "Select packing status",
-  "editPacking": "Edit packing"
+  "editPacking": "Edit packing",
+  "showPassiveSeedBatches": "Show non-active seed batches",
+  "seedBatchState": "Seed batch is active"
 }
