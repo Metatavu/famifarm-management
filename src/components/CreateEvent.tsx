@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, ProductionLine, SeedBatch, WastageReason, Team, BatchPhase } from "famifarm-typescript-models";
+import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, ProductionLine, SeedBatch, WastageReason, Team, BatchPhase, Seed } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 import { DateTimeInput } from 'semantic-ui-calendar-react';
@@ -52,6 +52,7 @@ interface State {
   productionLines?: ProductionLine[]
   packageSizes?: PackageSize[]
   seedBatches?: SeedBatch[]
+  seeds?: Seed[]
   wastageReasons?: WastageReason[]
   batchEvents: Event[]
 }
@@ -107,9 +108,13 @@ class CreateEvent extends React.Component<Props, State> {
       productionLineId: productionLineId
     }
 
+    const seedsService = await Api.getSeedsService(this.props.keycloak);
+    const seeds = await seedsService.listSeeds(undefined, undefined);
+
     this.setState({
       batchEvents: events,
       loading: false,
+      seeds: seeds,
       event: {
         batchId: this.props.batchId,
         startTime: moment().toISOString(),
@@ -612,11 +617,22 @@ class CreateEvent extends React.Component<Props, State> {
       };
     });
 
+    const getSeedName = (seedId?:String): any => {
+      if (this.state.seeds === null || this.state.seeds === undefined) {
+        return
+      }
+      const seed = this.state.seeds.find(seed => seed.id === seedId)
+      if (seed === null || seed === undefined) {
+        return
+      }
+      return LocalizedUtils.getLocalizedValue(seed.name)
+    }
+
     const seedBatchOptions = this.state.seedBatches.map((seedBatch) => {
       return {
         key: seedBatch.id,
         value: seedBatch.id,
-        text: seedBatch.code
+        text: seedBatch.code + " " + getSeedName(seedBatch.seedId)
       };
     });
 
