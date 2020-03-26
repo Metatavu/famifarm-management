@@ -150,6 +150,7 @@
   "reportTypeItemSPREAD": "Spread",
   "reportTypeItemHARVESTED": "Harvested",
   "reportTypeItemPACKED": "Packed",
+  "reportTypeItemPRODUCT_PHASE_COUNT": "Products by phase",
   "userManagementLink": "User management",
   "accountUrl": "Account",
   "logoutUrl": "Logout",

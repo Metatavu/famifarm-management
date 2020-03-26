@@ -149,6 +149,7 @@
     "reportTypeItemSPREAD": "Levitetty",
     "reportTypeItemHARVESTED": "Korjattu",
     "reportTypeItemPACKED": "Pakattu",
+    "reportTypeItemPRODUCT_PHASE_COUNT": "Tuotteet vaiheittain",
     "userManagementLink": "Käyttäjähallinta",
     "accountUrl": "Käyttäjätili",
     "logoutUrl": "Kirjaudu ulos",

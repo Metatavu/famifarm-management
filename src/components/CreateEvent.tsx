@@ -383,7 +383,6 @@ class CreateEvent extends React.Component<Props, State> {
         break;
         case "TABLE_SPREAD":
           data = {
-            location: "Taimialue",
             trayCount: eventData.trayCount
           } as TableSpreadEventData;
         break;
