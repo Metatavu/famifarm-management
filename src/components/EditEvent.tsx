@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, ProductionLine, SeedBatch, WastageReason, Team } from "famifarm-typescript-models";
+import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, ProductionLine, SeedBatch, WastageReason, Team, Seed } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 import { DateTimeInput } from 'semantic-ui-calendar-react';
@@ -51,6 +51,7 @@ interface State {
   packageSizes?: PackageSize[]
   seedBatches?: SeedBatch[]
   wastageReasons?: WastageReason[]
+  seeds?: Seed[]
 }
 
 /**
@@ -86,10 +87,12 @@ class EditEvent extends React.Component<Props, State> {
       this.setState({loading: true});
       const eventsService = await Api.getEventsService(this.props.keycloak);
       const event = await eventsService.findEvent(this.props.eventId);
-
+      const seedsService = await Api.getSeedsService(this.props.keycloak);
+      const seeds = await seedsService.listSeeds(undefined, undefined);
       this.setState({
         event: event,
-        loading: false
+        loading: false,
+        seeds: seeds
       });
     } catch (e) {
       this.props.onError({
@@ -508,11 +511,22 @@ class EditEvent extends React.Component<Props, State> {
       };
     });
 
+    const getSeedName = (seedId?:String): any => {
+      if (this.state.seeds === null || this.state.seeds === undefined) {
+        return
+      }
+      const seed = this.state.seeds.find(seed => seed.id === seedId)
+      if (seed === null || seed === undefined) {
+        return
+      }
+      return LocalizedUtils.getLocalizedValue(seed.name)
+    }
+
     const seedBatchOptions = this.state.seedBatches.map((seedBatch) => {
       return {
         key: seedBatch.id,
         value: seedBatch.id,
-        text: seedBatch.code
+        text: seedBatch.code + " " + getSeedName(seedBatch.seedId)
       };
     });
 
