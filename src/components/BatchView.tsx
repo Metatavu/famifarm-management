@@ -160,7 +160,7 @@ class BatchView extends React.Component<Props, State> {
       break;
       case "HARVEST":
         phase = "HARVEST";
-        loss = (event.remainingUnits || 0) - this.getProcessedCount("HARVEST");
+        loss = (event.remainingUnits || 0);
       break;
     }
 
