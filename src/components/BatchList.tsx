@@ -253,7 +253,7 @@ class BatchList extends React.Component<Props, State> {
    */
   private loadMoreBatches = async (e: any, { calculations }: any) => {
     if (calculations.bottomVisible === true && !this.state.loading) {
-      const firstResult = this.state.firstResult + 21;
+      const firstResult = this.state.firstResult + 20;
       await this.setState({firstResult});
       await this.updateBatches(this.state.status, firstResult);
     }
