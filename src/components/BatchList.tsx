@@ -18,7 +18,8 @@ import {
   Label,
   Form,
   InputOnChangeData,
-  TextAreaProps
+  TextAreaProps,
+  Visibility
 } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import LocalizedUtils from "src/localization/localizedutils";
@@ -47,7 +48,8 @@ interface State {
   selectedProductName?: string
   status: string
   loading: boolean
-  errorCount: number
+  errorCount: number,
+  firstResult: number
 }
 
 /**
@@ -60,8 +62,9 @@ class BatchList extends React.Component<Props, State> {
       batches: [],
       status: "OPEN",
       loading: false,
-      errorCount: 0
-    };
+      errorCount: 0,
+      firstResult: 0
+    };;
   }
 
   /**
@@ -69,7 +72,7 @@ class BatchList extends React.Component<Props, State> {
    */
   public async componentDidMount() {
     try {
-      await this.updateBatches(this.state.status);
+      await this.updateBatches(this.state.status, this.state.firstResult);
     } catch (e) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
@@ -93,12 +96,18 @@ class BatchList extends React.Component<Props, State> {
    * Render batch list view
    */
   public render() {
-    if (this.state.loading) {
+    if (this.state.loading && this.state.firstResult === 0) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
           <Loader inline active size="medium" />
         </Grid>
       );
+    }
+
+    const possibleLoader = (): any => {
+      if (this.state.loading) {
+        return <Loader inline active size="medium" />
+      }
     }
 
     const statusButtons = ["OPEN", "CLOSED", "NEGATIVE"].map((status: string) => {
@@ -154,11 +163,14 @@ class BatchList extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
+          <Visibility onUpdate={this.loadMoreBatches}>
             <List divided animated verticalAlign='middle'>
               {batches}
             </List>
+          </Visibility>
           </Grid.Column>
         </Grid.Row>
+        {possibleLoader()}
       </Grid>
     );
   }
@@ -168,10 +180,10 @@ class BatchList extends React.Component<Props, State> {
    */
   private handleButtonClick = (status: string) => {
     this.setState({
-      status: status
+      status: status,
+      firstResult: 0
     });
-
-    this.updateBatches(status).catch((err) => {
+    this.updateBatches(status, 0).catch((err) => {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -184,9 +196,9 @@ class BatchList extends React.Component<Props, State> {
    * Handles changing date
    */
   private onChangeDate = async (e: any, { value }: InputOnChangeData) => {
-    await this.setState({date: moment(value, "DD.MM.YYYY").toISOString()});
+    await this.setState({date: moment(value, "DD.MM.YYYY").toISOString(), firstResult: 0});
 
-    await this.updateBatches(this.state.status).catch((err) => {
+    await this.updateBatches(this.state.status, 0).catch((err) => {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -208,10 +220,11 @@ class BatchList extends React.Component<Props, State> {
     }
     await this.setState({
       selectedProduct: value !== "" ? String(value) : undefined,
-      selectedProductName: productName
+      selectedProductName: productName,
+      firstResult: 0
     });
 
-    await this.updateBatches(this.state.status).catch((err) => {
+    await this.updateBatches(this.state.status, 0).catch((err) => {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -236,9 +249,20 @@ class BatchList extends React.Component<Props, State> {
   }
 
   /**
+   * Loads more batches
+   */
+  private loadMoreBatches = async (e: any, { calculations }: any) => {
+    if (calculations.bottomVisible === true && !this.state.loading) {
+      const firstResult = this.state.firstResult + 21;
+      await this.setState({firstResult});
+      await this.updateBatches(this.state.status, firstResult);
+    }
+  }
+
+  /**
    * Updates batch list
    */
-  private updateBatches = async (status: string) => {
+  private updateBatches = async (status: string, firstResult: number) => {
     if (!this.props.keycloak) {
       return;
     }
@@ -252,11 +276,17 @@ class BatchList extends React.Component<Props, State> {
     ]);
 
     const [batches, products, errorBatches] = await Promise.all([
-      batchesService.listBatches(status, undefined, this.state.selectedProduct, undefined, undefined, createdBefore, createdAfter),
+      batchesService.listBatches(status, undefined, this.state.selectedProduct, firstResult, 20, createdBefore, createdAfter),
       productsService.listProducts(),
       batchesService.listBatches("NEGATIVE")
     ]);
-    this.props.onBatchesFound && this.props.onBatchesFound(batches);
+
+    if (firstResult === 0) {
+      this.props.onBatchesFound && this.props.onBatchesFound(batches);
+    } else {
+      this.props.onBatchesFound && this.props.onBatchesFound(this.props.batches!!.concat(batches));
+    }
+    
     this.props.onProductsFound && this.props.onProductsFound(products);
     this.setState({loading: false, errorCount: errorBatches.length})
   }
