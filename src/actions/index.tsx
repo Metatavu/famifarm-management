@@ -126,6 +126,10 @@ export interface SeedBatchesFound {
 export interface BatchesFound {
   type: constants.BATCHES_FOUND;
   batches: Batch[];
+  batchesFirstResult: number;
+  batchListDate?: string;
+  batchListProduct?: string;
+  batchListProductName?: string;
 }
 
 export interface SeedBatchSelected {
@@ -393,10 +397,14 @@ export function seedBatchesFound(seedBatches: SeedBatch[]): SeedBatchesFound {
   }
 }
 
-export function batchesFound(batches: Batch[]): BatchesFound {
+export function batchesFound(batches: Batch[], batchesFirstResult: number, batchListDate?: string, batchListProduct?: string, batchListProductName?: string): BatchesFound {
   return {
     type: constants.BATCHES_FOUND,
-    batches: batches
+    batches: batches,
+    batchesFirstResult: batchesFirstResult,
+    batchListDate: batchListDate,
+    batchListProduct: batchListProduct,
+    batchListProductName: batchListProductName
   }
 }
 

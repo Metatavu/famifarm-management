@@ -195,6 +195,8 @@ export interface IStrings extends LocalizedStringsMethods {
 
   showPassiveSeedBatches: string
   seedBatchState: string
+
+  returnToPreviousList: string
 }
 
 const strings: IStrings = new LocalizedStrings({

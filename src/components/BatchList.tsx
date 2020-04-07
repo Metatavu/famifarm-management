@@ -18,7 +18,8 @@ import {
   Label,
   Form,
   InputOnChangeData,
-  TextAreaProps
+  TextAreaProps,
+  Visibility
 } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import LocalizedUtils from "src/localization/localizedutils";
@@ -30,9 +31,13 @@ import LocalizedUtils from "src/localization/localizedutils";
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   batches?: Batch[];
+  batchesFirstResult?: number;
+  batchListProductName?: string;
+  batchListProduct?: string;
+  batchListDate?: string;
   products?: Product[];
   location?: any,
-  onBatchesFound?: (batches: Batch[]) => void,
+  onBatchesFound?: (batches: Batch[], batchesFirstResult: number, batchListDate?: string, batchListProduct?: string, batchListProductName?: string) => void,
   onProductsFound?: (products: Product[]) => void,
   onError: (error: ErrorMessage) => void
 }
@@ -41,13 +46,10 @@ interface Props {
  * Interface representing component state
  */
 interface State {
-  batches: Batch[]
-  date?: string
-  selectedProduct?: string
-  selectedProductName?: string
   status: string
   loading: boolean
-  errorCount: number
+  errorCount: number,
+  loadingFirstTime: boolean
 }
 
 /**
@@ -57,11 +59,11 @@ class BatchList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      batches: [],
       status: "OPEN",
       loading: false,
-      errorCount: 0
-    };
+      errorCount: 0,
+      loadingFirstTime: false
+    };;
   }
 
   /**
@@ -69,7 +71,7 @@ class BatchList extends React.Component<Props, State> {
    */
   public async componentDidMount() {
     try {
-      await this.updateBatches(this.state.status);
+      await this.updateBatches(this.state.status, this.props.batchesFirstResult || 0, this.props.batchListDate, this.props.batchListProduct, this.props.batchListProductName);
     } catch (e) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
@@ -93,12 +95,18 @@ class BatchList extends React.Component<Props, State> {
    * Render batch list view
    */
   public render() {
-    if (this.state.loading) {
+    if (this.state.loading && this.state.loadingFirstTime) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
           <Loader inline active size="medium" />
         </Grid>
       );
+    }
+
+    const possibleLoader = (): any => {
+      if (this.state.loading) {
+        return <Loader inline active size="medium" />
+      }
     }
 
     const statusButtons = ["OPEN", "CLOSED", "NEGATIVE"].map((status: string) => {
@@ -140,11 +148,11 @@ class BatchList extends React.Component<Props, State> {
             <Form.Field>
               <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem", paddingRight: "2rem"}}>
                 <label>{strings.date}</label>
-                <DateInput dateFormat="DD.MM.YYYY" onChange={this.onChangeDate} name="date" value={this.state.date ? moment(this.state.date).format("DD.MM.YYYY") : ""} />
+                <DateInput dateFormat="DD.MM.YYYY" onChange={this.onChangeDate} name="date" value={this.props.batchListDate ? moment(this.props.batchListDate).format("DD.MM.YYYY") : ""} />
               </div>
               <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem"}}>
                 <label>{strings.productName}</label>
-                <Form.Select name="product" options={this.renderOptions()} text={this.state.selectedProductName ? this.state.selectedProductName : strings.selectProduct} onChange={this.onChangeProduct} />
+                <Form.Select name="product" options={this.renderOptions()} text={this.props.batchListProductName ? this.props.batchListProductName : strings.selectProduct} onChange={this.onChangeProduct} />
               </div>
             </Form.Field>
           </Form>
@@ -154,11 +162,14 @@ class BatchList extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
+          <Visibility onUpdate={this.loadMoreBatches}>
             <List divided animated verticalAlign='middle'>
               {batches}
             </List>
+          </Visibility>
           </Grid.Column>
         </Grid.Row>
+        {possibleLoader()}
       </Grid>
     );
   }
@@ -170,8 +181,7 @@ class BatchList extends React.Component<Props, State> {
     this.setState({
       status: status
     });
-
-    this.updateBatches(status).catch((err) => {
+    this.updateBatches(status, 0, this.props.batchListDate, this.props.batchListProduct, this.props.batchListProductName).catch((err) => {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -184,9 +194,8 @@ class BatchList extends React.Component<Props, State> {
    * Handles changing date
    */
   private onChangeDate = async (e: any, { value }: InputOnChangeData) => {
-    await this.setState({date: moment(value, "DD.MM.YYYY").toISOString()});
-
-    await this.updateBatches(this.state.status).catch((err) => {
+    const date =  moment(value, "DD.MM.YYYY").toISOString();
+    await this.updateBatches(this.state.status, 0, date, this.props.batchListProduct, this.props.batchListProductName).catch((err) => {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -206,12 +215,10 @@ class BatchList extends React.Component<Props, State> {
         productName = LocalizedUtils.getLocalizedValue(object.name) || "";
       }
     }
-    await this.setState({
-      selectedProduct: value !== "" ? String(value) : undefined,
-      selectedProductName: productName
-    });
+    const selectedProduct = value !== "" ? String(value) : undefined;
+    const selectedProductName= productName;
 
-    await this.updateBatches(this.state.status).catch((err) => {
+    await this.updateBatches(this.state.status, 0, this.props.batchListDate, selectedProduct, selectedProductName).catch((err) => {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -236,15 +243,25 @@ class BatchList extends React.Component<Props, State> {
   }
 
   /**
+   * Loads more batches
+   */
+  private loadMoreBatches = async (e: any, { calculations }: any) => {
+    if (calculations.bottomVisible === true && !this.state.loading) {
+      const firstResult = (this.props.batchesFirstResult || 0) + 20;
+      await this.updateBatches(this.state.status, firstResult, this.props.batchListDate, this.props.batchListProduct, this.props.batchListProductName);
+    }
+  }
+
+  /**
    * Updates batch list
    */
-  private updateBatches = async (status: string) => {
+  private updateBatches = async (status: string, firstResult: number, date?: string, product?: string, productName?: string) => {
     if (!this.props.keycloak) {
       return;
     }
 
-    const createdBefore = this.state.date ? moment(this.state.date).endOf("day").toISOString() : undefined;
-    const createdAfter = this.state.date ? moment(this.state.date).startOf("day").toISOString() : undefined;
+    const createdBefore = date ? moment(date).endOf("day").toISOString() : undefined;
+    const createdAfter = date ? moment(date).startOf("day").toISOString() : undefined;
     this.setState({loading: true});
     const [batchesService, productsService] = await Promise.all([
       Api.getBatchesService(this.props.keycloak),
@@ -252,13 +269,19 @@ class BatchList extends React.Component<Props, State> {
     ]);
 
     const [batches, products, errorBatches] = await Promise.all([
-      batchesService.listBatches(status, undefined, this.state.selectedProduct, undefined, undefined, createdBefore, createdAfter),
+      batchesService.listBatches(status, undefined, product, firstResult, 20, createdBefore, createdAfter),
       productsService.listProducts(),
       batchesService.listBatches("NEGATIVE")
     ]);
-    this.props.onBatchesFound && this.props.onBatchesFound(batches);
+
+    if (firstResult === 0) {
+      this.props.onBatchesFound && this.props.onBatchesFound(batches, 0, date, product, productName);
+    } else if (this.props.batches && this.props.batches.length <= firstResult) {
+      this.props.onBatchesFound && this.props.onBatchesFound(this.props.batches!!.concat(batches), firstResult, date, product, productName);
+    }
+    
     this.props.onProductsFound && this.props.onProductsFound(products);
-    this.setState({loading: false, errorCount: errorBatches.length})
+    this.setState({loading: false, errorCount: errorBatches.length, loadingFirstTime: false})
   }
 }
 
@@ -270,7 +293,11 @@ class BatchList extends React.Component<Props, State> {
 export function mapStateToProps(state: StoreState) {
   return {
     products: state.products,
-    batches: state.batches
+    batches: state.batches,
+    batchesFirstResult: state.batchesFirstResult,
+    batchListDate: state.batchListDate,
+    batchListProduct: state.batchListProduct,
+    batchListProductName: state.batchListProductName
   };
 }
 
@@ -282,7 +309,7 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onProductsFound: (products: Product[]) => dispatch(actions.productsFound(products)),
-    onBatchesFound: (batches: Batch[]) => dispatch(actions.batchesFound(batches)),
+    onBatchesFound: (batches: Batch[], batchesFirstResult: number, batchListDate?: string, batchListProduct?: string, batchListProductName?: string) => dispatch(actions.batchesFound(batches, batchesFirstResult, batchListDate, batchListProduct, batchListProductName)),
     onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
   };
 }

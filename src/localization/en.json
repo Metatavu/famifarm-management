@@ -172,5 +172,6 @@
   "selectPackingStatus": "Select packing status",
   "editPacking": "Edit packing",
   "showPassiveSeedBatches": "Show non-active seed batches",
-  "seedBatchState": "Seed batch is active"
+  "seedBatchState": "Seed batch is active",
+  "returnToPreviousList": "Return to the previous list"
 }
