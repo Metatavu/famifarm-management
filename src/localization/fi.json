@@ -171,5 +171,6 @@
     "selectPackingStatus": "Valitse pakkauksen tila",
     "editPacking": "Muokkaa pakkausta",
     "showPassiveSeedBatches": "Näytä ei-aktiiviset siemenerät",
-    "seedBatchState": "Siemenerä on aktiivinen"
+    "seedBatchState": "Siemenerä on aktiivinen",
+    "returnToPreviousList": "Palaa edelliseen listaan"
   }

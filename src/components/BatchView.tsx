@@ -516,6 +516,11 @@ class BatchView extends React.Component<Props, State> {
               <Button className="submit-button">{strings.newEvent}</Button>
             </NavLink>
           </Grid.Column>
+          <Grid.Column width={4} style={{ textAlign: "right" }}>
+            <NavLink to={`/batches`}>
+              <Button className="submit-button">{strings.returnToPreviousList}</Button>
+            </NavLink>
+          </Grid.Column>
         </Grid.Row>
         <Grid.Row>
           { this.renderEvents() } 
