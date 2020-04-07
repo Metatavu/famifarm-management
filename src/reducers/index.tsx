@@ -56,7 +56,7 @@ export function processAction(state: StoreState, action: AppAction): StoreState 
     case PRODUCTS_FOUND:
       return { ...state, products: action.products };
     case BATCHES_FOUND:
-      return { ...state, batches: action.batches };
+      return { ...state, batches: action.batches, batchesFirstResult: action.batchesFirstResult, batchListDate: action.batchListDate, batchListProduct: action.batchListProduct, batchListProductName: action.batchListProductName };
     case PRODUCT_SELECTED:
       return { ...state, product: action.product};
     case PRODUCT_DELETED:
