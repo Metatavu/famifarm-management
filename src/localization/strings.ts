@@ -197,6 +197,11 @@ export interface IStrings extends LocalizedStringsMethods {
   seedBatchState: string
 
   returnToPreviousList: string
+
+  printPacking: string
+  print: string
+  selectPrinter: string
+  update: string
 }
 
 const strings: IStrings = new LocalizedStrings({

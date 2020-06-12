@@ -172,5 +172,10 @@
     "editPacking": "Muokkaa pakkausta",
     "showPassiveSeedBatches": "Näytä ei-aktiiviset siemenerät",
     "seedBatchState": "Siemenerä on aktiivinen",
-    "returnToPreviousList": "Palaa edelliseen listaan"
+    "returnToPreviousList": "Palaa edelliseen listaan",
+
+    "printPacking":" Tulosta pakkaustarra",
+    "print": "Tulosta",
+    "selectPrinter": "Valitse tulostin",
+    "update": "Päivitä"
   }
