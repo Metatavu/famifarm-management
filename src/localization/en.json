@@ -173,5 +173,10 @@
   "editPacking": "Edit packing",
   "showPassiveSeedBatches": "Show non-active seed batches",
   "seedBatchState": "Seed batch is active",
-  "returnToPreviousList": "Return to the previous list"
+  "returnToPreviousList": "Return to the previous list",
+
+  "printPacking": "Print packing label",
+  "print": "Print",
+  "selectPrinter": "Select printer",
+  "update": "Refresh"
 }

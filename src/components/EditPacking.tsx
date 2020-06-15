@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { StoreState, ErrorMessage } from "src/types";
 import * as actions from "../actions";
-import { Packing, Product, PackageSize, PackingState } from "famifarm-typescript-models";
+import { Packing, Product, PackageSize, PackingState, Printer } from "famifarm-typescript-models";
 import Api from "../api";
 import { KeycloakInstance } from "keycloak-js";
 import strings from "src/localization/strings";
@@ -33,7 +33,11 @@ export interface State {
   date: string,
   messageVisible: boolean,
   confirmOpen: boolean,
-  redirect: boolean
+  redirect: boolean,
+  printers: Printer[],
+  printing: boolean,
+  selectedPrinter?: Printer,
+  refreshingPrinters: boolean
 }
 
 class EditPacking extends React.Component<Props, State> {
@@ -50,7 +54,10 @@ class EditPacking extends React.Component<Props, State> {
       date : moment(moment(), "DD.MM.YYYY HH:mm").toISOString(),
       messageVisible : false,
       confirmOpen: false,
-      redirect: false
+      redirect: false,
+      printers: [],
+      printing: false,
+      refreshingPrinters: false
     }
     this.handleSubmit = this.handleSubmit.bind(this);
 }
@@ -67,6 +74,8 @@ class EditPacking extends React.Component<Props, State> {
       const packingStatus = packing.state;
       const date = packing.time;
       const packedCount = packing.packedCount || 0;
+
+      await this.refreshPrinters();
       
       const productsService = await Api.getProductsService(this.props.keycloak);
       const product = await productsService.findProduct(packing.productId);
@@ -132,6 +141,10 @@ class EditPacking extends React.Component<Props, State> {
         text: name
       };
     }));
+
+    const printers = (this.state.printers).map((printer, i) => {
+      return { text: printer.name, value: printer.id };
+    });
     
     return (
       <Grid>
@@ -172,9 +185,59 @@ class EditPacking extends React.Component<Props, State> {
                 </FormContainer>
             </Grid.Column>
         </Grid.Row>
+        <Grid.Row className="content-page-header-row">
+          <Grid.Column width={8}>
+              <h2>{strings.printPacking}</h2>
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row>
+          <Grid.Column width={8}>
+            <Select options={ printers } text={ this.state.selectedPrinter ? this.state.selectedPrinter.name : strings.selectPrinter } value={ this.state.selectedPrinter ? this.state.selectedPrinter.id : undefined } onChange={ this.onPrinterChange }></Select>
+            <Button style={{ marginLeft: 10 }} loading={ this.state.refreshingPrinters } className="submit-button" onClick={ this.refreshPrinters } type='submit'>{ strings.update }</Button>
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row>
+          <Grid.Column width={8}>
+            <Button disabled={ this.state.printing } loading={ this.state.printing } className="submit-button" onClick={ this.print } type='submit'>{ strings.print }</Button>
+          </Grid.Column>
+        </Grid.Row>
         <Confirm open={this.state.confirmOpen} size={"mini"} content={strings.deleteConfirmationText + this.state.productName + " - "+ this.state.date} onCancel={()=>this.setState({confirmOpen:false})} onConfirm={this.handleDelete} />
       </Grid>
     )
+  }
+
+   /**
+    * @summary Handles updating printers
+    */
+   private onPrinterChange = (event: any, { value }: InputOnChangeData) => {
+    this.setState({ selectedPrinter: this.state.printers.find(printer => printer.id == value)! });
+  }
+
+  /**
+   * @summary prints a packing label
+   */
+  private print = async () => {
+    if (!this.props.keycloak || !this.state.packing || !this.state.packing.id || !this.state.selectedPrinter) {
+      return;
+    }
+
+    this.setState({ printing: true });
+    const printingService = await Api.getPrintersService(this.props.keycloak);
+    await printingService.print({ packingId: this.state.packing.id }, this.state.selectedPrinter.id);
+    this.setState({ printing: false });
+  }
+
+  /**
+   * @summary Refreshes the list of printers
+   */
+  private refreshPrinters = async () => {
+    if (!this.props.keycloak) {
+      return;
+    }
+    this.setState({ refreshingPrinters: true })
+    const printingService = await Api.getPrintersService(this.props.keycloak);
+    const printers = await printingService.listPrinters();
+    this.setState({ printers, refreshingPrinters: false });
   }
 
   /**

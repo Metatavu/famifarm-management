@@ -24,6 +24,7 @@ import { KeycloakInstance } from 'keycloak-js';
 import { DraftsService } from './drafts.service';
 import { PestsService } from './pests.service';
 import { PackingsService } from './packings.service';
+import { PrintersService } from './printers.service';
 
 const API_URL = process.env.REACT_APP_FAMIFARM_API_BASE_PATH || "http://localhost";
 
@@ -37,13 +38,26 @@ export class Api {
    * 
    * @param response response object
    */
-  public static handleResponse(response: any) {
+  public static handleResponse(response: any, empty200?: boolean) {
     switch (response.status) {
       case 204:
         return {};
       default:
+        if (empty200) {
+          return {};
+        }
         return response.json();
     }
+  }
+  
+  /**
+   * Returns a promise of printers service authenticated with a valid token
+   * 
+   * @param keycloak keycloak instance
+   * @returns a promise of printers service authenticated with a valid token
+   */
+  public async getPrintersService(keycloak: KeycloakInstance): Promise<PrintersService> {
+    return new PrintersService(API_URL, await this.checkTokenValidity(keycloak));
   }
   
   /**
