@@ -54,12 +54,6 @@ export interface IStrings extends LocalizedStringsMethods {
   seedBatchCode: string;
   seedBatchArrived: string;
 
-  team: string;
-  teams: string;
-  newTeam: string;
-  teamName: string;
-  deleteTeam: string
-
   performedCultivationAction: string;
   performedCultivationActions: string;
   newPerformedCultivationAction: string;
@@ -130,7 +124,6 @@ export interface IStrings extends LocalizedStringsMethods {
   labelTrayCount: string
   labelPackageSize: string
   labelPackedCount: string
-  labelTeam: string
   labelHarvestType: string
   labelPests: string
   labelPerformedCultivationActions: string

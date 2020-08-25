@@ -16,8 +16,6 @@ export * from './seedBatches.service';
 import { SeedBatchesService } from './seedBatches.service';
 export * from './seeds.service';
 import { SeedsService } from './seeds.service';
-export * from './teams.service';
-import { TeamsService } from './teams.service';
 export * from './wastageReasons.service';
 import { WastageReasonsService } from './wastageReasons.service';
 import { KeycloakInstance } from 'keycloak-js';
@@ -158,16 +156,6 @@ export class Api {
    */
   public async getSeedsService(keycloak: KeycloakInstance): Promise<SeedsService> {
     return new SeedsService(API_URL, await this.checkTokenValidity(keycloak));
-  }
-  
-  /**
-   * Returns promise of teams service authenticated with valid token
-   * 
-   * @param keycloak keycloak instance
-   * @returns promise of teams service authenticated with valid token 
-   */
-  public async getTeamsService(keycloak: KeycloakInstance): Promise<TeamsService> {
-    return new TeamsService(API_URL, await this.checkTokenValidity(keycloak));
   }
   
   /**
