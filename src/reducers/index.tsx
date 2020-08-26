@@ -2,10 +2,7 @@ import { AppAction } from '../actions';
 import { StoreState } from '../types/index';
 import { 
   USER_LOGIN, 
-  USER_LOGOUT, 
-  TEAMS_FOUND, 
-  TEAM_SELECTED, 
-  TEAM_DELETED,
+  USER_LOGOUT,
   PACKINGS_FOUND,
   PRODUCTS_FOUND, 
   PRODUCT_SELECTED, 
@@ -45,12 +42,6 @@ export function processAction(state: StoreState, action: AppAction): StoreState 
       return { ...state, keycloak: action.keycloak, authenticated: action.authenticated};
     case USER_LOGOUT:
       return { ...state, keycloak: undefined, authenticated: false };
-    case TEAMS_FOUND:
-      return { ...state, teams: action.teams };
-    case TEAM_SELECTED:
-      return { ...state, team: action.team};
-    case TEAM_DELETED:
-      return { ...state,  teams: (state.teams || []).filter((team) => {return team.id !== action.teamId})};
     case PACKINGS_FOUND:
       return {...state, packings: action.packings};
     case PRODUCTS_FOUND:

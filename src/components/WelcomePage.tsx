@@ -40,9 +40,6 @@ import EditPerformedCultivationAction from "./EditPerformedCultivationAction";
 import EditWastageReason from "./EditWastageReason";
 import WastageReasonList from "./WastageReasonList";
 import CreateWastageReason from "./CreateWastageReason";
-import TeamList from "./TeamList";
-import EditTeam from "./EditTeam";
-import CreateTeam from "./CreateTeam";
 import ProductList from "./ProductList";
 import CreateProduct from "./CreateProduct";
 import PackageSizeList from "./PackageSizeList";
@@ -95,12 +92,10 @@ class WelcomePage extends React.Component<Props, any> {
     },{
       "text": strings.packings,
       "route": "/packings"
+
     },{
       "text": strings.store,
       "route": "/store"
-    },{
-      "text": strings.teams,
-      "route": "/teams"
     },{
       "text": strings.products,
       "route": "/products"
@@ -173,15 +168,6 @@ class WelcomePage extends React.Component<Props, any> {
                 )}
               />
               <Route
-                path="/teams"
-                exact={true}
-                render={props => (
-                  <TeamList
-                    keycloak={this.state.keycloak}
-                  />
-                )}
-              />
-              <Route
                 path="/batches"
                 exact={true}
                 render={props => (
@@ -218,16 +204,6 @@ class WelcomePage extends React.Component<Props, any> {
                   />
                 )}
               />
-              <Route
-                path="/teams/:teamId"
-                exact={true}
-                render={props => (
-                  <EditTeam
-                    keycloak={this.state.keycloak}
-                    teamId={props.match.params.teamId as string}
-                  />
-                )}
-              />
               <Route 
                 path="/packings/:packingId"
                 exact={true}
@@ -236,15 +212,6 @@ class WelcomePage extends React.Component<Props, any> {
                     keycloak={this.state.keycloak}
                     packingId={props.match.params.packingId as string}
                 />
-                )}
-              />
-              <Route
-                path="/createTeam"
-                exact={true}
-                render={props => (
-                  <CreateTeam
-                    keycloak={this.state.keycloak}
-                  />
                 )}
               />
               <Route

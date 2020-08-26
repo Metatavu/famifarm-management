@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, ProductionLine, SeedBatch, WastageReason, Team, BatchPhase, Seed } from "famifarm-typescript-models";
+import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, ProductionLine, SeedBatch, WastageReason, BatchPhase, Seed } from "famifarm-typescript-models";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 import { DateTimeInput } from 'semantic-ui-calendar-react';
@@ -48,7 +48,6 @@ interface State {
   event?: Event
   performedCultivationActions?: PerformedCultivationAction[]
   pests?: Pest[],
-  teams?: Team[],
   productionLines?: ProductionLine[]
   packageSizes?: PackageSize[]
   seedBatches?: SeedBatch[]
@@ -360,7 +359,6 @@ class CreateEvent extends React.Component<Props, State> {
           data = {
             gutterCount: eventData.gutterCount,
             productionLineId: eventData.productionLineId,
-            teamId: eventData.teamId,
             type: eventData.type
           } as HarvestEventData;
         break;
@@ -511,7 +509,7 @@ class CreateEvent extends React.Component<Props, State> {
    * Renders harvest event form
    */
   private renderHarvesDataForm = (data: HarvestEventData) => {
-    if (!this.state.teams || !this.state.productionLines) {
+    if (!this.state.productionLines) {
       this.loadHarvestData().catch((e) => {
         this.props.onError({
           message: strings.defaultApiErrorMessage,
@@ -522,14 +520,6 @@ class CreateEvent extends React.Component<Props, State> {
 
       return;
     }
-
-    const teamOptions = this.state.teams.map((team) => {
-      return {
-        key: team.id,
-        value: team.id,
-        text: LocalizedUtils.getLocalizedValue(team.name)
-      };
-    });
 
     const productionLineOptions = this.state.productionLines.map((productionLine) => {
       return {
@@ -552,7 +542,6 @@ class CreateEvent extends React.Component<Props, State> {
         <Form.Select required label={strings.labelHarvestType} name="type" options={harvestTypeOptions} value={data.type} onChange={this.handleDataChange} />
         <Form.Input  required label={strings.labelGutterCount} name="gutterCount" type="number" value={data.gutterCount} onChange={this.handleDataChange} />
         <Form.Select required label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
-        <Form.Select required label={strings.labelTeam} name="teamId" options={teamOptions} value={data.teamId} onChange={this.handleDataChange} />
       </React.Fragment>
     )
   }
@@ -725,18 +714,11 @@ class CreateEvent extends React.Component<Props, State> {
     }
 
     this.setState({loading: true});
-    const [teamsService, productionLinesService] = await Promise.all([
-      Api.getTeamsService(this.props.keycloak),
-      Api.getProductionLinesService(this.props.keycloak)
-    ]);
+    const productionLinesService = await Api.getProductionLinesService(this.props.keycloak);
 
-    const [teams, productionLines] = await Promise.all([
-      teamsService.listTeams(),
-      productionLinesService.listProductionLines()
-    ]);
+    const productionLines = await productionLinesService.listProductionLines();
 
     this.setState({
-      teams: teams,
       loading: false,
       productionLines: this.sortProductionLines(productionLines)
     });
