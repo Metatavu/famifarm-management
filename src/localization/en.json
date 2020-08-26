@@ -178,5 +178,9 @@
   "printPacking": "Print packing label",
   "print": "Print",
   "selectPrinter": "Select printer",
-  "update": "Refresh"
+  "update": "Refresh",
+
+  "amountInStore": "Amount in store",
+  "oldestPackingInStore": "Oldest packing in store",
+  "store": "Store"
 }

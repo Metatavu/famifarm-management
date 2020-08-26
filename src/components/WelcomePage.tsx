@@ -52,6 +52,7 @@ import CreateBatch from "./CreateBatch";
 import EditBatch from "./EditBatch";
 import PackingList from "./PackingList";
 import CreatePacking from "./CreatePacking";
+import ViewStore from "./ViewStore";
 
 export interface Props {
   authenticated: boolean,
@@ -94,6 +95,9 @@ class WelcomePage extends React.Component<Props, any> {
     },{
       "text": strings.packings,
       "route": "/packings"
+    },{
+      "text": strings.store,
+      "route": "/store"
     },{
       "text": strings.teams,
       "route": "/teams"
@@ -191,6 +195,15 @@ class WelcomePage extends React.Component<Props, any> {
                 exact={true}
                 render={props => (
                   <PackingList
+                    keycloak={this.state.keycloak}
+                  />
+                )}
+              />
+              <Route
+                path="/store"
+                exact={true}
+                render={props => (
+                  <ViewStore
                     keycloak={this.state.keycloak}
                   />
                 )}

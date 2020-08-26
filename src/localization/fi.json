@@ -177,5 +177,9 @@
     "printPacking":" Tulosta pakkaustarra",
     "print": "Tulosta",
     "selectPrinter": "Valitse tulostin",
-    "update": "Päivitä"
+    "update": "Päivitä",
+
+    "amountInStore": "Määrä varastossa",
+    "oldestPackingInStore": "Vanhin pakkaus varastossa",
+    "store": "Varasto"
   }
