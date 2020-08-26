@@ -92,7 +92,6 @@ class WelcomePage extends React.Component<Props, any> {
     },{
       "text": strings.packings,
       "route": "/packings"
-
     },{
       "text": strings.store,
       "route": "/store"

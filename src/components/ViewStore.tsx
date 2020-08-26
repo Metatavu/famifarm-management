@@ -6,8 +6,9 @@ import * as actions from "../actions";
 import { connect } from "react-redux";
 import { PackageSize, Packing } from "famifarm-typescript-models";
 import LocalizedUtils from "src/localization/localizedutils";
-import { Grid, Loader, List } from "semantic-ui-react";
+import { Grid, Loader, Table } from "semantic-ui-react";
 import strings from "src/localization/strings";
+import * as moment from "moment";
 
 /**
  * Interface describing component props
@@ -79,11 +80,19 @@ class ViewStore extends React.Component<Props, State> {
 
     return (
       <Grid>
+        <Grid.Row className="content-page-header-row" style={{flex: 1,justifyContent: "space-between", paddingLeft: 10, paddingRight: 10}}>
+          <h2>{strings.store}</h2>
+        </Grid.Row>  
         <Grid.Row>
           <Grid.Column>
-            <List divided animated verticalAlign='middle'>
-              { this.renderStoreListItems() }
-            </List>
+            <Table celled animated>
+              <Table.Header>
+                <Table.HeaderCell> { strings.productName } </Table.HeaderCell>
+                <Table.HeaderCell> { strings.amountInStore } </Table.HeaderCell>
+                <Table.HeaderCell> { strings.oldestPackingInStore } </Table.HeaderCell>
+              </Table.Header>
+              <Table.Body> { this.renderStoreTable() } </Table.Body>
+            </Table>
           </Grid.Column>
         </Grid.Row>
       </Grid>
@@ -93,28 +102,19 @@ class ViewStore extends React.Component<Props, State> {
   }
 
   /**
-   * Renders store list items
+   * Renders store table
    */
-  private renderStoreListItems = () => {
+  private renderStoreTable = () => {
     return this.state.storeListItems.map((storeListItem, i) => {
       return (
-        <List.Item style={i % 2 == 0 ? {backgroundColor: "#ddd"} : {}} key={ storeListItem.oldestDate }>
-          <List.Content>
-            <List.Header style={{paddingTop: "10px"}}>{ this.resolveListItemText(storeListItem) }</List.Header>
-          </List.Content>
-        </List.Item>
+        <Table.Row style={i % 2 == 0 ? {backgroundColor: "#ddd"} : {}} key={ i }>
+          <Table.Cell> { storeListItem.productName } </Table.Cell>
+          <Table.Cell> { storeListItem.amountInStore } </Table.Cell>
+          <Table.Cell> { storeListItem.oldestDate } </Table.Cell>
+        </Table.Row>
       );
     });
   }
-
-  /**
-   * Resolves list item text
-   * 
-   * @param storeListItem 
-   */
-  private resolveListItemText = (storeListItem: StoreListItem): string => {
-    return  `${ strings.productName }:  ${ storeListItem.productName }, ${ strings.amountInStore }: ${ storeListItem.amountInStore },  ${ strings.oldestPackingInStore }: ${ storeListItem.oldestDate }`
-  } 
 
   /**
    * Counts all products in given packings
@@ -144,7 +144,7 @@ class ViewStore extends React.Component<Props, State> {
     const dates = packings.map(packing => Date.parse(packing.time));
     const oldest = Math.min(...dates);
     const oldestDate = new Date(oldest);
-    return oldestDate.toISOString().split("T")[0];
+    return moment(oldestDate).format("DD.MM.YYYY");
   } 
 }
 
