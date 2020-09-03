@@ -1,12 +1,10 @@
 import { KeycloakInstance } from "keycloak-js";
-import { Team, Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, Batch, WastageReason, Pest, Packing } from "famifarm-typescript-models";
+import { Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, Batch, WastageReason, Pest, Packing } from "famifarm-typescript-models";
 
 export interface StoreState {
   keycloak?: KeycloakInstance
   authenticated: boolean
   packings: Packing[]
-  teams: Team[]
-  team: Team
   products: Product[]
   product: Product
   packageSizes: PackageSize[]
