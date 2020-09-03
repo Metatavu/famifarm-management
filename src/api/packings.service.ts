@@ -99,7 +99,7 @@ export class PackingsService {
         uri.addQuery('createdAfter', <any>createdAfter);
     }
     if (status !== undefined && status !== null) {
-        uri.addQuery("state", <any>status);
+        uri.addQuery("status", <any>status);
     }
     const options = {
       method: "get",

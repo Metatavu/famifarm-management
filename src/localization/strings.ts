@@ -195,6 +195,10 @@ export interface IStrings extends LocalizedStringsMethods {
   print: string
   selectPrinter: string
   update: string
+
+  amountInStore: string
+  oldestPackingInStore: string
+  store: string
 }
 
 const strings: IStrings = new LocalizedStrings({
