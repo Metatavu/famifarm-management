@@ -202,6 +202,9 @@ export interface IStrings extends LocalizedStringsMethods {
 
   campaigns: string
   newCampaign: string
+  campaignName: string
+  productCount: string
+  addCampaignProduct: string
 }
 
 const strings: IStrings = new LocalizedStrings({

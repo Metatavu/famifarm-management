@@ -51,6 +51,7 @@ import PackingList from "./PackingList";
 import CreatePacking from "./CreatePacking";
 import ViewStore from "./ViewStore";
 import CampaignList from "./CampaignList";
+import CreateCampaign from "./CreateCampaign";
 
 export interface Props {
   authenticated: boolean,
@@ -231,6 +232,13 @@ class WelcomePage extends React.Component<Props, any> {
                 exact={true}
                 render={props => (
                   <CreatePacking keycloak={this.state.keycloak}/>
+                )}
+              />
+              <Route
+                path="/createCampaign"
+                exact={true}
+                render={props => (
+                  <CreateCampaign keycloak={this.state.keycloak}/>
                 )}
               />
               <Route

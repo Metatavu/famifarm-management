@@ -178,5 +178,8 @@
     "store": "Varasto",
     
     "campaigns": "Kampanjat",
-    "newCampaign": "Uusi kampanja"
+    "newCampaign": "Uusi kampanja",
+    "campaignName": "Kampanjan nimi",
+    "productCount": "Tuotteiden määrä",
+    "addCampaignProduct": "Lisää kampanjatuote"
   }

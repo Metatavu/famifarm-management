@@ -179,5 +179,8 @@
   "store": "Store",
     
   "campaigns": "Campaigns",
-  "newCampaign": "New campaign"
+  "newCampaign": "New campaign",
+  "campaignName": "Campaign name",
+  "productCount": "Product count",
+  "add": "Add campaign product"
 }
