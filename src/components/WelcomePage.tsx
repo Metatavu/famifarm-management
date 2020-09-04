@@ -50,6 +50,7 @@ import EditBatch from "./EditBatch";
 import PackingList from "./PackingList";
 import CreatePacking from "./CreatePacking";
 import ViewStore from "./ViewStore";
+import CampaignList from "./CampaignList";
 
 export interface Props {
   authenticated: boolean,
@@ -93,6 +94,9 @@ class WelcomePage extends React.Component<Props, any> {
       "text": strings.packings,
       "route": "/packings"
     },{
+      "text": strings.campaigns,
+      "route": "/campaigns"
+    },{
       "text": strings.store,
       "route": "/store"
     },{
@@ -122,7 +126,7 @@ class WelcomePage extends React.Component<Props, any> {
     },{
       "text": strings.reportDownloadHeader,
       "route": "/reports"
-    }, {
+    },{
       "text": strings.userManagementLink,
       "route": process.env.REACT_APP_ACCOUNT_MANAGEMENT_URL,
       "external": true
@@ -180,6 +184,15 @@ class WelcomePage extends React.Component<Props, any> {
                 exact={true}
                 render={props => (
                   <PackingList
+                    keycloak={this.state.keycloak}
+                  />
+                )}
+              />
+              <Route
+                path="/campaigns"
+                exact={true}
+                render={props => (
+                  <CampaignList
                     keycloak={this.state.keycloak}
                   />
                 )}

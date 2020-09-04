@@ -176,5 +176,8 @@
 
   "amountInStore": "Amount in store",
   "oldestPackingInStore": "Oldest packing in store",
-  "store": "Store"
+  "store": "Store",
+    
+  "campaigns": "Campaigns",
+  "newCampaign": "New campaign"
 }

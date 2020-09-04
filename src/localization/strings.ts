@@ -199,6 +199,9 @@ export interface IStrings extends LocalizedStringsMethods {
   amountInStore: string
   oldestPackingInStore: string
   store: string
+
+  campaigns: string
+  newCampaign: string
 }
 
 const strings: IStrings = new LocalizedStrings({
