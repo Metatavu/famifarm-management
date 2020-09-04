@@ -1,5 +1,6 @@
 import { Campaign } from "famifarm-typescript-models";
 import { Api } from ".";
+import * as URI from "urijs";
 
 export class CampaignsService {
   private token: string;

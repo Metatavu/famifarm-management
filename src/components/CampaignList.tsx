@@ -54,6 +54,7 @@ class CampaignList extends React.Component<Props, State> {
     try {
       await this.updateCampaigns();
     } catch (exception) {
+      console.log(exception);
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
