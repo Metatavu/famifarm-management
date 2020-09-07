@@ -52,6 +52,7 @@ import CreatePacking from "./CreatePacking";
 import ViewStore from "./ViewStore";
 import CampaignList from "./CampaignList";
 import CreateCampaign from "./CreateCampaign";
+import EditCampaign from "./EditCampaign";
 
 export interface Props {
   authenticated: boolean,
@@ -224,6 +225,16 @@ class WelcomePage extends React.Component<Props, any> {
                   <EditPacking
                     keycloak={this.state.keycloak}
                     packingId={props.match.params.packingId as string}
+                />
+                )}
+              />
+              <Route 
+                path="/campaigns/:campaignId"
+                exact={ true }
+                render={ props => (
+                  <EditCampaign
+                    keycloak={ this.state.keycloak }
+                    campaignId={ props.match.params.campaignId as string }
                 />
                 )}
               />

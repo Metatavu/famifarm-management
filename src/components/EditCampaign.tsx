@@ -7,14 +7,15 @@ import * as actions from "../actions"
 import { Product, CampaignProducts } from "famifarm-typescript-models";
 import strings from "src/localization/strings";
 import Api from "src/api";
-import { Grid, Loader, DropdownItemProps, Button, Form, Select, Input, InputOnChangeData, DropdownProps, List } from "semantic-ui-react";
+import { Grid, Loader, DropdownItemProps, Button, Form, Select, Input, InputOnChangeData, DropdownProps, List, Message, Confirm } from "semantic-ui-react";
 import LocalizedUtils from "src/localization/localizedutils";
 import { FormContainer } from "./FormContainer";
 import { Redirect } from "react-router";
 
 interface Props {
   keycloak?: KeycloakInstance,
-  onError: (error: ErrorMessage) => void
+  onError: (error: ErrorMessage) => void,
+  campaignId: string
 }
 
 interface State {
@@ -25,10 +26,12 @@ interface State {
   addedCampaignProducts: CampaignProducts[];
   loading: boolean;
   redirect: boolean;
-  campaignId: string;
+  campaignId?: string;
+  messageVisible: boolean;
+  confirmOpen: boolean;
 }
 
-class CreateCampaign extends React.Component<Props, State> {
+class EditCampaign extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -39,7 +42,8 @@ class CreateCampaign extends React.Component<Props, State> {
       productId: "",
       count: "1",
       redirect: false,
-      campaignId: ""
+      messageVisible: false,
+      confirmOpen: false
     };
   }
 
@@ -63,12 +67,17 @@ class CreateCampaign extends React.Component<Props, State> {
     this.setState({ loading: true });
     const productsService = await Api.getProductsService(this.props.keycloak);
     const products = await productsService.listProducts();
-    this.setState({ products, loading: false });
+
+    const campaignsService = await Api.getCampaignsService(this.props.keycloak);
+    const campaign = await campaignsService.findCampaign(this.props.campaignId);
+    const campaignName = campaign.name;
+    const addedCampaignProducts = campaign.products;
+    this.setState({ products, loading: false, campaignName, addedCampaignProducts, campaignId: campaign.id! });
   }
 
   public render () {
     if (this.state.redirect) {
-      return <Redirect to={`/campaigns/${ this.state.campaignId }`} push={true} />;
+      return <Redirect to={`/campaigns`} push={true} />;
     }
 
     if (this.state.loading) {
@@ -107,7 +116,7 @@ class CreateCampaign extends React.Component<Props, State> {
       <Grid>
       <Grid.Row className="content-page-header-row">
       <Grid.Column width={8}>
-        <h2>{ strings.newCampaign }</h2>
+        <h2>{ strings.editCampaign }</h2>
       </Grid.Column>
       </Grid.Row>
       <Grid.Row>
@@ -131,10 +140,17 @@ class CreateCampaign extends React.Component<Props, State> {
               <label>{ strings.campaignName }</label>
               <Input type="text" value={ this.state.campaignName } onChange={ this.onCampaignNameChange }></Input>
             </Form.Field>
+            <Message
+              success
+              visible={this.state.messageVisible}
+              header={strings.savedSuccessfully}
+            />
             <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{ strings.save }</Button>
+            <Button className="danger-button" onClick={() => this.setState({ confirmOpen:true })}>{ strings.delete }</Button>
           </FormContainer>
         </Grid.Column>
       </Grid.Row>
+      <Confirm open={ this.state.confirmOpen } size={"mini"} content={strings.deleteConfirmationText + this.state.campaignName } onCancel={ () => this.setState({ confirmOpen:false }) } onConfirm={ this.handleDelete } />
     </Grid>
     );
 
@@ -198,7 +214,7 @@ class CreateCampaign extends React.Component<Props, State> {
    * Handles submitting a new campaign
    */
   private handleSubmit = async () => {
-    if (!this.props.keycloak) {
+    if (!this.props.keycloak || !this.state.campaignId) {
       return;
     }
 
@@ -206,8 +222,11 @@ class CreateCampaign extends React.Component<Props, State> {
       this.setState({ loading: true });
       const { campaignName, addedCampaignProducts } = this.state;
       const campaignsService = await Api.getCampaignsService(this.props.keycloak);
-      const createdCampaign = await campaignsService.createCampaign({ name: campaignName, products: addedCampaignProducts });
-      this.setState({ campaignId: createdCampaign.id!, redirect: true });
+      await campaignsService.updateCampaign({ id: this.state.campaignId, name: campaignName, products: addedCampaignProducts }, this.state.campaignId);
+      this.setState({ messageVisible: true, loading: false });
+      setTimeout(() => {
+        this.setState({messageVisible: false});
+      }, 3000);
     } catch (exception) {
       this.setState({ loading: false });
       this.props.onError({
@@ -217,6 +236,26 @@ class CreateCampaign extends React.Component<Props, State> {
       });
     }
 
+  }
+
+  private handleDelete = async () => {
+    try {
+      if (!this.props.keycloak || !this.state.campaignId) {
+        throw new Error("Either Keycloak or campaign id is undefined");
+      }
+
+      const campaignsService = await Api.getCampaignsService(this.props.keycloak);
+      await campaignsService.deleteCampaign(this.state.campaignId);
+
+      this.setState({redirect: true});
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
+ 
   }
 
 }
@@ -242,4 +281,4 @@ export function mapStateToProps(state: StoreState) {
   };
   }
   
-  export default connect(mapStateToProps, mapDispatchToProps)(CreateCampaign);
+  export default connect(mapStateToProps, mapDispatchToProps)(EditCampaign);

@@ -182,5 +182,6 @@
   "newCampaign": "New campaign",
   "campaignName": "Campaign name",
   "productCount": "Product count",
-  "add": "Add campaign product"
+  "addCampaignProduct": "Add campaign product",
+  "editCampaign": "Muokkaa kampanjaa"
 }
