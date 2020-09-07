@@ -28,7 +28,8 @@ import {
   WASTAGE_REASON_SELECTED,
   LOCALE_UPDATE,
   PESTS_FOUND,
-  ERROR_OCCURRED} from '../constants/index';
+  ERROR_OCCURRED,
+  CAMPAIGNS_FOUND} from '../constants/index';
 
 /**
  * Process action 
@@ -94,7 +95,9 @@ export function processAction(state: StoreState, action: AppAction): StoreState 
     case PESTS_FOUND:
       return { ...state, pests: action.pests}
     case ERROR_OCCURRED:
-    return { ...state, error: action.error}
+      return { ...state, error: action.error}
+    case CAMPAIGNS_FOUND:
+      return { ...state, campaigns: action.campaigns }
     }
   return state;
 }

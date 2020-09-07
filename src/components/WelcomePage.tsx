@@ -50,6 +50,9 @@ import EditBatch from "./EditBatch";
 import PackingList from "./PackingList";
 import CreatePacking from "./CreatePacking";
 import ViewStore from "./ViewStore";
+import CampaignList from "./CampaignList";
+import CreateCampaign from "./CreateCampaign";
+import EditCampaign from "./EditCampaign";
 
 export interface Props {
   authenticated: boolean,
@@ -93,6 +96,9 @@ class WelcomePage extends React.Component<Props, any> {
       "text": strings.packings,
       "route": "/packings"
     },{
+      "text": strings.campaigns,
+      "route": "/campaigns"
+    },{
       "text": strings.store,
       "route": "/store"
     },{
@@ -122,7 +128,7 @@ class WelcomePage extends React.Component<Props, any> {
     },{
       "text": strings.reportDownloadHeader,
       "route": "/reports"
-    }, {
+    },{
       "text": strings.userManagementLink,
       "route": process.env.REACT_APP_ACCOUNT_MANAGEMENT_URL,
       "external": true
@@ -185,6 +191,15 @@ class WelcomePage extends React.Component<Props, any> {
                 )}
               />
               <Route
+                path="/campaigns"
+                exact={true}
+                render={props => (
+                  <CampaignList
+                    keycloak={this.state.keycloak}
+                  />
+                )}
+              />
+              <Route
                 path="/store"
                 exact={true}
                 render={props => (
@@ -213,11 +228,28 @@ class WelcomePage extends React.Component<Props, any> {
                 />
                 )}
               />
+              <Route 
+                path="/campaigns/:campaignId"
+                exact={ true }
+                render={ props => (
+                  <EditCampaign
+                    keycloak={ this.state.keycloak }
+                    campaignId={ props.match.params.campaignId as string }
+                />
+                )}
+              />
               <Route
                 path="/createPacking"
                 exact={true}
                 render={props => (
                   <CreatePacking keycloak={this.state.keycloak}/>
+                )}
+              />
+              <Route
+                path="/createCampaign"
+                exact={true}
+                render={props => (
+                  <CreateCampaign keycloak={this.state.keycloak}/>
                 )}
               />
               <Route

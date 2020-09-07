@@ -23,6 +23,7 @@ import { DraftsService } from './drafts.service';
 import { PestsService } from './pests.service';
 import { PackingsService } from './packings.service';
 import { PrintersService } from './printers.service';
+import { CampaignsService } from './campaigns.service';
 
 const API_URL = process.env.REACT_APP_FAMIFARM_API_BASE_PATH || "http://localhost";
 
@@ -48,6 +49,16 @@ export class Api {
     }
   }
   
+  /**
+   * Returns a promise for campaigns service authenticated with a valid token
+   * 
+   * @param keycloak  keycloak instance
+   * @returns a promise for campaigns service authenticated with a valid token
+   */
+  public async getCampaignsService(keycloak: KeycloakInstance): Promise<CampaignsService> {
+    return new CampaignsService(API_URL, await this.checkTokenValidity(keycloak));
+  }
+
   /**
    * Returns a promise of printers service authenticated with a valid token
    * 

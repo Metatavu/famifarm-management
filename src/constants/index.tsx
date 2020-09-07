@@ -102,3 +102,6 @@ export type ERROR_OCCURRED = typeof ERROR_OCCURRED;
 
 export const PACKINGS_FOUND = "PACKINGS_FOUND";
 export type PACKINGS_FOUND = typeof PACKINGS_FOUND;
+
+export const CAMPAIGNS_FOUND = "CAMPAIGNS_FOUND";
+export type CAMPAIGNS_FOUND = typeof CAMPAIGNS_FOUND;

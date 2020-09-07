@@ -175,5 +175,12 @@
 
     "amountInStore": "Määrä varastossa",
     "oldestPackingInStore": "Vanhin pakkaus varastossa",
-    "store": "Varasto"
+    "store": "Varasto",
+    
+    "campaigns": "Kampanjat",
+    "newCampaign": "Uusi kampanja",
+    "campaignName": "Kampanjan nimi",
+    "productCount": "Tuotteiden määrä",
+    "addCampaignProduct": "Lisää kampanjatuote",
+    "editCampaign": "Muokkaa kampanjaa"
   }

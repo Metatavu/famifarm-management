@@ -1,6 +1,6 @@
 import * as constants from '../constants'
 import { KeycloakInstance } from 'keycloak-js';
-import { Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, Batch, WastageReason, Pest, Packing } from "famifarm-typescript-models";
+import { Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, Batch, WastageReason, Pest, Packing, Campaign } from "famifarm-typescript-models";
 import { ErrorMessage } from '../types';
 
 export interface UserLogin {
@@ -199,6 +199,14 @@ export interface ErrorOccurred {
   error?: ErrorMessage;
 }
 
+/**
+ * Interface representing CampaignsFound action
+ */
+export interface CampaignsFound {
+  type: constants.CAMPAIGNS_FOUND;
+  campaigns: Campaign[]
+}
+
 
 export type AppAction = UserLogin | UserLogout
   | ProductsFound | ProductSelected | ProductCreated | ProductDeleted | PackageSizesFound 
@@ -207,7 +215,19 @@ export type AppAction = UserLogin | UserLogout
   | ProductionLineDeleted | SeedBatchesFound | SeedBatchSelected | SeedBatchCreated | SeedBatchDeleted
   | PerformedCultivationActionsFound | PerformedCultivationActionSelected | PerformedCultivationActionCreated
   | PerformedCultivationActionDeleted | LocaleUpdate | BatchesFound | WastageReasonsFound | WastageReasonSelected 
-  | WastageReasonCreated | WastageReasonDeleted| PestsFound | ErrorOccurred | PackingsFound;
+  | WastageReasonCreated | WastageReasonDeleted| PestsFound | ErrorOccurred | PackingsFound | CampaignsFound;
+
+  /**
+   * Redux store update method for campaigns
+   * 
+   * @param campaigns campaigns
+   */
+export function campaignsFound(campaigns: Campaign[]): CampaignsFound {
+  return {
+    type: constants.CAMPAIGNS_FOUND,
+    campaigns
+  }
+}
 
 export function userLogin(keycloak: KeycloakInstance, authenticated: boolean): UserLogin {
   return {
