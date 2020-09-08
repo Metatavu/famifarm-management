@@ -7,7 +7,7 @@ import strings from "src/localization/strings";
 import { Grid, Form, Button, Select, DropdownItemProps, DropdownProps, Input, InputOnChangeData, Loader } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import { FormContainer } from "./FormContainer";
-import { Packing, Product, PackageSize, PackingState } from "famifarm-typescript-models";
+import { Packing, Product, PackageSize, PackingState, PackingType, Campaign } from "famifarm-typescript-models";
 import LocalizedUtils from "src/localization/localizedutils";
 import * as moment from "moment";
 import Api from "../api";
@@ -29,7 +29,10 @@ export interface State {
   packageSizes: PackageSize[],
   date: string,
   redirect: boolean,
-  packingId?: string
+  packingId?: string,
+  packingType: PackingType,
+  campaignId?: string,
+  campaigns: Campaign[]
 }
 
 class CreatePacking extends React.Component<Props, State> {
@@ -41,7 +44,9 @@ class CreatePacking extends React.Component<Props, State> {
       loading: false,
       packedCount: 0,
       date: moment(moment(), "DD.MM.YYYY HH:mm").toISOString(),
-      redirect: false
+      redirect: false,
+      packingType: PackingType.BASIC,
+      campaigns: []
     }
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -58,13 +63,17 @@ class CreatePacking extends React.Component<Props, State> {
       const productsService = await Api.getProductsService(this.props.keycloak);
       const products = await productsService.listProducts();
 
+      const campaignsService = await Api.getCampaignsService(this.props.keycloak);
+      const campaigns = await campaignsService.listCampaigns();
+
       const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
       const packageSizes = await packageSizeService.listPackageSizes();
       
       this.setState({
         productId: products.length ? products[0].id! : "",
-        packageSizes: packageSizes, 
-        products: products,
+        packageSizes, 
+        products,
+        campaigns,
         loading: false
       });
     
@@ -89,7 +98,8 @@ class CreatePacking extends React.Component<Props, State> {
     if (this.state.redirect) {
       return <Redirect to={`/packings/${this.state.packingId}`} push={true} />;
     }
-    const productOptions: DropdownItemProps[] = [{ key: "", value: "", text: "", }].concat(this.state.products.map((product) => {
+
+    const productOptions = this.state.products.map((product) => {
       const id = product.id!;
       const name = LocalizedUtils.getLocalizedValue(product.name);
     
@@ -98,9 +108,20 @@ class CreatePacking extends React.Component<Props, State> {
         value: id,
         text: name
       };
-      }));
+    });
 
-      const packageSizeOptions: DropdownItemProps[] = [{ key: "", value: "", text: "", }].concat(this.state.packageSizes.map((size) => {
+    const campaignOptions = this.state.campaigns.map((campaign) => {
+      const id = campaign.id!;
+      const name = campaign.name;
+
+      return {
+        key: id,
+        value: id,
+        text: name
+      };
+    });
+
+    const packageSizeOptions = this.state.packageSizes.map((size) => {
       const id = size.id!;
       const name = LocalizedUtils.getLocalizedValue(size.name);
     
@@ -109,7 +130,8 @@ class CreatePacking extends React.Component<Props, State> {
         value: id,
         text: name
       };
-      }));
+    });
+      
     return (    
       <Grid>
         <Grid.Row className="content-page-header-row">
@@ -120,27 +142,56 @@ class CreatePacking extends React.Component<Props, State> {
         <Grid.Row>
           <Grid.Column width={8}>
             <FormContainer>
-              <Form.Field required>
-                <label>{strings.product}</label>
-                <Select options={ productOptions } value={ this.state.productId } onChange={ this.onPackingProductChange }></Select>
-              </Form.Field>
-              <Form.Field required>
-                <label>{strings.packageSize}</label>
-                <Select options={ packageSizeOptions } value={ this.state.packageSizeId } onChange={ this.onPackageSizeChange }></Select>
-              </Form.Field>
-              <Form.Field required>
-                <label>{strings.packingStatus}</label>
-                <Select options={ [{value:"IN_STORE", text: strings.packingStoreStatus}, {value: "REMOVED", text: strings.packingRemovedStatus}] } text={this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus} value={ this.state.packingStatus } onChange={ this.onStatusChange }></Select>
-              </Form.Field>
               <Form.Field>
-                <label>{strings.labelPackedCount}</label>
-                <Input type="number" value={ this.state.packedCount} onChange={ this.onPackedCountChange }></Input>
+                <label>{ strings.packingType }</label>
+                <Select options={ [{ value: PackingType.BASIC, text: strings.packingTypeBasic }, { value: PackingType.CAMPAIGN, text: strings.packingTypeCampaign }] } value={ this.state.packingType } onChange={ this.onPackingTypeChange }></Select>
               </Form.Field>
-              <Form.Field>
-                <DateInput dateFormat="DD.MM.YYYY" onChange={this.onChangeDate} name="date" value={ moment(this.state.date).format("DD.MM.YYYY") } />
-              </Form.Field>
-              <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
             </FormContainer>
+
+            {
+              this.state.packingType === PackingType.BASIC && 
+              <FormContainer>
+                <Form.Field required>
+                  <label>{strings.product}</label>
+                  <Select options={ productOptions } value={ this.state.productId } onChange={ this.onPackingProductChange }></Select>
+                </Form.Field>
+                <Form.Field required>
+                  <label>{strings.packageSize}</label>
+                  <Select options={ packageSizeOptions } value={ this.state.packageSizeId } onChange={ this.onPackageSizeChange }></Select>
+                </Form.Field>
+                <Form.Field required>
+                  <label>{strings.packingStatus}</label>
+                  <Select options={ [{value:"IN_STORE", text: strings.packingStoreStatus}, {value: "REMOVED", text: strings.packingRemovedStatus}] } text={this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus} value={ this.state.packingStatus } onChange={ this.onStatusChange }></Select>
+                </Form.Field>
+                <Form.Field>
+                  <label>{strings.labelPackedCount}</label>
+                  <Input type="number" value={ this.state.packedCount } onChange={ this.onPackedCountChange }></Input>
+                </Form.Field>
+                <Form.Field>
+                  <DateInput dateFormat="DD.MM.YYYY" onChange={this.onChangeDate} name="date" value={ moment(this.state.date).format("DD.MM.YYYY") } />
+                </Form.Field>
+                <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
+              </FormContainer>
+            }
+
+            {
+              this.state.packingType === PackingType.CAMPAIGN && 
+              <FormContainer>
+                <Form.Field required>
+                  <label>{ strings.campaign }</label>
+                  <Select options={ campaignOptions } value={ this.state.campaignId } onChange={ this.onPackingCampaignChange }></Select>
+                </Form.Field>
+                <Form.Field required>
+                  <label>{strings.packingStatus}</label>
+                  <Select options={ [{value:"IN_STORE", text: strings.packingStoreStatus}, {value: "REMOVED", text: strings.packingRemovedStatus}] } text={this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus} value={ this.state.packingStatus } onChange={ this.onStatusChange }></Select>
+                </Form.Field>
+                <Form.Field>
+                  <DateInput dateFormat="DD.MM.YYYY" onChange={this.onChangeDate} name="date" value={ moment(this.state.date).format("DD.MM.YYYY") } />
+                </Form.Field>
+                <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
+              </FormContainer>
+            }
+            
           </Grid.Column>
         </Grid.Row>
       </Grid>
@@ -159,7 +210,16 @@ class CreatePacking extends React.Component<Props, State> {
    */
   private onPackingProductChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
     this.setState({
-    productId: data.value as string
+      productId: data.value as string
+    });
+  }
+
+  /**
+   * Event handler for campaign change 
+   */
+  private onPackingCampaignChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    this.setState({
+      campaignId: data.value as string
     });
   }
 
@@ -168,7 +228,7 @@ class CreatePacking extends React.Component<Props, State> {
    */
   private onPackageSizeChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
     this.setState({
-    packageSizeId: data.value as string
+      packageSizeId: data.value as string
     });
   }
 
@@ -186,6 +246,13 @@ class CreatePacking extends React.Component<Props, State> {
   private onStatusChange = (event: any, { value }: InputOnChangeData) => {
     this.setState({packingStatus: value as PackingState})
   }
+
+  /**
+   * Event handler for packing type
+   */
+  private onPackingTypeChange = (event: any, { value }: InputOnChangeData) => {
+    this.setState({ packingType: value as PackingType });
+  }
   
   /**
    * Handles changing date
@@ -202,12 +269,29 @@ class CreatePacking extends React.Component<Props, State> {
         return;
       }
 
-      const packingObject: Packing= {
+      const type = this.state.packingType;
+
+      if (type === PackingType.BASIC && !this.state.productId) {
+        return;
+      }
+
+      if (type === PackingType.CAMPAIGN && !this.state.campaignId) {
+        return;
+      }
+
+      const packingObject = type === PackingType.BASIC ? 
+      {
         state: this.state.packingStatus as PackingState,
-        productId: this.state.productId || "",
+        productId: this.state.productId,
         time: this.state.date,
         packageSizeId: this.state.packageSizeId,
-        packedCount: this.state.packedCount
+        packedCount: this.state.packedCount,
+        type
+      } : {
+        state: this.state.packingStatus as PackingState,
+        type,
+        time: this.state.date,
+        campaignId: this.state.campaignId
       };
 
       const packingsService = await Api.getPackingsService(this.props.keycloak);
@@ -215,7 +299,7 @@ class CreatePacking extends React.Component<Props, State> {
       this.setState({
         packingId: packing.id,
         redirect: true
-      })
+      });
     } catch (e) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
