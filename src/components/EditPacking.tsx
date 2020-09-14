@@ -90,7 +90,7 @@ class EditPacking extends React.Component<Props, State> {
         throw new Error("Could not find packing");
       }
 
-      if (packing.type === PackingType.BASIC) {
+      if (packing.type == "BASIC") {
         const product = await productsService.findProduct(packing.productId!);
         const packedCount = packing.packedCount || 0;
   
@@ -110,7 +110,7 @@ class EditPacking extends React.Component<Props, State> {
         this.setState({ packing, productName, productId, products, packageSizes, packingStatus, date, packedCount, packageSizeId: packing.packageSizeId, loading: false, campaigns });
       }
 
-      if (packing.type === PackingType.CAMPAIGN) {
+      if (packing.type == "CAMPAIGN") {
         const campaign = await campaignsService.findCampaign(packing.campaignId!);
         const { name, id } = campaign;
 
@@ -187,7 +187,7 @@ class EditPacking extends React.Component<Props, State> {
         <Grid.Row>
             <Grid.Column width={8}>
             {
-              this.state.packingType === PackingType.BASIC && 
+              this.state.packingType == "BASIC" && 
               <FormContainer>
                 <Form.Field required>
                   <label>{strings.product}</label>
@@ -219,7 +219,7 @@ class EditPacking extends React.Component<Props, State> {
             }
                 
             {
-              this.state.packingType === PackingType.CAMPAIGN &&
+              this.state.packingType === "CAMPAIGN" &&
               <FormContainer>
                 <Form.Field required>
                   <label>{ strings.campaign }</label>
@@ -245,7 +245,7 @@ class EditPacking extends React.Component<Props, State> {
         </Grid.Row>
 
         {
-          this.state.packingType === PackingType.BASIC && 
+          this.state.packingType === "BASIC" && 
           <Grid.Row className="content-page-header-row">
             <Grid.Column width={8}>
                 <h2>{strings.printPacking}</h2>
@@ -254,7 +254,7 @@ class EditPacking extends React.Component<Props, State> {
         }
         
         {
-          this.state.packingType === PackingType.BASIC &&
+          this.state.packingType === "BASIC" &&
           <Grid.Row>
             <Grid.Column width={8}>
               <Select options={ printers } text={ this.state.selectedPrinter ? this.state.selectedPrinter.name : strings.selectPrinter } value={ this.state.selectedPrinter ? this.state.selectedPrinter.id : undefined } onChange={ this.onPrinterChange }></Select>
@@ -264,7 +264,7 @@ class EditPacking extends React.Component<Props, State> {
         }
 
         {
-          this.state.packingType === PackingType.BASIC &&
+          this.state.packingType === "BASIC" &&
           <Grid.Row>
             <Grid.Column width={8}>
               <Button disabled={ this.state.printing } loading={ this.state.printing } className="submit-button" onClick={ this.print } type='submit'>{ strings.print }</Button>
@@ -374,11 +374,11 @@ class EditPacking extends React.Component<Props, State> {
     try {
       const type = this.state.packingType;
 
-      if (type === PackingType.BASIC && !this.state.productId) {
+      if (type == "BASIC" && !this.state.productId) {
         return;
       }
 
-      if (type === PackingType.CAMPAIGN && !this.state.campaignId) {
+      if (type == "CAMPAIGN" && !this.state.campaignId) {
         return;
       }
 
@@ -386,7 +386,7 @@ class EditPacking extends React.Component<Props, State> {
         return;
       }
 
-      const updatedPacking = type === PackingType.CAMPAIGN ? {
+      const updatedPacking = type == "CAMPAIGN" ? {
         type,
         id :  this.state.packing ? this.state.packing.id : undefined,
         campaignId: this.state.campaignId,

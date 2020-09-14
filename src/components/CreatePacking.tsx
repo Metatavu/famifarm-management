@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { ErrorMessage, StoreState } from "src/types";
 import { Dispatch } from "redux";
 import strings from "src/localization/strings";
-import { Grid, Form, Button, Select, DropdownItemProps, DropdownProps, Input, InputOnChangeData, Loader } from "semantic-ui-react";
+import { Grid, Form, Button, Select, DropdownProps, Input, InputOnChangeData, Loader } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import { FormContainer } from "./FormContainer";
 import { Packing, Product, PackageSize, PackingState, PackingType, Campaign } from "famifarm-typescript-models";
@@ -45,7 +45,7 @@ class CreatePacking extends React.Component<Props, State> {
       packedCount: 0,
       date: moment(moment(), "DD.MM.YYYY HH:mm").toISOString(),
       redirect: false,
-      packingType: PackingType.BASIC,
+      packingType: "BASIC",
       campaigns: []
     }
 
@@ -144,12 +144,12 @@ class CreatePacking extends React.Component<Props, State> {
             <FormContainer>
               <Form.Field>
                 <label>{ strings.packingType }</label>
-                <Select options={ [{ value: PackingType.BASIC, text: strings.packingTypeBasic }, { value: PackingType.CAMPAIGN, text: strings.packingTypeCampaign }] } value={ this.state.packingType } onChange={ this.onPackingTypeChange }></Select>
+                <Select options={ [{ value: "BASIC", text: strings.packingTypeBasic }, { value: "CAMPAIGN", text: strings.packingTypeCampaign }] } value={ this.state.packingType } onChange={ this.onPackingTypeChange }></Select>
               </Form.Field>
             </FormContainer>
 
             {
-              this.state.packingType === PackingType.BASIC && 
+              this.state.packingType === "BASIC" && 
               <FormContainer>
                 <Form.Field required>
                   <label>{strings.product}</label>
@@ -175,7 +175,7 @@ class CreatePacking extends React.Component<Props, State> {
             }
 
             {
-              this.state.packingType === PackingType.CAMPAIGN && 
+              this.state.packingType === "CAMPAIGN" && 
               <FormContainer>
                 <Form.Field required>
                   <label>{ strings.campaign }</label>
@@ -271,15 +271,15 @@ class CreatePacking extends React.Component<Props, State> {
 
       const type = this.state.packingType;
 
-      if (type === PackingType.BASIC && !this.state.productId) {
+      if (type == "BASIC" && !this.state.productId) {
         return;
       }
 
-      if (type === PackingType.CAMPAIGN && !this.state.campaignId) {
+      if (type == "CAMPAIGN" && !this.state.campaignId) {
         return;
       }
 
-      const packingObject = type === PackingType.BASIC ? 
+      const packingObject = type == "BASIC" ? 
       {
         state: this.state.packingStatus as PackingState,
         productId: this.state.productId,
