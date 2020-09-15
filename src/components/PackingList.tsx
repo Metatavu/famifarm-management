@@ -2,7 +2,7 @@ import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Packing, PackingState, Product } from "famifarm-typescript-models";
+import { Campaign, Packing, PackingState, Product } from "famifarm-typescript-models";
 import strings from "src/localization/strings";
 import * as moment from "moment";
 import * as actions from "../actions";
@@ -30,10 +30,12 @@ interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   packings?: Packing[];
   products?: Product[];
-  location?: any,
-  onPackingsFound?: (packings: Packing[]) => void,
-  onProductsFound?: (products: Product[]) => void,
-  onError: (error: ErrorMessage) => void
+  campaigns?: Campaign[];
+  location?: any;
+  onPackingsFound?: (packings: Packing[]) => void;
+  onProductsFound?: (products: Product[]) => void;
+  onCampaignsFound?: (campaigns: Campaign[]) => void;
+  onError: (error: ErrorMessage) => void;
 }
 
 /**
@@ -78,6 +80,11 @@ class PackingList extends React.Component<Props, State> {
     }
   }
 
+  /**
+   * Returns a text for a basic packing list entry
+   * 
+   * @param packing packing 
+   */
   private getPackingName = (packing: Packing): string => {
     const products = this.props.products || [];
     const packingProduct = products.find((product) => product.id === packing.productId);
@@ -85,6 +92,20 @@ class PackingList extends React.Component<Props, State> {
     const packingDate = moment(packing.time).format("DD.MM.YYYY");
 
     return `${productName} - ${packingDate}`;
+  }
+
+    /**
+   * Returns a text for a campaign packing list entry
+   * 
+   * @param packing packing
+   */
+  private getCampaignPackingName = (packing: Packing): string => {
+    const campaigns = this.props.campaigns || [];
+    const packingCampaign = campaigns.find((campaign) => campaign.id === packing.campaignId)
+    const campaignName = packingCampaign ? packingCampaign.name : packing.id;
+    const packingDate = moment(packing.time).format("DD.MM.YYYY");
+    
+    return `${campaignName} - ${packingDate}`;
   }
 
   /**
@@ -108,7 +129,7 @@ class PackingList extends React.Component<Props, State> {
             </NavLink>
           </List.Content>
           <List.Content>
-            <List.Header style={{paddingTop: "10px"}}>{this.getPackingName(packing)}</List.Header>
+            <List.Header style={{paddingTop: "10px"}}>{ packing.type == "BASIC" ? this.getPackingName(packing) : this.getCampaignPackingName(packing) }</List.Header>
           </List.Content>
         </List.Item>
       );
@@ -266,17 +287,20 @@ class PackingList extends React.Component<Props, State> {
     }
 
     this.setState({loading: true});
-    const [packingsService, productsService] = await Promise.all([
+    const [packingsService, productsService, camapginsService] = await Promise.all([
       Api.getPackingsService(this.props.keycloak),
-      Api.getProductsService(this.props.keycloak)
+      Api.getProductsService(this.props.keycloak),
+      Api.getCampaignsService(this.props.keycloak)
     ]);
 
-    const [packings, products] = await Promise.all([
+    const [packings, products, campaigns] = await Promise.all([
       packingsService.listPackings(undefined, undefined, this.state.selectedProduct, this.state.selectedStatus, this.state.dateBefore, this.state.dateAfter),
-      productsService.listProducts()
+      productsService.listProducts(),
+      camapginsService.listCampaigns()
     ]);
     this.props.onPackingsFound && this.props.onPackingsFound(packings);
     this.props.onProductsFound && this.props.onProductsFound(products);
+    this.props.onCampaignsFound && this.props.onCampaignsFound(campaigns);
     this.setState({loading: false})
   }
 }
@@ -289,7 +313,8 @@ class PackingList extends React.Component<Props, State> {
 export function mapStateToProps(state: StoreState) {
   return {
     products: state.products,
-    packings: state.packings
+    packings: state.packings,
+    campaigns: state.campaigns
   };
 }
 
@@ -302,6 +327,7 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onProductsFound: (products: Product[]) => dispatch(actions.productsFound(products)),
     onPackingsFound: (packings: Packing[]) => dispatch(actions.packingsFound(packings)),
+    onCampaignsFound: (campaigns: Campaign[]) => dispatch(actions.campaignsFound(campaigns)),
     onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
   };
 }

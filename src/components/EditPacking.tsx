@@ -107,14 +107,14 @@ class EditPacking extends React.Component<Props, State> {
         const packageSizesSerivce = await Api.getPackageSizesService(this.props.keycloak);
         const packageSizes = await packageSizesSerivce.listPackageSizes();
   
-        this.setState({ packing, productName, productId, products, packageSizes, packingStatus, date, packedCount, packageSizeId: packing.packageSizeId, loading: false, campaigns });
+        this.setState({ packing, productName, productId, products, packageSizes, packingStatus, date, packedCount, packageSizeId: packing.packageSizeId, loading: false, campaigns, packingType: "BASIC" });
       }
 
       if (packing.type == "CAMPAIGN") {
         const campaign = await campaignsService.findCampaign(packing.campaignId!);
         const { name, id } = campaign;
 
-        this.setState({ products, campaigns, date, packingStatus, campaignName: name, campaignId: id, loading: false });
+        this.setState({ packing, products, campaigns, date, packingStatus, campaignName: name, campaignId: id, loading: false, packingType: "CAMPAIGN" });
       }
 
 
@@ -219,7 +219,7 @@ class EditPacking extends React.Component<Props, State> {
             }
                 
             {
-              this.state.packingType === "CAMPAIGN" &&
+              this.state.packingType == "CAMPAIGN" &&
               <FormContainer>
                 <Form.Field required>
                   <label>{ strings.campaign }</label>
@@ -245,7 +245,7 @@ class EditPacking extends React.Component<Props, State> {
         </Grid.Row>
 
         {
-          this.state.packingType === "BASIC" && 
+          this.state.packingType == "BASIC" && 
           <Grid.Row className="content-page-header-row">
             <Grid.Column width={8}>
                 <h2>{strings.printPacking}</h2>
@@ -254,7 +254,7 @@ class EditPacking extends React.Component<Props, State> {
         }
         
         {
-          this.state.packingType === "BASIC" &&
+          this.state.packingType == "BASIC" &&
           <Grid.Row>
             <Grid.Column width={8}>
               <Select options={ printers } text={ this.state.selectedPrinter ? this.state.selectedPrinter.name : strings.selectPrinter } value={ this.state.selectedPrinter ? this.state.selectedPrinter.id : undefined } onChange={ this.onPrinterChange }></Select>
@@ -264,7 +264,7 @@ class EditPacking extends React.Component<Props, State> {
         }
 
         {
-          this.state.packingType === "BASIC" &&
+          this.state.packingType == "BASIC" &&
           <Grid.Row>
             <Grid.Column width={8}>
               <Button disabled={ this.state.printing } loading={ this.state.printing } className="submit-button" onClick={ this.print } type='submit'>{ strings.print }</Button>
@@ -272,9 +272,49 @@ class EditPacking extends React.Component<Props, State> {
           </Grid.Row>
         }
 
-        <Confirm open={this.state.confirmOpen} size={"mini"} content={strings.deleteConfirmationText + this.state.productName + " - "+ this.state.date} onCancel={()=>this.setState({confirmOpen:false})} onConfirm={this.handleDelete} />
+        <Confirm open={this.state.confirmOpen} size={"mini"} content={ this.getDeleteConfirmationText() } onCancel={()=>this.setState({ confirmOpen : false })} onConfirm={ this.handleDelete } />
       </Grid>
     )
+  }
+
+  /**
+   * Returns a delete confiramtion text
+   */
+  private getDeleteConfirmationText = (): string => {
+    if (this.state.packing) {
+      const packingText = this.state.packing.type == "BASIC" ? this.getPackingName(this.state.packing) : this.getCampaignPackingName(this.state.packing);
+      return strings.deleteConfirmationText + packingText + "?";
+
+    }
+    return strings.deleteConfirmationText + "?";
+  }
+
+  /**
+   * Returns a text for a basic packing list entry
+   * 
+   * @param packing packing 
+   */
+  private getPackingName = (packing: Packing): string => {
+    const products = this.state.products;
+    const packingProduct = products.find((product) => product.id === packing.productId);
+    const productName = packingProduct ? LocalizedUtils.getLocalizedValue(packingProduct.name) : packing.id;
+    const packingDate = moment(packing.time).format("DD.MM.YYYY");
+
+    return `${productName} - ${packingDate}`;
+  }
+
+  /**
+   * Returns a text for a campaign packing list entry
+   * 
+   * @param packing packing
+   */
+  private getCampaignPackingName = (packing: Packing): string => {
+    const campaigns = this.state.campaigns;
+    const packingCampaign = campaigns.find((campaign) => campaign.id === packing.campaignId)
+    const campaignName = packingCampaign ? packingCampaign.name : packing.id;
+    const packingDate = moment(packing.time).format("DD.MM.YYYY");
+    
+    return `${campaignName} - ${packingDate}`;
   }
 
   /**
