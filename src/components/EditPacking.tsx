@@ -244,33 +244,26 @@ class EditPacking extends React.Component<Props, State> {
             </Grid.Column>
         </Grid.Row>
 
-        {
-          this.state.packingType == "BASIC" && 
-          <Grid.Row className="content-page-header-row">
-            <Grid.Column width={8}>
-                <h2>{strings.printPacking}</h2>
-            </Grid.Column>
-          </Grid.Row>
-        }
-        
-        {
-          this.state.packingType == "BASIC" &&
-          <Grid.Row>
-            <Grid.Column width={8}>
-              <Select options={ printers } text={ this.state.selectedPrinter ? this.state.selectedPrinter.name : strings.selectPrinter } value={ this.state.selectedPrinter ? this.state.selectedPrinter.id : undefined } onChange={ this.onPrinterChange }></Select>
-              <Button style={{ marginLeft: 10 }} loading={ this.state.refreshingPrinters } className="submit-button" onClick={ this.refreshPrinters } type='submit'>{ strings.update }</Button>
-            </Grid.Column>
-          </Grid.Row>
-        }
+     
+        <Grid.Row className="content-page-header-row">
+          <Grid.Column width={8}>
+             <h2>{strings.printPacking}</h2>
+          </Grid.Column>
+        </Grid.Row>
 
-        {
-          this.state.packingType == "BASIC" &&
-          <Grid.Row>
-            <Grid.Column width={8}>
-              <Button disabled={ this.state.printing } loading={ this.state.printing } className="submit-button" onClick={ this.print } type='submit'>{ strings.print }</Button>
-            </Grid.Column>
-          </Grid.Row>
-        }
+        <Grid.Row>
+          <Grid.Column width={8}>
+          <Select options={ printers } text={ this.state.selectedPrinter ? this.state.selectedPrinter.name : strings.selectPrinter } value={ this.state.selectedPrinter ? this.state.selectedPrinter.id : undefined } onChange={ this.onPrinterChange }></Select>
+            <Button style={{ marginLeft: 10 }} loading={ this.state.refreshingPrinters } className="submit-button" onClick={ this.refreshPrinters } type='submit'>{ strings.update }</Button>
+          </Grid.Column>
+        </Grid.Row>
+
+
+        <Grid.Row>
+          <Grid.Column width={8}>
+            <Button disabled={ this.state.printing } loading={ this.state.printing } className="submit-button" onClick={ this.print } type='submit'>{ strings.print }</Button>
+          </Grid.Column>
+        </Grid.Row>
 
         <Confirm open={this.state.confirmOpen} size={"mini"} content={ this.getDeleteConfirmationText() } onCancel={()=>this.setState({ confirmOpen : false })} onConfirm={ this.handleDelete } />
       </Grid>
