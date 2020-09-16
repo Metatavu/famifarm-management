@@ -159,7 +159,7 @@ class CreatePacking extends React.Component<Props, State> {
               this.state.packingType === "BASIC" && 
               <FormContainer>
                 <Form.Field required>
-                  <label>{strings.product}</label>
+                  <label>{ strings.product }</label>
                   <Select
                     options={ productOptions }
                     value={ this.state.productId }
