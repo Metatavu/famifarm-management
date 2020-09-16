@@ -216,16 +216,39 @@ class CreatePacking extends React.Component<Props, State> {
               <FormContainer>
                 <Form.Field required>
                   <label>{ strings.campaign }</label>
-                  <Select options={ campaignOptions } value={ this.state.campaignId } onChange={ this.onPackingCampaignChange }></Select>
+                  <Select
+                    options={ campaignOptions }
+                    value={ this.state.campaignId }
+                    onChange={ this.onPackingCampaignChange }
+                  />
                 </Form.Field>
                 <Form.Field required>
-                  <label>{strings.packingStatus}</label>
-                  <Select options={ [{value:"IN_STORE", text: strings.packingStoreStatus}, {value: "REMOVED", text: strings.packingRemovedStatus}] } text={this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus} value={ this.state.packingStatus } onChange={ this.onStatusChange }></Select>
+                  <label>{ strings.packingStatus }</label>
+                  <Select
+                    options={[
+                      { value: "IN_STORE", text: strings.packingStoreStatus },
+                      { value: "REMOVED", text: strings.packingRemovedStatus }
+                    ]}
+                    text={ this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus }
+                    value={ this.state.packingStatus }
+                    onChange={ this.onStatusChange }
+                  />
                 </Form.Field>
                 <Form.Field>
-                  <DateInput dateFormat="DD.MM.YYYY" onChange={this.onChangeDate} name="date" value={ moment(this.state.date).format("DD.MM.YYYY") } />
+                  <DateInput
+                    dateFormat="DD.MM.YYYY"
+                    onChange={ this.onChangeDate }
+                    name="date"
+                    value={ moment(this.state.date).format("DD.MM.YYYY") }
+                  />
                 </Form.Field>
-                <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
+                <Button
+                  className="submit-button"
+                  onClick={ this.handleSubmit }
+                  type='submit'
+                >
+                  { strings.save }
+                </Button>
               </FormContainer>
             }
             
