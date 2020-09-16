@@ -253,7 +253,10 @@ class CreatePacking extends React.Component<Props, State> {
   }
 
   /**
-   * Event handler for campaign change 
+   * Event handler for campaign change
+   *
+   * @param event React change event
+   * @param data dropdown data
    */
   private onPackingCampaignChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
     this.setState({
