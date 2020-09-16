@@ -202,7 +202,13 @@ class CreatePacking extends React.Component<Props, State> {
                     value={ moment(this.state.date).format("DD.MM.YYYY") }
                   />
                 </Form.Field>
-                <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
+                <Button
+                  className="submit-button"
+                  onClick={ this.handleSubmit }
+                  type='submit'
+                >
+                  { strings.save }
+                </Button>
               </FormContainer>
             }
 
