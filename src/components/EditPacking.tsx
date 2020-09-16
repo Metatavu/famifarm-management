@@ -314,7 +314,10 @@ class EditPacking extends React.Component<Props, State> {
    */
   private getDeleteConfirmationText = (): string => {
     if (this.state.packing) {
-      const packingText = this.state.packing.type == "BASIC" ? this.getPackingName(this.state.packing) : this.getCampaignPackingName(this.state.packing);
+      const packingText = this.state.packing.type == "BASIC" ?
+        this.getPackingName(this.state.packing) :
+        this.getCampaignPackingName(this.state.packing);
+
       return strings.deleteConfirmationText + packingText + "?";
 
     }
