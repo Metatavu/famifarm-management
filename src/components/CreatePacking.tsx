@@ -312,6 +312,9 @@ class CreatePacking extends React.Component<Props, State> {
 
   /**
    * Event handler for packing type
+   *
+   * @param event event
+   * @param value value from input on change data
    */
   private onPackingTypeChange = (event: any, { value }: InputOnChangeData) => {
     this.setState({ packingType: value as PackingType });
