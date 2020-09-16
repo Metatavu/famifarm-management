@@ -275,7 +275,7 @@ class EditPacking extends React.Component<Props, State> {
      
         <Grid.Row className="content-page-header-row">
           <Grid.Column width={8}>
-             <h2>{strings.printPacking}</h2>
+             <h2>{ strings.printPacking }</h2>
           </Grid.Column>
         </Grid.Row>
 
