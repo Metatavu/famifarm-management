@@ -127,7 +127,17 @@ class EditPacking extends React.Component<Props, State> {
         const campaign = await campaignsService.findCampaign(packing.campaignId!);
         const { name, id } = campaign;
 
-        this.setState({ packing, products, campaigns, date, packingStatus, campaignName: name, campaignId: id, loading: false, packingType: "CAMPAIGN" });
+        this.setState({
+          packing,
+          products,
+          campaigns,
+          date,
+          packingStatus,
+          campaignName: name,
+          campaignId: id,
+          loading: false,
+          packingType: "CAMPAIGN"
+        });
       }
 
 
