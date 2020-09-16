@@ -107,7 +107,20 @@ class EditPacking extends React.Component<Props, State> {
         const packageSizesSerivce = await Api.getPackageSizesService(this.props.keycloak);
         const packageSizes = await packageSizesSerivce.listPackageSizes();
   
-        this.setState({ packing, productName, productId, products, packageSizes, packingStatus, date, packedCount, packageSizeId: packing.packageSizeId, loading: false, campaigns, packingType: "BASIC" });
+        this.setState({
+          packing,
+          productName,
+          productId,
+          products,
+          packageSizes,
+          packingStatus,
+          date,
+          packedCount,
+          packageSizeId: packing.packageSizeId,
+          loading: false,
+          campaigns,
+          packingType: "BASIC"
+        });
       }
 
       if (packing.type == "CAMPAIGN") {
