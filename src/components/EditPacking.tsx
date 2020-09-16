@@ -281,7 +281,12 @@ class EditPacking extends React.Component<Props, State> {
 
         <Grid.Row>
           <Grid.Column width={8}>
-          <Select options={ printers } text={ this.state.selectedPrinter ? this.state.selectedPrinter.name : strings.selectPrinter } value={ this.state.selectedPrinter ? this.state.selectedPrinter.id : undefined } onChange={ this.onPrinterChange }></Select>
+          <Select
+            options={ printers }
+            text={ this.state.selectedPrinter ? this.state.selectedPrinter.name : strings.selectPrinter }
+            value={ this.state.selectedPrinter?.id }
+            onChange={ this.onPrinterChange }
+          />
             <Button style={{ marginLeft: 10 }} loading={ this.state.refreshingPrinters } className="submit-button" onClick={ this.refreshPrinters } type='submit'>{ strings.update }</Button>
           </Grid.Column>
         </Grid.Row>
