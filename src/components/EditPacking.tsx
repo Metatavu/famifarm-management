@@ -525,12 +525,12 @@ class EditPacking extends React.Component<Props, State> {
 
       const updatedPacking = type == "CAMPAIGN" ? {
         type,
-        id :  this.state.packing ? this.state.packing.id : undefined,
+        id: this.state.packing?.id,
         campaignId: this.state.campaignId,
         state: this.state.packingStatus,
         time: this.state.date
       } : {
-        id :  this.state.packing ? this.state.packing.id : undefined,
+        id: this.state.packing?.id,
         productId: this.state.productId,
         time: this.state.date,
         packedCount: this.state.packedCount,
