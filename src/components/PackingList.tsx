@@ -101,7 +101,7 @@ class PackingList extends React.Component<Props, State> {
    */
   private getCampaignPackingName = (packing: Packing): string => {
     const campaigns = this.props.campaigns || [];
-    const packingCampaign = campaigns.find((campaign) => campaign.id === packing.campaignId)
+    const packingCampaign = campaigns.find((campaign) => campaign.id === packing.campaignId);
     const campaignName = packingCampaign ? packingCampaign.name : packing.id;
     const packingDate = moment(packing.time).format("DD.MM.YYYY");
     
