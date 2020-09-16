@@ -176,7 +176,15 @@ class CreatePacking extends React.Component<Props, State> {
                 </Form.Field>
                 <Form.Field required>
                   <label>{strings.packingStatus}</label>
-                  <Select options={ [{value:"IN_STORE", text: strings.packingStoreStatus}, {value: "REMOVED", text: strings.packingRemovedStatus}] } text={this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus} value={ this.state.packingStatus } onChange={ this.onStatusChange }></Select>
+                  <Select
+                    options={[
+                      {value:"IN_STORE", text: strings.packingStoreStatus},
+                      {value: "REMOVED", text: strings.packingRemovedStatus}
+                    ]}
+                    text={ this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus }
+                    value={ this.state.packingStatus }
+                    onChange={ this.onStatusChange }
+                  />
                 </Form.Field>
                 <Form.Field>
                   <label>{strings.labelPackedCount}</label>
