@@ -182,5 +182,10 @@
     "campaignName": "Kampanjan nimi",
     "productCount": "Tuotteiden määrä",
     "addCampaignProduct": "Lisää kampanjatuote",
-    "editCampaign": "Muokkaa kampanjaa"
+    "editCampaign": "Muokkaa kampanjaa",
+
+    "packingType": "Pakkauksen tyyppi",
+    "packingTypeBasic": "Tavallinen pakkaus",
+    "packingTypeCampaign": "Kampanjapakkaus",
+    "campaign": "Kampanja"
   }

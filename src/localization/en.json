@@ -183,5 +183,10 @@
   "campaignName": "Campaign name",
   "productCount": "Product count",
   "addCampaignProduct": "Add campaign product",
-  "editCampaign": "Muokkaa kampanjaa"
+  "editCampaign": "Muokkaa kampanjaa",
+
+  "packingType": "Type of the packing",
+  "packingTypeBasic": "Basic packing",
+  "packingTypeCampaign": "Campaign packing",
+  "campaign": "Campaign"
 }

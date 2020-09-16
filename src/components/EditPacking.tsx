@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { StoreState, ErrorMessage } from "src/types";
 import * as actions from "../actions";
-import { Packing, Product, PackageSize, PackingState, Printer } from "famifarm-typescript-models";
+import { Packing, Product, PackageSize, PackingState, Printer, PackingType, Campaign } from "famifarm-typescript-models";
 import Api from "../api";
 import { KeycloakInstance } from "keycloak-js";
 import strings from "src/localization/strings";
@@ -37,7 +37,11 @@ export interface State {
   printers: Printer[],
   printing: boolean,
   selectedPrinter?: Printer,
-  refreshingPrinters: boolean
+  refreshingPrinters: boolean,
+  campaignId?: string,
+  packingType?: PackingType,
+  campaigns: Campaign[],
+  campaignName?: string
 }
 
 class EditPacking extends React.Component<Props, State> {
@@ -57,7 +61,8 @@ class EditPacking extends React.Component<Props, State> {
       redirect: false,
       printers: [],
       printing: false,
-      refreshingPrinters: false
+      refreshingPrinters: false,
+      campaigns: []
     }
     this.handleSubmit = this.handleSubmit.bind(this);
 }
@@ -71,32 +76,70 @@ class EditPacking extends React.Component<Props, State> {
 
       const packingsService = await Api.getPackingsService(this.props.keycloak);
       const packing = await packingsService.findPacking(this.props.packingId);
-      const packingStatus = packing.state;
-      const date = packing.time;
-      const packedCount = packing.packedCount || 0;
 
-      await this.refreshPrinters();
-      
       const productsService = await Api.getProductsService(this.props.keycloak);
-      const product = await productsService.findProduct(packing.productId);
       const products = await productsService.listProducts();
 
-      const productId = product.id;
+      const campaignsService = await Api.getCampaignsService(this.props.keycloak);
+      const campaigns = await campaignsService.listCampaigns();
 
-      if (!productId) {
-        throw new Error("Product id undefined");
-      }
-
-      const productName = LocalizedUtils.getLocalizedValue( product.name);
-
-      const packageSizesSerivce = await Api.getPackageSizesService(this.props.keycloak);
-      const packageSizes = await packageSizesSerivce.listPackageSizes();
+      const packingStatus = packing.state;
+      const date = packing.time;
 
       if (!packing) {
         throw new Error("Could not find packing");
       }
 
-      this.setState({packing, productName, productId, products, packageSizes, packingStatus, date, packedCount, packageSizeId: packing.packageSizeId, loading: false});
+      if (packing.type == "BASIC") {
+        const product = await productsService.findProduct(packing.productId!);
+        const packedCount = packing.packedCount || 0;
+  
+        await this.refreshPrinters();
+        
+        const productId = product.id;
+  
+        if (!productId) {
+          throw new Error("Product id undefined");
+        }
+  
+        const productName = LocalizedUtils.getLocalizedValue(product.name);
+  
+        const packageSizesSerivce = await Api.getPackageSizesService(this.props.keycloak);
+        const packageSizes = await packageSizesSerivce.listPackageSizes();
+  
+        this.setState({
+          packing,
+          productName,
+          productId,
+          products,
+          packageSizes,
+          packingStatus,
+          date,
+          packedCount,
+          packageSizeId: packing.packageSizeId,
+          loading: false,
+          campaigns,
+          packingType: "BASIC"
+        });
+      }
+
+      if (packing.type == "CAMPAIGN") {
+        const campaign = await campaignsService.findCampaign(packing.campaignId!);
+        const { name, id } = campaign;
+
+        this.setState({
+          packing,
+          products,
+          campaigns,
+          date,
+          packingStatus,
+          campaignName: name,
+          campaignId: id,
+          loading: false,
+          packingType: "CAMPAIGN"
+        });
+      }
+
 
     } catch (e) {
       this.props.onError({
@@ -120,7 +163,7 @@ class EditPacking extends React.Component<Props, State> {
       return <Redirect to="/packings" push={true} />;
     }
     
-    const productOptions: DropdownItemProps[] = [{ key: "", value: "", text: "", }].concat(this.state.products.map((product) => {
+    const productOptions: DropdownItemProps[] = this.state.products.map((product) => {
       const id = product.id!;
       const name = LocalizedUtils.getLocalizedValue(product.name);
 
@@ -129,9 +172,9 @@ class EditPacking extends React.Component<Props, State> {
         value: id,
         text: name
       };
-    }));
+    });
 
-    const packageSizeOptions: DropdownItemProps[] = [{ key: "", value: "", text: "", }].concat(this.state.packageSizes.map((size) => {
+    const packageSizeOptions: DropdownItemProps[] = this.state.packageSizes.map((size) => {
       const id = size.id!;
       const name = LocalizedUtils.getLocalizedValue(size.name);
 
@@ -140,10 +183,21 @@ class EditPacking extends React.Component<Props, State> {
         value: id,
         text: name
       };
-    }));
+    });
 
     const printers = (this.state.printers).map((printer, i) => {
       return { text: printer.name, value: printer.id };
+    });
+
+    const campaignOptions = this.state.campaigns.map((campaign) => {
+      const id = campaign.id!;
+      const name = campaign.name;
+
+      return {
+        key: id,
+        value: id,
+        text: name
+      };
     });
     
     return (
@@ -155,55 +209,218 @@ class EditPacking extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
             <Grid.Column width={8}>
-                <FormContainer>
-                    <Form.Field required>
-                        <label>{strings.product}</label>
-                        <Select options={ productOptions } value={ this.state.productId } onChange={ this.onPackingProductChange }></Select>
-                    </Form.Field>
-                    <Form.Field required>
-                        <label>{strings.packageSize}</label>
-                        <Select options={ packageSizeOptions } value={ this.state.packageSizeId } onChange={ this.onPackageSizeChange }></Select>
-                    </Form.Field>
-                    <Form.Field required>
-                        <label>{strings.packingStatus}</label>
-                        <Select options={ [{value:"IN_STORE", text: strings.packingStoreStatus}, {value: "REMOVED", text: strings.packingRemovedStatus}] } text={this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus} value={ this.state.packingStatus } onChange={ this.onStatusChange }></Select>
-                    </Form.Field>
-                    <Form.Field>
-                        <label>{strings.labelPackedCount}</label>
-                        <Input type="number" value={ this.state.packedCount} onChange={ this.onPackedCountChange }></Input>
-                    </Form.Field>
-                    <Form.Field>
-                        <DateInput dateFormat="DD.MM.YYYY" onChange={this.onChangeDate} name="date" value={ moment(this.state.date).format("DD.MM.YYYY") } />
-                    </Form.Field>
-                    <Message
-                      success
-                      visible={this.state.messageVisible}
-                      header={strings.savedSuccessfully}
-                    />
-                    <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
-                    <Button className="danger-button" onClick={() => this.setState({confirmOpen:true})}>{strings.delete}</Button>
-                </FormContainer>
+            {
+              this.state.packingType == "BASIC" && 
+              <FormContainer>
+                <Form.Field required>
+                  <label>{ strings.product }</label>
+                  <Select
+                    options={ productOptions }
+                    value={ this.state.productId }
+                    onChange={ this.onPackingProductChange }
+                  />
+                </Form.Field>
+                <Form.Field required>
+                  <label>{ strings.packageSize }</label>
+                  <Select
+                    options={ packageSizeOptions }
+                    value={ this.state.packageSizeId }
+                    onChange={ this.onPackageSizeChange }
+                  />
+                </Form.Field>
+                <Form.Field required>
+                  <label>{ strings.packingStatus }</label>
+                  <Select
+                    options={[
+                      { value:"IN_STORE", text: strings.packingStoreStatus },
+                      { value: "REMOVED", text: strings.packingRemovedStatus }
+                    ]}
+                    text={ this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus }
+                    value={ this.state.packingStatus }
+                    onChange={ this.onStatusChange }
+                  />
+                </Form.Field>
+                <Form.Field>
+                  <label>{ strings.labelPackedCount }</label>
+                  <Input
+                    type="number"
+                    value={ this.state.packedCount }
+                    onChange={ this.onPackedCountChange }
+                  />
+                </Form.Field>
+                <Form.Field>
+                  <DateInput
+                    dateFormat="DD.MM.YYYY"
+                    onChange={ this.onChangeDate }
+                    name="date"
+                    value={ moment(this.state.date).format("DD.MM.YYYY") }
+                  />
+                </Form.Field>
+                <Message
+                  success
+                  visible={ this.state.messageVisible }
+                  header={ strings.savedSuccessfully }
+                />
+                <Button
+                  className="submit-button"
+                  onClick={ this.handleSubmit }
+                  type='submit'
+                >
+                  { strings.save }
+                </Button>
+                <Button
+                  className="danger-button"
+                  onClick={ () => this.setState({ confirmOpen: true }) }
+                >
+                  { strings.delete }
+                </Button>
+              </FormContainer>
+            }
+                
+            {
+              this.state.packingType == "CAMPAIGN" &&
+              <FormContainer>
+                <Form.Field required>
+                  <label>{ strings.campaign }</label>
+                  <Select
+                    options={ campaignOptions }
+                    value={ this.state.campaignId }
+                    onChange={ this.onPackingCampaignChange }
+                  />
+                </Form.Field>
+                <Form.Field required>
+                  <label>{ strings.packingStatus }</label>
+                  <Select
+                    options={[
+                      { value:"IN_STORE", text: strings.packingStoreStatus },
+                      { value: "REMOVED", text: strings.packingRemovedStatus }
+                    ]}
+                    text={ this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus }
+                    value={ this.state.packingStatus }
+                    onChange={ this.onStatusChange }
+                  />
+                </Form.Field>
+                <Form.Field>
+                  <DateInput
+                    dateFormat="DD.MM.YYYY"
+                    onChange={ this.onChangeDate }
+                    name="date"
+                    value={ moment(this.state.date).format("DD.MM.YYYY") }
+                  />
+                </Form.Field>
+                <Message
+                  success
+                  visible={ this.state.messageVisible }
+                  header={ strings.savedSuccessfully }
+                />
+                <Button
+                  className="submit-button"
+                  onClick={ this.handleSubmit }
+                  type='submit'
+                >
+                  { strings.save }
+                </Button>
+                <Button
+                  className="danger-button"
+                  onClick={ () => this.setState({ confirmOpen: true }) }
+                >
+                  { strings.delete }
+                </Button>
+              </FormContainer>
+            }
             </Grid.Column>
         </Grid.Row>
+
+     
         <Grid.Row className="content-page-header-row">
           <Grid.Column width={8}>
-              <h2>{strings.printPacking}</h2>
+             <h2>{ strings.printPacking }</h2>
           </Grid.Column>
         </Grid.Row>
+
         <Grid.Row>
           <Grid.Column width={8}>
-            <Select options={ printers } text={ this.state.selectedPrinter ? this.state.selectedPrinter.name : strings.selectPrinter } value={ this.state.selectedPrinter ? this.state.selectedPrinter.id : undefined } onChange={ this.onPrinterChange }></Select>
+          <Select
+            options={ printers }
+            text={ this.state.selectedPrinter ? this.state.selectedPrinter.name : strings.selectPrinter }
+            value={ this.state.selectedPrinter?.id }
+            onChange={ this.onPrinterChange }
+          />
             <Button style={{ marginLeft: 10 }} loading={ this.state.refreshingPrinters } className="submit-button" onClick={ this.refreshPrinters } type='submit'>{ strings.update }</Button>
           </Grid.Column>
         </Grid.Row>
+
+
         <Grid.Row>
           <Grid.Column width={8}>
             <Button disabled={ this.state.printing } loading={ this.state.printing } className="submit-button" onClick={ this.print } type='submit'>{ strings.print }</Button>
           </Grid.Column>
         </Grid.Row>
-        <Confirm open={this.state.confirmOpen} size={"mini"} content={strings.deleteConfirmationText + this.state.productName + " - "+ this.state.date} onCancel={()=>this.setState({confirmOpen:false})} onConfirm={this.handleDelete} />
+
+        <Confirm
+          open={ this.state.confirmOpen }
+          size="mini"
+          content={ this.getDeleteConfirmationText() }
+          onCancel={ () => this.setState({ confirmOpen : false }) }
+          onConfirm={ this.handleDelete }
+        />
       </Grid>
     )
+  }
+
+  /**
+   * Returns a delete confiramtion text
+   */
+  private getDeleteConfirmationText = (): string => {
+    if (this.state.packing) {
+      const packingText = this.state.packing.type == "BASIC" ?
+        this.getPackingName(this.state.packing) :
+        this.getCampaignPackingName(this.state.packing);
+
+      return strings.deleteConfirmationText + packingText + "?";
+
+    }
+    return strings.deleteConfirmationText + "?";
+  }
+
+  /**
+   * Returns a text for a basic packing list entry
+   * 
+   * @param packing packing 
+   */
+  private getPackingName = (packing: Packing): string => {
+    const products = this.state.products;
+    const packingProduct = products.find((product) => product.id === packing.productId);
+    const productName = packingProduct ? LocalizedUtils.getLocalizedValue(packingProduct.name) : packing.id;
+    const packingDate = moment(packing.time).format("DD.MM.YYYY");
+
+    return `${productName} - ${packingDate}`;
+  }
+
+  /**
+   * Returns a text for a campaign packing list entry
+   * 
+   * @param packing packing
+   */
+  private getCampaignPackingName = (packing: Packing): string => {
+    const campaigns = this.state.campaigns;
+    const packingCampaign = campaigns.find((campaign) => campaign.id === packing.campaignId)
+    const campaignName = packingCampaign ? packingCampaign.name : packing.id;
+    const packingDate = moment(packing.time).format("DD.MM.YYYY");
+    
+    return `${campaignName} - ${packingDate}`;
+  }
+
+  /**
+   * Event handler for campaign change
+   *
+   * @param event React change event
+   * @param data dropdown data
+   */
+  private onPackingCampaignChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    this.setState({
+      campaignId: data.value as string
+    });
   }
 
    /**
@@ -292,13 +509,34 @@ class EditPacking extends React.Component<Props, State> {
    */
   private handleSubmit = async () => {
     try {
-      const updatedPacking: Packing  = {
-        id : this.state.packing ? this.state.packing.id : undefined,
+      const type = this.state.packingType;
+
+      if (type == "BASIC" && !this.state.productId) {
+        return;
+      }
+
+      if (type == "CAMPAIGN" && !this.state.campaignId) {
+        return;
+      }
+
+      if (!type) {
+        return;
+      }
+
+      const updatedPacking = type == "CAMPAIGN" ? {
+        type,
+        id: this.state.packing?.id,
+        campaignId: this.state.campaignId,
+        state: this.state.packingStatus,
+        time: this.state.date
+      } : {
+        id: this.state.packing?.id,
         productId: this.state.productId,
         time: this.state.date,
         packedCount: this.state.packedCount,
         packageSizeId: this.state.packageSizeId,
-        state: this.state.packingStatus
+        state: this.state.packingStatus,
+        type
       }
 
       if (!updatedPacking.id) {
