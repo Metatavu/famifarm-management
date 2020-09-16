@@ -144,7 +144,14 @@ class CreatePacking extends React.Component<Props, State> {
             <FormContainer>
               <Form.Field>
                 <label>{ strings.packingType }</label>
-                <Select options={ [{ value: "BASIC", text: strings.packingTypeBasic }, { value: "CAMPAIGN", text: strings.packingTypeCampaign }] } value={ this.state.packingType } onChange={ this.onPackingTypeChange }></Select>
+                <Select
+                  options={[
+                    { value: "BASIC", text: strings.packingTypeBasic },
+                    { value: "CAMPAIGN", text: strings.packingTypeCampaign }
+                  ]}
+                  value={ this.state.packingType }
+                  onChange={ this.onPackingTypeChange }
+                />
               </Form.Field>
             </FormContainer>
 
