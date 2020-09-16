@@ -129,7 +129,12 @@ class PackingList extends React.Component<Props, State> {
             </NavLink>
           </List.Content>
           <List.Content>
-            <List.Header style={{paddingTop: "10px"}}>{ packing.type == "BASIC" ? this.getPackingName(packing) : this.getCampaignPackingName(packing) }</List.Header>
+            <List.Header style={{ paddingTop: "10px" }}>
+              { packing.type == "BASIC" ?
+                this.getPackingName(packing) :
+                this.getCampaignPackingName(packing)
+              }
+            </List.Header>
           </List.Content>
         </List.Item>
       );
