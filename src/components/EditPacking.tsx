@@ -190,31 +190,67 @@ class EditPacking extends React.Component<Props, State> {
               this.state.packingType == "BASIC" && 
               <FormContainer>
                 <Form.Field required>
-                  <label>{strings.product}</label>
-                  <Select options={ productOptions } value={ this.state.productId } onChange={ this.onPackingProductChange }></Select>
+                  <label>{ strings.product }</label>
+                  <Select
+                    options={ productOptions }
+                    value={ this.state.productId }
+                    onChange={ this.onPackingProductChange }
+                  />
                 </Form.Field>
                 <Form.Field required>
-                  <label>{strings.packageSize}</label>
-                  <Select options={ packageSizeOptions } value={ this.state.packageSizeId } onChange={ this.onPackageSizeChange }></Select>
+                  <label>{ strings.packageSize }</label>
+                  <Select
+                    options={ packageSizeOptions }
+                    value={ this.state.packageSizeId }
+                    onChange={ this.onPackageSizeChange }
+                  />
                 </Form.Field>
                 <Form.Field required>
-                  <label>{strings.packingStatus}</label>
-                  <Select options={ [{value:"IN_STORE", text: strings.packingStoreStatus}, {value: "REMOVED", text: strings.packingRemovedStatus}] } text={this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus} value={ this.state.packingStatus } onChange={ this.onStatusChange }></Select>
+                  <label>{ strings.packingStatus }</label>
+                  <Select
+                    options={[
+                      { value:"IN_STORE", text: strings.packingStoreStatus },
+                      { value: "REMOVED", text: strings.packingRemovedStatus }
+                    ]}
+                    text={ this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus }
+                    value={ this.state.packingStatus }
+                    onChange={ this.onStatusChange }
+                  />
                 </Form.Field>
                 <Form.Field>
-                  <label>{strings.labelPackedCount}</label>
-                  <Input type="number" value={ this.state.packedCount} onChange={ this.onPackedCountChange }></Input>
+                  <label>{ strings.labelPackedCount }</label>
+                  <Input
+                    type="number"
+                    value={ this.state.packedCount }
+                    onChange={ this.onPackedCountChange }
+                  />
                 </Form.Field>
                 <Form.Field>
-                  <DateInput dateFormat="DD.MM.YYYY" onChange={this.onChangeDate} name="date" value={ moment(this.state.date).format("DD.MM.YYYY") } />
+                  <DateInput
+                    dateFormat="DD.MM.YYYY"
+                    onChange={ this.onChangeDate }
+                    name="date"
+                    value={ moment(this.state.date).format("DD.MM.YYYY") }
+                  />
                 </Form.Field>
                 <Message
                   success
-                  visible={this.state.messageVisible}
-                  header={strings.savedSuccessfully}
-                  />
-                <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
-                <Button className="danger-button" onClick={() => this.setState({confirmOpen:true})}>{strings.delete}</Button>
+                  visible={ this.state.messageVisible }
+                  header={ strings.savedSuccessfully }
+                />
+                <Button
+                  className="submit-button"
+                  onClick={ this.handleSubmit }
+                  type='submit'
+                >
+                  { strings.save }
+                </Button>
+                <Button
+                  className="danger-button"
+                  onClick={ () => this.setState({ confirmOpen: true }) }
+                >
+                  { strings.delete }
+                </Button>
               </FormContainer>
             }
                 
