@@ -164,7 +164,11 @@ class CreatePacking extends React.Component<Props, State> {
                 </Form.Field>
                 <Form.Field required>
                   <label>{strings.packageSize}</label>
-                  <Select options={ packageSizeOptions } value={ this.state.packageSizeId } onChange={ this.onPackageSizeChange }></Select>
+                  <Select
+                    options={ packageSizeOptions }
+                    value={ this.state.packageSizeId }
+                    onChange={ this.onPackageSizeChange }
+                  />
                 </Form.Field>
                 <Form.Field required>
                   <label>{strings.packingStatus}</label>
