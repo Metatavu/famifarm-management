@@ -180,7 +180,11 @@ class CreatePacking extends React.Component<Props, State> {
                 </Form.Field>
                 <Form.Field>
                   <label>{strings.labelPackedCount}</label>
-                  <Input type="number" value={ this.state.packedCount } onChange={ this.onPackedCountChange }></Input>
+                  <Input
+                    type="number"
+                    value={ this.state.packedCount }
+                    onChange={ this.onPackedCountChange }
+                  />
                 </Form.Field>
                 <Form.Field>
                   <DateInput dateFormat="DD.MM.YYYY" onChange={this.onChangeDate} name="date" value={ moment(this.state.date).format("DD.MM.YYYY") } />
