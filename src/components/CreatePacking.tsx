@@ -175,7 +175,7 @@ class CreatePacking extends React.Component<Props, State> {
                   />
                 </Form.Field>
                 <Form.Field required>
-                  <label>{strings.packingStatus}</label>
+                  <label>{ strings.packingStatus }</label>
                   <Select
                     options={[
                       {value:"IN_STORE", text: strings.packingStoreStatus},
