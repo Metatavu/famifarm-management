@@ -293,7 +293,13 @@ class EditPacking extends React.Component<Props, State> {
           </Grid.Column>
         </Grid.Row>
 
-        <Confirm open={this.state.confirmOpen} size={"mini"} content={ this.getDeleteConfirmationText() } onCancel={()=>this.setState({ confirmOpen : false })} onConfirm={ this.handleDelete } />
+        <Confirm
+          open={ this.state.confirmOpen }
+          size="mini"
+          content={ this.getDeleteConfirmationText() }
+          onCancel={ () => this.setState({ confirmOpen : false }) }
+          onConfirm={ this.handleDelete }
+        />
       </Grid>
     )
   }
