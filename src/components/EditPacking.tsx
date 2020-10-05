@@ -343,7 +343,7 @@ class EditPacking extends React.Component<Props, State> {
           <Select
             options={ printers }
             text={ this.state.selectedPrinter ? this.state.selectedPrinter.name : strings.selectPrinter }
-            value={ this.state.selectedPrinter?.id }
+            value={ this.state.selectedPrinter ? this.state.selectedPrinter.id : undefined }
             onChange={ this.onPrinterChange }
           />
             <Button style={{ marginLeft: 10 }} loading={ this.state.refreshingPrinters } className="submit-button" onClick={ this.refreshPrinters } type='submit'>{ strings.update }</Button>
@@ -525,12 +525,12 @@ class EditPacking extends React.Component<Props, State> {
 
       const updatedPacking = type == "CAMPAIGN" ? {
         type,
-        id: this.state.packing?.id,
+        id: this.state.packing ? this.state.packing.id : undefined,
         campaignId: this.state.campaignId,
         state: this.state.packingStatus,
         time: this.state.date
       } : {
-        id: this.state.packing?.id,
+        id: this.state.packing ? this.state.packing.id : undefined,
         productId: this.state.productId,
         time: this.state.date,
         packedCount: this.state.packedCount,
