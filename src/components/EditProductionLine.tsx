@@ -193,7 +193,7 @@ class EditProductionLine extends React.Component<Props, State> {
               <Form.Field required>
                 <label>{strings.productionLineNumber}</label>
                 <Input 
-                  value={this.state.productionLine && this.state.productionLine!.lineNumber} 
+                  value={this.state.productionLine && this.state.productionLine.lineNumber} 
                   placeholder={strings.productionLineNumber}
                   onChange={this.handeLineNumberChange}
                 />

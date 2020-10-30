@@ -46,7 +46,7 @@ class CreateProductionLine extends React.Component<Props, State> {
    * 
    * @param event event
    */
-  private handeDefaultGutterHoleCountChange(event: React.FormEvent<HTMLInputElement>) {
+  private handeDefaultGutterHoleCountChange = (event: React.FormEvent<HTMLInputElement>) => {
     this.setState({defaultGutterHoleCount: parseInt(event.currentTarget.value) || undefined });
   }
 
@@ -60,7 +60,8 @@ class CreateProductionLine extends React.Component<Props, State> {
       }
       
       const productionLineObject = {
-        lineNumber: this.state.lineNumber
+        lineNumber: this.state.lineNumber,
+        defaultGutterHoleCount: this.state.defaultGutterHoleCount
       };
   
       const productionLineService = await Api.getProductionLinesService(this.props.keycloak);

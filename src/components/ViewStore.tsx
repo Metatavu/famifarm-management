@@ -58,13 +58,16 @@ class ViewStore extends React.Component<Props, State> {
     const [products, packingSizes, campaigns]= await Promise.all([productsApi.listProducts(), packingSizesApi.listPackageSizes(), campaignsApi.listCampaigns()]);
 
     const packings = await packingsApi.listPackings(undefined, undefined, undefined, "IN_STORE");
-    const packingsInStoreByProduct = products.map(product => {
+    let packingsInStoreByProduct = products.map(product => {
       return packings.filter(packing => packing.productId == product.id);
     });
+    packingsInStoreByProduct = packingsInStoreByProduct.filter(packings => packings.length > 0);
 
-    const packingsInStoreByCampaign = campaigns.map(campaign => {
+    let packingsInStoreByCampaign = campaigns.map(campaign => {
       return packings.filter(packing => packing.campaignId === campaign.id);
     })
+
+    packingsInStoreByCampaign = packingsInStoreByCampaign.filter(packings => packings.length > 0);
 
     const productListItems = packingsInStoreByProduct.map(packings => {
       const amountInStore = this.countProducts(packings, packingSizes);
