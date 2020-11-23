@@ -188,5 +188,7 @@
   "packingType": "Type of the packing",
   "packingTypeBasic": "Basic packing",
   "packingTypeCampaign": "Campaign packing",
-  "campaign": "Campaign"
+  "campaign": "Campaign",
+
+  "subcontractorProduct": "Subcontractor product"
 }

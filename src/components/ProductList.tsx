@@ -46,7 +46,7 @@ class ProductList extends React.Component<Props, State> {
       }
   
       const productsService = await Api.getProductsService(this.props.keycloak);
-      const products = await productsService.listProducts();
+      const products = await productsService.listProducts(undefined, undefined, true);
       products.sort((a, b) => {
         let nameA = LocalizedUtils.getLocalizedValue(a.name)
         let nameB = LocalizedUtils.getLocalizedValue(b.name)
