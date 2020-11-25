@@ -213,6 +213,18 @@ export interface IStrings extends LocalizedStringsMethods {
   campaign: string
 
   subcontractorProduct: string
+
+  cut: string
+  weight: string
+  gutterCount: string
+  gutterHoleCount: string
+  contactInformation: string
+  producer: string
+  sowingDay: string
+  cuttingDay: string
+  storageCondition: string
+  createCutPacking: string
+  cutPackings: string
 }
 
 const strings: IStrings = new LocalizedStrings({
