@@ -62,7 +62,7 @@ class CreateCampaign extends React.Component<Props, State> {
 
     this.setState({ loading: true });
     const productsService = await Api.getProductsService(this.props.keycloak);
-    const products = await productsService.listProducts();
+    const products = await productsService.listProducts(undefined, undefined, true);
     this.setState({ products, loading: false });
   }
 

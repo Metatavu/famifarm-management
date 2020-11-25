@@ -187,5 +187,7 @@
     "packingType": "Pakkauksen tyyppi",
     "packingTypeBasic": "Tavallinen pakkaus",
     "packingTypeCampaign": "Kampanjapakkaus",
-    "campaign": "Kampanja"
+    "campaign": "Kampanja",
+
+    "subcontractorProduct": "Alihankittu tuote"
   }
