@@ -202,5 +202,6 @@
   "cuttingDay": "Cutting day",
   "storageCondition": "Storage condition",
   "createCutPacking": "Create cut packing",
-  "cutPackings": "Cut packings"
+  "cutPackings": "Cut packings",
+  "editCutPacking": "Edit cut packing"
 }

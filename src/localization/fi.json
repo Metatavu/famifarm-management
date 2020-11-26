@@ -201,5 +201,6 @@
     "cuttingDay": "Leikkauspäivä",
     "storageCondition": "Säilytysolosuhteet",
     "createCutPacking": "Luo leikattu pakkaus",
-    "cutPackings": "Leikatut pakkaukset"
+    "cutPackings": "Leikatut pakkaukset",
+    "editCutPacking": "Muokkaa leikattua pakkausta"
   }

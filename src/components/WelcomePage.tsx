@@ -53,6 +53,9 @@ import ViewStore from "./ViewStore";
 import CampaignList from "./CampaignList";
 import CreateCampaign from "./CreateCampaign";
 import EditCampaign from "./EditCampaign";
+import CreateCutPacking from "./CreateCutPacking";
+import EditCutPacking from "./EditCutPacking";
+import CutPackingsList from "./CutPackingsList";
 
 export interface Props {
   authenticated: boolean,
@@ -95,6 +98,9 @@ class WelcomePage extends React.Component<Props, any> {
     },{
       "text": strings.packings,
       "route": "/packings"
+    },{
+      "text": strings.cutPackings,
+      "route": "/cutPackings"
     },{
       "text": strings.campaigns,
       "route": "/campaigns"
@@ -191,6 +197,15 @@ class WelcomePage extends React.Component<Props, any> {
                 )}
               />
               <Route
+                path="/cutPackings"
+                exact={ true }
+                render={ props => (
+                  <CutPackingsList
+                    keycloak={ this.state.keycloak }
+                  />
+                )}
+              />
+              <Route
                 path="/campaigns"
                 exact={true}
                 render={props => (
@@ -229,6 +244,16 @@ class WelcomePage extends React.Component<Props, any> {
                 )}
               />
               <Route 
+                path="/cutPackings/:cutPackingId"
+                exact={ true }
+                render={ props => (
+                  <EditCutPacking
+                    keycloak={ this.state.keycloak }
+                    cutPackingId={ props.match.params.cutPackingId as string }
+                  />
+                ) }
+              />
+              <Route 
                 path="/campaigns/:campaignId"
                 exact={ true }
                 render={ props => (
@@ -243,6 +268,13 @@ class WelcomePage extends React.Component<Props, any> {
                 exact={true}
                 render={props => (
                   <CreatePacking keycloak={this.state.keycloak}/>
+                )}
+              />
+              <Route
+                path="/createCutPacking"
+                exact={true}
+                render={props => (
+                  <CreateCutPacking keycloak={ this.state.keycloak }/>
                 )}
               />
               <Route

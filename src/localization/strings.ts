@@ -225,6 +225,7 @@ export interface IStrings extends LocalizedStringsMethods {
   storageCondition: string
   createCutPacking: string
   cutPackings: string
+  editCutPacking: string
 }
 
 const strings: IStrings = new LocalizedStrings({
