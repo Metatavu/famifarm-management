@@ -172,7 +172,7 @@ class EditProduct extends React.Component<Props, State> {
    */
   updateName = (name: LocalizedEntry) => {
     this.setState({
-      product: { ...this.state.product, name: name}
+      product: { ...this.state.product!, name: name}
     });
   }
 
@@ -184,7 +184,7 @@ class EditProduct extends React.Component<Props, State> {
    */
   private onPackageSizeChange = (e: any, { value }: InputOnChangeData) => {
     this.setState({
-      product: {...this.state.product, defaultPackageSizeId: value}
+      product: {...this.state.product!, defaultPackageSizeId: value}
     });
   }
 

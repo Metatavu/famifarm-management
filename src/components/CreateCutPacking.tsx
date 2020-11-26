@@ -314,8 +314,8 @@ class CreateCutPacking extends React.Component<Props, State> {
       const cutPackingsApi = await Api.getCutPackingsService(keycloak);
       const newCutPacking = await cutPackingsApi.createPacking({ 
         weight, 
-        sowingDay, 
-        cuttingDay, 
+        sowingDay: ( new Date(sowingDay)).toISOString(), 
+        cuttingDay: ( new Date(cuttingDay)).toISOString(), 
         gutterCount, 
         gutterHoleCount, 
         productId: selectedProductId!, 

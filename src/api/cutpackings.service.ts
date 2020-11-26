@@ -1,5 +1,6 @@
 import { CutPacking } from "famifarm-typescript-models";
 import { Api } from ".";
+import * as URI from "urijs";
 
 export class CutPackingsService {
   private token: string;

@@ -75,6 +75,7 @@ class CutPackingsList extends React.Component<Props, State> {
         this.setState({ listItems, loading: false });
       }
     } catch (exception) {
+      console.log(exception);
       onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -125,7 +126,7 @@ class CutPackingsList extends React.Component<Props, State> {
         <Grid.Row>
           <Grid.Column>
             <List divided animated verticalAlign='middle'>
-              { this.renderListItems }
+              { this.renderListItems() }
             </List>
           </Grid.Column>
         </Grid.Row>
@@ -247,7 +248,7 @@ class CutPackingsList extends React.Component<Props, State> {
    */
   private getListItems = (cutPackings: CutPacking[], products: Product[]): PackingListItem[] => {
     return cutPackings.map(packing => {
-      const productName = LocalizedUtils.getLocalizedValue(products.find(product => product.id === packing.productId)?.name) || packing.productId;
+      const productName = LocalizedUtils.getLocalizedValue(products.find(product => product.id === packing.productId)!!.name) || packing.productId;
 
       return { name: this.getPackingName(productName, packing.cuttingDay), id: packing.id! };
     });
