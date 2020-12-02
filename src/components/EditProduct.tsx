@@ -112,7 +112,8 @@ class EditProduct extends React.Component<Props, State> {
         language: "fi",
         value: event.currentTarget.value
       }],
-      defaultPackageSizeId: this.state.product!.defaultPackageSizeId
+      defaultPackageSizeId: this.state.product!.defaultPackageSizeId,
+      isSubcontractorProduct: this.state.product!.isSubcontractorProduct
     };
 
     this.setState({product: product});
@@ -171,7 +172,7 @@ class EditProduct extends React.Component<Props, State> {
    */
   updateName = (name: LocalizedEntry) => {
     this.setState({
-      product: {...this.state.product, name: name}
+      product: { ...this.state.product, name: name}
     });
   }
 
@@ -241,6 +242,12 @@ class EditProduct extends React.Component<Props, State> {
                   value={this.state.product ? this.state.product.defaultPackageSizeId : undefined}
                 />
               </Form.Field>
+              <Form.Checkbox
+                required
+                checked={ this.state.product? this.state.product.isSubcontractorProduct : undefined }
+                disabled
+                label={ strings.subcontractorProduct }
+              />
               <Message
                 success
                 visible={this.state.messageVisible}

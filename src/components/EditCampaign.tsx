@@ -66,7 +66,7 @@ class EditCampaign extends React.Component<Props, State> {
 
     this.setState({ loading: true });
     const productsService = await Api.getProductsService(this.props.keycloak);
-    const products = await productsService.listProducts();
+    const products = await productsService.listProducts(undefined, undefined, true);
 
     const campaignsService = await Api.getCampaignsService(this.props.keycloak);
     const campaign = await campaignsService.findCampaign(this.props.campaignId);

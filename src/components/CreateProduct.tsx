@@ -13,7 +13,8 @@ import {
   Grid,
   Button,
   Form,
-  InputOnChangeData
+  InputOnChangeData,
+  CheckboxProps
 } from "semantic-ui-react";
 import LocalizedUtils from "src/localization/localizedutils";
 import LocalizedValueInput from "./LocalizedValueInput";
@@ -43,7 +44,9 @@ class CreateProduct extends React.Component<Props, State> {
     super(props);
     this.state = {
       redirect: false,
-      productData: {}
+      productData: {
+        isSubcontractorProduct: false
+      }
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -81,7 +84,8 @@ class CreateProduct extends React.Component<Props, State> {
   
       const productObject: Product = {
         name: this.state.productData.name,
-        defaultPackageSizeId: this.state.productData.defaultPackageSizeId
+        defaultPackageSizeId: this.state.productData.defaultPackageSizeId,
+        isSubcontractorProduct: this.state.productData.isSubcontractorProduct!
       };
   
       const productsService = await Api.getProductsService(this.props.keycloak);  
@@ -118,6 +122,18 @@ class CreateProduct extends React.Component<Props, State> {
     this.setState({
       productData: {...this.state.productData, name: name}
     });
+  }
+
+  /**
+   * Sets the isSubcontractorProduct-boolean
+   * 
+   * @param e event 
+   * @param { checked } new value
+   */
+  updateIsSubcontractorProduct = (e: any, { checked }: CheckboxProps) => {
+    this.setState({
+      productData: { ...this.state.productData, isSubcontractorProduct: checked }
+    })
   }
 
   /**
@@ -161,6 +177,12 @@ class CreateProduct extends React.Component<Props, State> {
                 options={packageSizeOptions} 
                 placeholder={strings.packageSize} 
                 onChange={this.onUpdateDefaultPackageSize}
+              />
+              <Form.Checkbox
+                required
+                checked={ this.state.productData.isSubcontractorProduct }
+                onChange={ this.updateIsSubcontractorProduct }
+                label={ strings.subcontractorProduct }
               />
               <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save} </Button>
             </FormContainer>

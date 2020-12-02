@@ -211,6 +211,8 @@ export interface IStrings extends LocalizedStringsMethods {
   packingTypeBasic: string
   packingTypeCampaign: string
   campaign: string
+
+  subcontractorProduct: string
 }
 
 const strings: IStrings = new LocalizedStrings({
