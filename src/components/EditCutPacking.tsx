@@ -83,8 +83,10 @@ class EditCutPacking extends React.Component<Props, State> {
       const cutPacking = await cutPackingsApi.findPacking(cutPackingId);
       const { products, productionLines } = await this.loadDataForDropdowns(keycloak);
       const { weight, gutterCount, gutterHoleCount, contactInformation, producer, cuttingDay, sowingDay, storageCondition, productId, productionLineId } = cutPacking;
-      const selectedProductName = LocalizedUtils.getLocalizedValue(products.find(product => product.id === productId)!.name);
-      const selectedProductionLineName = productionLines.find(productionLine => productionLineId === productionLine.id)!.lineNumber;
+      const selectedProduct = products.find(product => product.id === productId);
+      const selectedProductName = selectedProduct ? LocalizedUtils.getLocalizedValue(selectedProduct.name) : "";
+      const selectedProductionLine = productionLines.find(productionLine => productionLineId === productionLine.id);
+      const selectedProductionLineName = selectedProductionLine ? selectedProductionLine.lineNumber : "";
 
       await this.refreshPrinters();
 
@@ -511,9 +513,13 @@ class EditCutPacking extends React.Component<Props, State> {
       productName = LocalizedUtils.getLocalizedValue(product.name) || "";
     }
 
+    if (!product) {
+      return;
+    }
+
     this.setState({
       selectedProductName: productName,
-      selectedProductId: product!.id
+      selectedProductId: product.id
     });
   }
 
@@ -584,10 +590,12 @@ class EditCutPacking extends React.Component<Props, State> {
     }
 
     const productionLine = productionLines.find(productionLine => productionLine.id === value);
-
+    if (!productionLine) {
+      return;
+    }
     this.setState({
-      selectedProductionLineName: productionLine!.lineNumber,
-      selectedProductionLineId: productionLine!.id
+      selectedProductionLineName: productionLine.lineNumber,
+      selectedProductionLineId: productionLine.id
     });
   }
 }

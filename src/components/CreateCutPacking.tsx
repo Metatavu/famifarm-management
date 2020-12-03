@@ -372,13 +372,17 @@ class CreateCutPacking extends React.Component<Props, State> {
     let productName = "";
 
     const product = products.find(product => product.id === value);
+    if (!product) {
+      return;
+    }
+
     if (product) {
       productName = LocalizedUtils.getLocalizedValue(product.name) || "";
     }
 
     this.setState({
       selectedProductName: productName,
-      selectedProductId: product!.id
+      selectedProductId: product.id
     });
   }
 
@@ -413,10 +417,19 @@ class CreateCutPacking extends React.Component<Props, State> {
     }
 
     const productionLine = productionLines.find(productionLine => productionLine.id === value);
+    if (!productionLine) {
+      return;
+    }
+
+    if (productionLine.defaultGutterHoleCount) {
+      this.setState({
+        gutterHoleCount: productionLine.defaultGutterHoleCount
+      }); 
+    }
 
     this.setState({
-      selectedProductionLineName: productionLine!.lineNumber,
-      selectedProductionLineId: productionLine!.id
+      selectedProductionLineName: productionLine.lineNumber,
+      selectedProductionLineId: productionLine.id
     });
   }
 }

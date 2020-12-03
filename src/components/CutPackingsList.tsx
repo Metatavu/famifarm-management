@@ -248,7 +248,8 @@ class CutPackingsList extends React.Component<Props, State> {
    */
   private getListItems = (cutPackings: CutPacking[], products: Product[]): PackingListItem[] => {
     return cutPackings.map(packing => {
-      const productName = LocalizedUtils.getLocalizedValue(products.find(product => product.id === packing.productId)!!.name) || packing.productId;
+      const product = products.find(product => product.id === packing.productId);
+      const productName = product ? LocalizedUtils.getLocalizedValue(product.name) : packing.productId;
 
       return { name: this.getPackingName(productName, packing.cuttingDay), id: packing.id! };
     });
