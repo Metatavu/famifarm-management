@@ -15,7 +15,8 @@ import {
   Form,
   Message,
   InputOnChangeData,
-  Confirm
+  Confirm,
+  CheckboxProps
 } from "semantic-ui-react";
 import LocalizedUtils from "src/localization/localizedutils";
 import LocalizedValueInput from "./LocalizedValueInput";
@@ -189,6 +190,18 @@ class EditProduct extends React.Component<Props, State> {
   }
 
   /**
+   * Sets the isSubcontractorProduct-boolean
+   * 
+   * @param e event 
+   * @param { checked } new value
+   */
+  updateIsSubcontractorProduct = (e: any, { checked }: CheckboxProps) => {
+    this.setState({
+      product: { ...this.state.product, isSubcontractorProduct: checked || false }
+    })
+  }
+
+  /**
    * Render edit product view
    */
   public render() {
@@ -244,8 +257,8 @@ class EditProduct extends React.Component<Props, State> {
               </Form.Field>
               <Form.Checkbox
                 required
+                onChange={ this.updateIsSubcontractorProduct }
                 checked={ this.state.product? this.state.product.isSubcontractorProduct : undefined }
-                disabled
                 label={ strings.subcontractorProduct }
               />
               <Message
