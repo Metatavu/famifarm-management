@@ -77,7 +77,14 @@ class ViewStore extends React.Component<Props, State> {
       const oldestDate = this.getOldestPackingDate(packings);
 
       const packingSizeAmounts = packingSizes.map(packingSize => {
-        return packings.filter(packing => packing.packageSizeId == packingSize.id).length;
+        const packingsToCount = packings.filter(packing => packing.packageSizeId == packingSize.id);
+        
+        let packingsCount = 0;
+        packingsToCount.forEach(packing => {
+          packingsCount += packing.packedCount!!;
+        });
+
+        return packingsCount;
       });
 
       return { amountInStore, name, oldestDate, packingSizeAmounts };

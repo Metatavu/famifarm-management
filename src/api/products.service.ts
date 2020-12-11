@@ -81,14 +81,18 @@ export class ProductsService {
    * @summary List all products
    * @param firstResult First index of results to be returned
    * @param maxResults How many items to return at one time
+   * @param includeSubcontractorProducts should subcontractor products be included
   */
-  public listProducts(firstResult?: number, maxResults?: number, ):Promise<Array<Product>> {
+  public listProducts(firstResult?: number, maxResults?: number, includeSubcontractorProducts?: boolean):Promise<Array<Product>> {
     const uri = new URI(`${this.basePath}/v1/products`);
     if (firstResult !== undefined && firstResult !== null) {
         uri.addQuery('firstResult', <any>firstResult);
     }
     if (maxResults !== undefined && maxResults !== null) {
         uri.addQuery('maxResults', <any>maxResults);
+    }
+    if (includeSubcontractorProducts !== undefined && includeSubcontractorProducts !== null) {
+      uri.addQuery('includeSubcontractorProducts', <any>includeSubcontractorProducts);
     }
     const options = {
       method: "get",
