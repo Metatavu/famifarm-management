@@ -190,5 +190,18 @@
   "packingTypeCampaign": "Campaign packing",
   "campaign": "Campaign",
 
-  "subcontractorProduct": "Subcontractor product"
+  "subcontractorProduct": "Subcontractor product",
+
+  "cut": "Cut",
+  "weight": "Weight",
+  "gutterCount": "Gutter count",
+  "gutterHoleCount": "Gutter hole count",
+  "contactInformation": "Contact informatiob",
+  "producer": "Producer",
+  "sowingDay": "Sowing day",
+  "cuttingDay": "Cutting day",
+  "storageCondition": "Storage condition",
+  "createCutPacking": "Create cut packing",
+  "cutPackings": "Cut packings",
+  "editCutPacking": "Edit cut packing"
 }

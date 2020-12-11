@@ -189,5 +189,18 @@
     "packingTypeCampaign": "Kampanjapakkaus",
     "campaign": "Kampanja",
 
-    "subcontractorProduct": "Alihankittu tuote"
+    "subcontractorProduct": "Alihankittu tuote",
+
+    "cut": "Leikattu",
+    "weight": "Paino",
+    "gutterCount": "Kourujen määrä",
+    "gutterHoleCount": "Kourujen reikämäärä",
+    "contactInformation": "Yhteystiedot",
+    "producer": "Valmistaja",
+    "sowingDay": "Kylvöpäivä",
+    "cuttingDay": "Leikkauspäivä",
+    "storageCondition": "Säilytysolosuhteet",
+    "createCutPacking": "Luo leikattu pakkaus",
+    "cutPackings": "Leikatut pakkaukset",
+    "editCutPacking": "Muokkaa leikattua pakkausta"
   }
