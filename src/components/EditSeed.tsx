@@ -4,7 +4,7 @@ import * as actions from "../actions";
 import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
-import { Seed, LocalizedEntry } from "famifarm-typescript-models";
+import { LocalizedValue, Seed } from "../generated/client";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -76,7 +76,7 @@ class EditSeed extends React.Component<Props, State> {
       }
   
       const seedsService = await Api.getSeedsService(this.props.keycloak);
-      const seed = await seedsService.findSeed(this.props.seedId);
+      const seed = await seedsService.findSeed({seedId: this.props.seedId});
       
       this.props.onSeedSelected && this.props.onSeedSelected(seed);
       this.setState({seed: seed});
@@ -95,7 +95,7 @@ class EditSeed extends React.Component<Props, State> {
    * 
    * @param name localized entry representing name
    */
-  updateName = (name: LocalizedEntry) => {
+  updateName = (name: LocalizedValue[]) => {
     this.setState({
       seed: {...this.state.seed, name: name}
     });
@@ -113,7 +113,7 @@ class EditSeed extends React.Component<Props, State> {
       const seedsService = await Api.getSeedsService(this.props.keycloak);
   
       this.setState({saving: true});
-      await seedsService.updateSeed(this.state.seed, this.state.seed.id || "");
+      await seedsService.updateSeed({seedId: this.state.seed.id!, seed: this.state.seed});
       this.setState({saving: false});
   
       this.setState({messageVisible: true});
@@ -140,7 +140,7 @@ class EditSeed extends React.Component<Props, State> {
   
       const seedsService = await Api.getSeedsService(this.props.keycloak);
       const id = this.state.seed.id || "";
-      await seedsService.deleteSeed(id)
+      await seedsService.deleteSeed({seedId: id});
   
       this.props.onSeedDeleted && this.props.onSeedDeleted(id);
       this.setState({redirect: true});

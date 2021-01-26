@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { WastageReason } from "famifarm-typescript-models";
+import { WastageReason } from "../generated/client";
 import strings from "src/localization/strings";
 
 import {
@@ -58,7 +58,7 @@ class WastageReasonList extends React.Component<Props, State> {
       }
   
       const wastageReasonsService = await Api.getWastageReasonsService(this.props.keycloak);
-      const wastageReasons = await wastageReasonsService.listWastageReasons();
+      const wastageReasons = await wastageReasonsService.listWastageReasons({});
       wastageReasons.sort((a, b) => {
         let nameA = LocalizedUtils.getLocalizedValue(a.reason)
         let nameB = LocalizedUtils.getLocalizedValue(b.reason)

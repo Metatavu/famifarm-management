@@ -5,7 +5,7 @@ import { StoreState } from "../types/index";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
-import { Pest, LocalizedEntry } from "famifarm-typescript-models";
+import { LocalizedValue, Pest } from "../generated/client";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -76,7 +76,7 @@ class EditPest extends React.Component<Props, State> {
       }
   
       const pestsService = await Api.getPestsService(this.props.keycloak);
-      const pest = await pestsService.findPest(this.props.pestId);
+      const pest = await pestsService.findPest({pestId: this.props.pestId});
       this.setState({pest: pest});
 
     } catch (e) {
@@ -94,7 +94,7 @@ class EditPest extends React.Component<Props, State> {
    * 
    * @param name localized entry representing name
    */
-  updateName = (name: LocalizedEntry) => {
+  updateName = (name: LocalizedValue[]) => {
     this.setState({
       pest: {...this.state.pest, name: name}
     });
@@ -112,7 +112,7 @@ class EditPest extends React.Component<Props, State> {
       const pestsService = await Api.getPestsService(this.props.keycloak);
   
       this.setState({saving: true});
-      await pestsService.updatePest(this.state.pest, this.state.pest.id || "");
+      await pestsService.updatePest({pestId: this.state.pest.id!, pest: this.state.pest});
       this.setState({saving: false});
   
       this.setState({messageVisible: true});
@@ -139,7 +139,7 @@ class EditPest extends React.Component<Props, State> {
   
       const pestsService = await Api.getPestsService(this.props.keycloak);
       const id = this.state.pest.id || "";
-      await pestsService.deletePest(id);
+      await pestsService.deletePest({pestId: id});
       
       this.setState({redirect: true});
     } catch (e) {

@@ -5,7 +5,7 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { PackageSize } from "famifarm-typescript-models";
+import { PackageSize } from "../generated/client";
 import strings from "src/localization/strings";
 
 import {
@@ -45,7 +45,7 @@ class PackageSizeList extends React.Component<Props, State> {
       }
   
       const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-      const packageSizes = await packageSizeService.listPackageSizes();
+      const packageSizes = await packageSizeService.listPackageSizes({});
   
       this.props.onPackageSizesFound && this.props.onPackageSizesFound(packageSizes);
     } catch (e) {

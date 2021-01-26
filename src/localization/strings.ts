@@ -226,6 +226,7 @@ export interface IStrings extends LocalizedStringsMethods {
   createCutPacking: string
   cutPackings: string
   editCutPacking: string
+  events: string
 }
 
 const strings: IStrings = new LocalizedStrings({

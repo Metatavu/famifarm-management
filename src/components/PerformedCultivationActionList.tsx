@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { PerformedCultivationAction } from "famifarm-typescript-models";
+import { PerformedCultivationAction } from "../generated/client";
 import strings from "src/localization/strings";
 
 import {
@@ -46,7 +46,7 @@ class PerformedCultivationActionList extends React.Component<Props, State> {
       }
   
       const performedCultivationActionServer = await Api.getPerformedCultivationActionsService(this.props.keycloak);
-      const performedCultivationActions = await performedCultivationActionServer.listPerformedCultivationActions();
+      const performedCultivationActions = await performedCultivationActionServer.listPerformedCultivationActions({});
       
       this.props.onPerformedCultivationActionsFound && this.props.onPerformedCultivationActionsFound(performedCultivationActions);
     } catch (e) {

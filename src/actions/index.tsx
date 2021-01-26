@@ -1,7 +1,7 @@
 import * as constants from '../constants'
 import { KeycloakInstance } from 'keycloak-js';
-import { Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, Batch, WastageReason, Pest, Packing, Campaign } from "famifarm-typescript-models";
-import { ErrorMessage } from '../types';
+import { Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, WastageReason, Pest, Packing, Campaign, Event } from "../generated/client";
+import { ErrorMessage, EventListFilters } from '../types';
 
 export interface UserLogin {
   type: constants.USER_LOGIN;
@@ -103,15 +103,6 @@ export interface SeedBatchesFound {
   seedBatches: SeedBatch[];
 }
 
-export interface BatchesFound {
-  type: constants.BATCHES_FOUND;
-  batches: Batch[];
-  batchesFirstResult: number;
-  batchListDate?: string;
-  batchListProduct?: string;
-  batchListProductName?: string;
-}
-
 export interface SeedBatchSelected {
   type: constants.SEED_BATCH_SELECTED;
   seedBatch: SeedBatch;
@@ -207,6 +198,17 @@ export interface CampaignsFound {
   campaigns: Campaign[]
 }
 
+export interface EventListFiltersUpdated {
+  type: constants.EVENT_LIST_FILTERS_UPDATED;
+  eventListFilters: EventListFilters
+}
+
+export interface EventsFound {
+  type: constants.EVENTS_FOUND;
+  events: Event[];
+}
+
+
 
 export type AppAction = UserLogin | UserLogout
   | ProductsFound | ProductSelected | ProductCreated | ProductDeleted | PackageSizesFound 
@@ -214,8 +216,8 @@ export type AppAction = UserLogin | UserLogout
   | SeedSelected | SeedDeleted | ProductionLinesFound | ProductionLineSelected | ProductionLineCreated
   | ProductionLineDeleted | SeedBatchesFound | SeedBatchSelected | SeedBatchCreated | SeedBatchDeleted
   | PerformedCultivationActionsFound | PerformedCultivationActionSelected | PerformedCultivationActionCreated
-  | PerformedCultivationActionDeleted | LocaleUpdate | BatchesFound | WastageReasonsFound | WastageReasonSelected 
-  | WastageReasonCreated | WastageReasonDeleted| PestsFound | ErrorOccurred | PackingsFound | CampaignsFound;
+  | PerformedCultivationActionDeleted | LocaleUpdate | WastageReasonsFound | WastageReasonSelected | EventsFound
+  | WastageReasonCreated | WastageReasonDeleted| PestsFound | ErrorOccurred | PackingsFound | CampaignsFound | EventListFiltersUpdated;
 
   /**
    * Redux store update method for campaigns
@@ -369,17 +371,6 @@ export function seedBatchesFound(seedBatches: SeedBatch[]): SeedBatchesFound {
   }
 }
 
-export function batchesFound(batches: Batch[], batchesFirstResult: number, batchListDate?: string, batchListProduct?: string, batchListProductName?: string): BatchesFound {
-  return {
-    type: constants.BATCHES_FOUND,
-    batches: batches,
-    batchesFirstResult: batchesFirstResult,
-    batchListDate: batchListDate,
-    batchListProduct: batchListProduct,
-    batchListProductName: batchListProductName
-  }
-}
-
 export function seedBatchSelected(seedBatch: SeedBatch): SeedBatchSelected {
   return {
     type: constants.SEED_BATCH_SELECTED,
@@ -513,5 +504,19 @@ export function onErrorOccurred(error?: ErrorMessage): ErrorOccurred {
   return {
     type: constants.ERROR_OCCURRED,
     error: error
+  }
+}
+
+export function eventListFiltersUpdated(filters: EventListFilters): EventListFiltersUpdated {
+  return {
+    type: constants.EVENT_LIST_FILTERS_UPDATED,
+    eventListFilters: filters
+  }
+}
+
+export function eventsFound(events: Event[]): EventsFound {
+  return {
+    type: constants.EVENTS_FOUND,
+    events: events
   }
 }

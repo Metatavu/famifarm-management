@@ -4,7 +4,7 @@ import { StoreState } from "src/types";
 import { Dispatch } from "redux";
 import * as actions from "../actions";
 import { connect } from "react-redux";
-import { PackageSize, Packing } from "famifarm-typescript-models";
+import { PackageSize, Packing, PackingState } from "../generated/client";
 import LocalizedUtils from "src/localization/localizedutils";
 import { Grid, Loader, Table } from "semantic-ui-react";
 import strings from "src/localization/strings";
@@ -55,9 +55,9 @@ class ViewStore extends React.Component<Props, State> {
     const { keycloak } = this.props;
 
     const [productsApi, packingSizesApi, packingsApi, campaignsApi] = await Promise.all([Api.getProductsService(keycloak), Api.getPackageSizesService(keycloak), Api.getPackingsService(keycloak), Api.getCampaignsService(keycloak)]);
-    const [products, packingSizes, campaigns]= await Promise.all([productsApi.listProducts(), packingSizesApi.listPackageSizes(), campaignsApi.listCampaigns()]);
+    const [products, packingSizes, campaigns]= await Promise.all([productsApi.listProducts({}), packingSizesApi.listPackageSizes({}), campaignsApi.listCampaigns()]);
 
-    const packings = await packingsApi.listPackings(undefined, undefined, undefined, "IN_STORE");
+    const packings = await packingsApi.listPackings({status: PackingState.InStore});
     let packingsInStoreByProduct = products.map(product => {
       return packings.filter(packing => packing.productId == product.id);
     });
@@ -202,7 +202,7 @@ class ViewStore extends React.Component<Props, State> {
    * @param packings 
    */
   private getOldestPackingDate = (packings: Packing[]): string => {
-    const dates = packings.map(packing => Date.parse(packing.time));
+    const dates = packings.map(packing => packing.time.getTime());
     const oldest = Math.min(...dates);
     const oldestDate = new Date(oldest);
     return moment(oldestDate).format("DD.MM.YYYY");

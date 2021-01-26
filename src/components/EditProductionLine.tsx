@@ -4,7 +4,7 @@ import * as actions from "../actions";
 import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
-import { ProductionLine } from "famifarm-typescript-models";
+import { ProductionLine } from "../generated/client";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -77,7 +77,7 @@ class EditProductionLine extends React.Component<Props, State> {
       }
   
       const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
-      const productionLine = await productionLineService.findProductionLine(this.props.productionLineId);
+      const productionLine = await productionLineService.findProductionLine({productionLineId: this.props.productionLineId});
   
       this.props.onProductionLineSelected && this.props.onProductionLineSelected(productionLine);
       this.setState({productionLine: productionLine});
@@ -120,7 +120,7 @@ class EditProductionLine extends React.Component<Props, State> {
       const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
   
       this.setState({saving: true});
-      await productionLineService.updateProductionLine(this.state.productionLine, this.state.productionLine.id || "");
+      await productionLineService.updateProductionLine({productionLineId: this.state.productionLine.id!, productionLine: this.state.productionLine});
       this.setState({saving: false});
   
       this.setState({messageVisible: true});
@@ -148,7 +148,7 @@ class EditProductionLine extends React.Component<Props, State> {
       const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
       const id = this.state.productionLine.id || "";
   
-      await productionLineService.deleteProductionLine(id);
+      await productionLineService.deleteProductionLine({productionLineId: id});
       
       this.props.onProductionLineDeleted && this.props.onProductionLineDeleted(id);
       this.setState({redirect: true});

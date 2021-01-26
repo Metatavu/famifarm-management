@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { Pest, PestOpt, LocalizedEntry } from "famifarm-typescript-models";
+import { LocalizedValue, Pest } from "../generated/client";
 import { Redirect } from 'react-router';
 import strings from "../localization/strings";
 import * as actions from "../actions";
@@ -30,7 +30,7 @@ interface Props {
  * Component state
  */
 interface State {
-  pestData: PestOpt
+  pestData: Pest
   redirect: boolean;
 }
 
@@ -59,7 +59,7 @@ class CreatePest extends React.Component<Props, State> {
       };
   
       const pestService = await Api.getPestsService(this.props.keycloak);
-      await pestService.createPest(pestObject);
+      await pestService.createPest({pest: pestObject});
       
       this.setState({redirect: true});
     } catch (e) {
@@ -76,7 +76,7 @@ class CreatePest extends React.Component<Props, State> {
    * 
    * @param name localized entry representing name
    */
-  updateName = (name: LocalizedEntry) => {
+  updateName = (name: LocalizedValue[]) => {
     this.setState({
       pestData: {...this.state.pestData, name: name}
     });

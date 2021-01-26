@@ -2,7 +2,7 @@ import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Campaign, Packing, PackingState, Product } from "famifarm-typescript-models";
+import { Campaign, Packing, PackingState, Product } from "../generated/client";
 import strings from "src/localization/strings";
 import * as moment from "moment";
 import * as actions from "../actions";
@@ -299,8 +299,8 @@ class PackingList extends React.Component<Props, State> {
     ]);
 
     const [packings, products, campaigns] = await Promise.all([
-      packingsService.listPackings(undefined, undefined, this.state.selectedProduct, this.state.selectedStatus, this.state.dateBefore, this.state.dateAfter),
-      productsService.listProducts(),
+      packingsService.listPackings({productId: this.state.selectedProduct, status: this.state.selectedStatus, createdAfter: this.state.dateAfter, createdBefore: this.state.dateBefore}),
+      productsService.listProducts({}),
       camapginsService.listCampaigns()
     ]);
     this.props.onPackingsFound && this.props.onPackingsFound(packings);

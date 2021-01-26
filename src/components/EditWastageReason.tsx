@@ -4,7 +4,7 @@ import * as actions from "../actions";
 import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
-import { WastageReason, LocalizedEntry } from "famifarm-typescript-models";
+import { LocalizedValue, WastageReason } from "../generated/client";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -79,7 +79,7 @@ class EditWastageReason extends React.Component<Props, State> {
   
       const wastageReasonsService = await Api.getWastageReasonsService(this.props.keycloak);
   
-      const wastageReason = await wastageReasonsService.findWastageReason(this.props.wastageReasonId);
+      const wastageReason = await wastageReasonsService.findWastageReason({wastageReasonId: this.props.wastageReasonId});
       
       this.props.onWastageReasonSelected && this.props.onWastageReasonSelected(wastageReason);
       this.setState({wastageReason: wastageReason});
@@ -125,7 +125,7 @@ class EditWastageReason extends React.Component<Props, State> {
       const wastageReasonsService = await Api.getWastageReasonsService(this.props.keycloak);
   
       this.setState({saving: true});
-      await wastageReasonsService.updateWastageReason(this.state.wastageReason, this.state.wastageReason.id || "");
+      await wastageReasonsService.updateWastageReason({wastageReasonId: this.state.wastageReason.id!, wastageReason: this.state.wastageReason});
       this.setState({saving: false, messageVisible: true});
       setTimeout(() => {
         this.setState({messageVisible: false});
@@ -150,7 +150,7 @@ class EditWastageReason extends React.Component<Props, State> {
   
       const wastageReasonsService = await Api.getWastageReasonsService(this.props.keycloak);
       const id = this.state.wastageReason.id || "";
-      await wastageReasonsService.deleteWastageReason(id);
+      await wastageReasonsService.deleteWastageReason({wastageReasonId: id});
       
       this.props.onWastageReasonDeleted && this.props.onWastageReasonDeleted(id);
       this.setState({redirect: true});
@@ -168,7 +168,7 @@ class EditWastageReason extends React.Component<Props, State> {
    * 
    * @param reason localized entry representing reason
    */
-  private updateReason = (reason: LocalizedEntry) => {
+  private updateReason = (reason: LocalizedValue[]) => {
     this.setState({
       wastageReason: {...this.state.wastageReason, reason: reason}
     });

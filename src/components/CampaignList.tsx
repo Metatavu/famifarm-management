@@ -2,7 +2,7 @@ import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Campaign } from "famifarm-typescript-models";
+import { Campaign } from "../generated/client";
 import strings from "src/localization/strings";
 import * as actions from "../actions";
 import { StoreState, ErrorMessage } from "../types/index";

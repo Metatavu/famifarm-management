@@ -4,7 +4,7 @@ import * as actions from "../actions";
 import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
-import { WastageReason, WastageReasonOpt, LocalizedEntry } from "famifarm-typescript-models";
+import { LocalizedValue, WastageReason } from "../generated/client";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -30,7 +30,7 @@ interface Props {
  */
 interface State {
   redirect: boolean;
-  wastageReasonData: WastageReasonOpt
+  wastageReasonData: WastageReason
 }
 
 class CreateWastageReason extends React.Component<Props, State> {
@@ -64,7 +64,7 @@ class CreateWastageReason extends React.Component<Props, State> {
       };
   
       const wastageReasonService = await Api.getWastageReasonsService(this.props.keycloak);
-      await wastageReasonService.createWastageReason(wastageReasonObject);
+      await wastageReasonService.createWastageReason({wastageReason: wastageReasonObject});
       
       this.setState({redirect: true});
     } catch (e) {
@@ -81,7 +81,7 @@ class CreateWastageReason extends React.Component<Props, State> {
    * 
    * @param reason localized entry representing reason
    */
-  private updateReason = (reason: LocalizedEntry) => {
+  private updateReason = (reason: LocalizedValue[]) => {
     this.setState({
       wastageReasonData: {...this.state.wastageReasonData, reason: reason}
     });

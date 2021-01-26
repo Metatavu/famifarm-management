@@ -1,32 +1,23 @@
-export * from './batches.service';
-import { BatchesService } from './batches.service';
-export * from './events.service';
-import { EventsService } from './events.service';
-export * from './packageSizes.service';
-import { PackageSizesService } from './packageSizes.service';
-export * from './performedCultivationActions.service';
-import { PerformedCultivationActionsService } from './performedCultivationActions.service';
-export * from './productionLines.service';
-import { ProductionLinesService } from './productionLines.service';
-export * from './products.service';
-import { ProductsService } from './products.service';
-export * from './reports.service';
-import { ReportsService } from './reports.service';
-export * from './seedBatches.service';
-import { SeedBatchesService } from './seedBatches.service';
-export * from './seeds.service';
-import { SeedsService } from './seeds.service';
-export * from './wastageReasons.service';
-import { WastageReasonsService } from './wastageReasons.service';
 import { KeycloakInstance } from 'keycloak-js';
-import { DraftsService } from './drafts.service';
-import { PestsService } from './pests.service';
-import { PackingsService } from './packings.service';
-import { PrintersService } from './printers.service';
-import { CampaignsService } from './campaigns.service';
-import { CutPackingsService } from './cutpackings.service';
+import {
+  CampaignsApi,
+  Configuration,
+  CutPackingsApi,
+  DraftsApi,
+  EventsApi,
+  PackageSizesApi,
+  PackingsApi,
+  PerformedCultivationActionsApi,
+  PestsApi,
+  PrintersApi,
+  ProductionLinesApi,
+  ProductsApi,
+  ReportsApi,
+  SeedBatchesApi,
+  SeedsApi,
+  WastageReasonsApi } from 'src/generated/client';
 
-const API_URL = process.env.REACT_APP_FAMIFARM_API_BASE_PATH || "http://localhost";
+const API_URL = process.env.REACT_APP_FAMIFARM_API_BASE_PATH || "http://localhost:8080";
 
 /**
  * Class for handling communications with API
@@ -56,8 +47,8 @@ export class Api {
    * @param keycloak  keycloak instance
    * @returns a promise for cut packings service authenticated with a valid token
    */
-  public async getCutPackingsService(keycloak: KeycloakInstance): Promise<CutPackingsService> {
-    return new CutPackingsService(API_URL, await this.checkTokenValidity(keycloak));
+  public async getCutPackingsService(keycloak: KeycloakInstance): Promise<CutPackingsApi> {
+    return new CutPackingsApi(await this.getApiConfiguration(keycloak));
   }
   
   /**
@@ -66,8 +57,8 @@ export class Api {
    * @param keycloak  keycloak instance
    * @returns a promise for campaigns service authenticated with a valid token
    */
-  public async getCampaignsService(keycloak: KeycloakInstance): Promise<CampaignsService> {
-    return new CampaignsService(API_URL, await this.checkTokenValidity(keycloak));
+  public async getCampaignsService(keycloak: KeycloakInstance): Promise<CampaignsApi> {
+    return new CampaignsApi(await this.getApiConfiguration(keycloak));
   }
 
   /**
@@ -76,8 +67,8 @@ export class Api {
    * @param keycloak keycloak instance
    * @returns a promise of printers service authenticated with a valid token
    */
-  public async getPrintersService(keycloak: KeycloakInstance): Promise<PrintersService> {
-    return new PrintersService(API_URL, await this.checkTokenValidity(keycloak));
+  public async getPrintersService(keycloak: KeycloakInstance): Promise<PrintersApi> {
+    return new PrintersApi(await this.getApiConfiguration(keycloak));
   }
   
   /**
@@ -86,18 +77,8 @@ export class Api {
    * @param keycloak keycloak instance
    * @returns promise of packings service authenticated with valid token 
    */
-  public async getPackingsService(keycloak: KeycloakInstance): Promise<PackingsService> {
-    return new PackingsService(API_URL, await this.checkTokenValidity(keycloak));
-  }
-
-  /**
-   * Returns promise of batches service authenticated with valid token
-   * 
-   * @param keycloak keycloak instance
-   * @returns promise of batches service authenticated with valid token 
-   */
-  public async getBatchesService(keycloak: KeycloakInstance): Promise<BatchesService> {
-    return new BatchesService(API_URL, await this.checkTokenValidity(keycloak));
+  public async getPackingsService(keycloak: KeycloakInstance): Promise<PackingsApi> {
+    return new PackingsApi(await this.getApiConfiguration(keycloak));
   }
   
   /**
@@ -106,8 +87,8 @@ export class Api {
    * @param keycloak keycloak instance
    * @returns promise of events service authenticated with valid token 
    */
-  public async getEventsService(keycloak: KeycloakInstance): Promise<EventsService> {
-    return new EventsService(API_URL, await this.checkTokenValidity(keycloak));
+  public async getEventsService(keycloak: KeycloakInstance): Promise<EventsApi> {
+    return new EventsApi(await this.getApiConfiguration(keycloak));
   }
   
   /**
@@ -116,8 +97,8 @@ export class Api {
    * @param keycloak keycloak instance
    * @returns promise of package sizes service authenticated with valid token 
    */
-  public async getPackageSizesService(keycloak: KeycloakInstance): Promise<PackageSizesService> {
-    return new PackageSizesService(API_URL, await this.checkTokenValidity(keycloak));
+  public async getPackageSizesService(keycloak: KeycloakInstance): Promise<PackageSizesApi> {
+    return new PackageSizesApi(await this.getApiConfiguration(keycloak));
   }
   
   /**
@@ -126,8 +107,8 @@ export class Api {
    * @param keycloak keycloak instance
    * @returns promise of performed cultivation actions service authenticated with valid token 
    */
-  public async getPerformedCultivationActionsService(keycloak: KeycloakInstance): Promise<PerformedCultivationActionsService> {
-    return new PerformedCultivationActionsService(API_URL, await this.checkTokenValidity(keycloak));
+  public async getPerformedCultivationActionsService(keycloak: KeycloakInstance): Promise<PerformedCultivationActionsApi> {
+    return new PerformedCultivationActionsApi(await this.getApiConfiguration(keycloak));
   }
   
   /**
@@ -136,8 +117,8 @@ export class Api {
    * @param keycloak keycloak instance
    * @returns promise of production lines service authenticated with valid token 
    */
-  public async getProductionLinesService(keycloak: KeycloakInstance): Promise<ProductionLinesService> {
-    return new ProductionLinesService(API_URL, await this.checkTokenValidity(keycloak));
+  public async getProductionLinesService(keycloak: KeycloakInstance): Promise<ProductionLinesApi> {
+    return new ProductionLinesApi(await this.getApiConfiguration(keycloak));
   }
   
   /**
@@ -146,8 +127,8 @@ export class Api {
    * @param keycloak keycloak instance
    * @returns promise of products service authenticated with valid token 
    */
-  public async getProductsService(keycloak: KeycloakInstance): Promise<ProductsService> {
-    return new ProductsService(API_URL, await this.checkTokenValidity(keycloak));
+  public async getProductsService(keycloak: KeycloakInstance): Promise<ProductsApi> {
+    return new ProductsApi(await this.getApiConfiguration(keycloak));
   }
   
   /**
@@ -156,8 +137,8 @@ export class Api {
    * @param keycloak keycloak instance
    * @returns promise of reports service authenticated with valid token 
    */
-  public async getReportsService(keycloak: KeycloakInstance): Promise<ReportsService> {
-    return new ReportsService(API_URL, await this.checkTokenValidity(keycloak));
+  public async getReportsService(keycloak: KeycloakInstance): Promise<ReportsApi> {
+    return new ReportsApi(await this.getApiConfiguration(keycloak));
   }
   
   /**
@@ -166,8 +147,8 @@ export class Api {
    * @param keycloak keycloak instance
    * @returns promise of seed batches service authenticated with valid token 
    */
-  public async getSeedBatchesService(keycloak: KeycloakInstance): Promise<SeedBatchesService> {
-    return new SeedBatchesService(API_URL, await this.checkTokenValidity(keycloak));
+  public async getSeedBatchesService(keycloak: KeycloakInstance): Promise<SeedBatchesApi> {
+    return new SeedBatchesApi(await this.getApiConfiguration(keycloak));
   }
   
   /**
@@ -176,8 +157,8 @@ export class Api {
    * @param keycloak keycloak instance
    * @returns promise of seeds service authenticated with valid token 
    */
-  public async getSeedsService(keycloak: KeycloakInstance): Promise<SeedsService> {
-    return new SeedsService(API_URL, await this.checkTokenValidity(keycloak));
+  public async getSeedsService(keycloak: KeycloakInstance): Promise<SeedsApi> {
+    return new SeedsApi(await this.getApiConfiguration(keycloak));
   }
   
   /**
@@ -186,8 +167,8 @@ export class Api {
    * @param keycloak keycloak instance
    * @returns promise of wastage reasons service authenticated with valid token 
    */
-  public async getWastageReasonsService(keycloak: KeycloakInstance): Promise<WastageReasonsService> {
-    return new WastageReasonsService(API_URL, await this.checkTokenValidity(keycloak));
+  public async getWastageReasonsService(keycloak: KeycloakInstance): Promise<WastageReasonsApi> {
+    return new WastageReasonsApi(await this.getApiConfiguration(keycloak));
   }
 
     /**
@@ -196,8 +177,8 @@ export class Api {
    * @param keycloak keycloak instance
    * @returns promise of drafts service authenticated with valid token 
    */
-  public async getDraftsService(keycloak: KeycloakInstance): Promise<DraftsService> {
-    return new DraftsService(API_URL, await this.checkTokenValidity(keycloak));
+  public async getDraftsService(keycloak: KeycloakInstance): Promise<DraftsApi> {
+    return new DraftsApi(await this.getApiConfiguration(keycloak));
   }
 
   /**
@@ -206,10 +187,17 @@ export class Api {
    * @param keycloak keycloak instance
    * @returns promise of pests service authenticated with valid token 
    */
-  public async getPestsService(keycloak: KeycloakInstance): Promise<PestsService> {
-    return new PestsService(API_URL, await this.checkTokenValidity(keycloak));
+  public async getPestsService(keycloak: KeycloakInstance): Promise<PestsApi> {
+    return new PestsApi(await this.getApiConfiguration(keycloak));
   }
   
+  private getApiConfiguration = async (keycloak: KeycloakInstance): Promise<Configuration> => {
+    return new Configuration({
+      basePath: API_URL,
+      accessToken: await this.checkTokenValidity(keycloak)
+    });
+  }
+
   /**
    * Check validation of given keycloak's token
    * 
@@ -218,6 +206,9 @@ export class Api {
   private checkTokenValidity(keycloak: KeycloakInstance): Promise<string> {
     return new Promise((resolve, reject) => {
       keycloak.updateToken(5).success(() => {
+        if (!keycloak.token) {
+          return reject();
+        }
         resolve(keycloak.token);
       }).error(() => {
         reject();

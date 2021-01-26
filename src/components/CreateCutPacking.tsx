@@ -1,4 +1,4 @@
-import { Product, ProductionLine } from "famifarm-typescript-models";
+import { Product, ProductionLine } from "../generated/client";
 import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
 import { Button, Form, Grid, InputOnChangeData, Loader } from "semantic-ui-react";
@@ -73,13 +73,13 @@ class CreateCutPacking extends React.Component<Props, State> {
 
       if (!products) {
         const productsApi = await Api.getProductsService(keycloak);
-        const foundProducts = await productsApi.listProducts();
+        const foundProducts = await productsApi.listProducts({});
         onProductsFound(foundProducts);
       }
 
       if (!productionLines) {
         const productionLinesApi = await Api.getProductionLinesService(keycloak);
-        const foundProductionLines = await productionLinesApi.listProductionLines();
+        const foundProductionLines = await productionLinesApi.listProductionLines({});
         onProductionLinesFound(foundProductionLines);
       }
 
@@ -312,10 +312,10 @@ class CreateCutPacking extends React.Component<Props, State> {
     try {
       this.setState({ loading: true });
       const cutPackingsApi = await Api.getCutPackingsService(keycloak);
-      const newCutPacking = await cutPackingsApi.createPacking({ 
+      const newCutPacking = await cutPackingsApi.createCutPacking({cutPacking: { 
         weight, 
-        sowingDay: ( new Date(sowingDay)).toISOString(), 
-        cuttingDay: ( new Date(cuttingDay)).toISOString(), 
+        sowingDay: new Date(sowingDay), 
+        cuttingDay: new Date(cuttingDay), 
         gutterCount, 
         gutterHoleCount, 
         productId: selectedProductId!, 
@@ -323,7 +323,7 @@ class CreateCutPacking extends React.Component<Props, State> {
         producer, 
         contactInformation, 
         storageCondition 
-      });
+      }});
   
       this.setState({
         cutPackingId: newCutPacking.id,

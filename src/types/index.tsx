@@ -1,5 +1,12 @@
 import { KeycloakInstance } from "keycloak-js";
-import { Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, Batch, WastageReason, Pest, Packing, Campaign } from "famifarm-typescript-models";
+import { Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, WastageReason, Pest, Packing, Campaign, EventType, Event } from "../generated/client";
+
+export interface EventListFilters {
+  product?: Product,
+  date?: Date,
+  firstResult?: number
+  type?: EventType
+}
 
 export interface StoreState {
   keycloak?: KeycloakInstance
@@ -17,17 +24,14 @@ export interface StoreState {
   seedBatch: SeedBatch
   performedCultivationAction: PerformedCultivationAction
   performedCultivationActions: PerformedCultivationAction[]
-  batches: Batch[]
-  batchesFirstResult: number
-  batchListProductName?: string
-  batchListProduct?: string
-  batchListDate?: string
   locale: string
   wastageReason: WastageReason
   wastageReasons: WastageReason[]
   pests: Pest[],
   error?: ErrorMessage,
-  campaigns: Campaign[]
+  campaigns: Campaign[],
+  eventListFilters: EventListFilters,
+  events: Event[]
 }
 
 /**

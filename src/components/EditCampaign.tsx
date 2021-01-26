@@ -4,7 +4,7 @@ import { StoreState, ErrorMessage } from "src/types";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import * as actions from "../actions"
-import { Product, CampaignProducts } from "famifarm-typescript-models";
+import { Product, CampaignProducts } from "../generated/client";
 import strings from "src/localization/strings";
 import Api from "src/api";
 import { Grid, Loader, DropdownItemProps, Button, Form, Select, Input, InputOnChangeData, DropdownProps, List, Message, Confirm } from "semantic-ui-react";
@@ -66,10 +66,10 @@ class EditCampaign extends React.Component<Props, State> {
 
     this.setState({ loading: true });
     const productsService = await Api.getProductsService(this.props.keycloak);
-    const products = await productsService.listProducts(undefined, undefined, true);
+    const products = await productsService.listProducts({includeSubcontractorProducts: true});
 
     const campaignsService = await Api.getCampaignsService(this.props.keycloak);
-    const campaign = await campaignsService.findCampaign(this.props.campaignId);
+    const campaign = await campaignsService.findCampaign({campaignId: this.props.campaignId});
     const campaignName = campaign.name;
     const addedCampaignProducts = campaign.products;
     this.setState({ products, loading: false, campaignName, addedCampaignProducts, campaignId: campaign.id! });
@@ -222,7 +222,7 @@ class EditCampaign extends React.Component<Props, State> {
       this.setState({ loading: true });
       const { campaignName, addedCampaignProducts } = this.state;
       const campaignsService = await Api.getCampaignsService(this.props.keycloak);
-      await campaignsService.updateCampaign({ id: this.state.campaignId, name: campaignName, products: addedCampaignProducts }, this.state.campaignId);
+      await campaignsService.updateCampaign({campaignId: this.state.campaignId, campaign: { id: this.state.campaignId, name: campaignName, products: addedCampaignProducts }});
       this.setState({ messageVisible: true, loading: false });
       setTimeout(() => {
         this.setState({messageVisible: false});
@@ -245,7 +245,7 @@ class EditCampaign extends React.Component<Props, State> {
       }
 
       const campaignsService = await Api.getCampaignsService(this.props.keycloak);
-      await campaignsService.deleteCampaign(this.state.campaignId);
+      await campaignsService.deleteCampaign({campaignId: this.state.campaignId});
 
       this.setState({redirect: true});
     } catch (e) {

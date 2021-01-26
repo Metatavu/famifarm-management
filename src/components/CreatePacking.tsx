@@ -7,7 +7,7 @@ import strings from "src/localization/strings";
 import { Grid, Form, Button, Select, DropdownProps, Input, InputOnChangeData, Loader } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import { FormContainer } from "./FormContainer";
-import { Packing, Product, PackageSize, PackingState, PackingType, Campaign } from "famifarm-typescript-models";
+import { Packing, Product, PackageSize, PackingState, PackingType, Campaign } from "../generated/client";
 import LocalizedUtils from "src/localization/localizedutils";
 import * as moment from "moment";
 import Api from "../api";
@@ -27,7 +27,7 @@ export interface State {
   products: Product[],
   loading: boolean,
   packageSizes: PackageSize[],
-  date: string,
+  date: Date,
   redirect: boolean,
   packingId?: string,
   packingType: PackingType,
@@ -43,9 +43,9 @@ class CreatePacking extends React.Component<Props, State> {
       packageSizes: [],
       loading: false,
       packedCount: 0,
-      date: moment(moment(), "DD.MM.YYYY HH:mm").toISOString(),
+      date: moment().toDate(),
       redirect: false,
-      packingType: "BASIC",
+      packingType: PackingType.Basic,
       campaigns: []
     }
 
@@ -61,13 +61,13 @@ class CreatePacking extends React.Component<Props, State> {
       this.setState({loading: true});
     
       const productsService = await Api.getProductsService(this.props.keycloak);
-      const products = await productsService.listProducts();
+      const products = await productsService.listProducts({});
 
       const campaignsService = await Api.getCampaignsService(this.props.keycloak);
       const campaigns = await campaignsService.listCampaigns();
 
       const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-      const packageSizes = await packageSizeService.listPackageSizes();
+      const packageSizes = await packageSizeService.listPackageSizes({});
       
       this.setState({
         productId: products.length ? products[0].id! : "",
@@ -324,7 +324,7 @@ class CreatePacking extends React.Component<Props, State> {
    * Handles changing date
    */
   private onChangeDate = async (e: any, { value }: InputOnChangeData) => {
-    this.setState({date: moment(value, "DD.MM.YYYY HH:mm").toISOString()});
+    this.setState({date: moment(value, "DD.MM.YYYY HH:mm").toDate()});
   }
   /**
    * Handle form submit
@@ -361,7 +361,7 @@ class CreatePacking extends React.Component<Props, State> {
       };
 
       const packingsService = await Api.getPackingsService(this.props.keycloak);
-      const packing = await packingsService.createPacking(packingObject);
+      const packing = await packingsService.createPacking({packing: packingObject});
       this.setState({
         packingId: packing.id,
         redirect: true

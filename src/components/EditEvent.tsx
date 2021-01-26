@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, ProductionLine, SeedBatch, WastageReason, Seed } from "famifarm-typescript-models";
+import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, ProductionLine, SeedBatch, WastageReason, Seed } from "../generated/client";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 import { DateTimeInput } from 'semantic-ui-calendar-react';
@@ -85,9 +85,9 @@ class EditEvent extends React.Component<Props, State> {
   
       this.setState({loading: true});
       const eventsService = await Api.getEventsService(this.props.keycloak);
-      const event = await eventsService.findEvent(this.props.eventId);
+      const event = await eventsService.findEvent({eventId: this.props.eventId});
       const seedsService = await Api.getSeedsService(this.props.keycloak);
-      const seeds = await seedsService.listSeeds(undefined, undefined);
+      const seeds = await seedsService.listSeeds({});
       this.setState({
         event: event,
         loading: false,
@@ -115,7 +115,7 @@ class EditEvent extends React.Component<Props, State> {
     }
 
     if (this.state.redirect) {
-      return <Redirect to={this.state.event ? `/batches/${this.state.event.batchId}` : "/batches"} push={true} />;
+      return <Redirect to={"/events"} push={true} />;
     }
 
     if (!this.state.event) {
@@ -299,7 +299,7 @@ class EditEvent extends React.Component<Props, State> {
       }
       event.data = data;
 
-      await eventsService.updateEvent(event, event.id!);
+      await eventsService.updateEvent({eventId: event.id!,  event});
       this.setState({saving: false, messageVisible: true});
       setTimeout(() => {
         this.setState({messageVisible: false});
@@ -325,7 +325,7 @@ class EditEvent extends React.Component<Props, State> {
       const eventsService = await Api.getEventsService(this.props.keycloak);
       const id = this.state.event.id || "";
   
-      await eventsService.deleteEvent(id);
+      await eventsService.deleteEvent({eventId: id});
       
       this.setState({redirect: true});
     } catch (e) {
@@ -354,6 +354,8 @@ class EditEvent extends React.Component<Props, State> {
         return this.renderTableSpreadDataForm(event.data as TableSpreadEventData);
       case "WASTAGE":
         return this.renderWastageDataForm(event.data as WastageEventData);
+      default:
+        return null;
     }
   }
 
@@ -610,7 +612,7 @@ class EditEvent extends React.Component<Props, State> {
     this.setState({loading: true});
     const productionLinesService = await Api.getProductionLinesService(this.props.keycloak);
 
-    const productionLines = await productionLinesService.listProductionLines();
+    const productionLines = await productionLinesService.listProductionLines({});
 
     this.setState({
       loading: false,
@@ -633,8 +635,8 @@ class EditEvent extends React.Component<Props, State> {
     ]);
 
     const [performedCultivationActions, pests] = await Promise.all([
-      performedCultivationActionsService.listPerformedCultivationActions(),
-      pestsService.listPests()
+      performedCultivationActionsService.listPerformedCultivationActions({}),
+      pestsService.listPests({})
     ]);
 
     this.setState({
@@ -654,7 +656,7 @@ class EditEvent extends React.Component<Props, State> {
 
     this.setState({loading: true});
     const getProductionLinesService = await Api.getProductionLinesService(this.props.keycloak);
-    const productionLines = await getProductionLinesService.listProductionLines();
+    const productionLines = await getProductionLinesService.listProductionLines({});
 
     this.setState({
       loading: false,
@@ -677,8 +679,8 @@ class EditEvent extends React.Component<Props, State> {
     ]);
 
     const [seedBatches, productionLines] = await Promise.all([
-      seedBatchesService.listSeedBatches(),
-      productionLinesService.listProductionLines()
+      seedBatchesService.listSeedBatches({}),
+      productionLinesService.listProductionLines({})
     ]);
 
     this.setState({
@@ -703,8 +705,8 @@ class EditEvent extends React.Component<Props, State> {
     ]);
 
     const [wastageReasons, productionLines] = await Promise.all([
-      wastageReasonsService.listWastageReasons(),
-      productionLinesService.listProductionLines()
+      wastageReasonsService.listWastageReasons({}),
+      productionLinesService.listProductionLines({})
     ]);
 
     this.setState({

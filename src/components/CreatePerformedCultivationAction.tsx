@@ -5,7 +5,7 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
-import { PerformedCultivationAction, PerformedCultivationActionOpt, LocalizedEntry } from "famifarm-typescript-models";
+import { LocalizedValue, PerformedCultivationAction } from "../generated/client";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -25,7 +25,7 @@ export interface Props {
 }
 
 export interface State {
-  performedCultivationActionData: PerformedCultivationActionOpt
+  performedCultivationActionData: PerformedCultivationAction
   redirect: boolean;
 }
 
@@ -54,7 +54,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
       };
   
       const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
-      await performedCultivationActionService.createPerformedCultivationAction(performedCultivationActionObject)
+      await performedCultivationActionService.createPerformedCultivationAction({performedCultivationAction: performedCultivationActionObject})
       this.setState({redirect: true});
     } catch (e) {
       this.props.onError({
@@ -70,7 +70,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
    * 
    * @param name localized entry representing name
    */
-  private updateName = (name: LocalizedEntry) => {
+  private updateName = (name: LocalizedValue[]) => {
     this.setState({
       performedCultivationActionData: {...this.state.performedCultivationActionData, name: name}
     });

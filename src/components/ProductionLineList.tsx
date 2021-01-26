@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { ProductionLine } from "famifarm-typescript-models";
+import { ProductionLine } from "../generated/client";
 import strings from "src/localization/strings";
 
 import {
@@ -45,7 +45,7 @@ class ProductionLineList extends React.Component<Props, State> {
       }
   
       const productionLinesService = await Api.getProductionLinesService(this.props.keycloak);
-      const productionLines = await productionLinesService.listProductionLines();
+      const productionLines = await productionLinesService.listProductionLines({});
 
       productionLines.sort((a, b) => {
         let nameA = this.getStringsNumber(a.lineNumber)

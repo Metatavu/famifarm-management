@@ -12,7 +12,9 @@ import { Provider } from 'react-redux';
 
 const store = createStore<StoreState, AppAction, any, any>(processAction, {
   authenticated: false,
-  locale: "fi"
+  locale: "fi",
+  events: [],
+  eventListFilters: {}
 });
 
 ReactDOM.render(

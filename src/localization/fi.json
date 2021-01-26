@@ -202,5 +202,6 @@
     "storageCondition": "Säilytysolosuhteet",
     "createCutPacking": "Luo leikattu pakkaus",
     "cutPackings": "Leikatut pakkaukset",
-    "editCutPacking": "Muokkaa leikattua pakkausta"
+    "editCutPacking": "Muokkaa leikattua pakkausta",
+    "events": "Tapahtumat"
   }

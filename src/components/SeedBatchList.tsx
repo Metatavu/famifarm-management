@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { SeedBatch } from "famifarm-typescript-models";
+import { SeedBatch } from "../generated/client";
 import strings from "src/localization/strings";
 
 import {
@@ -49,7 +49,7 @@ class SeedBatchList extends React.Component<Props, State> {
         return;
       }
       const seedBatchService = await Api.getSeedBatchesService(this.props.keycloak);
-      const seedBatches = await seedBatchService.listSeedBatches(undefined, undefined, this.state.showPassive);
+      const seedBatches = await seedBatchService.listSeedBatches({includePassive: this.state.showPassive});
       seedBatches.sort((a, b) => {
         let nameA = a.code || "";
         let nameB = b.code || "";
@@ -141,7 +141,7 @@ class SeedBatchList extends React.Component<Props, State> {
 
     this.setState({loading: true});
     const seedBatchesService = Api.getSeedBatchesService(this.props.keycloak);
-    const seedBatches = await (await seedBatchesService).listSeedBatches(undefined, undefined, this.state.showPassive);
+    const seedBatches = await (await seedBatchesService).listSeedBatches({includePassive: this.state.showPassive});
     seedBatches.sort((a, b) => {
       let nameA = a.code || "";
       let nameB = b.code || "";

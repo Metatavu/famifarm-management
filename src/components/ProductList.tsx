@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Product } from "famifarm-typescript-models";
+import { Product } from "../generated/client";
 import strings from "src/localization/strings";
 
 import {
@@ -46,7 +46,7 @@ class ProductList extends React.Component<Props, State> {
       }
   
       const productsService = await Api.getProductsService(this.props.keycloak);
-      const products = await productsService.listProducts(undefined, undefined, true);
+      const products = await productsService.listProducts({includeSubcontractorProducts: true});
       products.sort((a, b) => {
         let nameA = LocalizedUtils.getLocalizedValue(a.name)
         let nameB = LocalizedUtils.getLocalizedValue(b.name)
