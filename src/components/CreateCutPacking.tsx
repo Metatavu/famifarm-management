@@ -48,11 +48,11 @@ class CreateCutPacking extends React.Component<Props, State> {
       weight: 1,
       gutterCount: 1,
       gutterHoleCount: 1,
-      contactInformation: "",
-      producer: "",
+      contactInformation: process.env.REACT_APP_DEFAULT_CUT_PACKINGS_CONTACT || "",
+      producer: "Famifarm Oy",
       cuttingDay: moment().toString(),
       sowingDay: moment().toString(),
-      storageCondition: "",
+      storageCondition: "+8 C",
       redirect: false,
       loading: false
     }
