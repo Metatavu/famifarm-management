@@ -251,7 +251,7 @@ class CutPackingsList extends React.Component<Props, State> {
       const product = products.find(product => product.id === packing.productId);
       const productName = product ? LocalizedUtils.getLocalizedValue(product.name) : packing.productId;
 
-      return { name: this.getPackingName(productName, moment(packing.cuttingDay).format("DD.mm.YYYY")), id: packing.id! };
+      return { name: this.getPackingName(productName, moment(packing.cuttingDay).format("DD.MM.YYYY")), id: packing.id! };
     });
   }
 

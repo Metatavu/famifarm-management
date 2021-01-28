@@ -2184,6 +2184,7 @@ components:
       enum:
         - IN_STORE
         - REMOVED
+        - WASTAGE
         
     PackingType:
       type: "string"

@@ -19,7 +19,8 @@
  */
 export enum PackingState {
     InStore = 'IN_STORE',
-    Removed = 'REMOVED'
+    Removed = 'REMOVED',
+    Wastage = 'WASTAGE'
 }
 
 export function PackingStateFromJSON(json: any): PackingState {

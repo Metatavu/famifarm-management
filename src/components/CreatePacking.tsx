@@ -178,7 +178,8 @@ class CreatePacking extends React.Component<Props, State> {
                   <Select
                     options={[
                       {value:"IN_STORE", text: strings.packingStoreStatus},
-                      {value: "REMOVED", text: strings.packingRemovedStatus}
+                      {value: "REMOVED", text: strings.packingRemovedStatus},
+                      {value: "WASTAGE", text: strings.packingWastageStatus},
                     ]}
                     text={ this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus }
                     value={ this.state.packingStatus }
@@ -227,7 +228,8 @@ class CreatePacking extends React.Component<Props, State> {
                   <Select
                     options={[
                       { value: "IN_STORE", text: strings.packingStoreStatus },
-                      { value: "REMOVED", text: strings.packingRemovedStatus }
+                      { value: "REMOVED", text: strings.packingRemovedStatus },
+                      { value: "WASTAGE", text: strings.packingWastageStatus }
                     ]}
                     text={ this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus }
                     value={ this.state.packingStatus }
@@ -262,7 +264,16 @@ class CreatePacking extends React.Component<Props, State> {
    * Resolves localized name of the packing status
    */
   private resolveStatusLocalizedName = () => {
-    return this.state.packingStatus === "IN_STORE" ? strings.packingStoreStatus : strings.packingRemovedStatus;
+    switch(this.state.packingStatus) {
+      case "IN_STORE":
+        return strings.packingStoreStatus
+      case "REMOVED":
+        return strings.packingRemovedStatus
+      case "WASTAGE":
+        return strings.packingWastageStatus;
+      default:
+        return "";
+    }
   }
 
   /**

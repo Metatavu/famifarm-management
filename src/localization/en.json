@@ -204,5 +204,7 @@
   "createCutPacking": "Create cut packing",
   "cutPackings": "Cut packings",
   "editCutPacking": "Edit cut packing",
-  "events": "Events"
+  "events": "Events",
+  "packingWastageStatus": "Wastage",
+  "total": "Total"
 }

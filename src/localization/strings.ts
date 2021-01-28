@@ -182,6 +182,7 @@ export interface IStrings extends LocalizedStringsMethods {
   newPacking: string
   packingStatus: string
   packingStoreStatus: string
+  packingWastageStatus: string
   packingRemovedStatus: string
   selectPackingStatus: string
   editPacking: string
@@ -227,6 +228,7 @@ export interface IStrings extends LocalizedStringsMethods {
   cutPackings: string
   editCutPacking: string
   events: string
+  total: string
 }
 
 const strings: IStrings = new LocalizedStrings({

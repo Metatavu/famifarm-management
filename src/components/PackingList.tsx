@@ -165,7 +165,11 @@ class PackingList extends React.Component<Props, State> {
               </div>
               <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem"}}>
                 <label>{strings.packingStatus}</label>
-                <Form.Select name="status" options={[{value: "IN_STORE", text: strings.packingStoreStatus}, {value: "REMOVED",  text: strings.packingRemovedStatus}]} text={this.state.selectedStatus ? this.resolveLocalizedPackingStatus(this.state.selectedStatus) : strings.selectPackingStatus} onChange={this.onChangeStatus} />
+                <Form.Select name="status" options={[
+                  {value: "IN_STORE", text: strings.packingStoreStatus},
+                  {value: "REMOVED",  text: strings.packingRemovedStatus},
+                  {value: "WASTAGE",  text: strings.packingWastageStatus}
+                ]} text={this.state.selectedStatus ? this.resolveLocalizedPackingStatus(this.state.selectedStatus) : strings.selectPackingStatus} onChange={this.onChangeStatus} />
               </div>
             </Form.Field>
           </Form>
@@ -194,6 +198,11 @@ class PackingList extends React.Component<Props, State> {
     if (status == "REMOVED") {
       return strings.packingRemovedStatus;
     }
+
+    if (status == "WASTAGE") {
+      return strings.packingWastageStatus;
+    }
+
 
     return strings.selectPackingStatus;
   }
