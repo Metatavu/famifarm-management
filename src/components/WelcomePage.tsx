@@ -78,7 +78,7 @@ class WelcomePage extends React.Component<Props, any> {
       "clientId": process.env.REACT_APP_AUTH_RESOURCE
     };
     const keycloak = Keycloak(kcConf);
-    keycloak.init({onLoad: "login-required"}).success((authenticated) => {
+    keycloak.init({onLoad: "login-required", checkLoginIframe: false}).success((authenticated) => {
       this.props.onLogin && this.props.onLogin(keycloak, authenticated);
     });
 

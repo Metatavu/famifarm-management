@@ -177,7 +177,7 @@ class ViewStore extends React.Component<Props, State> {
           <h2>{strings.store}</h2>
         </Grid.Row>  
         <Grid.Row>
-          <Grid.Column>
+          <Grid.Column style={{overflowX: "auto"}}>
             { basicItems }
           </Grid.Column>
         </Grid.Row>
