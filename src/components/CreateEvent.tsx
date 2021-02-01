@@ -1,7 +1,23 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, ProductionLine, SeedBatch, WastageReason, BatchPhase, Seed } from "famifarm-typescript-models";
+import { 
+  PackageSize,
+  Event,
+  CultivationObservationEventData,
+  HarvestEventData,
+  PlantingEventData,
+  SowingEventData,
+  TableSpreadEventData,
+  WastageEventData,
+  PerformedCultivationAction,
+  Pest,
+  ProductionLine,
+  SeedBatch,
+  WastageReason,
+  Seed, 
+  EventType,
+  Product} from "../generated/client";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 import { DateTimeInput } from 'semantic-ui-calendar-react';
@@ -18,22 +34,22 @@ import {
   Message,
   InputOnChangeData,
   Confirm,
-  TextAreaProps
+  TextAreaProps,
+  DropdownItemProps,
+  DropdownProps
 } from "semantic-ui-react";
 import LocalizedUtils from "src/localization/localizedutils";
 import * as moment from "moment";
 import { ErrorMessage } from "src/types";
 import { FormContainer } from "./FormContainer";
-
-const PHASES: BatchPhase[] = ["SOWING", "PLANTING", "TABLE_SPREAD", "HARVEST", "COMPLETE"];
+import { Select } from "semantic-ui-react";
 
 /**
  * Interface representing component properties
  */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  batchId: string,
-  onError: (error: ErrorMessage) => void
+  onError: (error: ErrorMessage) => void;
 }
 
 /**
@@ -45,15 +61,15 @@ interface State {
   saving: boolean
   messageVisible: boolean,
   redirect: boolean
-  event?: Event
+  event: Partial<Event>
   performedCultivationActions?: PerformedCultivationAction[]
   pests?: Pest[],
   productionLines?: ProductionLine[]
   packageSizes?: PackageSize[]
   seedBatches?: SeedBatch[]
-  seeds?: Seed[]
+  seeds: Seed[]
+  products: Product[]
   wastageReasons?: WastageReason[]
-  batchEvents: Event[]
 }
 
 /**
@@ -69,12 +85,14 @@ class CreateEvent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
+      seeds: [],
+      products: [],
       loading: false,
       redirect: false,
       saving: false,
       messageVisible: false,
       open: false,
-      batchEvents: []
+      event: {}
     };
   }
 
@@ -88,38 +106,18 @@ class CreateEvent extends React.Component<Props, State> {
 
     this.setState({loading: true});
 
-    const eventsService = await Api.getEventsService(this.props.keycloak);
-    const events = await eventsService.listEvents(undefined, undefined, this.props.batchId);
-    let productionLineId = undefined;
-    const plantingEvent = events.find((event) => event.type == "PLANTING");
-    if (plantingEvent) {
-      let eventData = plantingEvent.data as PlantingEventData;
-      productionLineId = eventData.productionLineId;
-    } else {
-      const sowingEvent = events.find((event) => event.type == "SOWING");
-      if (sowingEvent) {
-        let eventData = sowingEvent.data as SowingEventData;
-        productionLineId = eventData.productionLineId;
-      }
-    }
-
-    const initialData: any = {
-      productionLineId: productionLineId
-    }
-
-    const seedsService = await Api.getSeedsService(this.props.keycloak);
-    const seeds = await seedsService.listSeeds(undefined, undefined);
+    const [seedsService, productsService] = await Promise.all([Api.getSeedsService(this.props.keycloak), Api.getProductsService(this.props.keycloak)]);
+    const [seeds, products] = await Promise.all([seedsService.listSeeds({}), productsService.listProducts({})]);
 
     this.setState({
-      batchEvents: events,
       loading: false,
       seeds: seeds,
+      products: products,
       event: {
-        batchId: this.props.batchId,
-        startTime: moment().toISOString(),
-        endTime: moment().toISOString(),
-        data: initialData,
-        type: "SOWING"
+        startTime: moment().toDate(),
+        endTime: moment().toDate(),
+        data: {},
+        type: EventType.Sowing
       }
     });
   }
@@ -127,6 +125,9 @@ class CreateEvent extends React.Component<Props, State> {
   public componentDidUpdate = (prevProps: Props, prevState: State) => {
     const prevData = (prevState.event ? prevState.event.data : {}) as any;
     const data = (this.state.event ? this.state.event.data : {}) as any;
+    if (!data) {
+      return;
+    }
 
     if (data.productionLineId && data.productionLineId !== prevData.productionLineId) {
       const selectedProductionLine = data.productionLineId ? (this.state.productionLines || []).find((p => p.id == data.productionLineId)) : undefined;
@@ -179,13 +180,13 @@ class CreateEvent extends React.Component<Props, State> {
     }
 
     if (this.state.redirect) {
-      return <Redirect to={this.state.event ? `/batches/${this.state.event.batchId}` : "/batches"} push={true} />;
+      return <Redirect to={"/events"} push={true} />;
     }
 
     if (!this.state.event) {
       return null;
     }
-    const event: Event = this.state.event;
+    const { event } = this.state;
     const eventTypeOptions = [
       "SOWING",
       "TABLE_SPREAD",
@@ -200,6 +201,17 @@ class CreateEvent extends React.Component<Props, State> {
       };
     });
 
+    const productOptions: DropdownItemProps[] = [{ key: "", value: "", text: "", }].concat(this.state.products.map((product) => {
+      const id = product.id!;
+      const name = LocalizedUtils.getLocalizedValue(product.name);
+
+      return {
+        key: id,
+        value: id,
+        text: name
+      };
+    }));
+
     return (
       <Grid>
         <Grid.Row className="content-page-header-row">
@@ -210,6 +222,10 @@ class CreateEvent extends React.Component<Props, State> {
         <Grid.Row>
           <Grid.Column width={8}>
             <FormContainer>
+            <Form.Field required>
+                <label>{strings.batchProduct}</label>
+                <Select options={ productOptions } value={ event.productId || "" } onChange={ this.handleProductChange }/>
+              </Form.Field>
               <Form.Field required>
                 <label>{strings.labelStartTime}</label>
                 <DateTimeInput dateTimeFormat="YYYY.MM.DD HH:mm" onChange={this.handleTimeChange} name="startTime" value={moment(event.startTime).format("YYYY.MM.DD HH:mm")} />
@@ -261,6 +277,15 @@ class CreateEvent extends React.Component<Props, State> {
   }
 
   /**
+   * Event handler for product change 
+   */
+  private handleProductChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    this.setState({
+      event: {...this.state.event, productId: data.value as string}
+    });
+  }
+
+  /**
    * Handle value change
    * 
    * @param event event
@@ -309,26 +334,6 @@ class CreateEvent extends React.Component<Props, State> {
    */
   private getStringsNumber = (string ?: string) : Number => {
     return string && string.match(/\d+/g) ? Number(string.match(/\d+/g)) : 0;
-  }
-
-
-  private getPhaseForEvent = (event: Event): BatchPhase | null => {
-    switch (event.type) {
-      case "SOWING":
-        return "TABLE_SPREAD";
-      case "TABLE_SPREAD":
-        return "PLANTING";
-      case "CULTIVATION_OBSERVATION":
-        return null;
-      case "PLANTING":
-        return "HARVEST";
-      case "HARVEST":
-        return "COMPLETE";
-      case "WASTAGE":
-        return null;
-      default:
-        return null;
-    }
   }
 
   /**
@@ -394,18 +399,8 @@ class CreateEvent extends React.Component<Props, State> {
         break;
       }
       event.data = data;
-      const createdEvent = await eventsService.createEvent(event);
-      const newEventPhase = this.getPhaseForEvent(createdEvent);
-      if (newEventPhase) {
-        const batchesService = await Api.getBatchesService(this.props.keycloak);
-        const currentBatch = await batchesService.findBatch(this.props.batchId);
-
-        if (PHASES.indexOf(newEventPhase) > PHASES.indexOf(currentBatch.phase || "SOWING")) {
-          currentBatch.phase = newEventPhase;
-          await batchesService.updateBatch(currentBatch, currentBatch.id!);
-        }
-      }
-
+      
+      await eventsService.createEvent({ event: event as Event });
       this.setState({saving: false, messageVisible: true});
       setTimeout(() => {
         this.setState({messageVisible: false});
@@ -431,7 +426,7 @@ class CreateEvent extends React.Component<Props, State> {
       const eventsService = await Api.getEventsService(this.props.keycloak);
       const id = this.state.event.id || "";
   
-      await eventsService.deleteEvent(id);
+      await eventsService.deleteEvent({eventId: id});
       
       this.setState({redirect: true});
     } catch (e) {
@@ -446,7 +441,7 @@ class CreateEvent extends React.Component<Props, State> {
   /**
    * Renders form suitable for specific event type
    */
-  private renderEventDataForm = (event: Event) => {
+  private renderEventDataForm = (event: Partial<Event>) => {
     switch (event.type) {
       case "CULTIVATION_OBSERVATION":
         return this.renderCultivationObservationDataForm(event.data as CultivationObservationEventData);
@@ -460,6 +455,8 @@ class CreateEvent extends React.Component<Props, State> {
         return this.renderTableSpreadDataForm(event.data as TableSpreadEventData);
       case "WASTAGE":
         return this.renderWastageDataForm(event.data as WastageEventData);
+      default:
+        return null;
     }
   }
 
@@ -716,7 +713,7 @@ class CreateEvent extends React.Component<Props, State> {
     this.setState({loading: true});
     const productionLinesService = await Api.getProductionLinesService(this.props.keycloak);
 
-    const productionLines = await productionLinesService.listProductionLines();
+    const productionLines = await productionLinesService.listProductionLines({});
 
     this.setState({
       loading: false,
@@ -741,8 +738,8 @@ class CreateEvent extends React.Component<Props, State> {
     ]);
 
     const [performedCultivationActions, pests] = await Promise.all([
-      performedCultivationActionsService.listPerformedCultivationActions(),
-      pestsService.listPests()
+      performedCultivationActionsService.listPerformedCultivationActions({}),
+      pestsService.listPests({})
     ]);
 
     this.setState({
@@ -762,7 +759,7 @@ class CreateEvent extends React.Component<Props, State> {
 
     this.setState({loading: true});
     const getProductionLinesService = await Api.getProductionLinesService(this.props.keycloak);
-    const productionLines = await getProductionLinesService.listProductionLines();
+    const productionLines = await getProductionLinesService.listProductionLines({});
 
     this.setState({
       loading: false,
@@ -787,8 +784,8 @@ class CreateEvent extends React.Component<Props, State> {
     ]);
 
     const [seedBatches, productionLines] = await Promise.all([
-      seedBatchesService.listSeedBatches(),
-      productionLinesService.listProductionLines()
+      seedBatchesService.listSeedBatches({}),
+      productionLinesService.listProductionLines({})
     ]);
 
     this.setState({
@@ -815,8 +812,8 @@ class CreateEvent extends React.Component<Props, State> {
     ]);
 
     const [wastageReasons, productionLines] = await Promise.all([
-      wastageReasonsService.listWastageReasons(),
-      productionLinesService.listProductionLines()
+      wastageReasonsService.listWastageReasons({}),
+      productionLinesService.listProductionLines({})
     ]);
 
     this.setState({

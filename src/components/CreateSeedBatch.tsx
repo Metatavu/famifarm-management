@@ -5,7 +5,7 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
-import { SeedBatch, Seed } from "famifarm-typescript-models";
+import { SeedBatch, Seed } from "../generated/client";
 import { Redirect } from 'react-router';
 import { DateInput } from 'semantic-ui-calendar-react';;
 import strings from "src/localization/strings";
@@ -31,7 +31,7 @@ interface Props {
 interface State {
   code: string;
   seedId: string;
-  time: string;
+  time: Date;
   redirect: boolean;
 }
 
@@ -41,7 +41,7 @@ class CreateSeedBatch extends React.Component<Props, State> {
     this.state = {
         code: "",
         seedId: "",
-        time: "",
+        time: new Date(),
         redirect: false
     };
 
@@ -58,7 +58,7 @@ class CreateSeedBatch extends React.Component<Props, State> {
       }
   
       const seedsService = await Api.getSeedsService(this.props.keycloak);
-      const seeds = await seedsService.listSeeds();
+      const seeds = await seedsService.listSeeds({});
       this.props.onSeedsFound && this.props.onSeedsFound(seeds);
     } catch (e) {
       this.props.onError({
@@ -105,7 +105,7 @@ class CreateSeedBatch extends React.Component<Props, State> {
       };
   
       const seedBatchService = await Api.getSeedBatchesService(this.props.keycloak);
-      await seedBatchService.createSeedBatch(seedBatchObject);
+      await seedBatchService.createSeedBatch({seedBatch: seedBatchObject});
   
       this.setState({redirect: true});
     } catch (e) {

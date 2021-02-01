@@ -5,7 +5,7 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
-import { PackageSize, PackageSizeOpt, LocalizedEntry } from "famifarm-typescript-models";
+import { LocalizedValue, PackageSize } from "../generated/client";
 import { Redirect } from 'react-router';
 import strings from "../localization/strings";
 
@@ -26,7 +26,7 @@ export interface Props {
 }
 
 export interface State {
-  packageSizeData: PackageSizeOpt;
+  packageSizeData: PackageSize;
   redirect: boolean;
 }
 
@@ -51,7 +51,7 @@ class CreatePackageSize extends React.Component<Props, State> {
       }
   
       const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-      await packageSizeService.createPackageSize(this.state.packageSizeData);
+      await packageSizeService.createPackageSize({packageSize: this.state.packageSizeData});
       this.setState({redirect: true});
     } catch (e) {
       this.props.onError({
@@ -67,7 +67,7 @@ class CreatePackageSize extends React.Component<Props, State> {
    * 
    * @param name localized package size name
    */
-  private updateName = (name: LocalizedEntry) => {
+  private updateName = (name: LocalizedValue[]) => {
     this.setState({
       packageSizeData: {...this.state.packageSizeData, name: name}
     });

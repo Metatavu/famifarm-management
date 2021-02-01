@@ -1,4 +1,4 @@
-import { Printer, Product, ProductionLine } from "famifarm-typescript-models";
+import { Printer, Product, ProductionLine } from "../generated/client";
 import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
 import { Button, Confirm, Form, Grid, InputOnChangeData, Loader, Message, Select } from "semantic-ui-react";
@@ -30,8 +30,8 @@ interface State {
   gutterHoleCount: number;
   contactInformation: string;
   producer: string;
-  cuttingDay: string;
-  sowingDay: string;
+  cuttingDay: Date;
+  sowingDay: Date;
   selectedProductName?: string;
   selectedProductId?: string;
   selectedProductionLineName?: string;
@@ -57,8 +57,8 @@ class EditCutPacking extends React.Component<Props, State> {
       gutterHoleCount: 1,
       contactInformation: "",
       producer: "",
-      cuttingDay: moment().toString(),
-      sowingDay: moment().toString(),
+      cuttingDay: moment().toDate(),
+      sowingDay: moment().toDate(),
       storageCondition: "",
       redirect: false,
       loading: false,
@@ -80,7 +80,7 @@ class EditCutPacking extends React.Component<Props, State> {
     try {
       this.setState({ loading: true });
       const cutPackingsApi = await Api.getCutPackingsService(keycloak);
-      const cutPacking = await cutPackingsApi.findPacking(cutPackingId);
+      const cutPacking = await cutPackingsApi.findCutPacking({cutPackingId});
       const { products, productionLines } = await this.loadDataForDropdowns(keycloak);
       const { weight, gutterCount, gutterHoleCount, contactInformation, producer, cuttingDay, sowingDay, storageCondition, productId, productionLineId } = cutPacking;
       const selectedProduct = products.find(product => product.id === productId);
@@ -339,7 +339,7 @@ class EditCutPacking extends React.Component<Props, State> {
 
     if (!products) {
      const productsApi = await Api.getProductsService(keycloak);
-     const foundProducts = await productsApi.listProducts();
+     const foundProducts = await productsApi.listProducts({});
 
      dropdownsData.products = foundProducts;
      onProductsFound(foundProducts);
@@ -347,7 +347,7 @@ class EditCutPacking extends React.Component<Props, State> {
 
     if (!productionLines) {
      const productionLinesApi = await Api.getProductionLinesService(keycloak);
-     const foundProductionLines = await productionLinesApi.listProductionLines();
+     const foundProductionLines = await productionLinesApi.listProductionLines({});
 
      dropdownsData.productionLines = foundProductionLines;
      onProductionLinesFound(foundProductionLines);
@@ -366,7 +366,7 @@ class EditCutPacking extends React.Component<Props, State> {
     }
     try {
       const cutPackingsApi = await Api.getCutPackingsService(keycloak);
-      await cutPackingsApi.deletePacking(cutPackingId);
+      await cutPackingsApi.deleteCutPacking({cutPackingId});
 
       this.setState({ redirect: true });
 
@@ -437,14 +437,14 @@ class EditCutPacking extends React.Component<Props, State> {
    * Handles sowing day change
    */
   private onSowingDayChange = async (e: any, { value }: InputOnChangeData) => {
-    this.setState({ sowingDay: moment(value, "DD.MM.YYYY").toISOString() });
+    this.setState({ sowingDay: moment(value, "DD.MM.YYYY").toDate() });
   }
 
   /**
    * Handles cutting day change
    */
   private onCuttingDayChange = async (e: any, { value }: InputOnChangeData) => {
-    this.setState({ cuttingDay: moment(value, "DD.MM.YYYY").toISOString() });
+    this.setState({ cuttingDay: moment(value, "DD.MM.YYYY").toDate() });
   }
 
 
@@ -461,7 +461,7 @@ class EditCutPacking extends React.Component<Props, State> {
 
     try {
       const cutPackingsApi = await Api.getCutPackingsService(keycloak);
-      await cutPackingsApi.updatePacking({ id: cutPackingId, weight, sowingDay, cuttingDay, gutterCount, gutterHoleCount, productId: selectedProductId!, productionLineId: selectedProductionLineId!, producer, contactInformation, storageCondition }, cutPackingId);
+      await cutPackingsApi.updateCutPacking({cutPackingId, cutPacking: { id: cutPackingId, weight, sowingDay, cuttingDay, gutterCount, gutterHoleCount, productId: selectedProductId!, productionLineId: selectedProductionLineId!, producer, contactInformation, storageCondition }});
     
       this.setState({messageVisible: true});
       setTimeout(() => {
@@ -542,7 +542,7 @@ class EditCutPacking extends React.Component<Props, State> {
 
     this.setState({ printing: true });
     const printingService = await Api.getPrintersService(keycloak);
-    await printingService.print({ packingId: cutPackingId }, selectedPrinter.id);
+    await printingService.print({ printerId: selectedPrinter.id, printData: {packingId: cutPackingId }});
     this.setState({ printing: false });
   }
 

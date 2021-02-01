@@ -4,7 +4,7 @@ import { StoreState, ErrorMessage } from "src/types";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import * as actions from "../actions"
-import { Product, CampaignProducts } from "famifarm-typescript-models";
+import { Product, CampaignProducts } from "../generated/client";
 import strings from "src/localization/strings";
 import Api from "src/api";
 import { Grid, Loader, DropdownItemProps, Button, Form, Select, Input, InputOnChangeData, DropdownProps, List } from "semantic-ui-react";
@@ -62,7 +62,7 @@ class CreateCampaign extends React.Component<Props, State> {
 
     this.setState({ loading: true });
     const productsService = await Api.getProductsService(this.props.keycloak);
-    const products = await productsService.listProducts(undefined, undefined, true);
+    const products = await productsService.listProducts({includeSubcontractorProducts: true});
     this.setState({ products, loading: false });
   }
 
@@ -206,7 +206,7 @@ class CreateCampaign extends React.Component<Props, State> {
       this.setState({ loading: true });
       const { campaignName, addedCampaignProducts } = this.state;
       const campaignsService = await Api.getCampaignsService(this.props.keycloak);
-      const createdCampaign = await campaignsService.createCampaign({ name: campaignName, products: addedCampaignProducts });
+      const createdCampaign = await campaignsService.createCampaign({campaign: {name: campaignName, products: addedCampaignProducts}});
       this.setState({ campaignId: createdCampaign.id!, redirect: true });
     } catch (exception) {
       this.setState({ loading: false });

@@ -5,7 +5,7 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
-import { ProductionLine } from "famifarm-typescript-models";
+import { ProductionLine } from "../generated/client";
 import { Redirect } from 'react-router';
 
 import {
@@ -65,7 +65,7 @@ class CreateProductionLine extends React.Component<Props, State> {
       };
   
       const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
-      await productionLineService.createProductionLine(productionLineObject);
+      await productionLineService.createProductionLine({productionLine: productionLineObject});
   
       this.setState({redirect: true});
     } catch (e) {

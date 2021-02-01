@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Pest } from "famifarm-typescript-models";
+import { Pest } from "../generated/client";
 import strings from "src/localization/strings";
 
 import {
@@ -52,7 +52,7 @@ class PestList extends React.Component<Props, State> {
       }
   
       const pestsService = await Api.getPestsService(this.props.keycloak);
-      const pests = await pestsService.listPests();
+      const pests = await pestsService.listPests({});
       pests.sort((a, b) => {
         let nameA = LocalizedUtils.getLocalizedValue(a.name)
         let nameB = LocalizedUtils.getLocalizedValue(b.name)

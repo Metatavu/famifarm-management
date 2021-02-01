@@ -4,7 +4,7 @@ import * as actions from "../actions";
 import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
-import { Product, PackageSize, LocalizedEntry } from "famifarm-typescript-models";
+import { Product, PackageSize, LocalizedValue } from "../generated/client";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -85,12 +85,12 @@ class EditProduct extends React.Component<Props, State> {
   
       const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
       const productsService = await Api.getProductsService(this.props.keycloak);
-      const product = await productsService.findProduct(this.props.productId);
+      const product = await productsService.findProduct({productId: this.props.productId});
   
       this.props.onProductSelected && this.props.onProductSelected(product);
       this.setState({product: product});
   
-      const packageSizes = await packageSizeService.listPackageSizes(0, 100);
+      const packageSizes = await packageSizeService.listPackageSizes({});
       this.props.onPackageSizesFound && this.props.onPackageSizesFound(packageSizes);
     } catch (e) {
       this.props.onError({
@@ -132,7 +132,7 @@ class EditProduct extends React.Component<Props, State> {
       const productsService = await Api.getProductsService(this.props.keycloak);
   
       this.setState({saving: true});
-      await productsService.updateProduct(this.state.product, this.state.product.id || "");
+      await productsService.updateProduct({productId: this.state.product.id!, product: this.state.product});
       this.setState({saving: false});
   
       this.setState({messageVisible: true});
@@ -159,7 +159,7 @@ class EditProduct extends React.Component<Props, State> {
     const productsService = await Api.getProductsService(this.props.keycloak);
     const id = this.state.product.id || "";
 
-    await productsService.deleteProduct(id);
+    await productsService.deleteProduct({productId: id});
 
     this.props.onProductDeleted && this.props.onProductDeleted(id!);
     this.setState({redirect: true});
@@ -171,7 +171,7 @@ class EditProduct extends React.Component<Props, State> {
    * 
    * @param name localized entry representing name
    */
-  updateName = (name: LocalizedEntry) => {
+  updateName = (name: LocalizedValue[]) => {
     this.setState({
       product: { ...this.state.product!, name: name}
     });

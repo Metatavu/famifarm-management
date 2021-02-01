@@ -1,4 +1,4 @@
-import { CutPacking, Product } from "famifarm-typescript-models";
+import { CutPacking, Product } from "../generated/client";
 import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
 import Api from "../api";
@@ -61,14 +61,14 @@ class CutPackingsList extends React.Component<Props, State> {
 
     try {
       const cutPackingsApi= await Api.getCutPackingsService(keycloak);
-      const cutPackings = await cutPackingsApi.listPackings();
+      const cutPackings = await cutPackingsApi.listCutPackings({});
   
       if (products) {
         const listItems = this.getListItems(cutPackings, products);
         this.setState({ listItems, loading: false });
       } else {
         const productsApi = await Api.getProductsService(keycloak);
-        const foundProducts = await productsApi.listProducts();
+        const foundProducts = await productsApi.listProducts({});
         const listItems = this.getListItems(cutPackings, foundProducts);
   
         onProductsFound(foundProducts);
@@ -151,7 +151,7 @@ class CutPackingsList extends React.Component<Props, State> {
     try {
       this.setState({ loading: true });
       const cutPackingsApi = await Api.getCutPackingsService(keycloak);
-      const cutPackings = await cutPackingsApi.listPackings(undefined, undefined, productId, createdBefore, createdAfter);
+      const cutPackings = await cutPackingsApi.listCutPackings({productId, createdAfter, createdBefore});
       const listItems = this.getListItems(cutPackings, products);
   
       this.setState({ listItems, loading: false });
@@ -251,7 +251,7 @@ class CutPackingsList extends React.Component<Props, State> {
       const product = products.find(product => product.id === packing.productId);
       const productName = product ? LocalizedUtils.getLocalizedValue(product.name) : packing.productId;
 
-      return { name: this.getPackingName(productName, packing.cuttingDay), id: packing.id! };
+      return { name: this.getPackingName(productName, moment(packing.cuttingDay).format("DD.MM.YYYY")), id: packing.id! };
     });
   }
 

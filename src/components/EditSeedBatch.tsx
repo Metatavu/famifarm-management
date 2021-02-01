@@ -4,7 +4,7 @@ import * as actions from "../actions";
 import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
-import { SeedBatch, Seed } from "famifarm-typescript-models";
+import { SeedBatch, Seed } from "../generated/client";
 import { Redirect } from 'react-router';
 import { DateInput } from 'semantic-ui-calendar-react';
 import strings from "src/localization/strings";import {
@@ -83,10 +83,10 @@ class EditSeedBatch extends React.Component<Props, State> {
       }      
       const seedBatchesService = await Api.getSeedBatchesService(this.props.keycloak);
       const seedsService = await Api.getSeedsService(this.props.keycloak);      
-      const seedBatch = await seedBatchesService.findSeedBatch(this.props.seedBatchId);
+      const seedBatch = await seedBatchesService.findSeedBatch({seedBatchId: this.props.seedBatchId});
       this.props.onSeedBatchSelected && this.props.onSeedBatchSelected(seedBatch);
       this.setState({seedBatch: seedBatch});      
-      const seeds = await seedsService.listSeeds();      
+      const seeds = await seedsService.listSeeds({});      
       this.props.onSeedsFound && this.props.onSeedsFound(seeds);
       this.setState({seeds: seeds});
     } catch (e) {
@@ -183,7 +183,7 @@ class EditSeedBatch extends React.Component<Props, State> {
       }      
       const seedBatchesService = await Api.getSeedBatchesService(this.props.keycloak);      
       this.setState({saving: true});
-      await seedBatchesService.updateSeedBatch(this.state.seedBatch, this.state.seedBatch.id || "");
+      await seedBatchesService.updateSeedBatch({seedBatchId: this.state.seedBatch.id!, seedBatch: this.state.seedBatch});
       this.props.onSeedBatchSelected && this.props.onSeedBatchSelected(this.state.seedBatch);
       this.setState({saving: false});      
       this.setState({messageVisible: true});
@@ -208,7 +208,7 @@ class EditSeedBatch extends React.Component<Props, State> {
       }      
       const seedBatchesService = await Api.getSeedBatchesService(this.props.keycloak);
       const id = this.state.seedBatch.id || "";
-      await seedBatchesService.deleteSeedBatch(id);      
+      await seedBatchesService.deleteSeedBatch({seedBatchId: id});      
       this.props.onSeedBatchDeleted && this.props.onSeedBatchDeleted(id!);
       this.setState({redirect: true});
     } catch (e) {

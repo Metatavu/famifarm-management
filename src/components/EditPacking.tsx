@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { StoreState, ErrorMessage } from "src/types";
 import * as actions from "../actions";
-import { Packing, Product, PackageSize, PackingState, Printer, PackingType, Campaign } from "famifarm-typescript-models";
+import { Packing, Product, PackageSize, PackingState, Printer, PackingType, Campaign } from "../generated/client";
 import Api from "../api";
 import { KeycloakInstance } from "keycloak-js";
 import strings from "src/localization/strings";
@@ -30,7 +30,7 @@ export interface State {
   packingStatus: PackingState,
   packedCount: number,
   loading: boolean,
-  date: string,
+  date: Date,
   messageVisible: boolean,
   confirmOpen: boolean,
   redirect: boolean,
@@ -55,7 +55,7 @@ class EditPacking extends React.Component<Props, State> {
       packingStatus : "IN_STORE" as PackingState,
       packedCount : 0,
       loading : false,
-      date : moment(moment(), "DD.MM.YYYY HH:mm").toISOString(),
+      date : new Date(),
       messageVisible : false,
       confirmOpen: false,
       redirect: false,
@@ -75,10 +75,10 @@ class EditPacking extends React.Component<Props, State> {
       this.setState({loading: true});
 
       const packingsService = await Api.getPackingsService(this.props.keycloak);
-      const packing = await packingsService.findPacking(this.props.packingId);
+      const packing = await packingsService.findPacking({packingId: this.props.packingId});
 
       const productsService = await Api.getProductsService(this.props.keycloak);
-      const products = await productsService.listProducts();
+      const products = await productsService.listProducts({});
 
       const campaignsService = await Api.getCampaignsService(this.props.keycloak);
       const campaigns = await campaignsService.listCampaigns();
@@ -91,7 +91,7 @@ class EditPacking extends React.Component<Props, State> {
       }
 
       if (packing.type == "BASIC") {
-        const product = await productsService.findProduct(packing.productId!);
+        const product = await productsService.findProduct({productId: packing.productId!});
         const packedCount = packing.packedCount || 0;
   
         await this.refreshPrinters();
@@ -105,7 +105,7 @@ class EditPacking extends React.Component<Props, State> {
         const productName = LocalizedUtils.getLocalizedValue(product.name);
   
         const packageSizesSerivce = await Api.getPackageSizesService(this.props.keycloak);
-        const packageSizes = await packageSizesSerivce.listPackageSizes();
+        const packageSizes = await packageSizesSerivce.listPackageSizes({});
   
         this.setState({
           packing,
@@ -119,12 +119,12 @@ class EditPacking extends React.Component<Props, State> {
           packageSizeId: packing.packageSizeId,
           loading: false,
           campaigns,
-          packingType: "BASIC"
+          packingType: PackingType.Basic
         });
       }
 
       if (packing.type == "CAMPAIGN") {
-        const campaign = await campaignsService.findCampaign(packing.campaignId!);
+        const campaign = await campaignsService.findCampaign({campaignId: packing.campaignId!});
         const { name, id } = campaign;
 
         this.setState({
@@ -136,7 +136,7 @@ class EditPacking extends React.Component<Props, State> {
           campaignName: name,
           campaignId: id,
           loading: false,
-          packingType: "CAMPAIGN"
+          packingType: PackingType.Campaign
         });
       }
 
@@ -233,7 +233,8 @@ class EditPacking extends React.Component<Props, State> {
                   <Select
                     options={[
                       { value:"IN_STORE", text: strings.packingStoreStatus },
-                      { value: "REMOVED", text: strings.packingRemovedStatus }
+                      { value: "REMOVED", text: strings.packingRemovedStatus },
+                      { value: "WASTAGE", text: strings.packingWastageStatus }
                     ]}
                     text={ this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus }
                     value={ this.state.packingStatus }
@@ -293,7 +294,8 @@ class EditPacking extends React.Component<Props, State> {
                   <Select
                     options={[
                       { value:"IN_STORE", text: strings.packingStoreStatus },
-                      { value: "REMOVED", text: strings.packingRemovedStatus }
+                      { value: "REMOVED", text: strings.packingRemovedStatus },
+                      { value: "WASTAGE", text: strings.packingWastageStatus }
                     ]}
                     text={ this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus }
                     value={ this.state.packingStatus }
@@ -440,7 +442,7 @@ class EditPacking extends React.Component<Props, State> {
 
     this.setState({ printing: true });
     const printingService = await Api.getPrintersService(this.props.keycloak);
-    await printingService.print({ packingId: this.state.packing.id }, this.state.selectedPrinter.id);
+    await printingService.print({printerId: this.state.selectedPrinter.id, printData: {packingId: this.state.packing.id}});
     this.setState({ printing: false });
   }
 
@@ -461,7 +463,16 @@ class EditPacking extends React.Component<Props, State> {
     * Resolves localized name of the packing status
     */
   private resolveStatusLocalizedName = () => {
-    return this.state.packingStatus === "IN_STORE" ? strings.packingStoreStatus : strings.packingRemovedStatus;
+    switch(this.state.packingStatus) {
+      case "IN_STORE":
+        return strings.packingStoreStatus
+      case "REMOVED":
+        return strings.packingRemovedStatus
+      case "WASTAGE":
+        return strings.packingWastageStatus;
+      default:
+        return "";
+    }
   }
 
   /**
@@ -501,7 +512,7 @@ class EditPacking extends React.Component<Props, State> {
     * Handles changing date
     */
     private onChangeDate = (e: any, { value }: InputOnChangeData) => {
-      this.setState({date: moment(value, "DD.MM.YYYY HH:mm").toISOString()});
+      this.setState({date: moment(value, "DD.MM.YYYY HH:mm").toDate()});
   }
 
   /**
@@ -544,7 +555,7 @@ class EditPacking extends React.Component<Props, State> {
       }
 
       const packingsService = await Api.getPackingsService(this.props.keycloak);
-      await packingsService.updatePacking(updatedPacking, updatedPacking.id);
+      await packingsService.updatePacking({packingId: updatedPacking.id, packing: updatedPacking});
 
       this.setState({messageVisible: true});
       setTimeout(() => {
@@ -574,7 +585,7 @@ class EditPacking extends React.Component<Props, State> {
         throw new Error("Packing id is undefined")
       }
 
-      await packingsService.deletePacking(this.state.packing.id);
+      await packingsService.deletePacking({packingId: this.state.packing.id});
 
       this.setState({redirect: true});
 

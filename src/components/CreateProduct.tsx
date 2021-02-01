@@ -5,7 +5,7 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
-import { Product, PackageSize, ProductOpt, LocalizedEntry } from "famifarm-typescript-models";
+import { Product, PackageSize, LocalizedValue } from "../generated/client";
 import { Redirect } from 'react-router';
 import strings from "../localization/strings";
 
@@ -35,7 +35,7 @@ interface Props {
  * Component state
  */
 interface State {
-  productData: ProductOpt,
+  productData: Product,
   redirect: boolean;
 }
 
@@ -62,7 +62,7 @@ class CreateProduct extends React.Component<Props, State> {
       }
 
       const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-      const packageSizes = await packageSizeService.listPackageSizes();
+      const packageSizes = await packageSizeService.listPackageSizes({});
       this.props.onPackageSizesFound && this.props.onPackageSizesFound(packageSizes);
     } catch (e) {
       this.props.onError({
@@ -89,7 +89,7 @@ class CreateProduct extends React.Component<Props, State> {
       };
   
       const productsService = await Api.getProductsService(this.props.keycloak);  
-      await productsService.createProduct(productObject);
+      await productsService.createProduct({product: productObject});
   
       this.setState({redirect: true});
     } catch (e) {
@@ -118,7 +118,7 @@ class CreateProduct extends React.Component<Props, State> {
    * 
    * @param name localized entry representing name
    */
-  updateName = (name: LocalizedEntry) => {
+  updateName = (name: LocalizedValue[]) => {
     this.setState({
       productData: {...this.state.productData, name: name}
     });
@@ -132,7 +132,7 @@ class CreateProduct extends React.Component<Props, State> {
    */
   updateIsSubcontractorProduct = (e: any, { checked }: CheckboxProps) => {
     this.setState({
-      productData: { ...this.state.productData, isSubcontractorProduct: checked }
+      productData: { ...this.state.productData, isSubcontractorProduct: checked || false }
     })
   }
 

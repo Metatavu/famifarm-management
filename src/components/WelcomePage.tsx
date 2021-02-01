@@ -17,13 +17,11 @@ import {
 import BasicLayout from "./BasicLayout";
 import CreateSeed from "./CreateSeed";
 import CreateProductionLine from "./CreateProductionLine";
-import BatchView from "./BatchView";
 import EditPest from "./EditPest";
 import CreatePest from "./CreatePest";
 import EditEvent from "./EditEvent";
 import ReportDownload from "./ReportDownload";
 import SeedList from "./SeedList";
-import BatchList from "./BatchList";
 import EditPacking from "./EditPacking";
 import EditProduct from "./EditProduct";
 import EditPackageSize from "./EditPackageSize";
@@ -45,8 +43,6 @@ import CreateProduct from "./CreateProduct";
 import PackageSizeList from "./PackageSizeList";
 import CreatePackageSize from "./CreatePackageSize";
 import CreateEvent from "./CreateEvent";
-import CreateBatch from "./CreateBatch";
-import EditBatch from "./EditBatch";
 import PackingList from "./PackingList";
 import CreatePacking from "./CreatePacking";
 import ViewStore from "./ViewStore";
@@ -56,6 +52,7 @@ import EditCampaign from "./EditCampaign";
 import CreateCutPacking from "./CreateCutPacking";
 import EditCutPacking from "./EditCutPacking";
 import CutPackingsList from "./CutPackingsList";
+import EventList from "./EventList";
 
 export interface Props {
   authenticated: boolean,
@@ -81,7 +78,7 @@ class WelcomePage extends React.Component<Props, any> {
       "clientId": process.env.REACT_APP_AUTH_RESOURCE
     };
     const keycloak = Keycloak(kcConf);
-    keycloak.init({onLoad: "login-required"}).success((authenticated) => {
+    keycloak.init({onLoad: "login-required", checkLoginIframe: false}).success((authenticated) => {
       this.props.onLogin && this.props.onLogin(keycloak, authenticated);
     });
 
@@ -93,8 +90,8 @@ class WelcomePage extends React.Component<Props, any> {
    */
   public render() {
     const navigationRoutes = [{
-      "text": strings.batches,
-      "route": "/batches"
+      "text": strings.events,
+      "route": "/events"
     },{
       "text": strings.packings,
       "route": "/packings"
@@ -179,10 +176,10 @@ class WelcomePage extends React.Component<Props, any> {
                 )}
               />
               <Route
-                path="/batches"
+                path="/events"
                 exact={true}
                 render={props => (
-                  <BatchList
+                  <EventList
                     keycloak={this.state.keycloak}
                   />
                 )}
@@ -220,16 +217,6 @@ class WelcomePage extends React.Component<Props, any> {
                 render={props => (
                   <ViewStore
                     keycloak={this.state.keycloak}
-                  />
-                )}
-              />
-              <Route
-                path="/batches/:batchId"
-                exact={true}
-                render={props => (
-                  <BatchView
-                    keycloak={this.state.keycloak}
-                    batchId={props.match.params.batchId as string}
                   />
                 )}
               />
@@ -285,25 +272,6 @@ class WelcomePage extends React.Component<Props, any> {
                 )}
               />
               <Route
-                path="/createBatch"
-                exact={true}
-                render={props => (
-                  <CreateBatch
-                    keycloak={this.state.keycloak}
-                  />
-                )}
-              />
-              <Route
-                path="/editBatch/:batchId"
-                exact={true}
-                render={props => (
-                  <EditBatch
-                    batchId={props.match.params.batchId as string}
-                    keycloak={this.state.keycloak}
-                  />
-                )}
-              />
-              <Route
                 path="/products"
                 exact={true}
                 render={props => (
@@ -333,12 +301,11 @@ class WelcomePage extends React.Component<Props, any> {
                 )}
               />
               <Route
-                path="/createEvent/:batchId"
+                path="/createEvent"
                 exact={true}
                 render={props => (
                     <CreateEvent
                       keycloak={this.state.keycloak}
-                      batchId={props.match.params.batchId as string}
                     />
                 )}
               />

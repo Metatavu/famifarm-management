@@ -22,14 +22,15 @@ import {
   PERFORMED_CULTIVATION_ACTIONS_FOUND,
   PERFORMED_CULTIVATION_ACTION_DELETED,
   PERFORMED_CULTIVATION_ACTION_SELECTED, 
-  BATCHES_FOUND,
   WASTAGE_REASONS_FOUND,
   WASTAGE_REASON_DELETED,
   WASTAGE_REASON_SELECTED,
   LOCALE_UPDATE,
   PESTS_FOUND,
   ERROR_OCCURRED,
-  CAMPAIGNS_FOUND} from '../constants/index';
+  CAMPAIGNS_FOUND,
+  EVENT_LIST_FILTERS_UPDATED,
+  EVENTS_FOUND} from '../constants/index';
 
 /**
  * Process action 
@@ -47,8 +48,6 @@ export function processAction(state: StoreState, action: AppAction): StoreState 
       return {...state, packings: action.packings};
     case PRODUCTS_FOUND:
       return { ...state, products: action.products };
-    case BATCHES_FOUND:
-      return { ...state, batches: action.batches, batchesFirstResult: action.batchesFirstResult, batchListDate: action.batchListDate, batchListProduct: action.batchListProduct, batchListProductName: action.batchListProductName };
     case PRODUCT_SELECTED:
       return { ...state, product: action.product};
     case PRODUCT_DELETED:
@@ -98,6 +97,10 @@ export function processAction(state: StoreState, action: AppAction): StoreState 
       return { ...state, error: action.error}
     case CAMPAIGNS_FOUND:
       return { ...state, campaigns: action.campaigns }
+    case EVENT_LIST_FILTERS_UPDATED:
+      return { ...state, eventListFilters: action.eventListFilters }
+    case EVENTS_FOUND:
+      return { ...state, events: action.events}
     }
   return state;
 }
