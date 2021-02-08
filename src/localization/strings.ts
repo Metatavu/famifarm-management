@@ -229,6 +229,7 @@ export interface IStrings extends LocalizedStringsMethods {
   editCutPacking: string
   events: string
   total: string
+  labelSowingDate: string
 }
 
 const strings: IStrings = new LocalizedStrings({

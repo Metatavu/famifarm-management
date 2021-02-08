@@ -205,5 +205,6 @@
     "editCutPacking": "Muokkaa leikattua pakkausta",
     "events": "Tapahtumat",
     "packingWastageStatus": "Poisheitto",
-    "total": "Yhteensä"
+    "total": "Yhteensä",
+    "labelSowingDate": "Kylvöpäivä"
   }

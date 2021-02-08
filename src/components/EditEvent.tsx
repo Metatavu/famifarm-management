@@ -4,7 +4,7 @@ import Api from "../api";
 import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, ProductionLine, SeedBatch, WastageReason, Seed } from "../generated/client";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
-import { DateTimeInput } from 'semantic-ui-calendar-react';
+import { DateTimeInput, DateInput } from 'semantic-ui-calendar-react';
 import * as actions from "../actions";
 import { StoreState } from "../types/index";
 import { connect } from "react-redux";
@@ -263,7 +263,8 @@ class EditEvent extends React.Component<Props, State> {
           data = {
             gutterCount: eventData.gutterCount,
             productionLineId: eventData.productionLineId,
-            type: eventData.type
+            type: eventData.type,
+            sowingDate: moment(eventData.sowingDate).toDate()
           } as HarvestEventData;
         break;
         case "PLANTING":
@@ -272,7 +273,8 @@ class EditEvent extends React.Component<Props, State> {
             gutterHoleCount: eventData.gutterHoleCount,
             productionLineId: eventData.productionLineId, 
             trayCount: eventData.trayCount,
-            workerCount: eventData.workerCount
+            workerCount: eventData.workerCount,
+            sowingDate: moment(eventData.sowingDate).toDate()
           } as PlantingEventData;
         break;
         case "SOWING":
@@ -311,6 +313,23 @@ class EditEvent extends React.Component<Props, State> {
         exception: e
       });
     }
+  }
+
+
+  /**
+   * Handle value change
+   * 
+   * @param event event
+   */
+  private handleDataTimeChange = (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
+    const eventData = {...this.state.event} as any;
+    if (!eventData) {
+      return;
+    }
+
+    eventData.data = {...this.state.event!.data};
+    eventData.data[name] = moment(value, "DD.MM.YYYY").toISOString();;
+    this.setState({ event: { ...eventData } });
   }
 
   /**
@@ -435,6 +454,10 @@ class EditEvent extends React.Component<Props, State> {
 
     return (
       <React.Fragment>
+        <Form.Field required>
+          <label>{strings.labelSowingDate}</label>
+          <DateInput dateTimeFormat="DD.MM.YYYY" onChange={this.handleDataTimeChange} name="sowingDate" value={data.sowingDate ? moment(data.sowingDate).format("DD.MM.YYYY") : ""} />
+        </Form.Field>
         <Form.Select required label={strings.labelHarvestType} name="type" options={harvestTypeOptions} value={data.type} onChange={this.handleDataChange} />
         <Form.Input required label={strings.labelGutterCount} name="gutterCount" type="number" value={data.gutterCount} onChange={this.handleDataChange} />
         <Form.Select required label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
@@ -468,6 +491,10 @@ class EditEvent extends React.Component<Props, State> {
 
     return (
       <React.Fragment>
+        <Form.Field required>
+          <label>{strings.labelSowingDate}</label>
+          <DateInput dateTimeFormat="DD.MM.YYYY" onChange={this.handleDataTimeChange} name="sowingDate" value={data.sowingDate ? moment(data.sowingDate).format("DD.MM.YYYY") : ""} />
+        </Form.Field>
         <Form.Select required label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
         <Form.Input required label={strings.labelTrayCount} name="trayCount" type="number" value={data.trayCount} onChange={this.handleDataChange} />
         <Form.Input required label={strings.labelGutterCount} name="gutterCount" type="number" value={data.gutterCount} onChange={this.handleDataChange} />

@@ -19,6 +19,9 @@ import strings from "src/localization/strings";import {
   Checkbox
 } from "semantic-ui-react";
 import { FormContainer } from "./FormContainer";
+import * as moment from "moment";
+
+const DATE_FORMAT = "DD.MM.YYYY";
 
 /**
  * Interface representing component properties
@@ -148,7 +151,7 @@ class EditSeedBatch extends React.Component<Props, State> {
       id: this.state.seedBatch.id,
       code: this.state.seedBatch.code,
       seedId: this.state.seedBatch.seedId,
-      time: value,
+      time: moment(value, DATE_FORMAT).toDate(),
       active: this.state.seedBatch.active
     };    
     this.setState({seedBatch: seedBatch});
@@ -275,9 +278,9 @@ class EditSeedBatch extends React.Component<Props, State> {
               <DateInput
                 name="dateTime"
                 placeholder={strings.date}
-                value={this.state.seedBatch ? this.state.seedBatch.time : ""}
+                value={this.state.seedBatch ? moment(this.state.seedBatch.time).format(DATE_FORMAT) : ""}
                 iconPosition="left"
-                dateFormat="YYYY-MM-DDTHH:mmZ"
+                dateFormat={DATE_FORMAT}
                 onChange={this.handleTimeChange}
               />
             </Form.Field>

@@ -206,5 +206,6 @@
   "editCutPacking": "Edit cut packing",
   "events": "Events",
   "packingWastageStatus": "Wastage",
-  "total": "Total"
+  "total": "Total",
+  "labelSowingDate": "Sowing date"
 }

@@ -10,6 +10,7 @@ import { Redirect } from 'react-router';
 import { DateInput } from 'semantic-ui-calendar-react';;
 import strings from "src/localization/strings";
 import { FormContainer } from "./FormContainer";
+import * as moment from "moment";
 
 import {
   Grid,
@@ -18,6 +19,8 @@ import {
   InputOnChangeData,
   Form
 } from "semantic-ui-react";
+
+const DATE_FORMAT = "DD.MM.YYYY";
 
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
@@ -31,7 +34,7 @@ interface Props {
 interface State {
   code: string;
   seedId: string;
-  time: Date;
+  time: string;
   redirect: boolean;
 }
 
@@ -41,7 +44,7 @@ class CreateSeedBatch extends React.Component<Props, State> {
     this.state = {
         code: "",
         seedId: "",
-        time: new Date(),
+        time: moment().format(DATE_FORMAT),
         redirect: false
     };
 
@@ -101,7 +104,7 @@ class CreateSeedBatch extends React.Component<Props, State> {
       const seedBatchObject = {
         code: this.state.code,
         seedId: this.state.seedId,
-        time: this.state.time
+        time: moment(this.state.time, DATE_FORMAT).toDate()
       };
   
       const seedBatchService = await Api.getSeedBatchesService(this.props.keycloak);
@@ -167,7 +170,7 @@ class CreateSeedBatch extends React.Component<Props, State> {
                   placeholder={strings.date}
                   value={this.state.time}
                   iconPosition="left"
-                  dateFormat="YYYY-MM-DDTHH:mmZ"
+                  dateFormat={DATE_FORMAT}
                   onChange={this.handleTimeChange}
                 />
               </Form.Field>
