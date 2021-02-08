@@ -49,6 +49,12 @@ export interface PlantingEventData {
      * @memberof PlantingEventData
      */
     workerCount?: number;
+    /**
+     * Sowing date
+     * @type {Date}
+     * @memberof PlantingEventData
+     */
+    sowingDate?: Date;
 }
 
 export function PlantingEventDataFromJSON(json: any): PlantingEventData {
@@ -66,6 +72,7 @@ export function PlantingEventDataFromJSONTyped(json: any, ignoreDiscriminator: b
         'gutterCount': !exists(json, 'gutterCount') ? undefined : json['gutterCount'],
         'trayCount': !exists(json, 'trayCount') ? undefined : json['trayCount'],
         'workerCount': !exists(json, 'workerCount') ? undefined : json['workerCount'],
+        'sowingDate': !exists(json, 'sowingDate') ? undefined : (new Date(json['sowingDate'])),
     };
 }
 
@@ -83,6 +90,7 @@ export function PlantingEventDataToJSON(value?: PlantingEventData | null): any {
         'gutterCount': value.gutterCount,
         'trayCount': value.trayCount,
         'workerCount': value.workerCount,
+        'sowingDate': value.sowingDate === undefined ? undefined : (value.sowingDate.toISOString()),
     };
 }
 

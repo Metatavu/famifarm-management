@@ -37,6 +37,12 @@ export interface HarvestEventData {
      * @memberof HarvestEventData
      */
     productionLineId?: string;
+    /**
+     * Sowing date
+     * @type {Date}
+     * @memberof HarvestEventData
+     */
+    sowingDate: Date;
 }
 
 /**
@@ -62,6 +68,7 @@ export function HarvestEventDataFromJSONTyped(json: any, ignoreDiscriminator: bo
         'gutterCount': !exists(json, 'gutterCount') ? undefined : json['gutterCount'],
         'type': !exists(json, 'type') ? undefined : json['type'],
         'productionLineId': !exists(json, 'productionLineId') ? undefined : json['productionLineId'],
+        'sowingDate': (new Date(json['sowingDate'])),
     };
 }
 
@@ -77,6 +84,7 @@ export function HarvestEventDataToJSON(value?: HarvestEventData | null): any {
         'gutterCount': value.gutterCount,
         'type': value.type,
         'productionLineId': value.productionLineId,
+        'sowingDate': (value.sowingDate.toISOString()),
     };
 }
 

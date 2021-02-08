@@ -2214,6 +2214,10 @@ components:
           description: "How many workers were doing the planting"
           type: "integer"
           format: "int32"
+        sowingDate:
+          description: "Sowing date"
+          type: "string"
+          format: "date-time"
           
     SowingEventData:
       description: "Entry when a batch has been sowed"
@@ -2271,6 +2275,7 @@ components:
     HarvestEventData:
       required:
         - amount
+        - sowingDate
       properties:
         gutterCount:
           type: "integer"
@@ -2285,6 +2290,10 @@ components:
           description: "Production line id"
           type: "string"
           format: "uuid"
+        sowingDate:
+          description: "Sowing date"
+          type: "string"
+          format: "date-time"
             
     WastageEventData:
       required:
