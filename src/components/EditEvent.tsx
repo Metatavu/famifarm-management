@@ -262,6 +262,7 @@ class EditEvent extends React.Component<Props, State> {
         case "HARVEST":
           data = {
             gutterCount: eventData.gutterCount,
+            gutterHoleCount: eventData.gutterHoleCount,
             productionLineId: eventData.productionLineId,
             type: eventData.type,
             sowingDate: moment(eventData.sowingDate).toDate()
@@ -461,6 +462,7 @@ class EditEvent extends React.Component<Props, State> {
         <Form.Select required label={strings.labelHarvestType} name="type" options={harvestTypeOptions} value={data.type} onChange={this.handleDataChange} />
         <Form.Input required label={strings.labelGutterCount} name="gutterCount" type="number" value={data.gutterCount} onChange={this.handleDataChange} />
         <Form.Select required label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
+        <Form.Input required label={strings.labelGutterHoleCount} name="gutterHoleCount" type="number" value={data.gutterHoleCount} onChange={this.handleDataChange} />
       </React.Fragment>
     )
   }

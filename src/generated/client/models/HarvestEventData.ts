@@ -20,6 +20,12 @@ import { exists, mapValues } from '../runtime';
  */
 export interface HarvestEventData {
     /**
+     * Number of holes in gutter used in planting
+     * @type {number}
+     * @memberof HarvestEventData
+     */
+    gutterHoleCount?: number;
+    /**
      * 
      * @type {number}
      * @memberof HarvestEventData
@@ -65,6 +71,7 @@ export function HarvestEventDataFromJSONTyped(json: any, ignoreDiscriminator: bo
     }
     return {
         
+        'gutterHoleCount': !exists(json, 'gutterHoleCount') ? undefined : json['gutterHoleCount'],
         'gutterCount': !exists(json, 'gutterCount') ? undefined : json['gutterCount'],
         'type': !exists(json, 'type') ? undefined : json['type'],
         'productionLineId': !exists(json, 'productionLineId') ? undefined : json['productionLineId'],
@@ -81,6 +88,7 @@ export function HarvestEventDataToJSON(value?: HarvestEventData | null): any {
     }
     return {
         
+        'gutterHoleCount': value.gutterHoleCount,
         'gutterCount': value.gutterCount,
         'type': value.type,
         'productionLineId': value.productionLineId,

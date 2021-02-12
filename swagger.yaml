@@ -2277,6 +2277,10 @@ components:
         - amount
         - sowingDate
       properties:
+        gutterHoleCount:
+          type: "integer"
+          format: "int32"
+          description: "Number of holes in gutter used in planting"
         gutterCount:
           type: "integer"
           format: "int32"
