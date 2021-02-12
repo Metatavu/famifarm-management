@@ -168,7 +168,7 @@
   "showPassiveSeedBatches": "Show non-active seed batches",
   "seedBatchState": "Seed batch is active",
   "returnToPreviousList": "Return to the previous list",
-
+  "labelHarvestType" : "Harvest type",
   "printPacking": "Print packing label",
   "print": "Print",
   "selectPrinter": "Select printer",
