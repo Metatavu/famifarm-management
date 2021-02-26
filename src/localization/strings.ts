@@ -230,6 +230,9 @@ export interface IStrings extends LocalizedStringsMethods {
   events: string
   total: string
   labelSowingDate: string
+
+  showInActiveProductsLabel: string
+  activeProductLabel: string
 }
 
 const strings: IStrings = new LocalizedStrings({

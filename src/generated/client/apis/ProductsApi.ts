@@ -38,6 +38,7 @@ export interface FindProductRequest {
 export interface ListProductsRequest {
     firstResult?: number;
     maxResults?: number;
+    includeInActiveProducts?: boolean;
     includeSubcontractorProducts?: boolean;
 }
 
@@ -179,6 +180,10 @@ export class ProductsApi extends runtime.BaseAPI {
 
         if (requestParameters.maxResults !== undefined) {
             queryParameters['maxResults'] = requestParameters.maxResults;
+        }
+
+        if (requestParameters.includeInActiveProducts !== undefined) {
+            queryParameters['includeInActiveProducts'] = requestParameters.includeInActiveProducts;
         }
 
         if (requestParameters.includeSubcontractorProducts !== undefined) {

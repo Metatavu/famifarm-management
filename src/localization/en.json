@@ -207,5 +207,8 @@
   "events": "Events",
   "packingWastageStatus": "Wastage",
   "total": "Total",
-  "labelSowingDate": "Sowing date"
+  "labelSowingDate": "Sowing date",
+
+  "showInActiveProductsLabel": "Show inactive products",
+  "activeProductLabel": "Active"
 }

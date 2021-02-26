@@ -201,6 +201,19 @@ class EditProduct extends React.Component<Props, State> {
     })
   }
 
+
+  /**
+   * Sets the active boolean
+   * 
+   * @param e event 
+   * @param { checked } new value
+   */
+  updateIsActive = (e: any, { checked }: CheckboxProps) => {
+    this.setState({
+      product: { ...this.state.product!, active: checked || false }
+    })
+  }
+
   /**
    * Render edit product view
    */
@@ -260,6 +273,12 @@ class EditProduct extends React.Component<Props, State> {
                 onChange={ this.updateIsSubcontractorProduct }
                 checked={ this.state.product? this.state.product.isSubcontractorProduct : undefined }
                 label={ strings.subcontractorProduct }
+              />
+              <Form.Checkbox
+                required
+                checked={ this.state.product ? this.state.product.active : undefined }
+                onChange={ this.updateIsActive }
+                label={ strings.activeProductLabel }
               />
               <Message
                 success

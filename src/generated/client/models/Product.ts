@@ -50,6 +50,12 @@ export interface Product {
      * @memberof Product
      */
     isSubcontractorProduct: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof Product
+     */
+    active?: boolean;
 }
 
 export function ProductFromJSON(json: any): Product {
@@ -66,6 +72,7 @@ export function ProductFromJSONTyped(json: any, ignoreDiscriminator: boolean): P
         'name': !exists(json, 'name') ? undefined : ((json['name'] as Array<any>).map(LocalizedValueFromJSON)),
         'defaultPackageSizeId': !exists(json, 'defaultPackageSizeId') ? undefined : json['defaultPackageSizeId'],
         'isSubcontractorProduct': json['isSubcontractorProduct'],
+        'active': !exists(json, 'active') ? undefined : json['active'],
     };
 }
 
@@ -82,6 +89,7 @@ export function ProductToJSON(value?: Product | null): any {
         'name': value.name === undefined ? undefined : ((value.name as Array<any>).map(LocalizedValueToJSON)),
         'defaultPackageSizeId': value.defaultPackageSizeId,
         'isSubcontractorProduct': value.isSubcontractorProduct,
+        'active': value.active,
     };
 }
 

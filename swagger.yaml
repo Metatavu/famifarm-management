@@ -1141,6 +1141,12 @@ paths:
           schema:
             type: integer
             format: int32
+        - name: includeInActiveProducts
+          in: query
+          description: "Should inactive products be included. If this parameter is left undefined, it will interpreted as false" 
+          required: false
+          schema:
+            type: boolean
         - name: includeSubcontractorProducts
           in: query
           description: "Should subcontractor products be included. If this parameter is left undefined, it will interpreted as false" 
@@ -2059,6 +2065,8 @@ components:
           type: "string"
           format: "uuid"
         isSubcontractorProduct:
+          type: "boolean"
+        active:
           type: "boolean"
 
     Pest:

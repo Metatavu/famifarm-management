@@ -206,5 +206,8 @@
     "events": "Tapahtumat",
     "packingWastageStatus": "Poisheitto",
     "total": "Yhteensä",
-    "labelSowingDate": "Kylvöpäivä"
+    "labelSowingDate": "Kylvöpäivä",
+
+    "showInActiveProductsLabel": "Näytä ei-aktiiviset tuotteet",
+    "activeProductLabel": "Aktiivinen"
   }
