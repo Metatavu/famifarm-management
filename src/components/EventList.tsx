@@ -19,7 +19,8 @@ import {
   Form,
   InputOnChangeData,
   TextAreaProps,
-  Visibility
+  Visibility,
+  Table
 } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import LocalizedUtils from "src/localization/localizedutils";
@@ -85,20 +86,33 @@ class EventList extends React.Component<Props, State> {
     }
   }
 
-  private getEventName = (event: Event): string => {
+  private renderEventTableRow = (event: Event) => {
     const products = this.props.products || [];
     const eventProduct = products.find((product) => product.id === event.productId);
     const productName = eventProduct ? LocalizedUtils.getLocalizedValue(eventProduct.name) : event.id;
-    const batchDate = moment(event.startTime).format("DD.MM.YYYY");
+    const startTime = moment(event.startTime).format("DD.MM.YYYY");
     const eventTypeString = strings[`phase${event.type}`];
-    let extra = "";
-    if (event.type == EventType.Sowing) {
-      const productionLine = this.state.productionLines.find(line => line.id == (event.data as SowingEventData).productionLineId);
-      extra = productionLine && productionLine.lineNumber ? `- ${strings.productionLine}: ${productionLine.lineNumber}` : "";
-    }
+    const eventData = event.data as any;
+    const productionLine = eventData.productionLineId ? this.state.productionLines.find(line => line.id == eventData.productionLineId) : undefined;
+    const productionLineText = productionLine ? productionLine.lineNumber || "" : "";
+    const gutterCountText = eventData.gutterCount !== undefined ? eventData.gutterCount : "";
+    const gutterHoleCountText = eventData.gutterHoleCount !== undefined ? eventData.gutterHoleCount : "";
 
-
-    return `${productName} - ${eventTypeString} - ${batchDate} ${extra}`;
+    return (
+      <Table.Row key={event.id}>
+        <Table.Cell>{ productName }</Table.Cell>
+        <Table.Cell>{ eventTypeString }</Table.Cell>
+        <Table.Cell>{ startTime }</Table.Cell>
+        <Table.Cell>{ productionLineText }</Table.Cell>
+        <Table.Cell>{ gutterCountText }</Table.Cell>
+        <Table.Cell>{ gutterHoleCountText }</Table.Cell>
+        <Table.Cell textAlign='right'>
+          <NavLink to={`/events/${event.id}`}>
+              <Button className="submit-button">{strings.open}</Button>
+          </NavLink>
+        </Table.Cell>
+      </Table.Row>
+    )
   }
 
   /**
@@ -119,31 +133,7 @@ class EventList extends React.Component<Props, State> {
       }
     }
 
-    /*const statusButtons = ["OPEN", "CLOSED", "NEGATIVE"].map((status: string) => {
-      return (
-        <Button onClick={() => this.handleButtonClick(status)} key={status} active={this.state.status === status} >
-          {strings.getString(`batchStatusButton${status}`, strings.getLanguage())}
-          {status === "NEGATIVE" && this.state.errorCount > 0 &&
-            <Label style={{position: "absolute", top: "5px"}} size="mini" circular color='red'>{this.state.errorCount}</Label>
-          }
-        </Button>
-      );
-    });*/
-
-    const batches = (this.props.events || []).map((event, i) => {
-      return (
-        <List.Item style={i % 2 == 0 ? {backgroundColor: "#ddd"} : {}} key={event.id}>
-          <List.Content floated='right'>
-            <NavLink to={`/events/${event.id}`}>
-              <Button className="submit-button">{strings.open}</Button>
-            </NavLink>
-          </List.Content>
-          <List.Content>
-            <List.Header style={{paddingTop: "10px"}}>{this.getEventName(event)}</List.Header>
-          </List.Content>
-        </List.Item>
-      );
-    });
+    const tableRows = (this.props.events || []).map((event, i) => this.renderEventTableRow(event));
 
     const { eventListFilters } = this.props;
     const productText = eventListFilters && eventListFilters.product ? LocalizedUtils.getLocalizedValue(eventListFilters.product.name) : strings.selectProduct
@@ -175,9 +165,22 @@ class EventList extends React.Component<Props, State> {
         <Grid.Row>
           <Grid.Column>
           <Visibility onUpdate={this.loadMoreEvents}>
-            <List divided animated verticalAlign='middle'>
-              {batches}
-            </List>
+            <Table selectable>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>{ strings.product }</Table.HeaderCell>
+                  <Table.HeaderCell>{ strings.labelEventType }</Table.HeaderCell>
+                  <Table.HeaderCell>{ strings.labelStartTime }</Table.HeaderCell>
+                  <Table.HeaderCell>{ strings.labelProductionLine }</Table.HeaderCell>
+                  <Table.HeaderCell>{ strings.labelGutterCount }</Table.HeaderCell>
+                  <Table.HeaderCell>{ strings.labelGutterHoleCount }</Table.HeaderCell>
+                  <Table.HeaderCell></Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                { tableRows }
+              </Table.Body>
+            </Table>
           </Visibility>
           </Grid.Column>
         </Grid.Row>
@@ -185,22 +188,6 @@ class EventList extends React.Component<Props, State> {
       </Grid>
     );
   }
-
-  /**
-   * Handles status button click
-   */
-  /*private handleButtonClick = (status: string) => {
-    this.setState({
-      status: status
-    });
-    this.updateBatches(status, 0, this.props.eventsListDate, this.props.eventsProduct, this.props.eventsProductName).catch((err) => {
-      this.props.onError({
-        message: strings.defaultApiErrorMessage,
-        title: strings.defaultApiErrorTitle,
-        exception: err
-      });
-    });
-  }*/
 
   /**
    * Handles changing date
