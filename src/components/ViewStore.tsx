@@ -311,17 +311,19 @@ class ViewStore extends React.Component<Props, State> {
         duration={ 250 }
         height={ isOpen ? 'auto' : 0 }
       >
-        <Table
-          key={ productData.product.id }
-          style={{ borderRadius: 0, border: "none" }}
-        >
-          <Table.Header>
-            { this.renderListItemTableHeader(productData) }
-          </Table.Header>
-          <Table.Body>
-            { this.renderListItemTableBody(productData) }
-          </Table.Body>
-        </Table>
+        <div style={{ overflowX: "auto" }}>
+          <Table
+            key={ productData.product.id }
+            style={{ borderRadius: 0, border: "none" }}
+          >
+            <Table.Header>
+              { this.renderListItemTableHeader(productData) }
+            </Table.Header>
+            <Table.Body>
+              { this.renderListItemTableBody(productData) }
+            </Table.Body>
+          </Table>
+        </div>
       </AnimateHeight>
     );
   }
