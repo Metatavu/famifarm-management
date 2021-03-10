@@ -13,8 +13,8 @@ import {
   Grid,
   Button,
   Form,
-  InputOnChangeData,
-  CheckboxProps
+  CheckboxProps,
+  DropdownProps
 } from "semantic-ui-react";
 import LocalizedUtils from "src/localization/localizedutils";
 import LocalizedValueInput from "./LocalizedValueInput";
@@ -39,7 +39,11 @@ interface State {
   redirect: boolean;
 }
 
+/**
+ * Create product screen
+ */
 class CreateProduct extends React.Component<Props, State> {
+
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -48,14 +52,12 @@ class CreateProduct extends React.Component<Props, State> {
         isSubcontractorProduct: false
       }
     };
-
-    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   /**
-   * Component did mount life-sycle method
+   * Component did mount life cycle method
    */
-  public async componentDidMount() {
+  public componentDidMount = async () => {
     try {
       if (!this.props.keycloak) {
         return;
@@ -76,22 +78,24 @@ class CreateProduct extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  private async handleSubmit() {
-    try {
-      if (!this.props.keycloak) {
-        return;
-      }
+  private handleSubmit = async () => {
+    const { keycloak } = this.props;
+
+    if (!keycloak) {
+      return;
+    }
+
+    try {  
+      const productsService = await Api.getProductsService(keycloak);  
+      await productsService.createProduct({
+        product: {
+          name: this.state.productData.name,
+          defaultPackageSizeIds: this.state.productData.defaultPackageSizeIds,
+          isSubcontractorProduct: this.state.productData.isSubcontractorProduct!
+        }
+      });
   
-      const productObject: Product = {
-        name: this.state.productData.name,
-        defaultPackageSizeId: this.state.productData.defaultPackageSizeId,
-        isSubcontractorProduct: this.state.productData.isSubcontractorProduct!
-      };
-  
-      const productsService = await Api.getProductsService(this.props.keycloak);  
-      await productsService.createProduct({product: productObject});
-  
-      this.setState({redirect: true});
+      this.setState({ redirect: true });
     } catch (e) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
@@ -105,11 +109,14 @@ class CreateProduct extends React.Component<Props, State> {
    * Handle default package size change
    * 
    * @param e event
-   * @param {value} value
+   * @param value updated list of package sizes from DropdownProps
    */
-  onUpdateDefaultPackageSize = (e: any, { value }: InputOnChangeData) => {
+  private onUpdateDefaultPackageSize = (e: any, { value }: DropdownProps) => {
     this.setState({
-      productData: {...this.state.productData, defaultPackageSizeId: value}
+      productData: {
+        ...this.state.productData,
+        defaultPackageSizeIds: value as string[]
+      }
     });
 }
 
@@ -118,73 +125,85 @@ class CreateProduct extends React.Component<Props, State> {
    * 
    * @param name localized entry representing name
    */
-  updateName = (name: LocalizedValue[]) => {
+  private updateName = (name: LocalizedValue[]) => {
     this.setState({
-      productData: {...this.state.productData, name: name}
+      productData: {...this.state.productData, name }
     });
   }
 
   /**
-   * Sets the isSubcontractorProduct-boolean
+   * Sets the isSubcontractorProduct boolean
    * 
-   * @param e event 
-   * @param { checked } new value
+   * @param e event
+   * @param checked checked state from CheckboxProps
    */
-  updateIsSubcontractorProduct = (e: any, { checked }: CheckboxProps) => {
+  private updateIsSubcontractorProduct = (e: any, { checked }: CheckboxProps) => {
     this.setState({
-      productData: { ...this.state.productData, isSubcontractorProduct: checked || false }
+      productData: {
+        ...this.state.productData,
+        isSubcontractorProduct: checked || false
+      }
     })
   }
 
   /**
    * Render product create view
    */
-  render() {
-    if (this.state.redirect) {
-      return <Redirect to="/products" push={true} />;
+  public render = () => {
+    const { packageSizes } = this.props;
+    const { redirect, productData } = this.state;
+
+    if (redirect) {
+      return <Redirect push to="/products"/>;
     }
 
-    const packageSizeOptions = (this.props.packageSizes || []).map((packageSize) => {
-      return {
-        key: packageSize.id,
-        text: LocalizedUtils.getLocalizedValue(packageSize.name),
-        value: packageSize.id
-      };
-    });
+    const packageSizeOptions = (packageSizes || []).map(packageSize => ({
+      key: packageSize.id,
+      text: LocalizedUtils.getLocalizedValue(packageSize.name),
+      value: packageSize.id
+    }));
 
     return (
       <Grid>
         <Grid.Row className="content-page-header-row">
-          <Grid.Column width={8}>
-            <h2>{strings.newProduct}</h2>
+          <Grid.Column width={ 8 }>
+            <h2>{ strings.newProduct }</h2>
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
-          <Grid.Column width={8}>
+          <Grid.Column width={ 8 }>
             <FormContainer>
               <Form.Field required>
-                <label>{strings.productName}</label>
+                <label>{ strings.productName }</label>
                 <LocalizedValueInput 
-                  onValueChange={this.updateName}
-                  value={this.state.productData.name}
-                  languages={["fi", "en"]}
+                  onValueChange={ this.updateName }
+                  value={ productData.name }
+                  languages={[ "fi", "en" ]}
                 />
               </Form.Field>
               <Form.Select 
                 fluid
-                required 
-                label={strings.packageSize} 
-                options={packageSizeOptions} 
-                placeholder={strings.packageSize} 
-                onChange={this.onUpdateDefaultPackageSize}
+                required
+                multiple
+                label={ strings.packageSize }
+                options={ packageSizeOptions }
+                placeholder={ strings.packageSize }
+                value={ productData.defaultPackageSizeIds || [] }
+                onChange={ this.onUpdateDefaultPackageSize }
               />
               <Form.Checkbox
                 required
-                checked={ this.state.productData.isSubcontractorProduct }
+                checked={ productData.isSubcontractorProduct }
                 onChange={ this.updateIsSubcontractorProduct }
                 label={ strings.subcontractorProduct }
               />
-              <Button className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save} </Button>
+              <Button
+                className="submit-button"
+                onClick={ this.handleSubmit }
+                type="submit"
+              >
+                { strings.save }
+              </Button>
             </FormContainer>
           </Grid.Column>
         </Grid.Row>
@@ -198,25 +217,21 @@ class CreateProduct extends React.Component<Props, State> {
  * 
  * @param state store state
  */
-export function mapStateToProps(state: StoreState) {
-  return {
-    products: state.products,
-    product: state.product,
-    packageSizes: state.packageSizes
-  };
-}
+const mapStateToProps = (state: StoreState) => ({
+  products: state.products,
+  product: state.product,
+  packageSizes: state.packageSizes
+});
 
 /**
  * Redux mapper for mapping component dispatches 
  * 
  * @param dispatch dispatch method
  */
-export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
-  return {
-    onProductCreated: (product: Product) => dispatch(actions.productCreated(product)),
-    onPackageSizesFound: (packageSizes: PackageSize[]) => dispatch(actions.packageSizesFound(packageSizes)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
-  };
-}
+const mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({
+  onProductCreated: (product: Product) => dispatch(actions.productCreated(product)),
+  onPackageSizesFound: (packageSizes: PackageSize[]) => dispatch(actions.packageSizesFound(packageSizes)),
+  onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateProduct);
