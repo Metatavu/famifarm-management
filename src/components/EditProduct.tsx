@@ -215,7 +215,6 @@ class EditProduct extends React.Component<Props, State> {
       value: packageSize.id
     }));
 
-    console.log(product ? product.defaultPackageSizeIds || [] : []);
 
     return (
       <Grid>
