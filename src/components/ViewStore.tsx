@@ -158,7 +158,7 @@ class ViewStore extends React.Component<Props, State> {
 
     if (loading) {
       return (
-        <Grid style={{paddingTop: "100px"}} centered>
+        <Grid style={{ paddingTop: "100px" }} centered>
           <Loader inline active size="medium" />
         </Grid>
       );
@@ -418,7 +418,8 @@ class ViewStore extends React.Component<Props, State> {
   ): BasicPackingProduct[] => {
     return products.map(product => {
       const productPackings = packings.filter(packing => packing.productId === product.id);
-      const packingSizeData = packageSizes.map(packageSize => {
+      const productPackageSizes = this.getProductPackageSizes(packageSizes, product);
+      const packingSizeData = productPackageSizes.map(packageSize => {
         const packingsSizePackingProducts = productPackings.filter(packing => packing.packageSizeId === packageSize.id);
           const totalSum = packingsSizePackingProducts
             .map(p => p.packedCount || 0)
@@ -454,6 +455,21 @@ class ViewStore extends React.Component<Props, State> {
       const name = campaigns.find(campaign => campaign.id == campaignId)!!.name;
 
       return { amountInStore, name };
+    });
+  }
+
+  /**
+   * Filter package sizes by default package sizes of product
+   *
+   * @param packageSizes list of package sizes
+   * @param product product
+   */
+  private getProductPackageSizes = (packageSizes: PackageSize[], product: Product) => {
+    return packageSizes.filter(packageSize => {
+      const { defaultPackageSizeIds } = product;
+      return defaultPackageSizeIds ?
+        defaultPackageSizeIds.some(id => id === packageSize.id) :
+        false;
     });
   }
 

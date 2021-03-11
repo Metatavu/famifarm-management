@@ -42,14 +42,20 @@ interface Props {
  * Interface representing component state
  */
 interface State {
-  packings: Packing[]
-  dateBefore?: string
-  dateAfter?: string
-  selectedProduct?: string
-  selectedProductName?: string
-  selectedStatus?: PackingState
-  loading: boolean
-  errorCount: number
+  packings: Packing[];
+  filters: Filters;
+  loading: boolean;
+  errorCount: number;
+}
+
+/**
+ * Interface describing filters
+ */
+interface Filters {
+  productId: string;
+  packingState: PackingState;
+  dateBefore?: string;
+  dateAfter?: string;
 }
 
 /**
@@ -61,16 +67,20 @@ class PackingList extends React.Component<Props, State> {
     this.state = {
       packings: [],
       loading: false,
-      errorCount: 0
+      errorCount: 0,
+      filters: {
+        productId: "all-products",
+        packingState: PackingState.InStore
+      }
     };
   }
 
   /**
-   * Component did mount life-sycle event
+   * Component did mount life cycle event
    */
   public async componentDidMount() {
     try {
-      await this.updatePackings();
+      await this.updatePackings(this.state.filters);
     } catch (e) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
@@ -86,9 +96,11 @@ class PackingList extends React.Component<Props, State> {
    * @param packing packing 
    */
   private getPackingName = (packing: Packing): string => {
-    const products = this.props.products || [];
-    const packingProduct = products.find((product) => product.id === packing.productId);
-    const productName = packingProduct ? LocalizedUtils.getLocalizedValue(packingProduct.name) : packing.id;
+    const { products } = this.props;
+    const packingProduct = (products || []).find(product => product.id === packing.productId);
+    const productName = packingProduct ?
+      LocalizedUtils.getLocalizedValue(packingProduct.name) :
+      packing.id;
     const packingDate = moment(packing.time).format("DD.MM.YYYY");
 
     return `${productName} - ${packingDate}`;
@@ -100,8 +112,8 @@ class PackingList extends React.Component<Props, State> {
    * @param packing packing
    */
   private getCampaignPackingName = (packing: Packing): string => {
-    const campaigns = this.props.campaigns || [];
-    const packingCampaign = campaigns.find((campaign) => campaign.id === packing.campaignId);
+    const { campaigns } = this.props;
+    const packingCampaign = (campaigns || []).find(campaign => campaign.id === packing.campaignId);
     const campaignName = packingCampaign ? packingCampaign.name : packing.id;
     const packingDate = moment(packing.time).format("DD.MM.YYYY");
     
@@ -112,20 +124,31 @@ class PackingList extends React.Component<Props, State> {
    * Render packing list view
    */
   public render() {
-    if (this.state.loading) {
+    const { packings } = this.props;
+    const {
+      loading,
+      filters
+    } = this.state;
+
+    if (loading) {
       return (
-        <Grid style={{paddingTop: "100px"}} centered>
+        <Grid centered style={{ paddingTop: "100px" }}>
           <Loader inline active size="medium" />
         </Grid>
       );
     }
 
-    const packings = (this.props.packings || []).map((packing, i) => {
+    const packingListItems = (packings || []).map((packing, i) => {
       return (
-        <List.Item style={i % 2 == 0 ? {backgroundColor: "#ddd"} : {}} key={packing.id}>
+        <List.Item
+          key={ packing.id }
+          style={{ backgroundColor: i % 2 == 0 ? "#ddd" : "initial" }}
+        >
           <List.Content floated='right'>
-            <NavLink to={`/packings/${packing.id}`}>
-              <Button className="submit-button">{strings.open}</Button>
+            <NavLink to={ `/packings/${packing.id}` }>
+              <Button className="submit-button">
+                { strings.open }
+              </Button>
             </NavLink>
           </List.Content>
           <List.Content>
@@ -140,36 +163,66 @@ class PackingList extends React.Component<Props, State> {
       );
     });
 
+    const filterStyles: React.CSSProperties = {
+      display:"inline-block",
+      paddingTop: "2rem",
+      paddingBottom: "2rem",
+      paddingRight: "2rem"
+    };
+
     return (
       <Grid>
-        <Grid.Row className="content-page-header-row" style={{flex: 1,justifyContent: "space-between", paddingLeft: 10, paddingRight: 10}}>
-          <h2>{strings.packings}</h2>
+        <Grid.Row
+          className="content-page-header-row"
+          style={{ flex: 1,justifyContent: "space-between", paddingLeft: 10, paddingRight: 10 }}
+        >
+          <h2>{ strings.packings }</h2>
           <NavLink to="/createPacking">
-            <Button className="submit-button">{strings.newPacking}</Button>
+            <Button className="submit-button">{ strings.newPacking }</Button>
           </NavLink>
         </Grid.Row>
         <Grid.Row>
           <Form>
             <Form.Field>
-              <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem", paddingRight: "2rem"}}>
-                <label>{strings.dateBefore}</label>
-                <DateInput dateFormat="DD.MM.YYYY" onChange={this.onChangeDateBefore} name="dateBefore" value={this.state.dateBefore ? moment(this.state.dateBefore).format("DD.MM.YYYY") : ""} />
+              <div style={ filterStyles }>
+                <label>{ strings.dateBefore }</label>
+                <DateInput
+                  dateFormat="DD.MM.YYYY"
+                  onChange={ this.onChangeDateBefore }
+                  name="dateBefore"
+                  value={ filters.dateBefore ? moment(filters.dateBefore).format("DD.MM.YYYY") : "" }
+                />
               </div>
-              <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem", paddingRight: "2rem"}}>
-                <label>{strings.dateAfter}</label>
-                <DateInput dateFormat="DD.MM.YYYY" onChange={this.onChangeDateAfter} name="dateAfter" value={this.state.dateAfter ? moment(this.state.dateAfter).format("DD.MM.YYYY") : ""} />
+              <div style={ filterStyles }>
+                <label>{ strings.dateAfter }</label>
+                <DateInput
+                  dateFormat="DD.MM.YYYY"
+                  onChange={ this.onChangeDateAfter }
+                  name="dateAfter"
+                  value={ filters.dateAfter ? moment(filters.dateAfter).format("DD.MM.YYYY") : "" }
+                />
               </div>
-              <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem", paddingRight: "2rem"}}>
-                <label>{strings.productName}</label>
-                <Form.Select name="product" options={this.renderOptions()} text={this.state.selectedProductName ? this.state.selectedProductName : strings.selectProduct} onChange={this.onChangeProduct} />
+              <div style={ filterStyles }>
+                <label>{ strings.productName }</label>
+                <Form.Select
+                  name="product"
+                  options={ this.renderOptions() }
+                  onChange={ this.onChangeProduct }
+                  value={ filters.productId || "" }
+                />
               </div>
-              <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem"}}>
-                <label>{strings.packingStatus}</label>
-                <Form.Select name="status" options={[
-                  {value: "IN_STORE", text: strings.packingStoreStatus},
-                  {value: "REMOVED",  text: strings.packingRemovedStatus},
-                  {value: "WASTAGE",  text: strings.packingWastageStatus}
-                ]} text={this.state.selectedStatus ? this.resolveLocalizedPackingStatus(this.state.selectedStatus) : strings.selectPackingStatus} onChange={this.onChangeStatus} />
+              <div style={{ ...filterStyles, paddingRight: 0 }}>
+                <label>{ strings.packingStatus }</label>
+                <Form.Select
+                  name="status"
+                  options={
+                    Object.keys(PackingState).map(state => ({
+                      value: PackingState[state], text: this.resolveLocalizedPackingState(PackingState[state])
+                    }))
+                  }
+                  value={ filters.packingState }
+                  onChange={ this.onChangeState }
+                />
               </div>
             </Form.Field>
           </Form>
@@ -177,7 +230,7 @@ class PackingList extends React.Component<Props, State> {
         <Grid.Row>
           <Grid.Column>
             <List divided animated verticalAlign='middle'>
-              {packings}
+              { packingListItems }
             </List>
           </Grid.Column>
         </Grid.Row>
@@ -186,35 +239,34 @@ class PackingList extends React.Component<Props, State> {
   }
 
   /**
-   * Returns a localized name for packign status
+   * Returns a localized name for packing state
    * 
-   * @param status 
+   * @param state packing state
    */
-  private resolveLocalizedPackingStatus = (status: string): string => {
-    if (status == "IN_STORE") {
-      return strings.packingStoreStatus;
-    } 
-
-    if (status == "REMOVED") {
-      return strings.packingRemovedStatus;
+  private resolveLocalizedPackingState = (state: string): string => {
+    switch (state as PackingState) {
+      case PackingState.InStore: return strings.packingStoreStatus;
+      case PackingState.Removed: return strings.packingRemovedStatus;
+      case PackingState.Wastage: return strings.packingWastageStatus;
+      default: return strings.selectPackingStatus;
     }
-
-    if (status == "WASTAGE") {
-      return strings.packingWastageStatus;
-    }
-
-
-    return strings.selectPackingStatus;
   }
 
   /**
-   * Handles changing status
+   * Handles changing packing state
+   *
+   * @param e event
+   * @param value value from InputOnChangeData
    */
-  private onChangeStatus = async (e: any, { value }: InputOnChangeData) => {
-    const packingStatus:PackingState = value as PackingState;
-    await this.setState({selectedStatus: packingStatus});
+  private onChangeState = async (e: any, { value }: InputOnChangeData) => {
+    const updatedFilters: Filters = {
+      ...this.state.filters,
+      packingState: value as PackingState
+    };
 
-    await this.updatePackings().catch((err) => {
+    this.setState({ filters: updatedFilters });
+
+    await this.updatePackings(updatedFilters).catch(err => {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -224,11 +276,19 @@ class PackingList extends React.Component<Props, State> {
   }
   /**
    * Handles changing date
+   *
+   * @param e event
+   * @param value value from InputOnChangeData
    */
   private onChangeDateAfter = async (e: any, { value }: InputOnChangeData) => {
-    await this.setState({dateAfter: moment(value, "DD.MM.YYYY").toISOString()});
+    const updatedFilters: Filters = {
+      ...this.state.filters,
+      dateAfter: moment(value, "DD.MM.YYYY").toISOString()
+    };
 
-    await this.updatePackings().catch((err) => {
+    this.setState({ filters: updatedFilters });
+
+    await this.updatePackings(updatedFilters).catch(err => {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -239,11 +299,18 @@ class PackingList extends React.Component<Props, State> {
 
   /**
    * Handles changing date
+   *
+   * @param e event
+   * @param value value from InputOnChangeData
    */
   private onChangeDateBefore = async (e: any, { value }: InputOnChangeData) => {
-    await this.setState({dateBefore: moment(value, "DD.MM.YYYY").toISOString()});
+    const updatedFilters: Filters = {
+      ...this.state.filters,
+      dateBefore: moment(value, "DD.MM.YYYY").toISOString()
+    };
+    this.setState({ filters: updatedFilters });
 
-    await this.updatePackings().catch((err) => {
+    await this.updatePackings(updatedFilters).catch((err) => {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -254,21 +321,25 @@ class PackingList extends React.Component<Props, State> {
 
   /**
    * Handles changing selected product
+   *
+   * @param e event
+   * @param value value from event data
    */
-  private onChangeProduct = async (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
-    let productName = "";
-    if (this.props.products) {
-      let object = this.props.products.find(product => product.id === value);
-      if (object) {
-        productName = LocalizedUtils.getLocalizedValue(object.name) || "";
-      }
-    }
-    await this.setState({
-      selectedProduct: value !== "" ? String(value) : undefined,
-      selectedProductName: productName
-    });
+  private onChangeProduct = async (e: any, { value }: InputOnChangeData | TextAreaProps) => {
+    const { products } = this.props;
 
-    await this.updatePackings().catch((err) => {
+    if (!products) {
+      return;
+    }
+
+    const updatedFilters: Filters = {
+      ...this.state.filters,
+      productId: value ? `${value}` : "all-products"
+    };
+
+    this.setState({ filters: updatedFilters });
+
+    await this.updatePackings(updatedFilters).catch((err) => {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -281,41 +352,55 @@ class PackingList extends React.Component<Props, State> {
    * Renders dropdown options
    */
   private renderOptions = () => {
-    if (this.props.products) {
-      let options = [{text: strings.allProducts, value: ""}];
-      for (let i = 0; i < this.props.products.length; i++) {
-        options.push({text: LocalizedUtils.getLocalizedValue(this.props.products[i].name) || "", value: this.props.products[i].id || ""});
-      }
-      return options;
-    } else {
-      return [{text:"", value:""}];
+    const { products } = this.props;
+
+    const options = [{ text: strings.allProducts, value: "all-products" }];
+
+    if (products) {
+      options.push(
+        ...products.map(({ name, id }) => ({
+          text: LocalizedUtils.getLocalizedValue(name) || "",
+          value: id || ""
+        }))
+      );
     }
+
+    return options;
   }
 
   /**
    * Updates packings list
+   *
+   * @param filters filters
    */
-  private updatePackings = async () => {
-    if (!this.props.keycloak) {
+  private updatePackings = async (filters: Filters) => {
+    const { keycloak, onPackingsFound, onProductsFound, onCampaignsFound } = this.props;
+    const { productId, packingState, dateAfter, dateBefore } = filters;
+    if (!keycloak) {
       return;
     }
 
-    this.setState({loading: true});
-    const [packingsService, productsService, camapginsService] = await Promise.all([
-      Api.getPackingsService(this.props.keycloak),
-      Api.getProductsService(this.props.keycloak),
-      Api.getCampaignsService(this.props.keycloak)
+    this.setState({ loading: true });
+    const [ packingsService, productsService, campaignsService ] = await Promise.all([
+      Api.getPackingsService(keycloak),
+      Api.getProductsService(keycloak),
+      Api.getCampaignsService(keycloak)
     ]);
 
     const [packings, products, campaigns] = await Promise.all([
-      packingsService.listPackings({productId: this.state.selectedProduct, status: this.state.selectedStatus, createdAfter: this.state.dateAfter, createdBefore: this.state.dateBefore}),
-      productsService.listProducts({}),
-      camapginsService.listCampaigns()
+      packingsService.listPackings({
+        productId: productId !== "all-products" ? productId : undefined,
+        status: packingState,
+        createdAfter: dateAfter,
+        createdBefore: dateBefore
+      }),
+      productsService.listProducts({ }),
+      campaignsService.listCampaigns()
     ]);
-    this.props.onPackingsFound && this.props.onPackingsFound(packings);
-    this.props.onProductsFound && this.props.onProductsFound(products);
-    this.props.onCampaignsFound && this.props.onCampaignsFound(campaigns);
-    this.setState({loading: false})
+    onPackingsFound && onPackingsFound(packings);
+    onProductsFound && onProductsFound(products);
+    onCampaignsFound && onCampaignsFound(campaigns);
+    this.setState({ loading: false })
   }
 }
 
@@ -324,26 +409,22 @@ class PackingList extends React.Component<Props, State> {
  * 
  * @param state store state
  */
-export function mapStateToProps(state: StoreState) {
-  return {
-    products: state.products,
-    packings: state.packings,
-    campaigns: state.campaigns
-  };
-}
+const mapStateToProps = (state: StoreState) => ({
+  products: state.products,
+  packings: state.packings,
+  campaigns: state.campaigns
+});
 
 /**
  * Redux mapper for mapping component dispatches 
  * 
  * @param dispatch dispatch method
  */
-export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
-  return {
-    onProductsFound: (products: Product[]) => dispatch(actions.productsFound(products)),
-    onPackingsFound: (packings: Packing[]) => dispatch(actions.packingsFound(packings)),
-    onCampaignsFound: (campaigns: Campaign[]) => dispatch(actions.campaignsFound(campaigns)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
-  };
-}
+const mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({
+  onProductsFound: (products: Product[]) => dispatch(actions.productsFound(products)),
+  onPackingsFound: (packings: Packing[]) => dispatch(actions.packingsFound(packings)),
+  onCampaignsFound: (campaigns: Campaign[]) => dispatch(actions.campaignsFound(campaigns)),
+  onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(PackingList);
