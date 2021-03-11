@@ -9,12 +9,11 @@ import LocalizedUtils from "src/localization/localizedutils";
 import { Accordion, Button, Grid, Icon, Loader, Table } from "semantic-ui-react";
 import strings from "src/localization/strings";
 import AnimateHeight from "react-animate-height";
-import SemanticDatepicker from "react-semantic-ui-datepickers";
-import 'react-semantic-ui-datepickers/dist/react-semantic-ui-datepickers.css';
+import { DateTimeInput } from 'semantic-ui-calendar-react';
 import * as Moment from 'moment';
 import { extendMoment } from 'moment-range';
-import fi from "react-semantic-ui-datepickers/dist/locales/fi-FI";
-import en from "react-semantic-ui-datepickers/dist/locales/en-US";
+import "moment/locale/fi";
+import "moment/locale/en-gb";
 
 /**
  * Moment extended with moment-range
@@ -94,6 +93,8 @@ class ViewStore extends React.Component<Props, State> {
       openIndexes: [],
       selectedDate: new Date()
     };
+
+    moment.locale(strings.getLanguage() === "fi" ? "fi" : "en-gb");
   }
 
   /**
@@ -179,17 +180,13 @@ class ViewStore extends React.Component<Props, State> {
               { strings.filterByDate }
             </span>
             <div style={{ marginRight: 10 }}>
-              <SemanticDatepicker
-                type="basic"
-                clearable={ false }
-                selected={ selectedDate }
-                firstDayOfWeek={ 1 }
-                locale={ strings.getLanguage() === "fi" ? fi : en }
-                onDateChange={ this.onSelectDate }
-                format={ `DD.MM.YYYY` }
-                placeholder={ strings.date }
+              <DateTimeInput
+                closable
+                closeOnMouseLeave={ false }
+                preserveViewMode={ false }
                 maxDate={ moment().endOf("day").toDate() }
-                size="medium"
+                onChange={ this.onSelectDate }
+                value={ moment(selectedDate).format("DD.MM.YYYY HH.mm") }
               />
             </div>
             <Button
@@ -531,20 +528,18 @@ class ViewStore extends React.Component<Props, State> {
   /**
    * Event handler for select date
    *
-   * @param newDate selected date
+   * @param e React change event
+   * @param updatedData updated data from DateTimeInput
    */
-  private onSelectDate = async (newDate: Date | Date[] | null) => {
-    if (newDate === null) {
+  private onSelectDate = async (e: React.ChangeEvent<HTMLInputElement>, updatedData: { name: string, value: string }) => {
+    if (!updatedData || !updatedData.value) {
       return;
     }
 
-    const selectedDate = Array.isArray(newDate) ? newDate[0] : newDate;
-
     this.setState({
-      selectedDate: moment(selectedDate).endOf("day").toDate()
+      selectedDate: moment(updatedData.value, "DD.MM.YYYY HH.mm").toDate()
     });
   }
-
 }
 
 /**
