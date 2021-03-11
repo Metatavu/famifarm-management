@@ -144,6 +144,7 @@
   "reportTypeItemSPREAD": "Spread",
   "reportTypeItemHARVESTED": "Harvested",
   "reportTypeItemPACKED": "Packed",
+  "reportTypeItemPACKED_CAMPAINGS": "Packed campaings",
   "reportTypeItemPRODUCT_PHASE_COUNT": "Products by phase",
   "userManagementLink": "User management",
   "accountUrl": "Account",

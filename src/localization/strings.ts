@@ -163,6 +163,7 @@ export interface IStrings extends LocalizedStringsMethods {
   reportTypeItemSPREAD: string
   reportTypeItemHARVESTED: string
   reportTypeItemPACKED: string
+  reportTypeItemPACKED_CAMPAINGS: string
   userManagementLink: string
   accountUrl: string
   logoutUrl: string
