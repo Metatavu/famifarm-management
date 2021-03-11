@@ -4,11 +4,22 @@ import { StoreState } from "src/types";
 import { Dispatch } from "redux";
 import * as actions from "../actions";
 import { connect } from "react-redux";
-import { PackageSize, Packing, PackingState, PackingType, Product } from "../generated/client";
+import { Campaign, PackageSize, Packing, PackingState, PackingType, Product } from "../generated/client";
 import LocalizedUtils from "src/localization/localizedutils";
-import { Grid, Loader, Table } from "semantic-ui-react";
+import { Accordion, Button, Grid, Icon, Loader, Table } from "semantic-ui-react";
 import strings from "src/localization/strings";
-import * as moment from "moment";
+import AnimateHeight from "react-animate-height";
+import SemanticDatepicker from "react-semantic-ui-datepickers";
+import 'react-semantic-ui-datepickers/dist/react-semantic-ui-datepickers.css';
+import * as Moment from 'moment';
+import { extendMoment } from 'moment-range';
+import fi from "react-semantic-ui-datepickers/dist/locales/fi-FI";
+import en from "react-semantic-ui-datepickers/dist/locales/en-US";
+
+/**
+ * Moment extended with moment-range
+ */
+const moment = extendMoment(Moment);
 
 /**
  * Interface describing component props
@@ -21,28 +32,44 @@ interface Props {
  * Interface describing component state
  */
 interface State {
-  productListItems: BasicPackingProduct[],
-  campaignListItems: StoreListItem[],
-  loading: boolean,
-  packingSizes: PackageSize[]
+  productListItems: BasicPackingProduct[];
+  campaignListItems: StoreListItem[];
+  loading: boolean;
+  products: Product[];
+  packings: Packing[];
+  packingSizes: PackageSize[];
+  openIndexes: number[];
+  selectedDate: Date;
 }
 
+/**
+ * Interface describing basic packing date data
+ */
 interface BasicPackingDateData {
-  header: string,
-  value: number
+  header: string;
+  value: number;
 }
 
+/**
+ * Interface describing basic packing product data
+ */
 interface BasicPackingProductData {
   packageSize: PackageSize,
   total: number,
   dates: BasicPackingDateData[]
 }
 
+/**
+ * Interface describing basic packing product
+ */
 interface BasicPackingProduct {
   product: Product,
   data: BasicPackingProductData[]
 }
 
+/**
+ * Interface describing store list item
+ */
 interface StoreListItem {
   name: string;
   amountInStore: number;
@@ -50,210 +77,474 @@ interface StoreListItem {
   packingSizeAmounts?: number[];
 }
 
+/**
+ * View store component
+ */
 class ViewStore extends React.Component<Props, State> {
+
   constructor(props: Props) {
     super(props);
     this.state = {
       productListItems: [],
       campaignListItems: [],
-      loading: false,
-      packingSizes: []
+      loading: true,
+      products: [],
+      packings: [],
+      packingSizes: [],
+      openIndexes: [],
+      selectedDate: new Date()
     };
   }
 
+  /**
+   * Component did mount life cycle method
+   */
   public componentDidMount = async () => {
-    if (!this.props.keycloak) {
+    const data = await this.fetchData();
+    if (!data) {
+      this.setState({ loading: false });
       return;
     }
 
-    this.setState({ loading: true });
+    const { products, packings, packingSizes, campaigns } = data;
+    const sortedPackingSizes = packingSizes.sort((p, p1) => (p.size || 0) - (p1.size || 0));
+    const basicPackings = packings.filter(p => p.type === PackingType.Basic);
+    const dates = this.getTableDates(basicPackings);
+    const productListItems = this.constructBasicPackingProducts(products, basicPackings, sortedPackingSizes, dates);
+    const campaignListItems = this.constructCampaignListItems(campaigns, packings);
 
-    const { keycloak } = this.props;
-
-    const [productsApi, packingSizesApi, packingsApi, campaignsApi] = await Promise.all([Api.getProductsService(keycloak), Api.getPackageSizesService(keycloak), Api.getPackingsService(keycloak), Api.getCampaignsService(keycloak)]);
-    let [products, packingSizes, campaigns]= await Promise.all([productsApi.listProducts({}), packingSizesApi.listPackageSizes({}), campaignsApi.listCampaigns()]);
-
-    const packings = await packingsApi.listPackings({status: PackingState.InStore});
-    const basicPackings = packings.filter(p => p.type == PackingType.Basic);
-    const maxDate = moment.max(basicPackings.map(p => moment(p.time))).endOf("day");
-    const minDate = moment.min(basicPackings.map(p => moment(p.time))).startOf("day");
-    let dates: moment.Moment[] = [];
-    for (let date = minDate; date.isBefore(maxDate); date.add(1, "day")) {
-      dates = [date.clone()].concat(dates);
-    }
-    packingSizes = packingSizes.sort((p, p1) => (p.size || 0) - (p1.size || 0));
-    let productListItems: BasicPackingProduct[] = products.map(product => {
-      let productPackings = basicPackings.filter(packing => packing.productId == product.id);
-      let packingSizeData = packingSizes.map((packingSize) => {
-        let packingsSizePackingProducts = productPackings.filter(packing => packing.packageSizeId == packingSize.id);
-          let totalSum = packingsSizePackingProducts.map(p => p.packedCount || 0).reduce((a: number, b: number )=> a + b, 0); 
-          let dateSums = dates.map((date) => {
-            let datePackings = packingsSizePackingProducts.filter((p) => moment(p.time).isSame(date, "day"));
-            let dateAmount = datePackings.map(p => p.packedCount || 0).reduce((a: number, b: number )=> a + b, 0);
-            return { header: date.format("DD.MM.YYYY"), value: dateAmount };
-          });
-          return { packageSize: packingSize, total: totalSum, dates: dateSums }
-      })
-      return { product: product, data: packingSizeData };
+    this.setState({
+      productListItems,
+      campaignListItems,
+      products,
+      packings,
+      packingSizes,
+      loading: false
     });
-
-    let packingsInStoreByCampaign = campaigns.map(campaign => {
-      return packings.filter(packing => packing.campaignId === campaign.id);
-    })
-
-    packingsInStoreByCampaign = packingsInStoreByCampaign.filter(packings => packings.length > 0);
-
-    const campaignListItems = packingsInStoreByCampaign.map(packings => {
-      const amountInStore = packings.length;
-      const campaignId = packings[0].campaignId;
-      const name = campaigns.find(campaign => campaign.id == campaignId)!!.name;
-
-      return { amountInStore, name };
-    });
-
-    this.setState({ productListItems, campaignListItems, packingSizes, loading: false });
   }
 
+  /**
+   * Component did update life cycle method
+   *
+   * @param prevProps previous component properties
+   * @param prevState previous component state
+   */
+  public componentDidUpdate = (prevProps: Props, prevState: State) => {
+    const { selectedDate } = this.state;
+    if (prevState.selectedDate.getTime() !== selectedDate.getTime()) {
+      const { products, packings, packingSizes } = this.state;
+
+      const basicPackings = packings
+        .filter(packing => packing.type === PackingType.Basic)
+        .filter(packing => moment(packing.time).isBefore(selectedDate));
+
+      const dates = this.getTableDates(basicPackings);
+      const productListItems = this.constructBasicPackingProducts(products, basicPackings, packingSizes, dates);
+
+      this.setState({ productListItems });
+    }
+  }
+
+  /**
+   * Component render method
+   */
   public render = () => {
-    if (this.state.loading) {
+    const {
+      loading,
+      productListItems,
+      campaignListItems,
+      selectedDate
+    } = this.state;
+
+    if (loading) {
       return (
-        <Grid style={{paddingTop: "100px"}} centered>
+        <Grid style={{ paddingTop: "100px" }} centered>
           <Loader inline active size="medium" />
         </Grid>
       );
     }
 
-    const basicData = this.state.productListItems;
-
-    const packingSizeNames = this.state.packingSizes.map(packingSize => {
-      return (
-        <Table.HeaderCell>{ LocalizedUtils.getLocalizedValue(packingSize.name) }</Table.HeaderCell>
-      );
-    })
-
-    const basicItems = [];
-    for (let i = 0; i < basicData.length; i++) {
-      let productData = basicData[i];
-      if (!productData.data.length) {
-        continue;
-      }
-      basicItems.push(
-        <Table color={"green"} key={productData.product.id}>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell width={3} key={`head-${productData.product.id}-name`} >{ LocalizedUtils.getLocalizedValue(productData.product.name) }</Table.HeaderCell>
-              <Table.HeaderCell key={`head-${productData.product.id}-ps`} >{ strings.packageSize }</Table.HeaderCell>
-              { productData.data[0].dates.map(d => {
-                return (
-                  <Table.HeaderCell key={`head-${productData.product.id}-${d.header}`}>{d.header}</Table.HeaderCell>
-                )
-              }) }
-              <Table.HeaderCell key={`head-${productData.product.id}-total`}> {strings.total} </Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            { productData.data.map( productRowData => {
-              return (
-                <Table.Row key={`row-${productData.product.id}-${productRowData.packageSize.id}`} >
-                  <Table.Cell key={`body-${productData.product.id}-name-${productRowData.packageSize.id}`}></Table.Cell>
-                  <Table.Cell key={`body-${productData.product.id}-ps-${productRowData.packageSize.id}`}>{ LocalizedUtils.getLocalizedValue(productRowData.packageSize.name) }</Table.Cell>
-                  { productRowData.dates.map(d => {
-                    return (
-                      <Table.Cell key={`body-${productData.product.id}-${productRowData.packageSize.id}-${d.header}`}>{ d.value }</Table.Cell>
-                    )
-                  }) }
-                  <Table.Cell key={`body-${productData.product.id}-total-${productRowData.packageSize.id}`}>{ productRowData.total }</Table.Cell>
-                </Table.Row>
-              );
-            })}
-          </Table.Body>
-        </Table>
-      )
-    }
+    const basicProducts = productListItems.filter(basicProduct => basicProduct.data.length);
+    const basicProductListItems = basicProducts.map(this.renderProductListItem);
 
     return (
       <Grid>
-        <Grid.Row className="content-page-header-row" style={{flex: 1,justifyContent: "space-between", paddingLeft: 10, paddingRight: 10}}>
-          <h2>{strings.store}</h2>
+        <Grid.Row
+          className="content-page-header-row"
+          style={{ flex: 1,justifyContent: "space-between", alignItems: "center", paddingLeft: 10, paddingRight: 10 }}
+        >
+          <h2 style={{ marginBottom: 0 }}>{ strings.store }</h2>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <span style={{ marginRight: 10 }}>
+              { strings.filterByDate }
+            </span>
+            <div style={{ marginRight: 10 }}>
+              <SemanticDatepicker
+                type="basic"
+                clearable={ false }
+                selected={ selectedDate }
+                firstDayOfWeek={ 1 }
+                locale={ strings.getLanguage() === "fi" ? fi : en }
+                onDateChange={ this.onSelectDate }
+                format={ `DD.MM.YYYY` }
+                placeholder={ strings.date }
+                maxDate={ moment().endOf("day").toDate() }
+                size="medium"
+              />
+            </div>
+            <Button
+              onClick={ this.openAll }
+              style={{ backgroundColor: "#2AA255", color: "white", padding: "12px 30px", marginRight: 10 }}
+            >
+              { strings.openAll }
+            </Button>
+            <Button
+              onClick={ this.closeAll }
+              style={{ backgroundColor: "#2AA255", color: "white", padding: "12px 30px" }}
+            >
+              { strings.closeAll }
+            </Button>
+          </div>
         </Grid.Row>  
         <Grid.Row>
-          <Grid.Column style={{overflowX: "auto"}}>
-            { basicItems }
+          <Grid.Column style={{ overflowX: "auto" }}>
+            { basicProductListItems }
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
-            <Table celled animated>
+            <Table celled>
               <Table.Header>
-                <Table.HeaderCell> { strings.campaignName } </Table.HeaderCell>
-                <Table.HeaderCell> { strings.amountInStore } </Table.HeaderCell>
+                <Table.Row>
+                  <Table.HeaderCell>{ strings.campaignName }</Table.HeaderCell>
+                  <Table.HeaderCell>{ strings.amountInStore }</Table.HeaderCell>
+                </Table.Row>
               </Table.Header>
-              <Table.Body> { this.renderStoreTable(this.state.campaignListItems) } </Table.Body>
+              <Table.Body>{ this.renderStoreTable(campaignListItems) }</Table.Body>
             </Table>
           </Grid.Column>
         </Grid.Row>
       </Grid>
-
     );
-
   }
 
   /**
    * Renders store table
+   *
+   * @param storeListItem store list item
    */
   private renderStoreTable = (storeListItems: StoreListItem[]) => {
     return storeListItems.map((item, i) => {
-      const packingSizeAmountCells = item.packingSizeAmounts ? item.packingSizeAmounts.map(packingSizeAmount => {
-      return (
+      const packingSizeAmountCells = (item.packingSizeAmounts || []).map(packingSizeAmount =>
         <Table.Cell>{ packingSizeAmount }</Table.Cell>
       );
-      }) : undefined;
 
       return (
-        <Table.Row style={i % 2 == 0 ? {backgroundColor: "#ddd"} : {}} key={ i }>
-          <Table.Cell> { item.name } </Table.Cell>
-          <Table.Cell> { item.amountInStore } </Table.Cell>
+        <Table.Row
+          key={ i }
+          style={{ backgroundColor: i % 2 == 0 ? "#ddd" : "initial" }}
+        >
+          <Table.Cell>{ item.name }</Table.Cell>
+          <Table.Cell>{ item.amountInStore }</Table.Cell>
           { item.oldestDate &&
-            <Table.Cell> { item.oldestDate } </Table.Cell>
+            <Table.Cell>{ item.oldestDate }</Table.Cell>
           }
-          {
-            packingSizeAmountCells
-          }
+          { packingSizeAmountCells }
         </Table.Row>
       );
     });
   }
 
   /**
-   * Counts all products in given packings
-   * 
-   * @param packings 
-   * @param packingSizes 
+   * Renders product list item
+   *
+   * @param productData product data
+   * @param index index of list item
    */
-  private countProducts = (packings: Packing[], packingSizes: PackageSize[]): number => {
-    let count = 0;
-    packings.forEach(packing => {
-      const packingSize = packingSizes.find(packingSize => packingSize.id == packing.packageSizeId);
-      if (packing.packedCount && packingSize && packingSize.size) {
-        const increaseBy = packingSize.size * packing.packedCount;
-        count += increaseBy;
-      }
-    });
-
-    return count;
+  private renderProductListItem = (productData: BasicPackingProduct, index: number) => {
+    const isOpen = this.isOpen(index);
+    return (
+      <Accordion
+        key={ index }
+        fluid
+        styled
+        activeIndex={ isOpen ? 1 : undefined }
+        onTitleClick={ this.toggleOpen(index) }
+        style={{ marginBottom: 10, borderRadius: 0, boxShadow: "none", backgroundColor: "#2AA25555" }}
+        panels={[{
+          key: 1,
+          title: this.renderListItemTitle(productData, isOpen),
+          content: this.renderListItemContent(productData, isOpen)
+        }]}
+      />
+    );
   }
 
   /**
-   * Returns the date of the oldest packing in a given list
-   * 
-   * @param packings 
+   * Renders list item title
+   *
+   * @param productData product data
+   * @param isOpen is product open
    */
-  private getOldestPackingDate = (packings: Packing[]): string => {
-    const dates = packings.map(packing => packing.time.getTime());
-    const oldest = Math.min(...dates);
-    const oldestDate = new Date(oldest);
-    return moment(oldestDate).format("DD.MM.YYYY");
-  } 
+  private renderListItemTitle = (productData: BasicPackingProduct, isOpen: boolean) => {
+    return (
+      <Accordion.Title
+        active={ isOpen }
+        style={{ color: "black" }}
+      >
+        <Icon name={ isOpen ? "caret up" : "caret down" }/>
+        { LocalizedUtils.getLocalizedValue(productData.product.name) }
+      </Accordion.Title>
+    );
+  }
+
+  /**
+   * Renders list item content
+   *
+   * @param productData product data
+   * @param isOpen is product open
+   */
+  private renderListItemContent = (productData: BasicPackingProduct, isOpen: boolean) => {
+    return (
+      <AnimateHeight
+        animateOpacity
+        duration={ 250 }
+        height={ isOpen ? 'auto' : 0 }
+      >
+        <div style={{ overflowX: "auto" }}>
+          <Table
+            key={ productData.product.id }
+            style={{ borderRadius: 0, border: "none" }}
+          >
+            <Table.Header>
+              { this.renderListItemTableHeader(productData) }
+            </Table.Header>
+            <Table.Body>
+              { this.renderListItemTableBody(productData) }
+            </Table.Body>
+          </Table>
+        </div>
+      </AnimateHeight>
+    );
+  }
+
+  /**
+   * Renders list item table header
+   *
+   * @param productData product data
+   */
+  private renderListItemTableHeader = (productData: BasicPackingProduct) => {
+    return (
+      <Table.Row>
+        <Table.HeaderCell style={{ paddingLeft: 30 }}>
+          { strings.packageSize }
+        </Table.HeaderCell>
+        { productData.data[0].dates.map(({ header }) =>
+          <Table.HeaderCell key={ header }>
+            { header }
+          </Table.HeaderCell>
+        )}
+        <Table.HeaderCell>
+          { strings.total }
+        </Table.HeaderCell>
+      </Table.Row>
+    );
+  }
+
+  /**
+   * Renders list item table body
+   *
+   * @param productData product data
+   */
+  private renderListItemTableBody = (productData: BasicPackingProduct) => {
+    return productData.data.map(productRowData =>
+      <Table.Row key={ productRowData.packageSize.id }>
+        <Table.Cell style={{ paddingLeft: 30 }}>
+          { LocalizedUtils.getLocalizedValue(productRowData.packageSize.name) }
+        </Table.Cell>
+        { productRowData.dates.map(({ header, value }) => 
+          <Table.Cell key={ header }>
+            { value }
+          </Table.Cell>
+        )}
+        <Table.Cell>
+          { productRowData.total }
+        </Table.Cell>
+      </Table.Row>
+    );
+  }
+
+  /**
+   * Fetch data needed by component from API
+   */
+  private fetchData = async () => {
+    const { keycloak } = this.props;
+
+    if (!keycloak) {
+      return;
+    }
+
+    const [ productsApi, packingSizesApi, packingsApi, campaignsApi ] = await Promise.all([
+      Api.getProductsService(keycloak),
+      Api.getPackageSizesService(keycloak),
+      Api.getPackingsService(keycloak),
+      Api.getCampaignsService(keycloak)
+    ]);
+
+    const [ products, packings, packingSizes, campaigns ] = await Promise.all([
+      productsApi.listProducts({}),
+      packingsApi.listPackings({ status: PackingState.InStore }),
+      packingSizesApi.listPackageSizes({}),
+      campaignsApi.listCampaigns()
+    ]);
+
+    return { products, packings, packingSizes, campaigns };
+  }
+
+  /**
+   * Constructs basic packing products from given products, packings and package sizes
+   *
+   * @param products products
+   * @param packings packings
+   * @param packageSizes package sizes
+   * @param dates array of moment dates
+   * @returns list of basic packing products
+   */
+  private constructBasicPackingProducts = (
+    products: Product[],
+    packings: Packing[],
+    packageSizes: PackageSize[],
+    dates: Moment.Moment[]
+  ): BasicPackingProduct[] => {
+    return products.map(product => {
+      const productPackings = packings.filter(packing => packing.productId === product.id);
+      const productPackageSizes = this.getProductPackageSizes(packageSizes, product);
+      const packingSizeData = productPackageSizes.map(packageSize => {
+        const packingsSizePackingProducts = productPackings.filter(packing => packing.packageSizeId === packageSize.id);
+          const totalSum = packingsSizePackingProducts
+            .map(p => p.packedCount || 0)
+            .reduce((a: number, b: number )=> a + b, 0);
+          const dateSums = dates.map(date => {
+            const datePackings = packingsSizePackingProducts.filter(p => moment(p.time).isSame(date, "day"));
+            const dateAmount = datePackings
+              .map(p => p.packedCount || 0)
+              .reduce((a: number, b: number )=> a + b, 0);
+            return { header: date.format("DD.MM.YYYY"), value: dateAmount };
+          });
+          return { packageSize: packageSize, total: totalSum, dates: dateSums };
+      })
+      return { product: product, data: packingSizeData };
+    });
+  }
+
+  /**
+   * Constructs campaign list items from given campaigns and packings
+   *
+   * @param campaigns campaigns
+   * @param packings packings
+   * @returns list of store list items
+   */
+  private constructCampaignListItems = (campaigns: Campaign[], packings: Packing[]): StoreListItem[] => {
+    const packingsInStoreByCampaign = campaigns
+      .map(campaign => packings.filter(packing => packing.campaignId === campaign.id))
+      .filter(packings => packings.length > 0);
+
+    return packingsInStoreByCampaign.map(packings => {
+      const amountInStore = packings.length;
+      const campaignId = packings[0].campaignId;
+      const name = campaigns.find(campaign => campaign.id == campaignId)!!.name;
+
+      return { amountInStore, name };
+    });
+  }
+
+  /**
+   * Filter package sizes by default package sizes of product
+   *
+   * @param packageSizes list of package sizes
+   * @param product product
+   */
+  private getProductPackageSizes = (packageSizes: PackageSize[], product: Product) => {
+    return packageSizes.filter(packageSize => {
+      const { defaultPackageSizeIds } = product;
+      return defaultPackageSizeIds ?
+        defaultPackageSizeIds.some(id => id === packageSize.id) :
+        false;
+    });
+  }
+
+  /**
+   * Gets dates for basic packages table
+   *
+   * @param packings list of packings to get dates from
+   * @returns array of moment dates
+   */
+  private getTableDates = (packings: Packing[]): Moment.Moment[] => {
+    if (!packings.length) {
+      return [];
+    }
+
+    const min = moment.min(packings.map(p => moment(p.time))).startOf("day");
+    const max = moment.max(packings.map(p => moment(p.time))).endOf("day");
+    return Array.from(moment.range(min, max).by("day")).reverse();
+  }
+
+  /**
+   * Toggles product accordion open
+   *
+   * @param index product index
+   */
+  private toggleOpen = (index: number) => () => {
+    const {  openIndexes } = this.state;
+    this.setState({
+      openIndexes: openIndexes.find(openIndex => openIndex === index) !== undefined ?
+        openIndexes.filter(openIndex => openIndex !== index) :
+        [ ...openIndexes, index ]
+    })
+  }
+
+  /**
+   * Opens all products
+   */
+  private openAll = () => {
+    this.setState({
+      openIndexes: this.state.productListItems.map((item, index) => index)
+    });
+  }
+
+  /**
+   * Closes all products
+   */
+  private closeAll = () => {
+    this.setState({ openIndexes: [] });
+  }
+
+  /**
+   * Is product accordion open
+   *
+   * @param index index of product in products list
+   */
+  private isOpen = (index: number) => {
+    return this.state.openIndexes.find(openIndex => openIndex === index) !== undefined;
+  }
+
+  /**
+   * Event handler for select date
+   *
+   * @param newDate selected date
+   */
+  private onSelectDate = async (newDate: Date | Date[] | null) => {
+    if (newDate === null) {
+      return;
+    }
+
+    const selectedDate = Array.isArray(newDate) ? newDate[0] : newDate;
+
+    this.setState({
+      selectedDate: moment(selectedDate).endOf("day").toDate()
+    });
+  }
+
 }
 
 /**

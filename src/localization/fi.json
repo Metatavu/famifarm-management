@@ -177,6 +177,9 @@
     "amountInStore": "Määrä varastossa",
     "oldestPackingInStore": "Vanhin pakkaus varastossa",
     "store": "Varasto",
+    "openAll": "Avaa kaikki",
+    "closeAll": "Sulje kaikki",
+    "filterByDate": "Rajaa päivämäärällä",
     
     "campaigns": "Kampanjat",
     "newCampaign": "Uusi kampanja",

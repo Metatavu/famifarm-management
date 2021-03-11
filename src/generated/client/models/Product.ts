@@ -40,10 +40,10 @@ export interface Product {
     name?: Array<LocalizedValue>;
     /**
      * 
-     * @type {string}
+     * @type {Array<string>}
      * @memberof Product
      */
-    defaultPackageSizeId?: string;
+    defaultPackageSizeIds?: Array<string>;
     /**
      * 
      * @type {boolean}
@@ -70,7 +70,7 @@ export function ProductFromJSONTyped(json: any, ignoreDiscriminator: boolean): P
         
         'id': !exists(json, 'id') ? undefined : json['id'],
         'name': !exists(json, 'name') ? undefined : ((json['name'] as Array<any>).map(LocalizedValueFromJSON)),
-        'defaultPackageSizeId': !exists(json, 'defaultPackageSizeId') ? undefined : json['defaultPackageSizeId'],
+        'defaultPackageSizeIds': !exists(json, 'defaultPackageSizeIds') ? undefined : json['defaultPackageSizeIds'],
         'isSubcontractorProduct': json['isSubcontractorProduct'],
         'active': !exists(json, 'active') ? undefined : json['active'],
     };
@@ -87,7 +87,7 @@ export function ProductToJSON(value?: Product | null): any {
         
         'id': value.id,
         'name': value.name === undefined ? undefined : ((value.name as Array<any>).map(LocalizedValueToJSON)),
-        'defaultPackageSizeId': value.defaultPackageSizeId,
+        'defaultPackageSizeIds': value.defaultPackageSizeIds,
         'isSubcontractorProduct': value.isSubcontractorProduct,
         'active': value.active,
     };

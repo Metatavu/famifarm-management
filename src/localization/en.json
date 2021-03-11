@@ -178,6 +178,9 @@
   "amountInStore": "Amount in store",
   "oldestPackingInStore": "Oldest packing in store",
   "store": "Store",
+  "openAll": "Open all",
+  "closeAll": "Close all",
+  "filterByDate": "Filter by date",
     
   "campaigns": "Campaigns",
   "newCampaign": "New campaign",

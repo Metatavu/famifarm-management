@@ -2061,9 +2061,11 @@ components:
           format: "uuid"
         name:
           $ref: '#/components/schemas/LocalizedEntry'
-        defaultPackageSizeId:
-          type: "string"
-          format: "uuid"
+        defaultPackageSizeIds:
+          type: array
+          items:
+            type: "string"
+            format: "uuid"
         isSubcontractorProduct:
           type: "boolean"
         active:

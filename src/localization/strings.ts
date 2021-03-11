@@ -201,6 +201,9 @@ export interface IStrings extends LocalizedStringsMethods {
   amountInStore: string
   oldestPackingInStore: string
   store: string
+  openAll: string
+  closeAll: string
+  filterByDate: string
 
   campaigns: string
   newCampaign: string
