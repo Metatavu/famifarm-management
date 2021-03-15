@@ -13,7 +13,8 @@ import {
   List,
   Button,
   Grid,
-  Loader
+  Loader,
+  Checkbox
 } from "semantic-ui-react";
 import LocalizedUtils from "src/localization/localizedutils";
 
@@ -26,41 +27,28 @@ export interface Props {
 
 export interface State {
   products: Product[];
+  showInActive: boolean;
 }
 
 class ProductList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      products: []
+      products: [],
+      showInActive: false
     };
   }
 
   /**
    * Component did mount life-sycle event
    */
-  async componentDidMount() {
-    try {
-      if (!this.props.keycloak) {
-        return;
-      }
-  
-      const productsService = await Api.getProductsService(this.props.keycloak);
-      const products = await productsService.listProducts({includeSubcontractorProducts: true});
-      products.sort((a, b) => {
-        let nameA = LocalizedUtils.getLocalizedValue(a.name)
-        let nameB = LocalizedUtils.getLocalizedValue(b.name)
-        if(nameA < nameB) { return -1; }
-        if(nameA > nameB) { return 1; }
-        return 0;
-      });
-      this.props.onProductsFound && this.props.onProductsFound(products);
-    } catch (e) {
-      this.props.onError({
-        message: strings.defaultApiErrorMessage,
-        title: strings.defaultApiErrorTitle,
-        exception: e
-      });
+  componentDidMount() {
+    this.loadData();
+  }
+
+  componentDidUpdate = async (prevprops: Props, prevstate: State) => {
+    if (prevstate.showInActive !== this.state.showInActive) {
+      this.loadData();
     }
   }
 
@@ -68,6 +56,9 @@ class ProductList extends React.Component<Props, State> {
    * Render product list view
    */
   public render() {
+
+    const { showInActive } = this.state;
+
     if (!this.props.products) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
@@ -86,7 +77,7 @@ class ProductList extends React.Component<Props, State> {
             </NavLink>
           </List.Content>
           <List.Content>
-            <List.Header style={{paddingTop: "10px"}}>{LocalizedUtils.getLocalizedValue(product.name)}</List.Header>
+            <List.Header style={{opacity: product.active ? "1" : "0.2", paddingTop: "10px"}}>{LocalizedUtils.getLocalizedValue(product.name)}</List.Header>
           </List.Content>
         </List.Item>
       );
@@ -99,6 +90,7 @@ class ProductList extends React.Component<Props, State> {
           <NavLink to="/createProduct">
             <Button className="submit-button">{strings.newProduct}</Button>
           </NavLink>
+          <Checkbox checked={showInActive} onChange={() => this.setState({showInActive: !showInActive})} label={strings.showInActiveProductsLabel} />
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
@@ -109,6 +101,36 @@ class ProductList extends React.Component<Props, State> {
         </Grid.Row>
       </Grid>
     );
+  }
+
+  private loadData = async () => {
+    const { showInActive } = this.state;
+    const { keycloak } = this.props;
+    try {
+      if (!keycloak) {
+        return;
+      }
+  
+      const productsService = await Api.getProductsService(keycloak);
+      const products = await productsService.listProducts({includeSubcontractorProducts: true, includeInActiveProducts: showInActive});
+      products.sort((a, b) => {
+        let aActive = a.active as any;
+        let bActive = b.active as any;
+        if (aActive - bActive) { return -1 * (aActive - bActive) }
+        let nameA = LocalizedUtils.getLocalizedValue(a.name)
+        let nameB = LocalizedUtils.getLocalizedValue(b.name)
+        if(nameA < nameB) { return -1; }
+        if(nameA > nameB) { return 1; }
+        return 0;
+      });
+      this.props.onProductsFound && this.props.onProductsFound(products);
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
 }
 
