@@ -119,17 +119,6 @@ class EventList extends React.Component<Props, State> {
       }
     }
 
-    /*const statusButtons = ["OPEN", "CLOSED", "NEGATIVE"].map((status: string) => {
-      return (
-        <Button onClick={() => this.handleButtonClick(status)} key={status} active={this.state.status === status} >
-          {strings.getString(`batchStatusButton${status}`, strings.getLanguage())}
-          {status === "NEGATIVE" && this.state.errorCount > 0 &&
-            <Label style={{position: "absolute", top: "5px"}} size="mini" circular color='red'>{this.state.errorCount}</Label>
-          }
-        </Button>
-      );
-    });*/
-
     const batches = (this.props.events || []).map((event, i) => {
       return (
         <List.Item style={i % 2 == 0 ? {backgroundColor: "#ddd"} : {}} key={event.id}>
@@ -146,8 +135,9 @@ class EventList extends React.Component<Props, State> {
     });
 
     const { eventListFilters } = this.props;
-    const productText = eventListFilters && eventListFilters.product ? LocalizedUtils.getLocalizedValue(eventListFilters.product.name) : strings.selectProduct
-    const dateText = eventListFilters && eventListFilters.date ? moment(eventListFilters.date).format("DD.MM.YYYY") : ""
+    const productText = eventListFilters && eventListFilters.product ? LocalizedUtils.getLocalizedValue(eventListFilters.product.name) : strings.selectProduct;
+    const dateText = eventListFilters && eventListFilters.date ? moment(eventListFilters.date).format("DD.MM.YYYY") : "";
+    const typeFilterText = eventListFilters && eventListFilters.type ? strings[`phase${eventListFilters.type}`] : strings.allEventTypes;
     return (
       <Grid>
         <Grid.Row className="content-page-header-row" style={{flex: 1,justifyContent: "space-between", paddingLeft: 10, paddingRight: 10}}>
@@ -166,6 +156,10 @@ class EventList extends React.Component<Props, State> {
               <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem"}}>
                 <label>{strings.productName}</label>
                 <Form.Select name="product" options={this.renderOptions()} text={productText} onChange={this.onChangeProduct} />
+              </div>
+              <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem"}}>
+                <label>{strings.labelEventType}</label>
+                <Form.Select name="event-type" options={this.renderEventTypeOptions()} text={typeFilterText} onChange={this.onChangeEventTypeFilter} />
               </div>
             </Form.Field>
           </Form>
@@ -187,22 +181,6 @@ class EventList extends React.Component<Props, State> {
   }
 
   /**
-   * Handles status button click
-   */
-  /*private handleButtonClick = (status: string) => {
-    this.setState({
-      status: status
-    });
-    this.updateBatches(status, 0, this.props.eventsListDate, this.props.eventsProduct, this.props.eventsProductName).catch((err) => {
-      this.props.onError({
-        message: strings.defaultApiErrorMessage,
-        title: strings.defaultApiErrorTitle,
-        exception: err
-      });
-    });
-  }*/
-
-  /**
    * Handles changing date
    */
   private onChangeDate = async (e: any, { value }: InputOnChangeData) => {
@@ -217,6 +195,31 @@ class EventList extends React.Component<Props, State> {
     const product = (this.props.products || []).find(product => product.id === value);
     await this.updateEvents({...this.props.eventListFilters, product});
   }
+
+  /**
+   * Handles changing selected product
+   */
+   private onChangeEventTypeFilter = async (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
+    const type = (value || undefined) as any;
+    await this.updateEvents({...this.props.eventListFilters, type});
+  }
+
+  /**
+   * Renders dropdown options
+   */
+    private renderEventTypeOptions = () => {
+      return [{text: strings.allEventTypes, value: ""}].concat([
+        EventType.Sowing,
+        EventType.TableSpread,
+        EventType.Planting,
+        EventType.Planting,
+        EventType.CultivationObservation,
+        EventType.Harvest,
+        EventType.Wastage
+      ].map(eventType => {
+        return { text: strings[`phase${eventType}`], value: eventType  }
+      }));
+    }
 
   /**
    * Renders dropdown options
@@ -264,6 +267,7 @@ class EventList extends React.Component<Props, State> {
 
       const [events, products] = await Promise.all([
         eventsService.listEvents({
+          eventType: filters.type,
           productId: filters.product ? filters.product.id : undefined,
           createdAfter: createdAfter,
           createdBefore: createdBefore,
@@ -278,8 +282,9 @@ class EventList extends React.Component<Props, State> {
       this.props.onEventListFiltersUpdated && this.props.onEventListFiltersUpdated({
         date: dateFilter.toDate(),
         firstResult: firstResult,
-        product: filters.product || undefined
-      })
+        product: filters.product || undefined,
+        type: filters.type
+      });
       this.props.onProductsFound && this.props.onProductsFound(products);
       this.setState({loading: false, loadingFirstTime: false})
     } catch(e) {

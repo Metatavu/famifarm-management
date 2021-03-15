@@ -209,5 +209,6 @@
     "events": "Tapahtumat",
     "packingWastageStatus": "Poisheitto",
     "total": "Yhteensä",
-    "labelSowingDate": "Kylvöpäivä"
+    "labelSowingDate": "Kylvöpäivä",
+    "allEventTypes": "Kaikki tyypit"
   }

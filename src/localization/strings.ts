@@ -233,6 +233,8 @@ export interface IStrings extends LocalizedStringsMethods {
   events: string
   total: string
   labelSowingDate: string
+
+  allEventTypes: string
 }
 
 const strings: IStrings = new LocalizedStrings({

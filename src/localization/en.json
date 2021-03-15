@@ -210,5 +210,6 @@
   "events": "Events",
   "packingWastageStatus": "Wastage",
   "total": "Total",
-  "labelSowingDate": "Sowing date"
+  "labelSowingDate": "Sowing date",
+  "allEventTypes": "All types "
 }

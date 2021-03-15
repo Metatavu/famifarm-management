@@ -228,6 +228,14 @@ paths:
           required: false
           schema:
             type: string
+        - name: eventType
+          in: query
+          description: Filter results by event type
+          required: false
+          schema:
+            type: object
+            $ref: "#/components/schemas/EventType"
+
       responses:
         '200':
           description: A paged array of events

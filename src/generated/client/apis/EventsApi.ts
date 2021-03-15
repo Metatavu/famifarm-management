@@ -21,6 +21,9 @@ import {
     Event,
     EventFromJSON,
     EventToJSON,
+    EventType,
+    EventTypeFromJSON,
+    EventTypeToJSON,
 } from '../models';
 
 export interface CreateEventRequest {
@@ -41,6 +44,7 @@ export interface ListEventsRequest {
     productId?: string;
     createdAfter?: string;
     createdBefore?: string;
+    eventType?: EventType;
 }
 
 export interface UpdateEventRequest {
@@ -193,6 +197,10 @@ export class EventsApi extends runtime.BaseAPI {
 
         if (requestParameters.createdBefore !== undefined) {
             queryParameters['createdBefore'] = requestParameters.createdBefore;
+        }
+
+        if (requestParameters.eventType !== undefined) {
+            queryParameters['eventType'] = requestParameters.eventType;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
