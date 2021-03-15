@@ -163,6 +163,7 @@ export interface IStrings extends LocalizedStringsMethods {
   reportTypeItemSPREAD: string
   reportTypeItemHARVESTED: string
   reportTypeItemPACKED: string
+  reportTypeItemPACKED_CAMPAINGS: string
   userManagementLink: string
   accountUrl: string
   logoutUrl: string
@@ -233,8 +234,9 @@ export interface IStrings extends LocalizedStringsMethods {
   events: string
   total: string
   labelSowingDate: string
-
   allEventTypes: string
+  showInActiveProductsLabel: string
+  activeProductLabel: string
 }
 
 const strings: IStrings = new LocalizedStrings({

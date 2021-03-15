@@ -143,6 +143,7 @@
     "reportTypeItemSPREAD": "Levitetty",
     "reportTypeItemHARVESTED": "Korjattu",
     "reportTypeItemPACKED": "Pakattu",
+    "reportTypeItemPACKED_CAMPAINGS": "Pakattu kampanjat",
     "reportTypeItemPRODUCT_PHASE_COUNT": "Tuotteet vaiheittain",
     "userManagementLink": "Käyttäjähallinta",
     "accountUrl": "Käyttäjätili",
@@ -210,5 +211,7 @@
     "packingWastageStatus": "Poisheitto",
     "total": "Yhteensä",
     "labelSowingDate": "Kylvöpäivä",
-    "allEventTypes": "Kaikki tyypit"
+    "allEventTypes": "Kaikki tyypit",
+    "showInActiveProductsLabel": "Näytä ei-aktiiviset tuotteet",
+    "activeProductLabel": "Aktiivinen"
   }

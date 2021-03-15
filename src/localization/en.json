@@ -144,6 +144,7 @@
   "reportTypeItemSPREAD": "Spread",
   "reportTypeItemHARVESTED": "Harvested",
   "reportTypeItemPACKED": "Packed",
+  "reportTypeItemPACKED_CAMPAINGS": "Packed campaings",
   "reportTypeItemPRODUCT_PHASE_COUNT": "Products by phase",
   "userManagementLink": "User management",
   "accountUrl": "Account",
@@ -211,5 +212,7 @@
   "packingWastageStatus": "Wastage",
   "total": "Total",
   "labelSowingDate": "Sowing date",
-  "allEventTypes": "All types "
+  "allEventTypes": "All types",
+  "showInActiveProductsLabel": "Show inactive products",
+  "activeProductLabel": "Active"
 }

@@ -49,7 +49,8 @@ class CreateProduct extends React.Component<Props, State> {
     this.state = {
       redirect: false,
       productData: {
-        isSubcontractorProduct: false
+        isSubcontractorProduct: false,
+        active: true
       }
     };
   }
@@ -91,7 +92,8 @@ class CreateProduct extends React.Component<Props, State> {
         product: {
           name: this.state.productData.name,
           defaultPackageSizeIds: this.state.productData.defaultPackageSizeIds,
-          isSubcontractorProduct: this.state.productData.isSubcontractorProduct!
+          isSubcontractorProduct: this.state.productData.isSubcontractorProduct!,
+          active: this.state.productData.active
         }
       });
   
@@ -146,6 +148,19 @@ class CreateProduct extends React.Component<Props, State> {
     })
   }
 
+
+  /**
+   * Sets the active boolean
+   * 
+   * @param e event 
+   * @param { checked } new value
+   */
+  updateIsActive = (e: any, { checked }: CheckboxProps) => {
+    this.setState({
+      productData: { ...this.state.productData, active: checked || false }
+    })
+  }
+
   /**
    * Render product create view
    */
@@ -196,6 +211,12 @@ class CreateProduct extends React.Component<Props, State> {
                 checked={ productData.isSubcontractorProduct }
                 onChange={ this.updateIsSubcontractorProduct }
                 label={ strings.subcontractorProduct }
+              />
+              <Form.Checkbox
+                required
+                checked={ this.state.productData.active }
+                onChange={ this.updateIsActive }
+                label={ strings.activeProductLabel }
               />
               <Button
                 className="submit-button"
