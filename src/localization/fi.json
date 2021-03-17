@@ -213,5 +213,9 @@
     "labelSowingDate": "Kylvöpäivä",
     "allEventTypes": "Kaikki tyypit",
     "showInActiveProductsLabel": "Näytä ei-aktiiviset tuotteet",
-    "activeProductLabel": "Aktiivinen"
+    "activeProductLabel": "Aktiivinen",
+    "packingTableHeaderName": "Tuote / Kampanja",
+    "packingTableHeaderDate": "Päiväys",
+    "packingTableHeaderBoxes": "Laatikkoa",
+    "packingTableHeaderStatus": "Tila"
   }

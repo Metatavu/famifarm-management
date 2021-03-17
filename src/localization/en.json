@@ -214,5 +214,9 @@
   "labelSowingDate": "Sowing date",
   "allEventTypes": "All types",
   "showInActiveProductsLabel": "Show inactive products",
-  "activeProductLabel": "Active"
+  "activeProductLabel": "Active",
+  "packingTableHeaderName": "Product / Campaing",
+  "packingTableHeaderDate": "Date",
+  "packingTableHeaderBoxes": "Boxes",
+  "packingTableHeaderStatus": "Status"
 }

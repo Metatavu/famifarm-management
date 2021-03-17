@@ -228,11 +228,11 @@ class CreateEvent extends React.Component<Props, State> {
               </Form.Field>
               <Form.Field required>
                 <label>{strings.labelStartTime}</label>
-                <DateTimeInput dateTimeFormat="YYYY.MM.DD HH:mm" onChange={this.handleTimeChange} name="startTime" value={moment(event.startTime).format("YYYY.MM.DD HH:mm")} />
+                <DateTimeInput dateTimeFormat="DD.MM.YYYY HH:mm" onChange={this.handleTimeChange} name="startTime" value={moment(event.startTime).format("DD.MM.YYYY HH:mm")} />
               </Form.Field>
               <Form.Field>
                 <label>{strings.labelEndTime}</label>
-                <DateTimeInput dateTimeFormat="YYYY.MM.DD HH:mm" onChange={this.handleTimeChange} name="endTime" value={moment(event.endTime).format("YYYY.MM.DD HH:mm")} />
+                <DateTimeInput dateTimeFormat="DD.MM.YYYY HH:mm" onChange={this.handleTimeChange} name="endTime" value={moment(event.endTime).format("DD.MM.YYYY HH:mm")} />
               </Form.Field>
               <Form.Select required label={strings.labelEventType} name="type" options={eventTypeOptions} value={event.type} onChange={this.handleBaseChange} />
               {this.renderEventDataForm(event)}
@@ -272,7 +272,7 @@ class CreateEvent extends React.Component<Props, State> {
       return;
     }
 
-    eventData[name] = moment(value, "YYYY.MM.DD HH:mm").toISOString();
+    eventData[name] = moment(value, "DD.MM.YYYY HH:mm").toDate()
     this.setState({ event: eventData });
   }
 
@@ -328,7 +328,7 @@ class CreateEvent extends React.Component<Props, State> {
     }
 
     eventData.data = {...this.state.event!.data};
-    eventData.data[name] = moment(value, "DD.MM.YYYY").toISOString();
+    eventData.data[name] = moment(value, "DD.MM.YYYY").toDate()
     console.log(eventData);
     this.setState({ event: { ...eventData } });
   }
@@ -426,6 +426,7 @@ class CreateEvent extends React.Component<Props, State> {
         this.setState({messageVisible: false});
       }, 3000);
     } catch (e) {
+      console.error(e);
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,

@@ -261,6 +261,17 @@ class EventList extends React.Component<Props, State> {
     }
   }
 
+  private filtersChanged = (filters: EventListFilters, prevFilters?: EventListFilters): boolean => {
+    if (!prevFilters) {
+      return true;
+    }
+
+    const dateChanged = prevFilters.date !== filters.date;
+    const productChanged = prevFilters.product !== filters.product;
+    const typeChanged = prevFilters.type !== filters.type;
+    return dateChanged || productChanged || typeChanged
+  }
+
   /**
    * Updates batch list
    */
@@ -268,10 +279,11 @@ class EventList extends React.Component<Props, State> {
     if (!this.props.keycloak) {
       return;
     }
+    const prevFilters = this.props.eventListFilters;
     const dateFilter = filters.date ? moment(filters.date) : moment();
     const createdBefore = dateFilter.endOf("day").toISOString();
     const createdAfter = dateFilter.startOf("day").toISOString();
-    const firstResult = filters.firstResult || 0;
+    const firstResult = this.filtersChanged(filters, prevFilters) ? 0 : filters.firstResult || 0;
     this.setState({loading: true});
     try {
       const [eventsService, productsService] = await Promise.all([

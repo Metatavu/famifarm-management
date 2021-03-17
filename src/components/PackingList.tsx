@@ -11,13 +11,13 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 
 import {
-  List,
   Button,
   Grid,
   Loader,
   Form,
   InputOnChangeData,
-  TextAreaProps
+  TextAreaProps,
+  Table
 } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import LocalizedUtils from "src/localization/localizedutils";
@@ -138,30 +138,7 @@ class PackingList extends React.Component<Props, State> {
       );
     }
 
-    const packingListItems = (packings || []).map((packing, i) => {
-      return (
-        <List.Item
-          key={ packing.id }
-          style={{ backgroundColor: i % 2 == 0 ? "#ddd" : "initial" }}
-        >
-          <List.Content floated='right'>
-            <NavLink to={ `/packings/${packing.id}` }>
-              <Button className="submit-button">
-                { strings.open }
-              </Button>
-            </NavLink>
-          </List.Content>
-          <List.Content>
-            <List.Header style={{ paddingTop: "10px" }}>
-              { packing.type == "BASIC" ?
-                this.getPackingName(packing) :
-                this.getCampaignPackingName(packing)
-              }
-            </List.Header>
-          </List.Content>
-        </List.Item>
-      );
-    });
+    const packingTableRows = (packings || []).map(packing => this.renderPackingTableRow(packing));
 
     const filterStyles: React.CSSProperties = {
       display:"inline-block",
@@ -229,13 +206,56 @@ class PackingList extends React.Component<Props, State> {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
-            <List divided animated verticalAlign='middle'>
-              { packingListItems }
-            </List>
+            <Table selectable>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>{ strings.packingTableHeaderName }</Table.HeaderCell>
+                  <Table.HeaderCell>{ strings.packingTableHeaderStatus }</Table.HeaderCell>
+                  <Table.HeaderCell>{ strings.packingTableHeaderDate }</Table.HeaderCell>
+                  <Table.HeaderCell>{ strings.packingTableHeaderBoxes }</Table.HeaderCell>
+                  <Table.HeaderCell></Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                { packingTableRows }
+              </Table.Body>
+            </Table>
           </Grid.Column>
         </Grid.Row>
       </Grid>
     );
+  }
+  
+  private getAmountOfBoxes = (packing: Packing) => {
+    if (packing.type == "BASIC") {
+      return packing.packedCount;
+    }
+
+    return 0;
+  }
+
+  private renderPackingTableRow = (packing: Packing) => {
+    const name = packing.type == "BASIC" ? 
+      this.getPackingName(packing) :
+      this.getCampaignPackingName(packing);
+
+    const status = this.resolveLocalizedPackingState(packing.state);
+    const packingDate = moment(packing.time).format("DD.MM.YYYY");
+    const amount = packing.type == "BASIC" ? this.getAmountOfBoxes(packing) : "-";
+
+    return (
+      <Table.Row key={packing.id}>
+        <Table.Cell>{ name }</Table.Cell>
+        <Table.Cell>{ status }</Table.Cell>
+        <Table.Cell>{ packingDate }</Table.Cell>
+        <Table.Cell>{ amount }</Table.Cell>
+        <Table.Cell textAlign='right'>
+          <NavLink to={ `/packings/${packing.id}` }>
+              <Button className="submit-button">{strings.open}</Button>
+          </NavLink>
+        </Table.Cell>
+      </Table.Row>
+    )
   }
 
   /**

@@ -237,6 +237,11 @@ export interface IStrings extends LocalizedStringsMethods {
   allEventTypes: string
   showInActiveProductsLabel: string
   activeProductLabel: string
+
+  packingTableHeaderName: string
+  packingTableHeaderDate: string
+  packingTableHeaderBoxes: string
+  packingTableHeaderStatus: string
 }
 
 const strings: IStrings = new LocalizedStrings({
