@@ -218,5 +218,6 @@
   "packingTableHeaderName": "Product / Campaing",
   "packingTableHeaderDate": "Date",
   "packingTableHeaderBoxes": "Boxes",
-  "packingTableHeaderStatus": "Status"
+  "packingTableHeaderStatus": "Status",
+  "allPackingStates": "All states"
 }

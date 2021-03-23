@@ -242,6 +242,8 @@ export interface IStrings extends LocalizedStringsMethods {
   packingTableHeaderDate: string
   packingTableHeaderBoxes: string
   packingTableHeaderStatus: string
+
+  allPackingStates: string
 }
 
 const strings: IStrings = new LocalizedStrings({

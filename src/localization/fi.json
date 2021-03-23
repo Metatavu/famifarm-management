@@ -217,5 +217,6 @@
     "packingTableHeaderName": "Tuote / Kampanja",
     "packingTableHeaderDate": "Päiväys",
     "packingTableHeaderBoxes": "Laatikkoa",
-    "packingTableHeaderStatus": "Tila"
+    "packingTableHeaderStatus": "Tila",
+    "allPackingStates": "Kaikki tilat"
   }

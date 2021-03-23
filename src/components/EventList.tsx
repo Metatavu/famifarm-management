@@ -11,11 +11,9 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 
 import {
-  List,
   Button,
   Grid,
   Loader,
-  Label,
   Form,
   InputOnChangeData,
   TextAreaProps,
@@ -129,7 +127,11 @@ class EventList extends React.Component<Props, State> {
 
     const possibleLoader = (): any => {
       if (this.state.loading) {
-        return <Loader inline active size="medium" />
+        return <Loader 
+          style={{ marginLeft: "auto", marginRight: "auto" }}
+          inline
+          active
+          size="medium" />
       }
     }
 
