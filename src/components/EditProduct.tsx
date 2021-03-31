@@ -4,7 +4,7 @@ import * as actions from "../actions";
 import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
-import { Product, PackageSize, LocalizedEntry } from "famifarm-typescript-models";
+import { Product, PackageSize, LocalizedValue } from "../generated/client";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -14,8 +14,9 @@ import {
   Loader,
   Form,
   Message,
-  InputOnChangeData,
-  Confirm
+  Confirm,
+  CheckboxProps,
+  DropdownProps
 } from "semantic-ui-react";
 import LocalizedUtils from "src/localization/localizedutils";
 import LocalizedValueInput from "./LocalizedValueInput";
@@ -31,8 +32,8 @@ interface Props {
   packageSizes?: PackageSize[];
   onProductSelected?: (product: Product) => void;
   onProductDeleted?: (productId: string) => void;
-  onPackageSizesFound?: (packageSizes: PackageSize[]) => void,
-  onError: (error: ErrorMessage) => void
+  onPackageSizesFound?: (packageSizes: PackageSize[]) => void;
+  onError: (error: ErrorMessage) => void;
 }
 
 /**
@@ -43,7 +44,7 @@ interface State {
   redirect: boolean;
   saving: boolean;
   messageVisible: boolean;
-  defaultPackageSize: string;
+  defaultPackageSizes: string[];
   open: boolean;
 }
 
@@ -64,33 +65,31 @@ class EditProduct extends React.Component<Props, State> {
       redirect: false,
       saving: false,
       messageVisible: false,
-      defaultPackageSize: "",
+      defaultPackageSizes: [],
       open:false
     };
-
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handeNameChange = this.handeNameChange.bind(this);
-    this.handleDelete = this.handleDelete.bind(this);
   }
 
   /**
-   * Component did mount life-sycle method
+   * Component did mount life cycle method
    */
-  public async componentDidMount() {
+  public componentDidMount = async () => {
+    const { keycloak, productId, onPackageSizesFound, onProductSelected } = this.props;
+
+    if (!keycloak) {
+      return;
+    }
+
     try {
-      if (!this.props.keycloak) {
-        return;
-      }
+      const packageSizeService = await Api.getPackageSizesService(keycloak);
+      const productsService = await Api.getProductsService(keycloak);
+      const product = await productsService.findProduct({ productId });
   
-      const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-      const productsService = await Api.getProductsService(this.props.keycloak);
-      const product = await productsService.findProduct(this.props.productId);
+      onProductSelected && onProductSelected(product);
+      this.setState({ product });
   
-      this.props.onProductSelected && this.props.onProductSelected(product);
-      this.setState({product: product});
-  
-      const packageSizes = await packageSizeService.listPackageSizes(0, 100);
-      this.props.onPackageSizesFound && this.props.onPackageSizesFound(packageSizes);
+      const packageSizes = await packageSizeService.listPackageSizes({ });
+      onPackageSizesFound && onPackageSizesFound(packageSizes);
     } catch (e) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
@@ -101,44 +100,28 @@ class EditProduct extends React.Component<Props, State> {
   }
 
   /**
-   * Handle name change
-   * 
-   * @param event event
-   */
-  private handeNameChange(event: React.FormEvent<HTMLInputElement>) {
-    const product = {
-      id: this.state.product!.id,
-      name: [{
-        language: "fi",
-        value: event.currentTarget.value
-      }],
-      defaultPackageSizeId: this.state.product!.defaultPackageSizeId
-    };
-
-    this.setState({product: product});
-  }
-
-  /**
    * Handle form submit
    */
-  private async handleSubmit() {
+  private handleSubmit = async () => {
+    const { keycloak, onError } = this.props;
+    const { product } = this.state;
     try {
-      if (!this.props.keycloak || !this.state.product) {
+      if (!keycloak || !product) {
         return;
       }
+
+      const productsService = await Api.getProductsService(keycloak);
+
+      this.setState({ saving: true });
+      await productsService.updateProduct({ productId: product.id!, product });
+      this.setState({ saving: false });
   
-      const productsService = await Api.getProductsService(this.props.keycloak);
-  
-      this.setState({saving: true});
-      await productsService.updateProduct(this.state.product, this.state.product.id || "");
-      this.setState({saving: false});
-  
-      this.setState({messageVisible: true});
+      this.setState({ messageVisible: true });
       setTimeout(() => {
-        this.setState({messageVisible: false});
+        this.setState({ messageVisible: false });
       }, 3000);
     } catch (e) {
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -149,18 +132,20 @@ class EditProduct extends React.Component<Props, State> {
   /**
    * Handle product delete
    */
-  private async handleDelete() {
-    if (!this.props.keycloak || !this.state.product) {
+  private handleDelete = async () => {
+    const { keycloak } = this.props;
+    const { product } = this.state;
+    if (!keycloak || !product) {
       return;
     }
 
-    const productsService = await Api.getProductsService(this.props.keycloak);
-    const id = this.state.product.id || "";
+    const productsService = await Api.getProductsService(keycloak);
+    const productId = product.id || "";
 
-    await productsService.deleteProduct(id);
+    await productsService.deleteProduct({ productId });
 
-    this.props.onProductDeleted && this.props.onProductDeleted(id!);
-    this.setState({redirect: true});
+    this.props.onProductDeleted && this.props.onProductDeleted(productId!);
+    this.setState({ redirect: true });
   }
 
 
@@ -169,9 +154,9 @@ class EditProduct extends React.Component<Props, State> {
    * 
    * @param name localized entry representing name
    */
-  updateName = (name: LocalizedEntry) => {
+  private updateName = (name: LocalizedValue[]) => {
     this.setState({
-      product: {...this.state.product, name: name}
+      product: { ...this.state.product!, name }
     });
   }
 
@@ -179,85 +164,142 @@ class EditProduct extends React.Component<Props, State> {
    * Handle package size select change
    * 
    * @param e event
-   * @param {value} value
+   * @param value updated list of package sizes from DropdownProps
    */
-  private onPackageSizeChange = (e: any, { value }: InputOnChangeData) => {
+  private onPackageSizeChange = (e: any, { value }: DropdownProps) => {
     this.setState({
-      product: {...this.state.product, defaultPackageSizeId: value}
+      product: {
+        ...this.state.product!,
+        defaultPackageSizeIds: value as string[]
+      }
     });
+  }
+
+  /**
+   * Sets the isSubcontractorProduct boolean
+   * 
+   * @param e event 
+   * @param checked checked state from CheckboxProps
+   */
+  private updateIsSubcontractorProduct = (e: any, { checked }: CheckboxProps) => {
+    this.setState({
+      product: {
+        ...this.state.product,
+        isSubcontractorProduct: checked || false
+      }
+    })
+  }
+
+
+  /**
+   * Sets the active boolean
+   * 
+   * @param e event 
+   * @param { checked } new value
+   */
+  updateIsActive = (e: any, { checked }: CheckboxProps) => {
+    this.setState({
+      product: { ...this.state.product!, active: checked || false }
+    })
   }
 
   /**
    * Render edit product view
    */
   public render() {
+    const { packageSizes } = this.props;
+    const { redirect, product, saving } = this.state;
+
     if (!this.props.product) {
       return (
-        <Grid style={{paddingTop: "100px"}} centered>
+        <Grid centered style={{ paddingTop: "100px" }}>
           <Loader inline active size="medium" />
         </Grid>
       );
     }
 
-    if (this.state.redirect) {
-      return <Redirect to="/products" push={true} />;
+    if (redirect) {
+      return <Redirect push to="/products" />;
     }
 
-    const packageSizeOptions = (this.props.packageSizes || []).map((packageSize) => {
-      return {
-        key: packageSize.id,
-        text: LocalizedUtils.getLocalizedValue(packageSize.name),
-        value: packageSize.id
-      };
-    });
+    const packageSizeOptions = (packageSizes || []).map(packageSize => ({
+      key: packageSize.id,
+      text: LocalizedUtils.getLocalizedValue(packageSize.name),
+      value: packageSize.id
+    }));
+
 
     return (
       <Grid>
         <Grid.Row className="content-page-header-row">
-          <Grid.Column width={6}>
-            <h2>{LocalizedUtils.getLocalizedValue(this.state.product ? this.state.product.name : undefined)}</h2>
+          <Grid.Column width={ 6 }>
+            <h2>{ LocalizedUtils.getLocalizedValue(product ? product.name : undefined) }</h2>
           </Grid.Column>
-          <Grid.Column width={3} floated="right">
-            <Button className="danger-button" onClick={() => this.setState({open:true})}>{strings.delete}</Button>
+          <Grid.Column width={ 3 } floated="right">
+            <Button
+              className="danger-button"
+              onClick={ () => this.setState({ open: true }) }
+            >
+              { strings.delete }
+            </Button>
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
-          <Grid.Column width={8}>
+          <Grid.Column width={ 8 }>
             <FormContainer>
               <Form.Field required>
-                <label>{strings.productName}</label>
-                <LocalizedValueInput 
-                  onValueChange={this.updateName}
-                  value={this.state.product ? this.state.product.name : undefined}
-                  languages={["fi", "en"]}
+                <label>{ strings.productName }</label>
+                <LocalizedValueInput
+                  onValueChange={ this.updateName }
+                  value={ product ? product.name : undefined }
+                  languages={[ "fi", "en" ]}
                 />
                 <Form.Select 
                   fluid
-                  required 
-                  label={strings.packageSize} 
-                  options={packageSizeOptions} 
-                  placeholder={strings.packageSize} 
-                  onChange={this.onPackageSizeChange}
-                  value={this.state.product ? this.state.product.defaultPackageSizeId : undefined}
+                  required
+                  multiple
+                  label={ strings.packageSize }
+                  options={ packageSizeOptions }
+                  placeholder={ strings.packageSize }
+                  onChange={ this.onPackageSizeChange }
+                  value={ product ? product.defaultPackageSizeIds || [] : [] }
                 />
               </Form.Field>
+              <Form.Checkbox
+                required
+                onChange={ this.updateIsSubcontractorProduct }
+                checked={ product ? product.isSubcontractorProduct : undefined }
+                label={ strings.subcontractorProduct }
+              />
+              <Form.Checkbox
+                required
+                checked={ this.state.product ? this.state.product.active : undefined }
+                onChange={ this.updateIsActive }
+                label={ strings.activeProductLabel }
+              />
               <Message
                 success
-                visible={this.state.messageVisible}
-                header={strings.savedSuccessfully}
+                visible={ this.state.messageVisible }
+                header={ strings.savedSuccessfully }
               />
               <Button 
                 className="submit-button" 
-                onClick={this.handleSubmit} 
+                onClick={ this.handleSubmit } 
                 type='submit'
-                loading={this.state.saving}
+                loading={ saving }
               >
-                {strings.save}
+                { strings.save }
               </Button>
             </FormContainer>
           </Grid.Column>
         </Grid.Row>
-        <Confirm open={this.state.open} size={"mini"} content={strings.deleteConfirmationText+ this.props.product!.name![0].value } onCancel={()=>this.setState({open:false})} onConfirm={this.handleDelete} />
+        <Confirm
+          open={ this.state.open }
+          size="mini"
+          content={ `${strings.deleteConfirmationText}${this.props.product!.name![0].value}` }
+          onCancel={ () => this.setState({ open:false }) }
+          onConfirm={ this.handleDelete }
+        />
       </Grid>
     );
   }
@@ -268,26 +310,22 @@ class EditProduct extends React.Component<Props, State> {
  * 
  * @param state store state
  */
-export function mapStateToProps(state: StoreState) {
-  return {
-    products: state.products,
-    product: state.product,
-    packageSizes: state.packageSizes
-  };
-}
+const mapStateToProps = (state: StoreState) => ({
+  products: state.products,
+  product: state.product,
+  packageSizes: state.packageSizes
+});
 
 /**
  * Redux mapper for mapping component dispatches 
  * 
  * @param dispatch dispatch method
  */
-export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
-  return {
-    onProductSelected: (product: Product) => dispatch(actions.productSelected(product)),
-    onProductDeleted: (productId: string) => dispatch(actions.productDeleted(productId)),
-    onPackageSizesFound: (packageSizes: PackageSize[]) => dispatch(actions.packageSizesFound(packageSizes)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
-  };
-}
+const mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({
+  onProductSelected: (product: Product) => dispatch(actions.productSelected(product)),
+  onProductDeleted: (productId: string) => dispatch(actions.productDeleted(productId)),
+  onPackageSizesFound: (packageSizes: PackageSize[]) => dispatch(actions.packageSizesFound(packageSizes)),
+  onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditProduct);

@@ -1,7 +1,7 @@
 import * as constants from '../constants'
 import { KeycloakInstance } from 'keycloak-js';
-import { Team, Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, Batch, WastageReason, Pest } from "famifarm-typescript-models";
-import { ErrorMessage } from '../types';
+import { Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, WastageReason, Pest, Packing, Campaign, Event } from "../generated/client";
+import { ErrorMessage, EventListFilters } from '../types';
 
 export interface UserLogin {
   type: constants.USER_LOGIN;
@@ -13,24 +13,9 @@ export interface UserLogout {
   type: constants.USER_LOGOUT;
 }
 
-export interface TeamsFound {
-  type: constants.TEAMS_FOUND;
-  teams: Team[];
-}
-
-export interface TeamSelected {
-  type: constants.TEAM_SELECTED;
-  team: Team;
-}
-
-export interface TeamCreated {
-  type: constants.TEAM_CREATED;
-  team: Team;
-}
-
-export interface TeamDeleted {
-  type: constants.TEAM_DELETED;
-  teamId: string;
+export interface PackingsFound {
+  type: constants.PACKINGS_FOUND;
+  packings: Packing[];
 }
 
 export interface ProductsFound {
@@ -116,11 +101,6 @@ export interface ProductionLineDeleted {
 export interface SeedBatchesFound {
   type: constants.SEED_BATCHES_FOUND;
   seedBatches: SeedBatch[];
-}
-
-export interface BatchesFound {
-  type: constants.BATCHES_FOUND;
-  batches: Batch[];
 }
 
 export interface SeedBatchSelected {
@@ -210,15 +190,46 @@ export interface ErrorOccurred {
   error?: ErrorMessage;
 }
 
+/**
+ * Interface representing CampaignsFound action
+ */
+export interface CampaignsFound {
+  type: constants.CAMPAIGNS_FOUND;
+  campaigns: Campaign[]
+}
 
-export type AppAction = UserLogin | UserLogout | TeamsFound | TeamSelected | TeamCreated | TeamDeleted 
+export interface EventListFiltersUpdated {
+  type: constants.EVENT_LIST_FILTERS_UPDATED;
+  eventListFilters: EventListFilters
+}
+
+export interface EventsFound {
+  type: constants.EVENTS_FOUND;
+  events: Event[];
+}
+
+
+
+export type AppAction = UserLogin | UserLogout
   | ProductsFound | ProductSelected | ProductCreated | ProductDeleted | PackageSizesFound 
   | PackageSizeSelected | PackageSizeCreated | PackageSizeDeleted | SeedsFound | SeedCreated
   | SeedSelected | SeedDeleted | ProductionLinesFound | ProductionLineSelected | ProductionLineCreated
   | ProductionLineDeleted | SeedBatchesFound | SeedBatchSelected | SeedBatchCreated | SeedBatchDeleted
   | PerformedCultivationActionsFound | PerformedCultivationActionSelected | PerformedCultivationActionCreated
-  | PerformedCultivationActionDeleted | LocaleUpdate | BatchesFound | WastageReasonsFound | WastageReasonSelected 
-  | WastageReasonCreated | WastageReasonDeleted| PestsFound | ErrorOccurred;
+  | PerformedCultivationActionDeleted | LocaleUpdate | WastageReasonsFound | WastageReasonSelected | EventsFound
+  | WastageReasonCreated | WastageReasonDeleted| PestsFound | ErrorOccurred | PackingsFound | CampaignsFound | EventListFiltersUpdated;
+
+  /**
+   * Redux store update method for campaigns
+   * 
+   * @param campaigns campaigns
+   */
+export function campaignsFound(campaigns: Campaign[]): CampaignsFound {
+  return {
+    type: constants.CAMPAIGNS_FOUND,
+    campaigns
+  }
+}
 
 export function userLogin(keycloak: KeycloakInstance, authenticated: boolean): UserLogin {
   return {
@@ -234,31 +245,10 @@ export function userLogout(): UserLogout {
   }
 }
 
-export function teamsFound(teams: Team[]): TeamsFound {
+export function packingsFound(packings: Packing[]): PackingsFound {
   return {
-    type: constants.TEAMS_FOUND,
-    teams: teams
-  }
-}
-
-export function teamSelected(team: Team): TeamSelected {
-  return {
-    type: constants.TEAM_SELECTED,
-    team: team
-  }
-}
-
-export function teamCreated(team: Team): TeamCreated {
-  return {
-    type: constants.TEAM_CREATED,
-    team: team
-  }
-}
-
-export function teamDeleted(teamId: string): TeamDeleted {
-  return {
-    type: constants.TEAM_DELETED,
-    teamId: teamId
+    type: constants.PACKINGS_FOUND,
+    packings: packings
   }
 }
 
@@ -378,13 +368,6 @@ export function seedBatchesFound(seedBatches: SeedBatch[]): SeedBatchesFound {
   return {
     type: constants.SEED_BATCHES_FOUND,
     seedBatches: seedBatches
-  }
-}
-
-export function batchesFound(batches: Batch[]): BatchesFound {
-  return {
-    type: constants.BATCHES_FOUND,
-    batches: batches
   }
 }
 
@@ -521,5 +504,19 @@ export function onErrorOccurred(error?: ErrorMessage): ErrorOccurred {
   return {
     type: constants.ERROR_OCCURRED,
     error: error
+  }
+}
+
+export function eventListFiltersUpdated(filters: EventListFilters): EventListFiltersUpdated {
+  return {
+    type: constants.EVENT_LIST_FILTERS_UPDATED,
+    eventListFilters: filters
+  }
+}
+
+export function eventsFound(events: Event[]): EventsFound {
+  return {
+    type: constants.EVENTS_FOUND,
+    events: events
   }
 }

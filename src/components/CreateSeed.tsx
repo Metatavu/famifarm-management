@@ -5,7 +5,7 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
-import { Seed, SeedOpt, LocalizedEntry } from "famifarm-typescript-models";
+import { LocalizedValue, Seed } from "../generated/client";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -31,7 +31,7 @@ interface Props {
  * Component state
  */
 interface State {
-  seedData: SeedOpt
+  seedData: Seed;
   redirect: boolean;
 }
 
@@ -60,7 +60,7 @@ class CreateSeed extends React.Component<Props, State> {
       };
   
       const seedService = await Api.getSeedsService(this.props.keycloak);
-      await seedService.createSeed(seedObject);
+      await seedService.createSeed({seed: seedObject});
       this.setState({redirect: true});
     } catch (e) {
       this.props.onError({
@@ -76,7 +76,7 @@ class CreateSeed extends React.Component<Props, State> {
    * 
    * @param name localized entry representing name
    */
-  updateName = (name: LocalizedEntry) => {
+  updateName = (name: LocalizedValue[]) => {
     this.setState({
       seedData: {...this.state.seedData, name: name}
     });

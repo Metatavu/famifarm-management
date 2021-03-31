@@ -17,6 +17,8 @@ export interface IStrings extends LocalizedStringsMethods {
   managementHeaderText: string;
   save: string;
   date: string;
+  dateAfter: string;
+  dateBefore: string;
   open: string;
   savedSuccessfully: string;
   delete: string;
@@ -29,8 +31,10 @@ export interface IStrings extends LocalizedStringsMethods {
 
   product: string;
   products: string;
+  allProducts: string;
   newProduct: string;
   productName: string;
+  selectProduct: string;
   
   productionLine: string;
   productionLines: string;
@@ -50,12 +54,6 @@ export interface IStrings extends LocalizedStringsMethods {
   seedBatchCode: string;
   seedBatchArrived: string;
 
-  team: string;
-  teams: string;
-  newTeam: string;
-  teamName: string;
-  deleteTeam: string
-
   performedCultivationAction: string;
   performedCultivationActions: string;
   newPerformedCultivationAction: string;
@@ -72,7 +70,6 @@ export interface IStrings extends LocalizedStringsMethods {
   batchPhaseTABLE_SPREAD: string,
   batchPhasePLANTING: string,
   batchPhaseHARVEST: string,
-  batchPhasePACKING: string,
   batchPhaseCOMPLETE: string,
 
   sowingEventHeader: string
@@ -92,9 +89,6 @@ export interface IStrings extends LocalizedStringsMethods {
 
   harvestEventHeader: string
   harvestEventText: string
-
-  packingEventHeader: string
-  packingEventText: string
 
   wastageEventHeader: string
   wastageEventText: string
@@ -130,7 +124,6 @@ export interface IStrings extends LocalizedStringsMethods {
   labelTrayCount: string
   labelPackageSize: string
   labelPackedCount: string
-  labelTeam: string
   labelHarvestType: string
   labelPests: string
   labelPerformedCultivationActions: string
@@ -148,7 +141,6 @@ export interface IStrings extends LocalizedStringsMethods {
   potTypeLARGE: string
   phasePLANTING: string
   phaseSOWING: string
-  phasePACKING: string
   phaseTABLE_SPREAD: string
   phaseWASTAGE: string,
   phaseCULTIVATION_OBSERVATION: string
@@ -171,6 +163,7 @@ export interface IStrings extends LocalizedStringsMethods {
   reportTypeItemSPREAD: string
   reportTypeItemHARVESTED: string
   reportTypeItemPACKED: string
+  reportTypeItemPACKED_CAMPAINGS: string
   userManagementLink: string
   accountUrl: string
   logoutUrl: string
@@ -180,6 +173,77 @@ export interface IStrings extends LocalizedStringsMethods {
   missingRequiredFieldError: string
   logPhaseWastage: string
   logPhaseWastageHeader: string
+  deleteBatchConfirmText: string
+  deleteBatchButtonText: string
+  batchDeletionError: string
+  batchDeletionSuccess: string
+  batchDeletingInProgress: string
+
+  packings: string
+  newPacking: string
+  packingStatus: string
+  packingStoreStatus: string
+  packingWastageStatus: string
+  packingRemovedStatus: string
+  selectPackingStatus: string
+  editPacking: string
+
+  showPassiveSeedBatches: string
+  seedBatchState: string
+
+  returnToPreviousList: string
+
+  printPacking: string
+  print: string
+  selectPrinter: string
+  update: string
+
+  amountInStore: string
+  oldestPackingInStore: string
+  store: string
+  openAll: string
+  closeAll: string
+  filterByDate: string
+
+  campaigns: string
+  newCampaign: string
+  campaignName: string
+  productCount: string
+  addCampaignProduct: string
+  editCampaign: string
+
+  packingType: string
+  packingTypeBasic: string
+  packingTypeCampaign: string
+  campaign: string
+
+  subcontractorProduct: string
+
+  cut: string
+  weight: string
+  gutterCount: string
+  gutterHoleCount: string
+  contactInformation: string
+  producer: string
+  sowingDay: string
+  cuttingDay: string
+  storageCondition: string
+  createCutPacking: string
+  cutPackings: string
+  editCutPacking: string
+  events: string
+  total: string
+  labelSowingDate: string
+  allEventTypes: string
+  showInActiveProductsLabel: string
+  activeProductLabel: string
+
+  packingTableHeaderName: string
+  packingTableHeaderDate: string
+  packingTableHeaderBoxes: string
+  packingTableHeaderStatus: string
+
+  allPackingStates: string
 }
 
 const strings: IStrings = new LocalizedStrings({

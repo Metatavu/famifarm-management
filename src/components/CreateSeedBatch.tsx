@@ -5,11 +5,12 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
-import { SeedBatch, Seed } from "famifarm-typescript-models";
+import { SeedBatch, Seed } from "../generated/client";
 import { Redirect } from 'react-router';
 import { DateInput } from 'semantic-ui-calendar-react';;
 import strings from "src/localization/strings";
 import { FormContainer } from "./FormContainer";
+import * as moment from "moment";
 
 import {
   Grid,
@@ -18,6 +19,8 @@ import {
   InputOnChangeData,
   Form
 } from "semantic-ui-react";
+
+const DATE_FORMAT = "DD.MM.YYYY";
 
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
@@ -41,7 +44,7 @@ class CreateSeedBatch extends React.Component<Props, State> {
     this.state = {
         code: "",
         seedId: "",
-        time: "",
+        time: moment().format(DATE_FORMAT),
         redirect: false
     };
 
@@ -58,7 +61,7 @@ class CreateSeedBatch extends React.Component<Props, State> {
       }
   
       const seedsService = await Api.getSeedsService(this.props.keycloak);
-      const seeds = await seedsService.listSeeds();
+      const seeds = await seedsService.listSeeds({});
       this.props.onSeedsFound && this.props.onSeedsFound(seeds);
     } catch (e) {
       this.props.onError({
@@ -101,11 +104,11 @@ class CreateSeedBatch extends React.Component<Props, State> {
       const seedBatchObject = {
         code: this.state.code,
         seedId: this.state.seedId,
-        time: this.state.time
+        time: moment(this.state.time, DATE_FORMAT).toDate()
       };
   
       const seedBatchService = await Api.getSeedBatchesService(this.props.keycloak);
-      await seedBatchService.createSeedBatch(seedBatchObject);
+      await seedBatchService.createSeedBatch({seedBatch: seedBatchObject});
   
       this.setState({redirect: true});
     } catch (e) {
@@ -167,7 +170,7 @@ class CreateSeedBatch extends React.Component<Props, State> {
                   placeholder={strings.date}
                   value={this.state.time}
                   iconPosition="left"
-                  dateFormat="YYYY-MM-DDTHH:mmZ"
+                  dateFormat={DATE_FORMAT}
                   onChange={this.handleTimeChange}
                 />
               </Form.Field>

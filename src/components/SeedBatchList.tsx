@@ -6,15 +6,17 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { SeedBatch } from "famifarm-typescript-models";
+import { Seed, SeedBatch } from "../generated/client";
 import strings from "src/localization/strings";
 
 import {
   List,
   Button,
   Grid,
-  Loader
+  Loader,
+  Checkbox
 } from "semantic-ui-react";
+import LocalizedUtils from "src/localization/localizedutils";
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
@@ -24,14 +26,20 @@ export interface Props {
 }
 
 export interface State {
-  seedBatches: SeedBatch[];
+  seedBatches: SeedBatch[],
+  seeds: Seed[],
+  showPassive: boolean,
+  loading: boolean
 }
 
 class SeedBatchList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      seedBatches: []
+      seeds: [],
+      seedBatches: [],
+      showPassive: false,
+      loading: false
     };
   }
 
@@ -43,9 +51,10 @@ class SeedBatchList extends React.Component<Props, State> {
       if (!this.props.keycloak) {
         return;
       }
-  
+      const seedService = await Api.getSeedsService(this.props.keycloak);
+      const seeds = await seedService.listSeeds({});
       const seedBatchService = await Api.getSeedBatchesService(this.props.keycloak);
-      const seedBatches = await seedBatchService.listSeedBatches();
+      const seedBatches = await seedBatchService.listSeedBatches({includePassive: this.state.showPassive});
       seedBatches.sort((a, b) => {
         let nameA = a.code || "";
         let nameB = b.code || "";
@@ -53,6 +62,7 @@ class SeedBatchList extends React.Component<Props, State> {
         if(nameA > nameB) { return 1; }
         return 0;
       });
+      this.setState({ seeds });
       this.props.onSeedBatchesFound && this.props.onSeedBatchesFound(seedBatches);
     } catch (e) {
       this.props.onError({
@@ -67,6 +77,13 @@ class SeedBatchList extends React.Component<Props, State> {
    * Render seed batch list view
    */
   public render() {
+    if (this.state.loading) {
+      return (
+        <Grid style={{paddingTop: "100px"}} centered>
+          <Loader inline active size="medium" />
+        </Grid>
+      );
+    }
     if (!this.props.seedBatches) {
       return (
         <Grid style={{paddingTop: "100px"}} centered>
@@ -77,6 +94,8 @@ class SeedBatchList extends React.Component<Props, State> {
 
     const seedBatches = this.props.seedBatches.map((seedBatch, i) => {
       const seedBatchPath = `/seedBatches/${seedBatch.id}`;
+      const seed = this.state.seeds.find(s => s.id == seedBatch.seedId);
+      const seedText = seed ? LocalizedUtils.getLocalizedValue(seed.name) : "";
       return (
         <List.Item style={i % 2 == 0 ? {backgroundColor: "#ddd"} : {}} key={seedBatch.id}>
           <List.Content floated='right'>
@@ -85,7 +104,7 @@ class SeedBatchList extends React.Component<Props, State> {
             </NavLink>
           </List.Content>
           <List.Content>
-            <List.Header style={{paddingTop: "10px"}}>{seedBatch.code}</List.Header>
+            <List.Header style={{paddingTop: "10px"}}>{`${seedBatch.code} / ${seedText}`}</List.Header>
           </List.Content>
         </List.Item>
       );
@@ -98,6 +117,7 @@ class SeedBatchList extends React.Component<Props, State> {
           <NavLink to="/createSeedBatch">
             <Button className="submit-button">{strings.newSeedBatch}</Button>
           </NavLink>
+          <Checkbox checked={this.state.showPassive} onChange={this.onShowPassiveChange} label={strings.showPassiveSeedBatches} />
         </Grid.Row>
         <Grid.Row>
           <Grid.Column>
@@ -108,6 +128,37 @@ class SeedBatchList extends React.Component<Props, State> {
         </Grid.Row>
       </Grid>
     );
+  }
+
+  private onShowPassiveChange = async () => {
+    const showPassive = !this.state.showPassive;
+    await this.setState({showPassive});
+    await this.updateSeedBatchesList().catch((err) => {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: err
+      });
+    });
+  }
+
+  private updateSeedBatchesList = async () => {
+    if (!this.props.keycloak) {
+      return;
+    }
+
+    this.setState({loading: true});
+    const seedBatchesService = Api.getSeedBatchesService(this.props.keycloak);
+    const seedBatches = await (await seedBatchesService).listSeedBatches({includePassive: this.state.showPassive});
+    seedBatches.sort((a, b) => {
+      let nameA = a.code || "";
+      let nameB = b.code || "";
+      if(nameA < nameB) { return -1; }
+      if(nameA > nameB) { return 1; }
+      return 0;
+    });
+    this.props.onSeedBatchesFound && this.props.onSeedBatchesFound(seedBatches);
+    this.setState({loading: false})
   }
 }
 

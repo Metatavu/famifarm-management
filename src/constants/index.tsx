@@ -4,21 +4,6 @@ export type USER_LOGIN = typeof USER_LOGIN;
 export const USER_LOGOUT = "USER_LOGOUT";
 export type USER_LOGOUT = typeof USER_LOGOUT;
 
-export const TEAMS_FOUND = "TEAMS_FOUND";
-export type TEAMS_FOUND = typeof TEAMS_FOUND;
-
-export const TEAM_SELECTED = "TEAM_SELECTED";
-export type TEAM_SELECTED = typeof TEAM_SELECTED;
-
-export const TEAM_CREATED = "TEAM_CREATED";
-export type TEAM_CREATED = typeof TEAM_CREATED;
-
-export const TEAM_DELETED = "TEAM_DELETED";
-export type TEAM_DELETED = typeof TEAM_DELETED;
-
-export const BATCHES_FOUND = "BATCHES_FOUND";
-export type BATCHES_FOUND = typeof BATCHES_FOUND; 
-
 export const PRODUCTS_FOUND= "PRODUCTS_FOUND";
 export type PRODUCTS_FOUND = typeof PRODUCTS_FOUND;
 
@@ -112,3 +97,14 @@ export type PESTS_FOUND = typeof PESTS_FOUND;
 export const ERROR_OCCURRED = "ERROR_OCCURRED";
 export type ERROR_OCCURRED = typeof ERROR_OCCURRED;
 
+export const PACKINGS_FOUND = "PACKINGS_FOUND";
+export type PACKINGS_FOUND = typeof PACKINGS_FOUND;
+
+export const CAMPAIGNS_FOUND = "CAMPAIGNS_FOUND";
+export type CAMPAIGNS_FOUND = typeof CAMPAIGNS_FOUND;
+
+export const EVENT_LIST_FILTERS_UPDATED = "EVENT_LIST_FILTERS_UPDATED";
+export type EVENT_LIST_FILTERS_UPDATED = typeof EVENT_LIST_FILTERS_UPDATED;
+
+export const EVENTS_FOUND = "EVENTS_FOUND";
+export type EVENTS_FOUND = typeof EVENTS_FOUND;

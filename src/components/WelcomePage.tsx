@@ -17,13 +17,12 @@ import {
 import BasicLayout from "./BasicLayout";
 import CreateSeed from "./CreateSeed";
 import CreateProductionLine from "./CreateProductionLine";
-import BatchView from "./BatchView";
 import EditPest from "./EditPest";
 import CreatePest from "./CreatePest";
 import EditEvent from "./EditEvent";
 import ReportDownload from "./ReportDownload";
 import SeedList from "./SeedList";
-import BatchList from "./BatchList";
+import EditPacking from "./EditPacking";
 import EditProduct from "./EditProduct";
 import EditPackageSize from "./EditPackageSize";
 import EditSeed from "./EditSeed";
@@ -39,16 +38,21 @@ import EditPerformedCultivationAction from "./EditPerformedCultivationAction";
 import EditWastageReason from "./EditWastageReason";
 import WastageReasonList from "./WastageReasonList";
 import CreateWastageReason from "./CreateWastageReason";
-import TeamList from "./TeamList";
-import EditTeam from "./EditTeam";
-import CreateTeam from "./CreateTeam";
 import ProductList from "./ProductList";
 import CreateProduct from "./CreateProduct";
 import PackageSizeList from "./PackageSizeList";
 import CreatePackageSize from "./CreatePackageSize";
 import CreateEvent from "./CreateEvent";
-import CreateBatch from "./CreateBatch";
-import EditBatch from "./EditBatch";
+import PackingList from "./PackingList";
+import CreatePacking from "./CreatePacking";
+import ViewStore from "./ViewStore";
+import CampaignList from "./CampaignList";
+import CreateCampaign from "./CreateCampaign";
+import EditCampaign from "./EditCampaign";
+import CreateCutPacking from "./CreateCutPacking";
+import EditCutPacking from "./EditCutPacking";
+import CutPackingsList from "./CutPackingsList";
+import EventList from "./EventList";
 
 export interface Props {
   authenticated: boolean,
@@ -74,7 +78,7 @@ class WelcomePage extends React.Component<Props, any> {
       "clientId": process.env.REACT_APP_AUTH_RESOURCE
     };
     const keycloak = Keycloak(kcConf);
-    keycloak.init({onLoad: "login-required"}).success((authenticated) => {
+    keycloak.init({onLoad: "login-required", checkLoginIframe: false}).success((authenticated) => {
       this.props.onLogin && this.props.onLogin(keycloak, authenticated);
     });
 
@@ -86,11 +90,20 @@ class WelcomePage extends React.Component<Props, any> {
    */
   public render() {
     const navigationRoutes = [{
-      "text": strings.batches,
-      "route": "/batches"
+      "text": strings.events,
+      "route": "/events"
     },{
-      "text": strings.teams,
-      "route": "/teams"
+      "text": strings.packings,
+      "route": "/packings"
+    },{
+      "text": strings.cutPackings,
+      "route": "/cutPackings"
+    },{
+      "text": strings.campaigns,
+      "route": "/campaigns"
+    },{
+      "text": strings.store,
+      "route": "/store"
     },{
       "text": strings.products,
       "route": "/products"
@@ -118,7 +131,7 @@ class WelcomePage extends React.Component<Props, any> {
     },{
       "text": strings.reportDownloadHeader,
       "route": "/reports"
-    }, {
+    },{
       "text": strings.userManagementLink,
       "route": process.env.REACT_APP_ACCOUNT_MANAGEMENT_URL,
       "external": true
@@ -163,69 +176,99 @@ class WelcomePage extends React.Component<Props, any> {
                 )}
               />
               <Route
-                path="/teams"
+                path="/events"
                 exact={true}
                 render={props => (
-                  <TeamList
+                  <EventList
                     keycloak={this.state.keycloak}
                   />
                 )}
               />
               <Route
-                path="/batches"
+                path="/packings"
                 exact={true}
                 render={props => (
-                  <BatchList
+                  <PackingList
                     keycloak={this.state.keycloak}
                   />
                 )}
               />
               <Route
-                path="/batches/:batchId"
-                exact={true}
-                render={props => (
-                  <BatchView
-                    keycloak={this.state.keycloak}
-                    batchId={props.match.params.batchId as string}
+                path="/cutPackings"
+                exact={ true }
+                render={ props => (
+                  <CutPackingsList
+                    keycloak={ this.state.keycloak }
                   />
                 )}
               />
               <Route
-                path="/teams/:teamId"
+                path="/campaigns"
                 exact={true}
                 render={props => (
-                  <EditTeam
-                    keycloak={this.state.keycloak}
-                    teamId={props.match.params.teamId as string}
-                  />
-                )}
-              />
-              <Route
-                path="/createTeam"
-                exact={true}
-                render={props => (
-                  <CreateTeam
+                  <CampaignList
                     keycloak={this.state.keycloak}
                   />
                 )}
               />
               <Route
-                path="/createBatch"
+                path="/store"
                 exact={true}
                 render={props => (
-                  <CreateBatch
+                  <ViewStore
                     keycloak={this.state.keycloak}
                   />
                 )}
               />
-              <Route
-                path="/editBatch/:batchId"
+              <Route 
+                path="/packings/:packingId"
                 exact={true}
                 render={props => (
-                  <EditBatch
-                    batchId={props.match.params.batchId as string}
+                  <EditPacking
                     keycloak={this.state.keycloak}
+                    packingId={props.match.params.packingId as string}
+                />
+                )}
+              />
+              <Route 
+                path="/cutPackings/:cutPackingId"
+                exact={ true }
+                render={ props => (
+                  <EditCutPacking
+                    keycloak={ this.state.keycloak }
+                    cutPackingId={ props.match.params.cutPackingId as string }
                   />
+                ) }
+              />
+              <Route 
+                path="/campaigns/:campaignId"
+                exact={ true }
+                render={ props => (
+                  <EditCampaign
+                    keycloak={ this.state.keycloak }
+                    campaignId={ props.match.params.campaignId as string }
+                />
+                )}
+              />
+              <Route
+                path="/createPacking"
+                exact={true}
+                render={props => (
+                  <CreatePacking keycloak={this.state.keycloak}/>
+                )}
+              />
+              <Route
+                path="/createCutPacking"
+                exact={true}
+                render={props => (
+                  <CreateCutPacking keycloak={ this.state.keycloak }/>
+                )}
+              />
+              <Route
+                path="/createCampaign"
+                exact={true}
+                render={props => (
+                  <CreateCampaign keycloak={this.state.keycloak}/>
                 )}
               />
               <Route
@@ -258,12 +301,11 @@ class WelcomePage extends React.Component<Props, any> {
                 )}
               />
               <Route
-                path="/createEvent/:batchId"
+                path="/createEvent"
                 exact={true}
                 render={props => (
                     <CreateEvent
                       keycloak={this.state.keycloak}
-                      batchId={props.match.params.batchId as string}
                     />
                 )}
               />

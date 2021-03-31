@@ -56,7 +56,9 @@ class ReportDownload extends React.Component<Props, State> {
       "PLANTED",
       "SPREAD",
       "HARVESTED",
-      "PACKED"
+      "PACKED",
+      "PACKED_CAMPAINGS",
+      "PRODUCT_PHASE_COUNT"
     ].map((reportType) => {
       return {
         key: reportType,
@@ -105,7 +107,8 @@ class ReportDownload extends React.Component<Props, State> {
     const fromTime = moment(this.state.startTime).startOf("day").toISOString();
     const toTime = moment(this.state.endTime).endOf("day").toISOString();
     const reportsService = await Api.getReportsService(this.props.keycloak);
-    const reportData = await reportsService.getReport(this.state.reportType, fromTime, toTime);
+    const reportData = await reportsService.getReport({type: this.state.reportType, fromTime, toTime});
+
     const dataObj = window.URL.createObjectURL(reportData);
     const link = document.createElement('a');
     document.body.appendChild(link);

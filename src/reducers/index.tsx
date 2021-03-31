@@ -2,10 +2,8 @@ import { AppAction } from '../actions';
 import { StoreState } from '../types/index';
 import { 
   USER_LOGIN, 
-  USER_LOGOUT, 
-  TEAMS_FOUND, 
-  TEAM_SELECTED, 
-  TEAM_DELETED,
+  USER_LOGOUT,
+  PACKINGS_FOUND,
   PRODUCTS_FOUND, 
   PRODUCT_SELECTED, 
   PRODUCT_DELETED,
@@ -24,13 +22,15 @@ import {
   PERFORMED_CULTIVATION_ACTIONS_FOUND,
   PERFORMED_CULTIVATION_ACTION_DELETED,
   PERFORMED_CULTIVATION_ACTION_SELECTED, 
-  BATCHES_FOUND,
   WASTAGE_REASONS_FOUND,
   WASTAGE_REASON_DELETED,
   WASTAGE_REASON_SELECTED,
   LOCALE_UPDATE,
   PESTS_FOUND,
-  ERROR_OCCURRED} from '../constants/index';
+  ERROR_OCCURRED,
+  CAMPAIGNS_FOUND,
+  EVENT_LIST_FILTERS_UPDATED,
+  EVENTS_FOUND} from '../constants/index';
 
 /**
  * Process action 
@@ -44,16 +44,10 @@ export function processAction(state: StoreState, action: AppAction): StoreState 
       return { ...state, keycloak: action.keycloak, authenticated: action.authenticated};
     case USER_LOGOUT:
       return { ...state, keycloak: undefined, authenticated: false };
-    case TEAMS_FOUND:
-      return { ...state, teams: action.teams };
-    case TEAM_SELECTED:
-      return { ...state, team: action.team};
-    case TEAM_DELETED:
-      return { ...state,  teams: (state.teams || []).filter((team) => {return team.id !== action.teamId})};
+    case PACKINGS_FOUND:
+      return {...state, packings: action.packings};
     case PRODUCTS_FOUND:
       return { ...state, products: action.products };
-    case BATCHES_FOUND:
-      return { ...state, batches: action.batches };
     case PRODUCT_SELECTED:
       return { ...state, product: action.product};
     case PRODUCT_DELETED:
@@ -100,7 +94,13 @@ export function processAction(state: StoreState, action: AppAction): StoreState 
     case PESTS_FOUND:
       return { ...state, pests: action.pests}
     case ERROR_OCCURRED:
-    return { ...state, error: action.error}
+      return { ...state, error: action.error}
+    case CAMPAIGNS_FOUND:
+      return { ...state, campaigns: action.campaigns }
+    case EVENT_LIST_FILTERS_UPDATED:
+      return { ...state, eventListFilters: action.eventListFilters }
+    case EVENTS_FOUND:
+      return { ...state, events: action.events}
     }
   return state;
 }

@@ -3,7 +3,7 @@ import * as Keycloak from 'keycloak-js';
 import * as actions from "../actions";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Seed } from "famifarm-typescript-models";
+import { Seed } from "../generated/client";
 import strings from "src/localization/strings";
 import { StoreState, ErrorMessage } from "../types/index";
 import { connect } from "react-redux";
@@ -46,7 +46,7 @@ class SeedsList extends React.Component<Props, State> {
       }
 
       const seedsService = await Api.getSeedsService(this.props.keycloak);
-      const seeds = await seedsService.listSeeds();
+      const seeds = await seedsService.listSeeds({});
       seeds.sort((a, b) => {
         let nameA = LocalizedUtils.getLocalizedValue(a.name)
         let nameB = LocalizedUtils.getLocalizedValue(b.name)

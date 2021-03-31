@@ -4,7 +4,7 @@ import * as actions from "../actions";
 import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
-import { PerformedCultivationAction, LocalizedEntry } from "famifarm-typescript-models";
+import { LocalizedValue, PerformedCultivationAction } from "../generated/client";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -75,7 +75,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
       }
       
       const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
-      const performedCultivationAction = await performedCultivationActionService.findPerformedCultivationAction(this.props.performedCultivationActionId);
+      const performedCultivationAction = await performedCultivationActionService.findPerformedCultivationAction({performedCultivationActionId: this.props.performedCultivationActionId});
       this.props.onPerformedCultivationActionSelected && this.props.onPerformedCultivationActionSelected(performedCultivationAction);
       this.setState({performedCultivationAction: performedCultivationAction});
 
@@ -93,7 +93,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
    * 
    * @param name localized entry representing name
    */
-  updateName = (name: LocalizedEntry) => {
+  updateName = (name: LocalizedValue[]) => {
     this.setState({
       performedCultivationAction: {...this.state.performedCultivationAction, name: name}
     });
@@ -111,7 +111,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
       this.setState({saving: true});
   
       const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
-      await performedCultivationActionService.updatePerformedCultivationAction(this.state.performedCultivationAction, this.state.performedCultivationAction.id!);
+      await performedCultivationActionService.updatePerformedCultivationAction({performedCultivationActionId: this.state.performedCultivationAction.id!, performedCultivationAction: this.state.performedCultivationAction});
       
       this.setState({saving: false});
   
@@ -139,7 +139,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
   
       const id = this.state.performedCultivationAction!.id;
       const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
-      await performedCultivationActionService.deletePerformedCultivationAction(id!);
+      await performedCultivationActionService.deletePerformedCultivationAction({performedCultivationActionId: id!});
   
       this.props.onPerformedCultivationActionDeleted && this.props.onPerformedCultivationActionDeleted(id!);
       this.setState({redirect: true});

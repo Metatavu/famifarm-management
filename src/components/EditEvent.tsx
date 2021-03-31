@@ -1,10 +1,10 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PackingEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, ProductionLine, SeedBatch, WastageReason, Team } from "famifarm-typescript-models";
+import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, ProductionLine, SeedBatch, WastageReason, Seed } from "../generated/client";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
-import { DateTimeInput } from 'semantic-ui-calendar-react';
+import { DateTimeInput, DateInput } from 'semantic-ui-calendar-react';
 import * as actions from "../actions";
 import { StoreState } from "../types/index";
 import { connect } from "react-redux";
@@ -46,11 +46,11 @@ interface State {
   event?: Event
   performedCultivationActions?: PerformedCultivationAction[]
   pests?: Pest[],
-  teams?: Team[],
   productionLines?: ProductionLine[]
   packageSizes?: PackageSize[]
   seedBatches?: SeedBatch[]
   wastageReasons?: WastageReason[]
+  seeds?: Seed[]
 }
 
 /**
@@ -85,11 +85,13 @@ class EditEvent extends React.Component<Props, State> {
   
       this.setState({loading: true});
       const eventsService = await Api.getEventsService(this.props.keycloak);
-      const event = await eventsService.findEvent(this.props.eventId);
-
+      const event = await eventsService.findEvent({eventId: this.props.eventId});
+      const seedsService = await Api.getSeedsService(this.props.keycloak);
+      const seeds = await seedsService.listSeeds({});
       this.setState({
         event: event,
-        loading: false
+        loading: false,
+        seeds: seeds
       });
     } catch (e) {
       this.props.onError({
@@ -113,7 +115,7 @@ class EditEvent extends React.Component<Props, State> {
     }
 
     if (this.state.redirect) {
-      return <Redirect to={this.state.event ? `/batches/${this.state.event.batchId}` : "/batches"} push={true} />;
+      return <Redirect to={"/events"} push={true} />;
     }
 
     if (!this.state.event) {
@@ -136,11 +138,11 @@ class EditEvent extends React.Component<Props, State> {
             <FormContainer>
               <Form.Field required>
                 <label>{strings.labelStartTime}</label>
-                <DateTimeInput dateTimeFormat="YYYY.MM.DD HH:mm" onChange={this.handleTimeChange} name="startTime" value={moment(event.startTime).format("YYYY.MM.DD HH:mm")} />
+                <DateTimeInput dateTimeFormat="DD.MM.YYYY HH:mm" onChange={this.handleTimeChange} name="startTime" value={moment(event.startTime).format("DD.MM.YYYY HH:mm")} />
               </Form.Field>
               <Form.Field>
                 <label>{strings.labelEndTime}</label>
-                <DateTimeInput dateTimeFormat="YYYY.MM.DD HH:mm" onChange={this.handleTimeChange} name="endTime" value={moment(event.endTime).format("YYYY.MM.DD HH:mm")} />
+                <DateTimeInput dateTimeFormat="DD.MM.YYYY HH:mm" onChange={this.handleTimeChange} name="endTime" value={moment(event.endTime).format("DD.MM.YYYY HH:mm")} />
               </Form.Field>
               {this.renderEventDataForm(event)}
               <Form.TextArea label={strings.labelAdditionalInformation} onChange={this.handleBaseChange} name="additionalInformation" value={event.additionalInformation} />
@@ -179,7 +181,7 @@ class EditEvent extends React.Component<Props, State> {
       return;
     }
 
-    eventData[name] = moment(value, "YYYY.MM.DD HH:mm").toISOString();
+    eventData[name] = moment(value, "DD.MM.YYYY HH:mm").toDate();
     this.setState({ event: eventData });
   }
 
@@ -260,16 +262,11 @@ class EditEvent extends React.Component<Props, State> {
         case "HARVEST":
           data = {
             gutterCount: eventData.gutterCount,
+            gutterHoleCount: eventData.gutterHoleCount,
             productionLineId: eventData.productionLineId,
-            teamId: eventData.teamId,
-            type: eventData.type
+            type: eventData.type,
+            sowingDate: moment(eventData.sowingDate).toDate()
           } as HarvestEventData;
-        break;
-        case "PACKING":
-          data = {
-            packageSizeId: eventData.packageSizeId,
-            packedCount: eventData.packedCount
-          } as PackingEventData;
         break;
         case "PLANTING":
           data = {
@@ -277,7 +274,8 @@ class EditEvent extends React.Component<Props, State> {
             gutterHoleCount: eventData.gutterHoleCount,
             productionLineId: eventData.productionLineId, 
             trayCount: eventData.trayCount,
-            workerCount: eventData.workerCount
+            workerCount: eventData.workerCount,
+            sowingDate: moment(eventData.sowingDate).toDate()
           } as PlantingEventData;
         break;
         case "SOWING":
@@ -290,7 +288,6 @@ class EditEvent extends React.Component<Props, State> {
         break;
         case "TABLE_SPREAD":
           data = {
-            location: "Taimialue",
             trayCount: eventData.trayCount
           } as TableSpreadEventData;
         break;
@@ -305,7 +302,7 @@ class EditEvent extends React.Component<Props, State> {
       }
       event.data = data;
 
-      await eventsService.updateEvent(event, event.id!);
+      await eventsService.updateEvent({eventId: event.id!,  event});
       this.setState({saving: false, messageVisible: true});
       setTimeout(() => {
         this.setState({messageVisible: false});
@@ -317,6 +314,23 @@ class EditEvent extends React.Component<Props, State> {
         exception: e
       });
     }
+  }
+
+
+  /**
+   * Handle value change
+   * 
+   * @param event event
+   */
+  private handleDataTimeChange = (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
+    const eventData = {...this.state.event} as any;
+    if (!eventData) {
+      return;
+    }
+
+    eventData.data = {...this.state.event!.data};
+    eventData.data[name] = moment(value, "DD.MM.YYYY").toDate();
+    this.setState({ event: { ...eventData } });
   }
 
   /**
@@ -331,7 +345,7 @@ class EditEvent extends React.Component<Props, State> {
       const eventsService = await Api.getEventsService(this.props.keycloak);
       const id = this.state.event.id || "";
   
-      await eventsService.deleteEvent(id);
+      await eventsService.deleteEvent({eventId: id});
       
       this.setState({redirect: true});
     } catch (e) {
@@ -352,8 +366,6 @@ class EditEvent extends React.Component<Props, State> {
         return this.renderCultivationObservationDataForm(event.data as CultivationObservationEventData);
       case "HARVEST":
         return this.renderHarvesDataForm(event.data as HarvestEventData);
-      case "PACKING":
-        return this.renderPackingDataForm(event.data as PackingEventData);
       case "PLANTING":
         return this.renderPlantingDataForm(event.data as PlantingEventData);
       case "SOWING":
@@ -362,6 +374,8 @@ class EditEvent extends React.Component<Props, State> {
         return this.renderTableSpreadDataForm(event.data as TableSpreadEventData);
       case "WASTAGE":
         return this.renderWastageDataForm(event.data as WastageEventData);
+      default:
+        return null;
     }
   }
 
@@ -411,7 +425,7 @@ class EditEvent extends React.Component<Props, State> {
    * Renders harvest event form
    */
   private renderHarvesDataForm = (data: HarvestEventData) => {
-    if (!this.state.teams || !this.state.productionLines) {
+    if (!this.state.productionLines) {
       this.loadHarvestData().catch((e) => {
         this.props.onError({
           message: strings.defaultApiErrorMessage,
@@ -422,14 +436,6 @@ class EditEvent extends React.Component<Props, State> {
 
       return;
     }
-
-    const teamOptions = this.state.teams.map((team) => {
-      return {
-        key: team.id,
-        value: team.id,
-        text: LocalizedUtils.getLocalizedValue(team.name)
-      };
-    });
 
     const productionLineOptions = this.state.productionLines.map((productionLine) => {
       return {
@@ -449,44 +455,16 @@ class EditEvent extends React.Component<Props, State> {
 
     return (
       <React.Fragment>
+        <Form.Field required>
+          <label>{strings.labelSowingDate}</label>
+          <DateInput dateTimeFormat="DD.MM.YYYY" onChange={this.handleDataTimeChange} name="sowingDate" value={data.sowingDate ? moment(data.sowingDate).format("DD.MM.YYYY") : ""} />
+        </Form.Field>
         <Form.Select required label={strings.labelHarvestType} name="type" options={harvestTypeOptions} value={data.type} onChange={this.handleDataChange} />
         <Form.Input required label={strings.labelGutterCount} name="gutterCount" type="number" value={data.gutterCount} onChange={this.handleDataChange} />
         <Form.Select required label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
-        <Form.Select required label={strings.labelTeam} name="teamId" options={teamOptions} value={data.teamId} onChange={this.handleDataChange} />
+        <Form.Input required label={strings.labelGutterHoleCount} name="gutterHoleCount" type="number" value={data.gutterHoleCount} onChange={this.handleDataChange} />
       </React.Fragment>
     )
-  }
-
-  /**
-   * Renders packing event form
-   */
-  private renderPackingDataForm = (data: PackingEventData) => {
-    if (!this.state.packageSizes) {
-      this.loadPackingData().catch((e) => {
-        this.props.onError({
-          message: strings.defaultApiErrorMessage,
-          title: strings.defaultApiErrorTitle,
-          exception: e
-        });
-      });
-
-      return;
-    }
-
-    const packageSizeOptions = this.state.packageSizes.map((packageSize) => {
-      return {
-        key: packageSize.id,
-        value: packageSize.id,
-        text: LocalizedUtils.getLocalizedValue(packageSize.name)
-      }
-    });
-
-    return (
-      <React.Fragment>
-        <Form.Input required label={strings.labelPackedCount} name="packedCount" type="number" value={data.packedCount} onChange={this.handleDataChange} />
-        <Form.Select required label={strings.labelPackageSize} name="packageSizeId" options={packageSizeOptions} value={data.packageSizeId} onChange={this.handleDataChange} />
-      </React.Fragment>
-    );
   }
 
   /**
@@ -515,6 +493,10 @@ class EditEvent extends React.Component<Props, State> {
 
     return (
       <React.Fragment>
+        <Form.Field required>
+          <label>{strings.labelSowingDate}</label>
+          <DateInput dateTimeFormat="DD.MM.YYYY" onChange={this.handleDataTimeChange} name="sowingDate" value={data.sowingDate ? moment(data.sowingDate).format("DD.MM.YYYY") : ""} />
+        </Form.Field>
         <Form.Select required label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
         <Form.Input required label={strings.labelTrayCount} name="trayCount" type="number" value={data.trayCount} onChange={this.handleDataChange} />
         <Form.Input required label={strings.labelGutterCount} name="gutterCount" type="number" value={data.gutterCount} onChange={this.handleDataChange} />
@@ -548,11 +530,22 @@ class EditEvent extends React.Component<Props, State> {
       };
     });
 
+    const getSeedName = (seedId?:String): any => {
+      if (this.state.seeds === null || this.state.seeds === undefined) {
+        return
+      }
+      const seed = this.state.seeds.find(seed => seed.id === seedId)
+      if (seed === null || seed === undefined) {
+        return
+      }
+      return LocalizedUtils.getLocalizedValue(seed.name)
+    }
+
     const seedBatchOptions = this.state.seedBatches.map((seedBatch) => {
       return {
         key: seedBatch.id,
         value: seedBatch.id,
-        text: seedBatch.code
+        text: seedBatch.code + " " + getSeedName(seedBatch.seedId)
       };
     });
 
@@ -619,7 +612,7 @@ class EditEvent extends React.Component<Props, State> {
       };
     });
 
-    const phaseOptions = ['PLANTING', 'SOWING', 'PACKING', 'TABLE_SPREAD', 'CULTIVATION_OBSERVATION', 'HARVEST' ].map((phase) => {
+    const phaseOptions = ['PLANTING', 'SOWING', 'TABLE_SPREAD', 'CULTIVATION_OBSERVATION', 'HARVEST' ].map((phase) => {
       return {
         key: phase,
         value: phase,
@@ -646,18 +639,11 @@ class EditEvent extends React.Component<Props, State> {
     }
 
     this.setState({loading: true});
-    const [teamsService, productionLinesService] = await Promise.all([
-      Api.getTeamsService(this.props.keycloak),
-      Api.getProductionLinesService(this.props.keycloak)
-    ]);
+    const productionLinesService = await Api.getProductionLinesService(this.props.keycloak);
 
-    const [teams, productionLines] = await Promise.all([
-      teamsService.listTeams(),
-      productionLinesService.listProductionLines()
-    ]);
+    const productionLines = await productionLinesService.listProductionLines({});
 
     this.setState({
-      teams: teams,
       loading: false,
       productionLines: this.sortProductionLines(productionLines)
     });
@@ -678,32 +664,14 @@ class EditEvent extends React.Component<Props, State> {
     ]);
 
     const [performedCultivationActions, pests] = await Promise.all([
-      performedCultivationActionsService.listPerformedCultivationActions(),
-      pestsService.listPests()
+      performedCultivationActionsService.listPerformedCultivationActions({}),
+      pestsService.listPests({})
     ]);
 
     this.setState({
       loading: false,
       pests: pests,
       performedCultivationActions: performedCultivationActions
-    });
-  }
-
-  /**
-   * Loads data required for packing event
-   */
-  private loadPackingData = async () => {
-    if (!this.props.keycloak) {
-      return;
-    }
-
-    this.setState({loading: true});
-    const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-    const packageSizes = await packageSizeService.listPackageSizes();
-
-    this.setState({
-      loading: false,
-      packageSizes: packageSizes
     });
   }
 
@@ -717,7 +685,7 @@ class EditEvent extends React.Component<Props, State> {
 
     this.setState({loading: true});
     const getProductionLinesService = await Api.getProductionLinesService(this.props.keycloak);
-    const productionLines = await getProductionLinesService.listProductionLines();
+    const productionLines = await getProductionLinesService.listProductionLines({});
 
     this.setState({
       loading: false,
@@ -740,8 +708,8 @@ class EditEvent extends React.Component<Props, State> {
     ]);
 
     const [seedBatches, productionLines] = await Promise.all([
-      seedBatchesService.listSeedBatches(),
-      productionLinesService.listProductionLines()
+      seedBatchesService.listSeedBatches({}),
+      productionLinesService.listProductionLines({})
     ]);
 
     this.setState({
@@ -766,8 +734,8 @@ class EditEvent extends React.Component<Props, State> {
     ]);
 
     const [wastageReasons, productionLines] = await Promise.all([
-      wastageReasonsService.listWastageReasons(),
-      productionLinesService.listProductionLines()
+      wastageReasonsService.listWastageReasons({}),
+      productionLinesService.listProductionLines({})
     ]);
 
     this.setState({

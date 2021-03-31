@@ -4,7 +4,7 @@ import * as actions from "../actions";
 import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
-import { PackageSize, PackageSizeOpt, LocalizedEntry } from "famifarm-typescript-models";
+import { LocalizedValue, PackageSize } from "../generated/client";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -37,7 +37,7 @@ interface Props {
  * Interface representing component state
  */
 interface State {
-  packageSize?: PackageSizeOpt;
+  packageSize?: PackageSize;
   redirect: boolean;
   saving: boolean;
   messageVisible: boolean;
@@ -78,7 +78,7 @@ class EditPackageSize extends React.Component<Props, State> {
       }
   
       const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-      const packageSize = await packageSizeService.findPackageSize(this.props.packageSizeId);
+      const packageSize = await packageSizeService.findPackageSize({packageSizeId: this.props.packageSizeId});
       this.props.onPackageSizeSelected && this.props.onPackageSizeSelected(packageSize);
       this.setState({packageSize: packageSize});
     } catch (e) {
@@ -102,7 +102,7 @@ class EditPackageSize extends React.Component<Props, State> {
       const packageSizeObject = this.state.packageSize || {};
       const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
       this.setState({saving: true});
-      await packageSizeService.updatePackageSize(packageSizeObject, packageSizeObject.id || "");
+      await packageSizeService.updatePackageSize({packageSizeId: packageSizeObject.id!, packageSize: packageSizeObject });
       this.setState({saving: false, messageVisible: true});
       setTimeout(() => {
         this.setState({messageVisible: false});
@@ -127,7 +127,7 @@ class EditPackageSize extends React.Component<Props, State> {
   
       const id = this.state.packageSize.id || "";
       const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-      await packageSizeService.deletePackageSize(id);
+      await packageSizeService.deletePackageSize({packageSizeId: id});
       this.props.onPackageSizeDeleted && this.props.onPackageSizeDeleted(id!);
       this.setState({redirect: true});
     } catch (e) {
@@ -144,7 +144,7 @@ class EditPackageSize extends React.Component<Props, State> {
    * 
    * @param name localized package size name
    */
-  private updateName = (name: LocalizedEntry) => {
+  private updateName = (name: LocalizedValue[]) => {
     this.setState({
       packageSize: {...this.state.packageSize, name: name}
     });

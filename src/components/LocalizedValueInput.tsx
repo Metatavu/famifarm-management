@@ -5,15 +5,15 @@ import {
   Input,
   InputOnChangeData
 } from "semantic-ui-react";
-import { LocalizedEntry } from "famifarm-typescript-models";
+import { LocalizedValue } from "../generated/client";
 
 /**
  * Component props
  */
 interface Props {
-  value?: LocalizedEntry
+  value?: LocalizedValue[]
   languages: string[]
-  onValueChange: (value: LocalizedEntry) => void
+  onValueChange: (value: LocalizedValue[]) => void
 }
 
 /**
