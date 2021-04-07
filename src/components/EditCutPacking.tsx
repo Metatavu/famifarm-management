@@ -138,7 +138,7 @@ class EditCutPacking extends React.Component<Props, State> {
     } = this.state;
 
     if (redirect) {
-      return <Redirect to={`/cutPackings}`} push={true} />;
+      return <Redirect to={`/cutPackings`} />;
     }
 
     if (loading) {
@@ -272,6 +272,12 @@ class EditCutPacking extends React.Component<Props, State> {
               >
                 { strings.save }
               </Button>
+              <Button
+                className="danger-button"
+                onClick={ () => this.setState({ confirmOpen: true }) }
+              >
+                { strings.delete }
+              </Button>
             </FormContainer>
           </Grid.Column>
         </Grid.Row>
@@ -388,7 +394,7 @@ class EditCutPacking extends React.Component<Props, State> {
    */
   private getPackingName = () => {
     const { selectedProductName, cuttingDay } = this.state;
-    return `${ selectedProductName } - ${ strings.cut } ${ cuttingDay }`
+    return `${ selectedProductName } - ${ strings.cut } ${ moment(cuttingDay).format("DD.MM.YYYY") }`
   }
 
   /**
