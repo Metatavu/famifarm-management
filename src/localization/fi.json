@@ -218,5 +218,6 @@
     "packingTableHeaderDate": "Päiväys",
     "packingTableHeaderBoxes": "Laatikkoa",
     "packingTableHeaderStatus": "Tila",
-    "allPackingStates": "Kaikki tilat"
+    "allPackingStates": "Kaikki tilat",
+    "allProductionLines": "Kaikki linjat"
   }

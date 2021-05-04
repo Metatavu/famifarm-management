@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, ProductionLine, SeedBatch, WastageReason, Seed } from "../generated/client";
+import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, ProductionLine, SeedBatch, WastageReason, Seed, Product } from "../generated/client";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 import { DateTimeInput, DateInput } from 'semantic-ui-calendar-react';
@@ -18,7 +18,10 @@ import {
   Message,
   InputOnChangeData,
   Confirm,
-  TextAreaProps
+  TextAreaProps,
+  Select,
+  DropdownItemProps,
+  DropdownProps
 } from "semantic-ui-react";
 import LocalizedUtils from "src/localization/localizedutils";
 import * as moment from "moment";
@@ -51,6 +54,7 @@ interface State {
   seedBatches?: SeedBatch[]
   wastageReasons?: WastageReason[]
   seeds?: Seed[]
+  products: Product[]
 }
 
 /**
@@ -66,6 +70,7 @@ class EditEvent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
+      products: [],
       loading: false,
       redirect: false,
       saving: false,
@@ -88,10 +93,13 @@ class EditEvent extends React.Component<Props, State> {
       const event = await eventsService.findEvent({eventId: this.props.eventId});
       const seedsService = await Api.getSeedsService(this.props.keycloak);
       const seeds = await seedsService.listSeeds({});
+      const productsService = await Api.getProductsService(this.props.keycloak);
+      const products = await productsService.listProducts({});
       this.setState({
-        event: event,
+        event,
         loading: false,
-        seeds: seeds
+        seeds,
+        products
       });
     } catch (e) {
       this.props.onError({
@@ -121,6 +129,18 @@ class EditEvent extends React.Component<Props, State> {
     if (!this.state.event) {
       return null;
     }
+
+    const productOptions: DropdownItemProps[] = [{ key: "", value: "", text: "", }].concat(this.state.products.map((product) => {
+      const id = product.id!;
+      const name = LocalizedUtils.getLocalizedValue(product.name);
+
+      return {
+        key: id,
+        value: id,
+        text: name
+      };
+    }));
+
     const event: Event = this.state.event;
 
     return (
@@ -136,6 +156,10 @@ class EditEvent extends React.Component<Props, State> {
         <Grid.Row>
           <Grid.Column width={8}>
             <FormContainer>
+              <Form.Field required>
+                <label>{strings.batchProduct}</label>
+                <Select options={ productOptions } value={ event.productId || "" } onChange={ this.handleProductChange }/>
+              </Form.Field>
               <Form.Field required>
                 <label>{strings.labelStartTime}</label>
                 <DateTimeInput dateTimeFormat="DD.MM.YYYY HH:mm" onChange={this.handleTimeChange} name="startTime" value={moment(event.startTime).format("DD.MM.YYYY HH:mm")} />
@@ -168,6 +192,15 @@ class EditEvent extends React.Component<Props, State> {
         <Confirm open={this.state.open} size={"mini"} content={strings.deleteEventConfirmText} onCancel={()=>this.setState({open:false})} onConfirm={this.handleDelete} />
       </Grid>
     );
+  }
+
+  /**
+   * Event handler for product change 
+   */
+  private handleProductChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    this.setState({
+      event: {...this.state.event, productId: data.value as string} as Event
+    });
   }
 
     /**

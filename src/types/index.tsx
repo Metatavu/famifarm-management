@@ -6,6 +6,7 @@ export interface EventListFilters {
   date?: Date,
   firstResult?: number
   type?: EventType
+  productionLine?: ProductionLine
 }
 
 export interface StoreState {

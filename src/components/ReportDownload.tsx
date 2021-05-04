@@ -86,7 +86,7 @@ class ReportDownload extends React.Component<Props, State> {
                 <label>{strings.labelEndTime}</label>
                 <DateInput dateFormat="DD.MM.YYYY" onChange={this.updateEndTime} name="endTime" value={moment(this.state.endTime).format("DD.MM.YYYY")} />
               </Form.Field>
-              <Button loading={this.state.loading} className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.save}</Button>
+              <Button loading={this.state.loading} className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.print}</Button>
             </Form>
           </Grid.Column>
         </Grid.Row>

@@ -222,7 +222,7 @@ class CreateEvent extends React.Component<Props, State> {
         <Grid.Row>
           <Grid.Column width={8}>
             <FormContainer>
-            <Form.Field required>
+              <Form.Field required>
                 <label>{strings.batchProduct}</label>
                 <Select options={ productOptions } value={ event.productId || "" } onChange={ this.handleProductChange }/>
               </Form.Field>
