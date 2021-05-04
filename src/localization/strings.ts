@@ -244,6 +244,7 @@ export interface IStrings extends LocalizedStringsMethods {
   packingTableHeaderStatus: string
 
   allPackingStates: string
+  allProductionLines: string
 }
 
 const strings: IStrings = new LocalizedStrings({

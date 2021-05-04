@@ -92,6 +92,14 @@ class EventList extends React.Component<Props, State> {
     const eventTypeString = strings[`phase${event.type}`];
     const eventData = event.data as any;
     const productionLine = eventData.productionLineId ? this.state.productionLines.find(line => line.id == eventData.productionLineId) : undefined;
+    if (this.props.eventListFilters && this.props.eventListFilters.productionLine) {
+      if (!productionLine) {
+        return null;
+      }
+      if (productionLine.id !== this.props.eventListFilters.productionLine.id) {
+        return null;
+      }
+    }
     const productionLineText = productionLine ? productionLine.lineNumber || "" : "";
     const gutterCountText = eventData.gutterCount !== undefined ? eventData.gutterCount : "";
     const gutterHoleCountText = eventData.gutterHoleCount !== undefined ? eventData.gutterHoleCount : "";
@@ -141,6 +149,7 @@ class EventList extends React.Component<Props, State> {
     const productText = eventListFilters && eventListFilters.product ? LocalizedUtils.getLocalizedValue(eventListFilters.product.name) : strings.selectProduct;
     const dateText = eventListFilters && eventListFilters.date ? moment(eventListFilters.date).format("DD.MM.YYYY") : "";
     const typeFilterText = eventListFilters && eventListFilters.type ? strings[`phase${eventListFilters.type}`] : strings.allEventTypes;
+    const lineFilterText = eventListFilters && eventListFilters.productionLine ? eventListFilters.productionLine.lineNumber : strings.allProductionLines;
     return (
       <Grid>
         <Grid.Row className="content-page-header-row" style={{flex: 1,justifyContent: "space-between", paddingLeft: 10, paddingRight: 10}}>
@@ -163,6 +172,10 @@ class EventList extends React.Component<Props, State> {
               <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem"}}>
                 <label>{strings.labelEventType}</label>
                 <Form.Select name="event-type" options={this.renderEventTypeOptions()} text={typeFilterText} onChange={this.onChangeEventTypeFilter} />
+              </div>
+              <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem"}}>
+                <label>{strings.labelProductionLine}</label>
+                <Form.Select name="event-production-line" options={this.renderProductionLineOptions()} text={lineFilterText} onChange={this.onChangeProductionLineFilter} />
               </div>
             </Form.Field>
           </Form>
@@ -215,9 +228,28 @@ class EventList extends React.Component<Props, State> {
   /**
    * Handles changing selected product
    */
-   private onChangeEventTypeFilter = async (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
+  private onChangeEventTypeFilter = async (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
     const type = (value || undefined) as any;
     await this.updateEvents({...this.props.eventListFilters, type});
+  }
+
+  /**
+   * Handles the change of production line filter
+   */
+  private onChangeProductionLineFilter = (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
+    const productionLine = (this.state.productionLines || []).find(productionLine => productionLine.id === value);
+    this.props.onEventListFiltersUpdated && this.props.onEventListFiltersUpdated({
+      ...this.props.eventListFilters,
+      productionLine
+    });
+  }
+
+  private renderProductionLineOptions = () => {
+    return [{text: strings.allProductionLines, value: ""}]
+      .concat(
+      this.state.productionLines.map(p => {
+        return { text: p.lineNumber!, value: p.id! }
+      }));
   }
 
   /**
