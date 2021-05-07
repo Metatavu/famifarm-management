@@ -218,6 +218,8 @@
     "packingTableHeaderDate": "Päiväys",
     "packingTableHeaderBoxes": "Laatikkoa",
     "packingTableHeaderStatus": "Tila",
+    "packingTableHeaderPackageSize": "Pakkauskoko",
     "allPackingStates": "Kaikki tilat",
-    "allProductionLines": "Kaikki linjat"
+    "allProductionLines": "Kaikki linjat",
+    "totalPackingsRow": "Yhteensä: {0} laatikkoa"
   }
