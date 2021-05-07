@@ -219,5 +219,8 @@
   "packingTableHeaderDate": "Date",
   "packingTableHeaderBoxes": "Boxes",
   "packingTableHeaderStatus": "Status",
-  "allPackingStates": "All states"
+  "packingTableHeaderPackageSize": "Package size",
+  "allPackingStates": "All states",
+  "allProductionLines": "All lines",
+  "totalPackingsRow": "Total: {0} boxes"
 }

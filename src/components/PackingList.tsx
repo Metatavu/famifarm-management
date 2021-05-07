@@ -2,7 +2,7 @@ import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Campaign, Packing, PackingState, Product } from "../generated/client";
+import { Campaign, PackageSize, Packing, PackingState, Product } from "../generated/client";
 import strings from "src/localization/strings";
 import * as moment from "moment";
 import * as actions from "../actions";
@@ -18,7 +18,8 @@ import {
   InputOnChangeData,
   TextAreaProps,
   Table,
-  Visibility
+  Visibility,
+  Transition
 } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import LocalizedUtils from "src/localization/localizedutils";
@@ -31,11 +32,13 @@ interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   packings?: Packing[];
   products?: Product[];
+  packageSizes?: PackageSize[];
   campaigns?: Campaign[];
   location?: any;
   onPackingsFound?: (packings: Packing[]) => void;
   onProductsFound?: (products: Product[]) => void;
   onCampaignsFound?: (campaigns: Campaign[]) => void;
+  onPackageSizesFound?: (packageSizes: PackageSize[]) => void;
   onError: (error: ErrorMessage) => void;
 }
 
@@ -47,6 +50,7 @@ interface State {
   filters: Filters;
   loading: boolean;
   errorCount: number;
+  allFound: boolean;
 }
 
 /**
@@ -69,6 +73,7 @@ class PackingList extends React.Component<Props, State> {
     this.state = {
       packings: [],
       loading: false,
+      allFound: false,
       errorCount: 0,
       filters: {
         firstResult: 0,
@@ -140,6 +145,7 @@ class PackingList extends React.Component<Props, State> {
     }
 
     const packingTableRows = (packings || []).map(packing => this.renderPackingTableRow(packing));
+    const totalBoxes = (packings || []).reduce((a, b) => a + (this.getAmountOfBoxes(b) || 0), 0);
 
     const filterStyles: React.CSSProperties = {
       display:"inline-block",
@@ -216,12 +222,22 @@ class PackingList extends React.Component<Props, State> {
                     <Table.HeaderCell>{ strings.packingTableHeaderStatus }</Table.HeaderCell>
                     <Table.HeaderCell>{ strings.packingTableHeaderDate }</Table.HeaderCell>
                     <Table.HeaderCell>{ strings.packingTableHeaderBoxes }</Table.HeaderCell>
+                    <Table.HeaderCell>{ strings.packingTableHeaderPackageSize }</Table.HeaderCell>
                     <Table.HeaderCell></Table.HeaderCell>
                   </Table.Row>
                 </Table.Header>
                 <Table.Body>
                   { packingTableRows }
                 </Table.Body>
+                <Table.Footer fullWidth>
+                  <Table.Row>
+                    <Table.HeaderCell colSpan='7'>
+                      <Transition visible={this.state.allFound} animation="fly right" >
+                        <b>{ strings.formatString(strings.totalPackingsRow, totalBoxes) }</b>
+                      </Transition>
+                    </Table.HeaderCell>
+                  </Table.Row>
+                </Table.Footer>
               </Table>
               </Visibility>
           </Grid.Column>
@@ -232,8 +248,8 @@ class PackingList extends React.Component<Props, State> {
   }
 
   private loadMore = async (e: any, { calculations }: any) => {
-    const { filters, loading } = this.state;
-    if (calculations.bottomVisible === true && !loading) {
+    const { filters, loading, allFound } = this.state;
+    if (calculations.bottomVisible === true && !loading && !allFound) {
       const firstResult = ((filters || {}).firstResult || 0) + 20;
       await this.updatePackings({...filters, firstResult}, true);
     }
@@ -252,6 +268,8 @@ class PackingList extends React.Component<Props, State> {
       this.getPackingName(packing) :
       this.getCampaignPackingName(packing);
 
+    const packageSize = packing.packageSizeId ? (this.props.packageSizes || []).find(p => p.id === packing.packageSizeId) : null;
+    const packageSizeName = packageSize ? LocalizedUtils.getLocalizedValue(packageSize.name) : "";
     const status = this.resolveLocalizedPackingState(packing.state);
     const packingDate = moment(packing.time).format("DD.MM.YYYY");
     const amount = packing.type == "BASIC" ? this.getAmountOfBoxes(packing) : "-";
@@ -262,6 +280,7 @@ class PackingList extends React.Component<Props, State> {
         <Table.Cell>{ status }</Table.Cell>
         <Table.Cell>{ packingDate }</Table.Cell>
         <Table.Cell>{ amount }</Table.Cell>
+        <Table.Cell>{ packageSizeName }</Table.Cell>
         <Table.Cell textAlign='right'>
           <NavLink to={ `/packings/${packing.id}` }>
               <Button className="submit-button">{strings.open}</Button>
@@ -407,18 +426,24 @@ class PackingList extends React.Component<Props, State> {
    * @param filters filters
    */
   private updatePackings = async (filters: Filters, append: boolean) => {
-    const { keycloak, onPackingsFound, onProductsFound, onCampaignsFound } = this.props;
+    const { keycloak, onPackingsFound, onProductsFound, onCampaignsFound, onPackageSizesFound } = this.props;
     const { productId, packingState, dateAfter, dateBefore, firstResult } = filters;
     if (!keycloak) {
       return;
     }
 
     this.setState({ loading: true });
-    const [ packingsService, productsService, campaignsService ] = await Promise.all([
+    const [ packingsService, productsService, campaignsService, packageSizesService ] = await Promise.all([
       Api.getPackingsService(keycloak),
       Api.getProductsService(keycloak),
-      Api.getCampaignsService(keycloak)
+      Api.getCampaignsService(keycloak),
+      Api.getPackageSizesService(keycloak)
     ]);
+
+    if (!this.props.packageSizes || this.props.packageSizes.length < 1) {
+      const packageSizes = await packageSizesService.listPackageSizes({ });
+      onPackageSizesFound && onPackageSizesFound(packageSizes);
+    }
 
     if (!this.props.products || this.props.products.length < 1) {
       const products = await productsService.listProducts({ })
@@ -438,7 +463,7 @@ class PackingList extends React.Component<Props, State> {
       maxResults: 20
     });
     onPackingsFound && onPackingsFound(append ? (this.props.packings || []).concat(packings) : packings);
-    this.setState({ filters: {...filters, firstResult: fr}, loading: false });
+    this.setState({ filters: {...filters, firstResult: fr}, loading: false, allFound: packings.length < 20 });
   }
 }
 
@@ -450,7 +475,8 @@ class PackingList extends React.Component<Props, State> {
 const mapStateToProps = (state: StoreState) => ({
   products: state.products,
   packings: state.packings,
-  campaigns: state.campaigns
+  campaigns: state.campaigns,
+  packageSizes: state.packageSizes
 });
 
 /**
@@ -462,7 +488,8 @@ const mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({
   onProductsFound: (products: Product[]) => dispatch(actions.productsFound(products)),
   onPackingsFound: (packings: Packing[]) => dispatch(actions.packingsFound(packings)),
   onCampaignsFound: (campaigns: Campaign[]) => dispatch(actions.campaignsFound(campaigns)),
-  onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error)),
+  onPackageSizesFound: (packageSizes: PackageSize[]) => dispatch(actions.packageSizesFound(packageSizes))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PackingList);
