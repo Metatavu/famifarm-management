@@ -222,5 +222,12 @@
   "packingTableHeaderPackageSize": "Package size",
   "allPackingStates": "All states",
   "allProductionLines": "All lines",
-  "totalPackingsRow": "Total: {0} boxes"
+  "totalPackingsRow": "Total: {0} boxes",
+
+  "discards": "Discarded products",
+  "newDiscard": "New Discard",
+  "discardDate": "Discard Date",
+  "editDiscard": "Edit discard",
+  "edit": "Edit"
+
 }

@@ -12,6 +12,7 @@ apis/ProductsApi.ts
 apis/ReportsApi.ts
 apis/SeedBatchesApi.ts
 apis/SeedsApi.ts
+apis/StorageDiscardsApi.ts
 apis/WastageReasonsApi.ts
 apis/index.ts
 index.ts
@@ -40,6 +41,7 @@ models/ProductionLine.ts
 models/Seed.ts
 models/SeedBatch.ts
 models/SowingEventData.ts
+models/StorageDiscard.ts
 models/TableSpreadEventData.ts
 models/WastageEventData.ts
 models/WastageReason.ts

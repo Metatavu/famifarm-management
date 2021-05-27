@@ -230,6 +230,7 @@ export interface IStrings extends LocalizedStringsMethods {
   storageCondition: string
   createCutPacking: string
   cutPackings: string
+  
   editCutPacking: string
   events: string
   total: string
@@ -248,6 +249,12 @@ export interface IStrings extends LocalizedStringsMethods {
   allProductionLines: string
 
   totalPackingsRow: string
+
+  discards: string;
+  newDiscard: string;
+  discardDate: string;
+  editDiscard: string;
+  edit: string;
 }
 
 const strings: IStrings = new LocalizedStrings({

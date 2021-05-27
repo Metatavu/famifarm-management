@@ -24,6 +24,7 @@ export interface GetReportRequest {
     type: string;
     fromTime?: string;
     toTime?: string;
+    format?: string;
 }
 
 /**
@@ -47,6 +48,10 @@ export class ReportsApi extends runtime.BaseAPI {
 
         if (requestParameters.toTime !== undefined) {
             queryParameters['toTime'] = requestParameters.toTime;
+        }
+
+        if (requestParameters.format !== undefined) {
+            queryParameters['format'] = requestParameters.format;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

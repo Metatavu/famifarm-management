@@ -12,4 +12,5 @@ export * from './ProductsApi';
 export * from './ReportsApi';
 export * from './SeedBatchesApi';
 export * from './SeedsApi';
+export * from './StorageDiscardsApi';
 export * from './WastageReasonsApi';

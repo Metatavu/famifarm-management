@@ -873,7 +873,7 @@ paths:
       summary: Create new package size
       operationId: createPackageSize
       requestBody:
-        description: Wastage reason to be added
+        description: Package size to be added
         required: true
         content:
           application/json:
@@ -1966,11 +1966,21 @@ paths:
           required: false
           schema:
             type: "string"
+        - name: format
+          in: query
+          description: Format of the report
+          required: false
+          schema:
+            type: "string"
       responses:
         '200':
-          description: Excel report
+          description: report
           content:
             application/vnd.ms-excel:
+              schema:
+                type: "string"
+                format: "binary"
+            application/json:
               schema:
                 type: "string"
                 format: "binary"
@@ -1980,6 +1990,169 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  '/v1/storageDiscards':
+    get:
+      summary: List all storage discard events
+      operationId: listStorageDiscards
+      tags:
+        - storageDiscards
+      parameters:
+        - name: firstResult
+          in: query
+          description: First index of results to be returned
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: maxResults
+          in: query
+          description: How many items to return at one time
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: fromTime
+          in: query
+          description: From time of the report
+          required: false
+          schema:
+            type: string
+        - name: toTime
+          in: query
+          description: To time of the report
+          required: false
+          schema:
+            type: string
+        - name: productId
+          in: query
+          description: Id of discarded product
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A paged array of storage discard events
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/StorageDiscard"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      summary: Create new storage discard event
+      operationId: createStorageDiscard
+      requestBody:
+        description: Storage discard body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StorageDiscard"
+      tags:
+        - storageDiscards
+      responses:
+        '200':
+          description: A created storage discard event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StorageDiscard"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  '/v1/storageDiscards/{storageDiscardId}':
+    get:
+      summary: Finds storage discard event
+      operationId: getStorageDiscard
+      tags:
+        - storageDiscards
+      parameters:
+        - name: storageDiscardId
+          in: path
+          description: Storage discard id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A foung storage discard event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StorageDiscard"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      summary: Updates a storage discard event
+      operationId: updateStorageDiscard
+      requestBody:
+        description: Request payload
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StorageDiscard"
+      tags:
+        - storageDiscards
+      parameters:
+        - name: storageDiscardId
+          in: path
+          description: Storage discard id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: An updated storage discard event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StorageDiscard"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      summary: Deletes a storage discard event
+      operationId: deleteStorageDiscard
+      tags:
+        - storageDiscards
+      parameters:
+        - name: storageDiscardId
+          in: path
+          description: Storage discard id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Empty result indication a successful removal
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 
 components:
   securitySchemes:
@@ -2433,6 +2606,25 @@ components:
           type: integer
         storageCondition:
           type: string
+
+    StorageDiscard:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        discardDate:
+          type: string
+          format: date-time
+        packageSizeId:
+          type: string
+          format: uuid
+        discardAmount:
+          type: integer
+          format: int32
 
         
     ErrorResponse:
