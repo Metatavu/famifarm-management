@@ -210,7 +210,7 @@ class WelcomePage extends React.Component<Props, any> {
               />
               <Route
                 path="/discards"
-                exact={ true }
+                exact
                 render={ () => <DiscardList keycloak={ this.state.keycloak }/> }
               />
               <Route
