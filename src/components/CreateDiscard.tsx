@@ -74,7 +74,7 @@ class CreateDiscard extends React.Component<Props, State> {
   /**
    * render
    */
-  render() {
+  render = () => {
     const {
       loading,
       redirect,
