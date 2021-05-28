@@ -134,7 +134,7 @@ class CreateDiscard extends React.Component<Props, State> {
                 } 
               </Form.Field>
               <Form.Field>
-                <label>{strings.labelPackedCount}</label>
+                <label>{ strings.labelPackedCount }</label>
                 <Input
                   type="number"
                   value={ discardCount }
