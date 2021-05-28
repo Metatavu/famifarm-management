@@ -224,7 +224,7 @@
   "allProductionLines": "All lines",
   "totalPackingsRow": "Total: {0} boxes",
 
-  "discards": "Discarded products",
+  "discards": "Discarded from storage",
   "newDiscard": "New Discard",
   "discardDate": "Discard Date",
   "editDiscard": "Edit discard",
