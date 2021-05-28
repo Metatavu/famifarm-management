@@ -413,9 +413,7 @@ class DiscardList extends React.Component<Props, State> {
  * 
  * @param state store state
  */
-const mapStateToProps = (state: StoreState) => ({
-
-});
+const mapStateToProps = (state: StoreState) => ({ });
 
 /**
  * Redux mapper for mapping component dispatches 
