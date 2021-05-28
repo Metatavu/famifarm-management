@@ -107,7 +107,7 @@ class DiscardList extends React.Component<Props, State> {
       }
     }
 
-    const discardedTableRows = (discardedProducts || []).map(discardedProduct => this.renderDiscardRow(discardedProduct));
+    const discardedTableRows = (discardedProducts || []).map(this.renderDiscardRow);
 
     const filterStyles: React.CSSProperties = {
       display:"inline-block",
