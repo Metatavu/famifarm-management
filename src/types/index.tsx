@@ -49,7 +49,7 @@ export interface ErrorMessage {
  * An interface describing packagesize options
  */
  export interface PackageSizeOptions {
-  id?: string,
-  key?: string,
-  name?: string
+  id?: string;
+  key?: string;
+  name?: string;
 }
