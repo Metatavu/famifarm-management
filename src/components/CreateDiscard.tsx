@@ -205,9 +205,12 @@ class CreateDiscard extends React.Component<Props, State> {
 
   /**
    * Handles changing date
+   *
+   * @param event React change event
+   * @param data input change data
    */
-  private onChangeDate = async (e: any, { value }: InputOnChangeData) => {
-    this.setState({date: moment(value, "DD.MM.YYYY HH:mm").toDate()});
+  private onChangeDate = async (event: any, { value }: InputOnChangeData) => {
+    this.setState({ date: moment(value, "DD.MM.YYYY HH:mm").toDate() });
   }
 
   /**
