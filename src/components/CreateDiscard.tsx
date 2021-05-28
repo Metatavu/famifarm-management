@@ -308,10 +308,7 @@ class CreateDiscard extends React.Component<Props, State> {
  * 
  * @param state store state
  */
-export function mapStateToProps(state: StoreState) {
-  return {
-  };
-  }
+const mapStateToProps = (state: StoreState) => ({ });
   
   /**
    * Redux mapper for mapping component dispatches 
