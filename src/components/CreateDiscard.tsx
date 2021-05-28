@@ -319,4 +319,4 @@ export function mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => 
   onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
 });
   
-  export default connect(mapStateToProps, mapDispatchToProps)(CreateDiscard);
+export default connect(mapStateToProps, mapDispatchToProps)(CreateDiscard);
