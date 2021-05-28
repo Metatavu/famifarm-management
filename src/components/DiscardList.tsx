@@ -390,7 +390,10 @@ class DiscardList extends React.Component<Props, State> {
      private renderOptions = () => {
       const { products } = this.state;
   
-      const options = [{ text: strings.allProducts, value: "all-products" }];
+      const options = [{
+        text: strings.allProducts,
+        value: "all-products"
+      }];
   
       if (products) {
         options.push(
