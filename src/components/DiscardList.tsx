@@ -250,9 +250,7 @@ class DiscardList extends React.Component<Props, State> {
       const { products, discardedProducts } = this.state;
       const discard = (products || []).find(product => product.id == discardedProduct.productId);
 
-      const productName = discard ? LocalizedUtils.getLocalizedValue(discard.name) : "";
-
-      return productName;
+      return discard ? LocalizedUtils.getLocalizedValue(discard.name) : "";
     }
   
 
