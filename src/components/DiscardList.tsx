@@ -269,9 +269,7 @@ class DiscardList extends React.Component<Props, State> {
       return;
     }
 
-    this.setState({
-      loading: true
-    })
+    this.setState({ loading: true });
 
     const productsService = await Api.getProductsService(keycloak)
     const products = await productsService.listProducts({ includeSubcontractorProducts: true })
