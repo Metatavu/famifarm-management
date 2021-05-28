@@ -315,10 +315,8 @@ const mapStateToProps = (state: StoreState) => ({ });
    * 
    * @param dispatch dispatch method
    */
-  export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
-  return {
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
-  };
-  }
+export function mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({
+  onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+});
   
   export default connect(mapStateToProps, mapDispatchToProps)(CreateDiscard);
