@@ -279,13 +279,13 @@ class DiscardList extends React.Component<Props, State> {
 
     const storageDiscardService  = await Api.getStorageDiscardsService(keycloak);
 
-    const firstResult = append ? firstResult : 0;
+    const fr = append ? firstResult : 0;
     const discards = await storageDiscardService.listStorageDiscards({ 
       productId: productId !== "all-products" ? productId : undefined,
       toTime: dateBefore,
       fromTime: dateAfter,
       maxResults: 20,
-      firstResult: firstResult
+      firstResult: fr
     });
     
     if (append) {

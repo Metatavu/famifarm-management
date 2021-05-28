@@ -196,6 +196,7 @@ class CreateDiscard extends React.Component<Props, State> {
    * @param data input change data
    */
   private onDiscardedCountChange = (event: any, { value }: InputOnChangeData) => {
+    const { discardCount } = this.state;
     const count = Number(value);
     !Number.isNaN(discardCount) && this.setState({
       discardCount: count > 0 ? count : 0
@@ -258,16 +259,14 @@ class CreateDiscard extends React.Component<Props, State> {
    */
   private filterOptions = () => {
     const { selectedProduct, packageSizes } = this.state;
-    if(!selectedProduct?.defaultPackageSizeIds) {
-      return;
-    }
 
     const newOptions: PackageSizeOptions[] = [];
-    packageSizes.forEach(size =>
+    packageSizes.forEach(size => {
+      if(!selectedProduct || !selectedProduct.defaultPackageSizeIds) return;
       selectedProduct.defaultPackageSizeIds.forEach(packageSizeId =>
         size.id === packageSizeId && newOptions.push({ 
-          key:size.id,
-          value:size.id,
+          key: size.id,
+          value: size.id,
           text: LocalizedUtils.getLocalizedValue(size.name)
         })
       );
@@ -315,7 +314,7 @@ const mapStateToProps = (state: StoreState) => ({ });
  * 
  * @param dispatch dispatch method
  */
-export function mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({
+const mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({
   onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
 });
   
