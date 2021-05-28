@@ -219,11 +219,11 @@ class CreateDiscard extends React.Component<Props, State> {
   private async handleSubmit() {
     const { packageSizeId, discardCount } = this.state;
     const { keycloak } = this.props;
+    if (!keycloak) {
+      return;
+    }
 
     try {
-      if (!keycloak) {
-        return;
-      }
 
       const storageDiscard: StorageDiscard = {
         productId: this.state.productId,
