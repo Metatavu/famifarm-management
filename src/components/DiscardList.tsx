@@ -124,7 +124,9 @@ class DiscardList extends React.Component<Props, State> {
         >
           <h2>{ strings.discards }</h2>
           <NavLink to="/createDiscard">
-            <Button className="submit-button">{ strings.newDiscard }</Button>
+            <Button className="submit-button">
+              { strings.newDiscard }
+            </Button>
           </NavLink>
         </Grid.Row>
         <Grid.Row>
