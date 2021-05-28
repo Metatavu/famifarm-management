@@ -194,6 +194,9 @@ class DiscardList extends React.Component<Props, State> {
 
   /**
    * method for loading more discarded products 
+   *
+   * @param event React change event
+   * @param data element visibility data
    */
   private loadMore = async (e: any, { calculations }: any) => {
     const { filters, loading, allFound } = this.state;
