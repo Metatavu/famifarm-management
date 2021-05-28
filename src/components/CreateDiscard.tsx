@@ -75,7 +75,15 @@ class CreateDiscard extends React.Component<Props, State> {
    * render
    */
   render() {
-    const { loading, redirect, discardCount, productId, packageSizeId, date  } = this.state;
+    const {
+      loading,
+      redirect,
+      discardCount,
+      productId,
+      packageSizeId,
+      date,
+      products
+    } = this.state;
 
     if (loading) {
       return (
