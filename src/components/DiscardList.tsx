@@ -275,7 +275,7 @@ class DiscardList extends React.Component<Props, State> {
     const products = await productsService.listProducts({ includeSubcontractorProducts: true });
 
     const packageSizesService = await Api.getPackageSizesService(keycloak);
-    const packageSizes = await packageSizesService.listPackageSizes({})
+    const packageSizes = await packageSizesService.listPackageSizes({});
 
     const storageDiscardService  = await Api.getStorageDiscardsService(keycloak);
 
