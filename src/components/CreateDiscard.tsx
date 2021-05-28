@@ -18,8 +18,8 @@ import { Redirect } from "react-router";
  */
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  onPackingCreated?: (packing: Packing) => void,
-  onError: (error: ErrorMessage) => void
+  onPackingCreated?: (packing: Packing) => void;
+  onError: (error: ErrorMessage) => void;
 }
 
 /**
