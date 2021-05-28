@@ -97,16 +97,11 @@ class CreateDiscard extends React.Component<Props, State> {
       return <Redirect to={ `/discards/${this.state.discardId}` } push />;
     }
 
-    const productOptions = this.state.products.map((product) => {
-      const id = product.id!;
-      const name = LocalizedUtils.getLocalizedValue(product.name);
-    
-      return {
-        key: id,
-        value: id,
-        text: name
-      };
-    });
+    const productOptions = products.map(({ id, name }) => ({
+      key: id!,
+      value: id!,
+      text: LocalizedUtils.getLocalizedValue(name)
+    }));
 
     const filteredPackageSizeOptions = this.filterOptions();
 
