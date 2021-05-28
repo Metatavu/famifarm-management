@@ -230,7 +230,9 @@ class DiscardList extends React.Component<Props, State> {
         <Table.Cell>{ packageSizeName }</Table.Cell>
         <Table.Cell textAlign='right'>
           <NavLink to={ `/discards/${discardedProduct.id}` }>
-              <Button className="submit-button">{strings.edit}</Button>
+            <Button className="submit-button">
+              { strings.edit }
+            </Button>
           </NavLink>
         </Table.Cell>
       </Table.Row>
