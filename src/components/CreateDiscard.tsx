@@ -164,7 +164,10 @@ class CreateDiscard extends React.Component<Props, State> {
   }
 
   /**
-   * Event handler for discarded product change 
+   * Event handler for discarded product change
+   *
+   * @param event React change event
+   * @param data dropdown properties
    */
   private onDiscardedProductChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
     const { products } = this.state;
