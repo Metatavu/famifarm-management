@@ -310,11 +310,11 @@ class CreateDiscard extends React.Component<Props, State> {
  */
 const mapStateToProps = (state: StoreState) => ({ });
   
-  /**
-   * Redux mapper for mapping component dispatches 
-   * 
-   * @param dispatch dispatch method
-   */
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
 export function mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({
   onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
 });
