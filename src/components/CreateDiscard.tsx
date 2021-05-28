@@ -26,16 +26,16 @@ export interface Props {
  * Interface representing component state
  */
 export interface State {
-  productId?: string,
-  packingStatus?: PackingState,
-  packageSizeId?: string,
-  discardCount: number,
-  products: Product[],
-  loading: boolean,
-  packageSizes: PackageSize[],
-  date: Date,
-  redirect: boolean,
-  discardId?: string,
+  productId?: string;
+  packingStatus?: PackingState;
+  packageSizeId?: string;
+  discardCount: number;
+  products: Product[];
+  loading: boolean;
+  packageSizes: PackageSize[];
+  date: Date;
+  redirect: boolean;
+  discardId?: string;
   selectedProduct?: Product;
 }
 
