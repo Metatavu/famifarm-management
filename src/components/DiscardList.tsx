@@ -256,6 +256,9 @@ class DiscardList extends React.Component<Props, State> {
 
   /**
    * Method for fetching discarded products
+   *
+   * @param filters filters
+   * @param append is append operation
    */
   private fetchData = async (filters: Filters, append: boolean) => {
     const { keycloak } = this.props;
