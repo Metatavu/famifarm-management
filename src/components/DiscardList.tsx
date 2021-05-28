@@ -343,6 +343,7 @@ class DiscardList extends React.Component<Props, State> {
         ...this.state.filters,
         dateBefore: moment(value, "DD.MM.YYYY").toISOString()
       };
+
       this.setState({ filters: updatedFilters });
   
       await this.fetchData(updatedFilters, false).catch(err => {
