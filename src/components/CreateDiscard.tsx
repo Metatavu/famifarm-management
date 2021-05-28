@@ -280,26 +280,25 @@ class CreateDiscard extends React.Component<Props, State> {
    * method for fetching data
    */
   private fetchData = async () => {
-    if (!this.props.keycloak) {
+    const { keycloak } = this.props;
+    if (!keycloak) {
       return;
     }
 
-    this.setState({loading: true});
+    this.setState({ loading: true });
   
-    const productsService = await Api.getProductsService(this.props.keycloak);
+    const productsService = await Api.getProductsService(keycloak);
+    const packageSizeService = await Api.getPackageSizesService(keycloak);
+
     const products = await productsService.listProducts({});
-
-    const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
     const packageSizes = await packageSizeService.listPackageSizes({});
-
-    const selectedProduct = products.find(p => p.id === products[0].id);
       
     this.setState({
-      productId: products.length ? products[0].id! : "",
-      packageSizes, 
       products,
-      loading: false,
-      selectedProduct
+      packageSizes,
+      productId: products.length ? products[0].id! : "",
+      selectedProduct: products.length ? products[0]: undefined,
+      loading: false
     });
   }
 }
