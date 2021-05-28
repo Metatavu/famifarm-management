@@ -43,7 +43,7 @@ export interface State {
  * React component for creating new discard
  */
 class CreateDiscard extends React.Component<Props, State> {
-  constructor(props:Props) {
+  constructor(props: Props) {
     super(props);
     this.state = {
       products: [],
