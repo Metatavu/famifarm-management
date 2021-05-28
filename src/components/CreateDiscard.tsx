@@ -127,7 +127,7 @@ class CreateDiscard extends React.Component<Props, State> {
                 <label>{ strings.packageSize }</label>
                 { filteredPackageSizeOptions &&
                   <Select
-                    options={ filteredPackageSizeOptions  }
+                    options={ filteredPackageSizeOptions }
                     value={ packageSizeId }
                     onChange={ this.onDiscardedSizeChange }
                   />
