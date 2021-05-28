@@ -251,37 +251,29 @@ class CreateDiscard extends React.Component<Props, State> {
     }
   }
 
-/**
- * method for filtering options based on selected product
- * @returns filtered options
- */
+  /**
+   * method for filtering options based on selected product
+   *
+   * @returns filtered options
+   */
   private filterOptions = () => {
     const { selectedProduct, packageSizes } = this.state;
-    const newOptions: PackageSizeOptions[] = []
-
-    if(!selectedProduct || !selectedProduct.defaultPackageSizeIds) {
+    if(!selectedProduct?.defaultPackageSizeIds) {
       return;
     }
 
-
-    packageSizes.map((size) => {
-      if(!selectedProduct || !selectedProduct.defaultPackageSizeIds) {
-        return;
-      }
-      selectedProduct.defaultPackageSizeIds.forEach((element: any) => {
-        if(size.id === element) {
-
-          var newElement = { 
-            key:size.id,
-            value:size.id,
-            text: LocalizedUtils.getLocalizedValue(size.name)
-          };
-          
-          newOptions.push(newElement)
-        }
-      });
+    const newOptions: PackageSizeOptions[] = [];
+    packageSizes.forEach(size =>
+      selectedProduct.defaultPackageSizeIds.forEach(packageSizeId =>
+        size.id === packageSizeId && newOptions.push({ 
+          key:size.id,
+          value:size.id,
+          text: LocalizedUtils.getLocalizedValue(size.name)
+        })
+      );
     });
-    return newOptions
+
+    return newOptions;
   }
 
   /**
