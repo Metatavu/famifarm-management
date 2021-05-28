@@ -184,7 +184,7 @@ class DiscardList extends React.Component<Props, State> {
         </Grid.Row>
         { possibleLoader() }
       </Grid>
-    )
+    );
   }
 
   /**
