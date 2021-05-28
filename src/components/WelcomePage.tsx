@@ -263,7 +263,7 @@ class WelcomePage extends React.Component<Props, any> {
               />
               <Route
                 path="/discards/:discardId"
-                exact={ true }
+                exact
                 render={ props => (
                   <EditDiscard
                     keycloak={ this.state.keycloak }
