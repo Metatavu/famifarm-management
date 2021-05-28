@@ -214,7 +214,9 @@ class DiscardList extends React.Component<Props, State> {
   private renderDiscardRow = (discardedProduct: StorageDiscard) => {
     const { packageSizes } = this.state;
 
-    const packageSize = discardedProduct.packageSizeId ? (packageSizes || []).find(p => p.id === discardedProduct.packageSizeId) : null;
+    const packageSize = discardedProduct.packageSizeId ?
+      (packageSizes || []).find(product => product.id === discardedProduct.packageSizeId) :
+      null;
     const packageSizeName = packageSize ? LocalizedUtils.getLocalizedValue(packageSize.name) : "";
     const name = this.getProductName(discardedProduct);
     const discardDAte = moment(discardedProduct.discardDate).format("DD.MM.YYYY");
