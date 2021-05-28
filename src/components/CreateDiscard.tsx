@@ -53,7 +53,6 @@ class CreateDiscard extends React.Component<Props, State> {
       date: moment().toDate(),
       redirect: false,
     }
-    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   /**
