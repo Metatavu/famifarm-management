@@ -91,7 +91,7 @@ class CreateDiscard extends React.Component<Props, State> {
         <Loader inline active size="medium" />
         </Grid>
       );
-      }
+    }
       
     if (redirect) {
       return <Redirect to={ `/discards/${this.state.discardId}` } push />;
