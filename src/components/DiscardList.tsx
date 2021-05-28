@@ -279,18 +279,18 @@ class DiscardList extends React.Component<Props, State> {
 
     const storageDiscardService  = await Api.getStorageDiscardsService(keycloak);
 
-    const fr = append ? firstResult : 0;
+    const firstResult = append ? firstResult : 0;
     const discards = await storageDiscardService.listStorageDiscards({ 
       productId: productId !== "all-products" ? productId : undefined,
       toTime: dateBefore,
       fromTime: dateAfter,
       maxResults: 20,
-      firstResult: fr
+      firstResult: firstResult
     });
     
-    if(append) {
+    if (append) {
       this.setState({
-        discardedProducts: [...discardedProducts, ...discards],
+        discardedProducts: [ ...discardedProducts, ...discards ],
         loading: false
       })
     } else {
@@ -302,8 +302,11 @@ class DiscardList extends React.Component<Props, State> {
       })
     }
 
-    this.setState({ filters: {...filters, firstResult: fr}, loading: false, allFound: discards.length < 20 });
-
+    this.setState({
+      filters: { ...filters, firstResult },
+      loading: false,
+      allFound: discards.length < 20
+    });
   }
 
   /**
