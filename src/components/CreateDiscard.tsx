@@ -190,7 +190,10 @@ class CreateDiscard extends React.Component<Props, State> {
   }
 
   /**
-   * Event handler for discarded count change 
+   * Event handler for discarded count change
+   *
+   * @param event React change event
+   * @param data input change data
    */
   private onDiscardedCountChange = (event: any, { value }: InputOnChangeData) => {
     const actualNumber = Number.parseInt(value) >= 0 ? Number.parseInt(value) : 0;
