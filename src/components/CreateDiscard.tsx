@@ -79,7 +79,7 @@ class CreateDiscard extends React.Component<Props, State> {
 
     if (loading) {
       return (
-        <Grid style={{paddingTop: "100px"}} centered>
+        <Grid style={{ paddingTop: "100px" }} centered>
         <Loader inline active size="medium" />
         </Grid>
       );
