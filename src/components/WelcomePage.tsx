@@ -211,11 +211,7 @@ class WelcomePage extends React.Component<Props, any> {
               <Route
                 path="/discards"
                 exact={ true }
-                render={ props => (
-                  <DiscardList
-                    keycloak={ this.state.keycloak }
-                  />
-                )}
+                render={ () => <DiscardList keycloak={ this.state.keycloak }/> }
               />
               <Route
                 path="/campaigns"
