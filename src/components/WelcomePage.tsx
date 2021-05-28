@@ -274,8 +274,8 @@ class WelcomePage extends React.Component<Props, any> {
               <Route
                 path="/createPacking"
                 exact
-                render={props => (
-                  <CreatePacking keycloak={this.state.keycloak}/>
+                render={ props => (
+                  <CreatePacking keycloak={ this.state.keycloak }/>
                 )}
               />
               <Route
