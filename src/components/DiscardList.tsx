@@ -58,7 +58,6 @@ interface State {
   dateAfter?: string;
 }
 
-
 /**
  * React component for displaying list of discarded products
  */
