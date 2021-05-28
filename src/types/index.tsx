@@ -42,8 +42,7 @@ export interface StoreState {
 export interface ErrorMessage {
   title?: string,
   message?: string,
-  exception?: 
-  Error
+  exception?: Error
 }
 
 /**
