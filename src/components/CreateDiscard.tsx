@@ -226,14 +226,18 @@ class CreateDiscard extends React.Component<Props, State> {
     try {
 
       const storageDiscard: StorageDiscard = {
-        productId: this.state.productId,
-        discardDate: new Date(),
-        packageSizeId: packageSizeId,
-        discardAmount: discardCount,
+
       }
 
       const storageDiscardService = await Api.getStorageDiscardsService(keycloak);
-      const discarded = await storageDiscardService.createStorageDiscard({ storageDiscard: storageDiscard });
+      const discarded = await storageDiscardService.createStorageDiscard({
+        storageDiscard: {
+          productId: this.state.productId,
+          discardDate: new Date(),
+          packageSizeId: packageSizeId,
+          discardAmount: discardCount,
+        }
+      });
       this.setState({
         discardId: discarded.id,
         redirect: true
