@@ -186,9 +186,7 @@ class CreateDiscard extends React.Component<Props, State> {
    * @param data dropdown properties
    */
   private onDiscardedSizeChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
-    this.setState({
-      packageSizeId: data.value as string
-    });
+    this.setState({ packageSizeId: data.value as string });
   }
 
   /**
