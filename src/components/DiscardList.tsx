@@ -94,7 +94,7 @@ class DiscardList extends React.Component<Props, State> {
   /**
    * Render 
    */
-  public render() {
+  public render = () => {
     const { filters, discardedProducts, products, loading } = this.state;
 
     const possibleLoader = (): any=> {
