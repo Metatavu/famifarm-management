@@ -160,7 +160,7 @@ class CreateDiscard extends React.Component<Props, State> {
           </Grid.Column>
         </Grid.Row>
       </Grid>
-    )
+    );
   }
 
   /**
