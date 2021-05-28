@@ -358,10 +358,10 @@ class DiscardList extends React.Component<Props, State> {
   /**
    * Handles changing selected product
    *
-   * @param e event
-   * @param value value from event data
+   * @param event event
+   * @param data input on change data
    */
-  private onChangeProduct = async (e: any, { value }: InputOnChangeData | TextAreaProps) => {
+  private onChangeProduct = async (event: any, { value }: InputOnChangeData | TextAreaProps) => {
     const { products } = this.state;
 
     if (!products) {
