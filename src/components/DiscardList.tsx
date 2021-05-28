@@ -312,10 +312,10 @@ class DiscardList extends React.Component<Props, State> {
   /**
    * Handles changing date
    *
-   * @param e event
-   * @param value value from InputOnChangeData
+   * @param event event
+   * @param data input on change data
    */
-     private onChangeDateAfter = async (e: any, { value }: InputOnChangeData) => {
+     private onChangeDateAfter = async (event: any, { value }: InputOnChangeData) => {
       const updatedFilters: Filters = {
         ...this.state.filters,
         dateAfter: moment(value, "DD.MM.YYYY").toISOString()
