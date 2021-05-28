@@ -200,7 +200,7 @@ class DiscardList extends React.Component<Props, State> {
    */
   private loadMore = async (e: any, { calculations }: any) => {
     const { filters, loading, allFound } = this.state;
-    if (calculations.bottomVisible === true && !loading && !allFound) {
+    if (calculations.bottomVisible && !loading && !allFound) {
       const firstResult = ((filters || {}).firstResult || 0) + 20;
       await this.fetchData({ ...filters, firstResult }, true);
     }
