@@ -57,7 +57,7 @@ class CreateDiscard extends React.Component<Props, State> {
   }
 
   /**
-   * component did mount life cycle method
+   * Component did mount life cycle method
    */
   public async componentDidMount() {
     try {
