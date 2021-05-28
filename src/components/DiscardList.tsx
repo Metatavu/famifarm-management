@@ -79,7 +79,7 @@ class DiscardList extends React.Component<Props, State> {
   /**
    * Component did mount life cycle event
    */
-   public async componentDidMount() {
+  public async componentDidMount() {
     try {
       await this.fetchData(this.state.filters, false);
     } catch (e) {
@@ -90,7 +90,7 @@ class DiscardList extends React.Component<Props, State> {
       });
     }
   }
-   
+  
   /**
    * Render 
    */
@@ -99,11 +99,14 @@ class DiscardList extends React.Component<Props, State> {
 
     const possibleLoader = (): any=> {
       if (loading) {
-        return <Loader 
+        return (
+        <Loader 
           style={{ marginLeft: "auto", marginRight: "auto" }}
           inline
           active
-          size="medium" />
+          size="medium"
+        />
+        );
       }
     }
 

@@ -60,17 +60,38 @@ class EditDiscard extends React.Component<Props, State> {
       loading: false, 
       productId: "",
     }
-}
+  }
 
   /**
-   * component did mount lifecycle method
+   * Component did mount life cycle method
    */
   public async componentDidMount() {
-    await this.fetchData()
+    try {
+      await this.fetchData();
+    } catch (e) {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: e
+      });
+    }
   }
   
-  public render() {
-    const { loading, redirect, products, packageSizes, productId, packageSizeId, discardCount, date, messageVisible, discard} = this.state;
+  /**
+   * render
+   */
+  render = () =>  {
+    const { 
+      loading,
+      redirect,
+      products,
+      packageSizes,
+      productId,
+      packageSizeId,
+      discardCount,
+      date,
+      messageVisible,
+      } = this.state;
 
     if (loading) {
       return (
@@ -84,44 +105,34 @@ class EditDiscard extends React.Component<Props, State> {
       return <Redirect to="/discards" push={ true } />;
     }
     
-    const productOptions: DropdownItemProps[] = products.map((product) => {
-      const id = product.id!;
-      const name = LocalizedUtils.getLocalizedValue(product.name);
+    const productOptions = products.map(({ id, name }) => ({
+      key: id!,
+      value: id!,
+      text: LocalizedUtils.getLocalizedValue(name)
+    }));
 
-      return {
-        key: id,
-        value: id,
-        text: name
-      };
-    });
-
-    const packageSizeOptions: DropdownItemProps[] = packageSizes.map((size) => {
-      const id = size.id!;
-      const name = LocalizedUtils.getLocalizedValue(size.name);
-
-      return {
-        key: id,
-        value: id,
-        text: name
-      };
-    });
+    const packageSizeOptions = packageSizes.map(({ id, name }) => ({
+      key: id!,
+      value: id!,
+      text: LocalizedUtils.getLocalizedValue(name)
+    }));
       
     return (
       <Grid>
         <Grid.Row className="content-page-header-row">
-          <Grid.Column width={8}>
+          <Grid.Column width={ 8 }>
               <h2>{strings.editDiscard}</h2>
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
-          <Grid.Column width={8}>
+          <Grid.Column width={ 8 }>
             <FormContainer>
               <Form.Field required>
                 <label>{ strings.product }</label>
                 <Select
                   options={ productOptions }
                   value={ productId }
-                  onChange={ this.onPackingProductChange }
+                  onChange={ this.onDiscardedProductChange }
                 />
               </Form.Field>
               <Form.Field required>
@@ -129,7 +140,7 @@ class EditDiscard extends React.Component<Props, State> {
                 <Select
                   options={ packageSizeOptions }
                   value={ packageSizeId }
-                  onChange={ this.onPackageSizeChange }
+                  onChange={ this.onDiscardedSizeChange }
                 />
               </Form.Field>
               <Form.Field required>
@@ -139,7 +150,7 @@ class EditDiscard extends React.Component<Props, State> {
                 <Input
                   type="number"
                   value={ discardCount }
-                  onChange={ this.onDiscardCountChange }
+                  onChange={ this.onDiscardedCountChange }
                 />
               </Form.Field>
               <Form.Field>
@@ -185,14 +196,13 @@ class EditDiscard extends React.Component<Props, State> {
   /**
    * Returns a delete confirmation text
    */
-     private getDeleteConfirmationText = (): string => {
-      const { discard } = this.state;
-      if (discard) {
-        const productText = this.getProductName(discard) 
+  private getDeleteConfirmationText = (): string => {
+    const { discard } = this.state;
+    if (discard) {
+      const productText = this.getProductName(discard) 
+      return strings.deleteConfirmationText + productText + "?";
+    }
 
-        return strings.deleteConfirmationText + productText + "?";
-  
-      }
       return strings.deleteConfirmationText + "?";
     }
 
@@ -221,58 +231,49 @@ class EditDiscard extends React.Component<Props, State> {
       return;
     }
 
-    try {
-      this.setState({ loading: true })
+    this.setState({ loading: true })
 
-      const productsService = await Api.getProductsService(keycloak);
-      const products = await productsService.listProducts({});
+    const productsService = await Api.getProductsService(keycloak);
+    const products = await productsService.listProducts({ });
 
-      const discardsService = await Api.getStorageDiscardsService(keycloak);
-      const discard = await discardsService.getStorageDiscard({ storageDiscardId: discardId })
+    const discardsService = await Api.getStorageDiscardsService(keycloak);
+    const discard = await discardsService.getStorageDiscard({ storageDiscardId: discardId })
         
-      const packageSizesSerivce = await Api.getPackageSizesService(keycloak);
-      const packageSizes = await packageSizesSerivce.listPackageSizes({});
+    const packageSizesSerivce = await Api.getPackageSizesService(keycloak);
+    const packageSizes = await packageSizesSerivce.listPackageSizes({ });
 
-      const product = (products || []).find(product => product.id == discard.productId);
-      const date = discard.discardDate || new Date();
-      const discardCount = discard.discardAmount || 0;
-      const packageSizeId = discard.packageSizeId;
-      const productId = discard.productId;
+    const product = (products || []).find(product => product.id == discard.productId);
+    const date = discard.discardDate || new Date();
+    const discardCount = discard.discardAmount || 0;
+    const packageSizeId = discard.packageSizeId;
+    const productId = discard.productId;
 
-
-
-      if(!productId || !product) {
-        throw new Error("Product id undefined");
-      }
-
-      const productName = LocalizedUtils.getLocalizedValue(product.name);
-
-      this.setState({
-        products,
-        discard,
-        packageSizes,
-        productName,
-        date,
-        discardCount,
-        packageSizeId,
-        loading: false,
-        productId
-      })
-    } catch (e) {
-      this.props.onError({
-        message: strings.defaultApiErrorMessage,
-        title: strings.defaultApiErrorTitle,
-        exception: e
-      });
+    if(!productId || !product) {
+      throw new Error("Product id undefined");
     }
+
+    const productName = LocalizedUtils.getLocalizedValue(product.name);
+
+    this.setState({
+      products,
+      discard,
+      packageSizes,
+      productName,
+      date,
+      discardCount,
+      packageSizeId,
+      loading: false,
+      productId
+    })
   }
 
   /**
    * Submits an updated discard
    */
-     private handleSubmit = async () => {
+    private  handleSubmit = async () => {
       const { discard, productId, date, discardCount, packageSizeId } = this.state;
       const { keycloak } = this.props;
+
       try {
         const updatedDiscard = {
           id: discard ? discard.id : undefined,
@@ -287,11 +288,11 @@ class EditDiscard extends React.Component<Props, State> {
         }
   
         const discardService = await Api.getStorageDiscardsService(keycloak);
-        await discardService.updateStorageDiscard({storageDiscardId: updatedDiscard.id, storageDiscard: updatedDiscard});
+        await discardService.updateStorageDiscard({ storageDiscardId: updatedDiscard.id, storageDiscard: updatedDiscard });
   
-        this.setState({messageVisible: true});
+        this.setState({ messageVisible: true });
         setTimeout(() => {
-          this.setState({messageVisible: false});
+          this.setState({ messageVisible: false });
         }, 3000);
       } catch (e) {
         this.props.onError({
@@ -308,6 +309,7 @@ class EditDiscard extends React.Component<Props, State> {
   private handleDelete = async () => {
     const { discard } = this.state;
     const { keycloak } = this.props;
+
     try {
       const discardService = await Api.getStorageDiscardsService(keycloak);
       if (!discard) {
@@ -332,42 +334,51 @@ class EditDiscard extends React.Component<Props, State> {
   }
   
 
-    /**
-    * Event handler for product change 
-    */
-     private onPackingProductChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
-      this.setState({
-        productId: data.value as string
-      });
+  /**
+   * Event handler for discarded product change
+   *
+   * @param event React change event
+   * @param data dropdown properties
+   */
+    private onDiscardedProductChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+      this.setState({ productId: data.value as string });
     }
   
-      /**
-      * Event handler for product change 
-      */
-     private onPackageSizeChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
-      this.setState({
-        packageSizeId: data.value as string
+  /**
+   * Event handler for discarded product change
+   *
+   * @param event React change event
+   * @param data dropdown properties
+   */
+    private onDiscardedSizeChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+      this.setState({ packageSizeId: data.value as string });
+    }
+    
+  /**
+   * Event handler for discarded count change
+   *
+   * @param event React change event
+   * @param data input change data
+   */
+    private onDiscardedCountChange = (event: any, { value }: InputOnChangeData) => {
+      const { discardCount } = this.state;
+      const count = Number(value);
+      !Number.isNaN(discardCount) && this.setState({
+        discardCount: count > 0 ? count : 0
       });
     }
-  
 
-  
-    /**
-    * Event handler for packed count change 
-    */
-    private onDiscardCountChange = (event: any, { value }: InputOnChangeData) => {
-      const actualNumber = Number.parseInt(value) >= 0 ? Number.parseInt(value) : 0;
-      this.setState({discardCount: actualNumber})
-    }
-  
-    /**
-    * Handles changing date
-    */
-     private onChangeDate = (e: any, { value }: InputOnChangeData) => {
+  /**
+   * Handles changing date
+   *
+   * @param event React change event
+   * @param data input change data
+   */
+    private onChangeDate = (e: any, { value }: InputOnChangeData) => {
       this.setState({date: moment(value, "DD.MM.YYYY HH:mm").toDate()});
     }
 }
- 
+
 /**
  * Redux mapper for mapping store state to component props
  * 

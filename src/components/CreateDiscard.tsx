@@ -216,7 +216,7 @@ class CreateDiscard extends React.Component<Props, State> {
   /**
    * Handle form submit
    */
-  private async handleSubmit() {
+  private handleSubmit = async () => {
     const { packageSizeId, discardCount } = this.state;
     const { keycloak } = this.props;
     if (!keycloak) {
