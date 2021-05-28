@@ -94,7 +94,7 @@ class CreateDiscard extends React.Component<Props, State> {
       }
       
     if (redirect) {
-      return <Redirect to={`/discards/${this.state.discardId}`} push={ true } />;
+      return <Redirect to={ `/discards/${this.state.discardId}` } push />;
     }
 
     const productOptions = this.state.products.map((product) => {
