@@ -196,8 +196,10 @@ class CreateDiscard extends React.Component<Props, State> {
    * @param data input change data
    */
   private onDiscardedCountChange = (event: any, { value }: InputOnChangeData) => {
-    const actualNumber = Number.parseInt(value) >= 0 ? Number.parseInt(value) : 0;
-    this.setState({discardCount: actualNumber})
+    const count = Number(value);
+    !Number.isNaN(discardCount) && this.setState({
+      discardCount: count > 0 ? count : 0
+    });
   }
 
 
