@@ -53,6 +53,9 @@ import CreateCutPacking from "./CreateCutPacking";
 import EditCutPacking from "./EditCutPacking";
 import CutPackingsList from "./CutPackingsList";
 import EventList from "./EventList";
+import DiscardList from "./DiscardList";
+import CreateDiscard from "./CreateDiscard";
+import EditDiscard from "./EditDiscard";
 
 export interface Props {
   authenticated: boolean,
@@ -98,6 +101,9 @@ class WelcomePage extends React.Component<Props, any> {
     },{
       "text": strings.cutPackings,
       "route": "/cutPackings"
+    },{
+      "text": strings.discards,
+      "route": "/discards"
     },{
       "text": strings.campaigns,
       "route": "/campaigns"
@@ -203,6 +209,11 @@ class WelcomePage extends React.Component<Props, any> {
                 )}
               />
               <Route
+                path="/discards"
+                exact
+                render={ () => <DiscardList keycloak={ this.state.keycloak }/> }
+              />
+              <Route
                 path="/campaigns"
                 exact={true}
                 render={props => (
@@ -251,10 +262,27 @@ class WelcomePage extends React.Component<Props, any> {
                 )}
               />
               <Route
+                path="/discards/:discardId"
+                exact
+                render={ props => (
+                  <EditDiscard
+                    keycloak={ this.state.keycloak }
+                    discardId={ props.match.params.discardId as string }
+                  />
+                )}
+              />
+              <Route
                 path="/createPacking"
-                exact={true}
-                render={props => (
-                  <CreatePacking keycloak={this.state.keycloak}/>
+                exact
+                render={ props => (
+                  <CreatePacking keycloak={ this.state.keycloak }/>
+                )}
+              />
+              <Route
+                path="/createDiscard"
+                exact
+                render={ props => (
+                  <CreateDiscard keycloak={ this.state.keycloak }/>
                 )}
               />
               <Route

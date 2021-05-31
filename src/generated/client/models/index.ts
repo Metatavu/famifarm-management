@@ -23,6 +23,7 @@ export * from './ProductionLine';
 export * from './Seed';
 export * from './SeedBatch';
 export * from './SowingEventData';
+export * from './StorageDiscard';
 export * from './TableSpreadEventData';
 export * from './WastageEventData';
 export * from './WastageReason';
