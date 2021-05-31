@@ -1,5 +1,5 @@
 import { KeycloakInstance } from "keycloak-js";
-import { Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, WastageReason, Pest, Packing, Campaign, EventType, Event } from "../generated/client";
+import { Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, WastageReason, Pest, Packing, Campaign, EventType, Event, StorageDiscard } from "../generated/client";
 
 export interface EventListFilters {
   product?: Product,
@@ -13,6 +13,7 @@ export interface StoreState {
   keycloak?: KeycloakInstance
   authenticated: boolean
   packings: Packing[]
+  storageDiscards: StorageDiscard[]
   products: Product[]
   product: Product
   packageSizes: PackageSize[]
@@ -42,4 +43,13 @@ export interface ErrorMessage {
   title?: string,
   message?: string,
   exception?: Error
+}
+
+/**
+ * An interface describing packagesize options
+ */
+ export interface PackageSizeOptions {
+  key?: string;
+  value?: string;
+  text?: string;
 }

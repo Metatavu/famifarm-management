@@ -15,7 +15,8 @@ import {
   ReportsApi,
   SeedBatchesApi,
   SeedsApi,
-  WastageReasonsApi } from 'src/generated/client';
+  WastageReasonsApi,
+  StorageDiscardsApi } from 'src/generated/client';
 
 const API_URL = process.env.REACT_APP_FAMIFARM_API_BASE_PATH || "http://localhost:8080";
 
@@ -189,6 +190,16 @@ export class Api {
    */
   public async getPestsService(keycloak: KeycloakInstance): Promise<PestsApi> {
     return new PestsApi(await this.getApiConfiguration(keycloak));
+  }
+
+  /**
+   * Returns promise of storage discards service authenticated with valid token
+   * 
+   * @param keycloak keycloak instance
+   * @returns promise of storage discards service authenticated with valid token 
+   */
+  public async getStorageDiscardsService(keycloak: KeycloakInstance): Promise<StorageDiscardsApi> {
+    return new StorageDiscardsApi(await this.getApiConfiguration(keycloak));
   }
   
   private getApiConfiguration = async (keycloak: KeycloakInstance): Promise<Configuration> => {

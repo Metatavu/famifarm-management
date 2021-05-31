@@ -221,5 +221,11 @@
     "packingTableHeaderPackageSize": "Pakkauskoko",
     "allPackingStates": "Kaikki tilat",
     "allProductionLines": "Kaikki linjat",
-    "totalPackingsRow": "Yhteensä: {0} laatikkoa"
-  }
+    "totalPackingsRow": "Yhteensä: {0} laatikkoa",
+
+    "discards": "Poisheitto kylmiöstä",
+    "newDiscard": "Uusi Poisheitto",
+    "discardDate": "Poisheittopäivä",
+    "editDiscard": "Muokkaa poisheittoa",
+    "edit": "Muokkaa"
+}
