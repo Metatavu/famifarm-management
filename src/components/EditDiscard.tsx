@@ -234,7 +234,7 @@ class EditDiscard extends React.Component<Props, State> {
     this.setState({ loading: true })
 
     const productsService = await Api.getProductsService(keycloak);
-    const products = await productsService.listProducts({ });
+    const products = await productsService.listProducts({ includeSubcontractorProducts: true });
 
     const discardsService = await Api.getStorageDiscardsService(keycloak);
     const discard = await discardsService.getStorageDiscard({ storageDiscardId: discardId })
