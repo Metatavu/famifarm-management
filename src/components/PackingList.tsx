@@ -24,6 +24,8 @@ import {
 import { DateInput } from 'semantic-ui-calendar-react';
 import LocalizedUtils from "src/localization/localizedutils";
 
+const ALL_PRODUCTS_KEY = "all-products";
+const ALL_CAMPAIGNS_KEY = "all-campaigns";
 
 /**
  * Interface representing component properties
@@ -59,6 +61,7 @@ interface State {
 interface Filters {
   firstResult: number;
   productId: string;
+  campaingId: string;
   packingState?: PackingState;
   dateBefore?: string;
   dateAfter?: string;
@@ -77,7 +80,8 @@ class PackingList extends React.Component<Props, State> {
       errorCount: 0,
       filters: {
         firstResult: 0,
-        productId: "all-products"
+        productId: ALL_PRODUCTS_KEY,
+        campaingId: ALL_CAMPAIGNS_KEY
       }
     };
   }
@@ -193,6 +197,15 @@ class PackingList extends React.Component<Props, State> {
                   options={ this.renderOptions() }
                   onChange={ this.onChangeProduct }
                   value={ filters.productId || "" }
+                />
+              </div>
+              <div style={ filterStyles }>
+                <label>{ strings.campaignName }</label>
+                <Form.Select
+                  name="campaings"
+                  options={ this.renderCampaingOptions() }
+                  onChange={ this.onChangeCampaing }
+                  value={ filters.campaingId || "" }
                 />
               </div>
               <div style={{ ...filterStyles, paddingRight: 0 }}>
@@ -386,7 +399,38 @@ class PackingList extends React.Component<Props, State> {
 
     const updatedFilters: Filters = {
       ...this.state.filters,
-      productId: value ? `${value}` : "all-products"
+      productId: value ? `${value}` : ALL_PRODUCTS_KEY,
+      campaingId: ALL_CAMPAIGNS_KEY
+    };
+
+    this.setState({ filters: updatedFilters });
+
+    await this.updatePackings(updatedFilters, false).catch((err) => {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: err
+      });
+    });
+  }
+
+  /**
+   * Handles changing selected product
+   *
+   * @param e event
+   * @param value value from event data
+   */
+  private onChangeCampaing = async (e: any, { value }: InputOnChangeData | TextAreaProps) => {
+    const { campaigns } = this.props;
+
+    if (!campaigns) {
+      return;
+    }
+
+    const updatedFilters: Filters = {
+      ...this.state.filters,
+      productId: ALL_PRODUCTS_KEY,
+      campaingId: value ? `${value}` : ALL_CAMPAIGNS_KEY
     };
 
     this.setState({ filters: updatedFilters });
@@ -406,12 +450,30 @@ class PackingList extends React.Component<Props, State> {
   private renderOptions = () => {
     const { products } = this.props;
 
-    const options = [{ text: strings.allProducts, value: "all-products" }];
+    const options = [{ text: strings.allProducts, value: ALL_PRODUCTS_KEY }];
 
     if (products) {
       options.push(
         ...products.map(({ name, id }) => ({
           text: LocalizedUtils.getLocalizedValue(name) || "",
+          value: id || ""
+        }))
+      );
+    }
+
+    return options;
+  }
+
+  /**
+   * Renders dropdown options
+   */
+  private renderCampaingOptions = () => {
+    const { campaigns } = this.props;
+    const options = [{ text: strings.allCampaings, value: ALL_CAMPAIGNS_KEY }];
+    if (campaigns) {
+      options.push(
+        ...campaigns.map(({ name, id }) => ({
+          text: name,
           value: id || ""
         }))
       );
@@ -427,7 +489,7 @@ class PackingList extends React.Component<Props, State> {
    */
   private updatePackings = async (filters: Filters, append: boolean) => {
     const { keycloak, onPackingsFound, onProductsFound, onCampaignsFound, onPackageSizesFound } = this.props;
-    const { productId, packingState, dateAfter, dateBefore, firstResult } = filters;
+    const { productId, campaingId, packingState, dateAfter, dateBefore, firstResult } = filters;
     if (!keycloak) {
       return;
     }
@@ -455,7 +517,8 @@ class PackingList extends React.Component<Props, State> {
     }
     const fr = append ? firstResult : 0;
     const packings  = await packingsService.listPackings({
-      productId: productId !== "all-products" ? productId : undefined,
+      productId: productId !== ALL_PRODUCTS_KEY ? productId : undefined,
+      campaingId: campaingId !== ALL_CAMPAIGNS_KEY ? campaingId: undefined,
       status: packingState,
       createdAfter: dateAfter,
       createdBefore: dateBefore,

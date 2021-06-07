@@ -255,6 +255,8 @@ export interface IStrings extends LocalizedStringsMethods {
   discardDate: string;
   editDiscard: string;
   edit: string;
+
+  allCampaings: string;
 }
 
 const strings: IStrings = new LocalizedStrings({
