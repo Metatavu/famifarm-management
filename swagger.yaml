@@ -386,6 +386,13 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: campaingId
+          in: query
+          description: Filter results by campaing id
+          required: false
+          schema:
+            type: string
+            format: uuid
         - name: status
           in: query
           description: Filter results by packing status
@@ -2626,7 +2633,6 @@ components:
           type: integer
           format: int32
 
-        
     ErrorResponse:
       type: object
       required: [message]

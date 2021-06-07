@@ -42,6 +42,7 @@ export interface ListPackingsRequest {
     firstResult?: number;
     maxResults?: number;
     productId?: string;
+    campaingId?: string;
     status?: PackingState;
     createdBefore?: string;
     createdAfter?: string;
@@ -189,6 +190,10 @@ export class PackingsApi extends runtime.BaseAPI {
 
         if (requestParameters.productId !== undefined) {
             queryParameters['productId'] = requestParameters.productId;
+        }
+
+        if (requestParameters.campaingId !== undefined) {
+            queryParameters['campaingId'] = requestParameters.campaingId;
         }
 
         if (requestParameters.status !== undefined) {
