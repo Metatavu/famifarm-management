@@ -10,7 +10,7 @@ import strings from "src/localization/strings";
 import LocalizedUtils from "src/localization/localizedutils";
 import { Grid, Button, Form, Select, Input, DropdownItemProps, DropdownProps, InputOnChangeData, Loader, Message, Confirm } from "semantic-ui-react";
 import { FormContainer } from "./FormContainer";
-import { DateInput } from 'semantic-ui-calendar-react';
+import { DateTimeInput } from 'semantic-ui-calendar-react';
 import * as moment from "moment";
 import { Redirect } from "react-router";
 
@@ -250,11 +250,11 @@ class EditPacking extends React.Component<Props, State> {
                   />
                 </Form.Field>
                 <Form.Field>
-                  <DateInput
-                    dateFormat="DD.MM.YYYY"
+                  <DateTimeInput
+                    dateFormat="DD.MM.YYYY HH:mm"
                     onChange={ this.onChangeDate }
                     name="date"
-                    value={ moment(this.state.date).format("DD.MM.YYYY") }
+                    value={ moment(this.state.date).format("DD.MM.YYYY HH:mm") }
                   />
                 </Form.Field>
                 <Message
@@ -303,11 +303,11 @@ class EditPacking extends React.Component<Props, State> {
                   />
                 </Form.Field>
                 <Form.Field>
-                  <DateInput
-                    dateFormat="DD.MM.YYYY"
+                  <DateTimeInput
+                    dateFormat="DD.MM.YYYY HH:mm"
                     onChange={ this.onChangeDate }
                     name="date"
-                    value={ moment(this.state.date).format("DD.MM.YYYY") }
+                    value={ moment(this.state.date).format("DD.MM.YYYY HH:mm") }
                   />
                 </Form.Field>
                 <Message
