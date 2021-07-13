@@ -318,8 +318,8 @@ class PackingList extends React.Component<Props, State> {
         <Table.Cell textAlign='right'>
           { packing.state == PackingState.InStore && 
             <Button
-              loading={removingFromStorageIds.indexOf(packing.id!) > -1}
-              onClick={() => this.removePackingFromStorage(packing)}>
+              loading={ removingFromStorageIds.indexOf(packing.id!) > -1 }
+              onClick={ () => this.removePackingFromStorage(packing) }>
                 { strings.removeFromStorageButton }
             </Button>
           }
