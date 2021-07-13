@@ -228,5 +228,6 @@
     "discardDate": "Poisheittopäivä",
     "editDiscard": "Muokkaa poisheittoa",
     "edit": "Muokkaa",
-    "allCampaings": "Kaikki kampanjat"
+    "allCampaings": "Kaikki kampanjat",
+    "removeFromStorageButton": "Poista varastosta"
 }
