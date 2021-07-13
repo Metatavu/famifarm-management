@@ -229,6 +229,7 @@
   "discardDate": "Discard Date",
   "editDiscard": "Edit discard",
   "edit": "Edit",
-  "allCampaings": "All campaings"
+  "allCampaings": "All campaings",
+  "removeFromStorageButton": "Remove from storage"
 
 }

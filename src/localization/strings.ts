@@ -257,6 +257,7 @@ export interface IStrings extends LocalizedStringsMethods {
   edit: string;
 
   allCampaings: string;
+  removeFromStorageButton: string;
 }
 
 const strings: IStrings = new LocalizedStrings({

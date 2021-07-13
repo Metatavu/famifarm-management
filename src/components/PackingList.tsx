@@ -53,6 +53,7 @@ interface State {
   loading: boolean;
   errorCount: number;
   allFound: boolean;
+  removingFromStorageIds: string[]
 }
 
 /**
@@ -75,6 +76,7 @@ class PackingList extends React.Component<Props, State> {
     super(props);
     this.state = {
       packings: [],
+      removingFromStorageIds: [],
       loading: false,
       allFound: false,
       errorCount: 0,
@@ -129,6 +131,24 @@ class PackingList extends React.Component<Props, State> {
     const packingDate = moment(packing.time).format("DD.MM.YYYY");
     
     return `${campaignName} - ${packingDate}`;
+  }
+
+  /**
+   * Removes packing from storage ( Updates the state to removed )
+   * 
+   * @param packing Packing to remove from storage
+   */
+  private removePackingFromStorage = async (packing: Packing) => {
+    const { packings, keycloak, onPackingsFound } = this.props;
+    if (!keycloak || !packing.id) {
+      return;
+    }
+    this.setState({removingFromStorageIds: [ ...this.state.removingFromStorageIds, packing.id ]})
+    packing.state = PackingState.Removed;
+    const packingService = await Api.getPackingsService(keycloak);
+    const updatedPacking = await packingService.updatePacking({packingId: packing.id, packing: packing});
+    onPackingsFound && onPackingsFound((packings || []).map(p => p.id == updatedPacking.id ? updatedPacking : p));
+    this.setState({removingFromStorageIds: this.state.removingFromStorageIds.filter(id => id !== packing.id)});
   }
 
   /**
@@ -281,6 +301,7 @@ class PackingList extends React.Component<Props, State> {
       this.getPackingName(packing) :
       this.getCampaignPackingName(packing);
 
+    const { removingFromStorageIds } = this.state
     const packageSize = packing.packageSizeId ? (this.props.packageSizes || []).find(p => p.id === packing.packageSizeId) : null;
     const packageSizeName = packageSize ? LocalizedUtils.getLocalizedValue(packageSize.name) : "";
     const status = this.resolveLocalizedPackingState(packing.state);
@@ -295,6 +316,13 @@ class PackingList extends React.Component<Props, State> {
         <Table.Cell>{ amount }</Table.Cell>
         <Table.Cell>{ packageSizeName }</Table.Cell>
         <Table.Cell textAlign='right'>
+          { packing.state == PackingState.InStore && 
+            <Button
+              loading={ removingFromStorageIds.indexOf(packing.id!) > -1 }
+              onClick={ () => this.removePackingFromStorage(packing) }>
+                { strings.removeFromStorageButton }
+            </Button>
+          }
           <NavLink to={ `/packings/${packing.id}` }>
               <Button className="submit-button">{strings.open}</Button>
           </NavLink>
