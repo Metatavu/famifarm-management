@@ -288,7 +288,7 @@ class CreateDiscard extends React.Component<Props, State> {
     const productsService = await Api.getProductsService(keycloak);
     const packageSizeService = await Api.getPackageSizesService(keycloak);
 
-    const products = await productsService.listProducts({});
+    const products = await productsService.listProducts({ includeSubcontractorProducts: true });
     const packageSizes = await packageSizeService.listPackageSizes({});
       
     this.setState({
