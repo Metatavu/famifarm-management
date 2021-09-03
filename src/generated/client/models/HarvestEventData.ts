@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import {
+    HarvestEventType,
+    HarvestEventTypeFromJSON,
+    HarvestEventTypeFromJSONTyped,
+    HarvestEventTypeToJSON,
+} from './';
+
 /**
  * 
  * @export
@@ -33,10 +40,10 @@ export interface HarvestEventData {
     gutterCount?: number;
     /**
      * 
-     * @type {string}
+     * @type {HarvestEventType}
      * @memberof HarvestEventData
      */
-    type?: HarvestEventDataTypeEnum;
+    type?: HarvestEventType;
     /**
      * Production line id
      * @type {string}
@@ -51,16 +58,6 @@ export interface HarvestEventData {
     sowingDate: Date;
 }
 
-/**
-* @export
-* @enum {string}
-*/
-export enum HarvestEventDataTypeEnum {
-    Bagging = 'BAGGING',
-    Cutting = 'CUTTING',
-    Boxing = 'BOXING'
-}
-
 export function HarvestEventDataFromJSON(json: any): HarvestEventData {
     return HarvestEventDataFromJSONTyped(json, false);
 }
@@ -73,7 +70,7 @@ export function HarvestEventDataFromJSONTyped(json: any, ignoreDiscriminator: bo
         
         'gutterHoleCount': !exists(json, 'gutterHoleCount') ? undefined : json['gutterHoleCount'],
         'gutterCount': !exists(json, 'gutterCount') ? undefined : json['gutterCount'],
-        'type': !exists(json, 'type') ? undefined : json['type'],
+        'type': !exists(json, 'type') ? undefined : HarvestEventTypeFromJSON(json['type']),
         'productionLineId': !exists(json, 'productionLineId') ? undefined : json['productionLineId'],
         'sowingDate': (new Date(json['sowingDate'])),
     };
@@ -90,7 +87,7 @@ export function HarvestEventDataToJSON(value?: HarvestEventData | null): any {
         
         'gutterHoleCount': value.gutterHoleCount,
         'gutterCount': value.gutterCount,
-        'type': value.type,
+        'type': HarvestEventTypeToJSON(value.type),
         'productionLineId': value.productionLineId,
         'sowingDate': (value.sowingDate.toISOString()),
     };

@@ -258,6 +258,7 @@ export interface IStrings extends LocalizedStringsMethods {
 
   allCampaings: string;
   removeFromStorageButton: string;
+  allowedHarvestTypes: string;
 }
 
 const strings: IStrings = new LocalizedStrings({

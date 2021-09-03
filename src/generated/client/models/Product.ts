@@ -14,6 +14,10 @@
 
 import { exists, mapValues } from '../runtime';
 import {
+    HarvestEventType,
+    HarvestEventTypeFromJSON,
+    HarvestEventTypeFromJSONTyped,
+    HarvestEventTypeToJSON,
     LocalizedValue,
     LocalizedValueFromJSON,
     LocalizedValueFromJSONTyped,
@@ -46,6 +50,12 @@ export interface Product {
     defaultPackageSizeIds?: Array<string>;
     /**
      * 
+     * @type {Array<HarvestEventType>}
+     * @memberof Product
+     */
+    allowedHarvestTypes?: Array<HarvestEventType>;
+    /**
+     * 
      * @type {boolean}
      * @memberof Product
      */
@@ -71,6 +81,7 @@ export function ProductFromJSONTyped(json: any, ignoreDiscriminator: boolean): P
         'id': !exists(json, 'id') ? undefined : json['id'],
         'name': !exists(json, 'name') ? undefined : ((json['name'] as Array<any>).map(LocalizedValueFromJSON)),
         'defaultPackageSizeIds': !exists(json, 'defaultPackageSizeIds') ? undefined : json['defaultPackageSizeIds'],
+        'allowedHarvestTypes': !exists(json, 'allowedHarvestTypes') ? undefined : ((json['allowedHarvestTypes'] as Array<any>).map(HarvestEventTypeFromJSON)),
         'isSubcontractorProduct': json['isSubcontractorProduct'],
         'active': !exists(json, 'active') ? undefined : json['active'],
     };
@@ -88,6 +99,7 @@ export function ProductToJSON(value?: Product | null): any {
         'id': value.id,
         'name': value.name === undefined ? undefined : ((value.name as Array<any>).map(LocalizedValueToJSON)),
         'defaultPackageSizeIds': value.defaultPackageSizeIds,
+        'allowedHarvestTypes': value.allowedHarvestTypes === undefined ? undefined : ((value.allowedHarvestTypes as Array<any>).map(HarvestEventTypeToJSON)),
         'isSubcontractorProduct': value.isSubcontractorProduct,
         'active': value.active,
     };

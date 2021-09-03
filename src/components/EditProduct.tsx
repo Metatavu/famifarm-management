@@ -4,7 +4,7 @@ import * as actions from "../actions";
 import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
-import { Product, PackageSize, LocalizedValue } from "../generated/client";
+import { Product, PackageSize, LocalizedValue, HarvestEventType } from "../generated/client";
 import { Redirect } from 'react-router';
 import strings from "src/localization/strings";
 
@@ -176,6 +176,21 @@ class EditProduct extends React.Component<Props, State> {
   }
 
   /**
+   * Handle allowd harvest types event change
+   * 
+   * @param e event
+   * @param value updated list of package sizes from DropdownProps
+   */
+  private onAllowedHarvestTypesChange = (e: any, { value }: DropdownProps) => {
+    this.setState({
+      product: {
+        ...this.state.product!,
+        allowedHarvestTypes: value as HarvestEventType[]
+      }
+    });
+  }
+
+  /**
    * Sets the isSubcontractorProduct boolean
    * 
    * @param e event 
@@ -228,6 +243,18 @@ class EditProduct extends React.Component<Props, State> {
       value: packageSize.id
     }));
 
+    const allowedHarvestTypeOptions = [
+      HarvestEventType.Bagging,
+      HarvestEventType.Boxing,
+      HarvestEventType.Cutting
+    ].map(harvestType => {
+      return {
+        key: harvestType,
+        value: harvestType,
+        text: strings[`harvestType${harvestType}`]
+      }
+    });
+
 
     return (
       <Grid>
@@ -263,6 +290,16 @@ class EditProduct extends React.Component<Props, State> {
                   placeholder={ strings.packageSize }
                   onChange={ this.onPackageSizeChange }
                   value={ product ? product.defaultPackageSizeIds || [] : [] }
+                />
+                <Form.Select 
+                  fluid
+                  required
+                  multiple
+                  label={ strings.allowedHarvestTypes }
+                  options={ allowedHarvestTypeOptions }
+                  placeholder={ strings.labelHarvestType }
+                  onChange={ this.onAllowedHarvestTypesChange }
+                  value={ product ? product.allowedHarvestTypes || [] : [] }
                 />
               </Form.Field>
               <Form.Checkbox
