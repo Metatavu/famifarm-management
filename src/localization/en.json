@@ -230,6 +230,7 @@
   "editDiscard": "Edit discard",
   "edit": "Edit",
   "allCampaings": "All campaings",
-  "removeFromStorageButton": "Remove from storage"
+  "removeFromStorageButton": "Remove from storage",
+  "allowedHarvestTypes": "Allowed harvest types"
 
 }

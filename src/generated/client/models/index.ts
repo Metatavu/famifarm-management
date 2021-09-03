@@ -7,6 +7,7 @@ export * from './ErrorResponse';
 export * from './Event';
 export * from './EventType';
 export * from './HarvestEventData';
+export * from './HarvestEventType';
 export * from './LocalizedValue';
 export * from './PackageSize';
 export * from './Packing';

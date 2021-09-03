@@ -547,7 +547,12 @@ class CreateEvent extends React.Component<Props, State> {
       };
     });
 
-    const harvestTypeOptions = ['BAGGING', 'CUTTING', 'BOXING'].map((harvestType) => {
+    const selectedProductId = this.state.event.productId;
+    const selectedProduct = selectedProductId ? 
+      this.state.products.find(product => product.id === selectedProductId) 
+      : undefined;
+
+    const harvestTypeOptions = (selectedProduct ? selectedProduct.allowedHarvestTypes || [] : []).map((harvestType) => {
       return {
         key: harvestType,
         value: harvestType,

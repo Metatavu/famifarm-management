@@ -229,5 +229,6 @@
     "editDiscard": "Muokkaa poisheittoa",
     "edit": "Muokkaa",
     "allCampaings": "Kaikki kampanjat",
-    "removeFromStorageButton": "Poista varastosta"
+    "removeFromStorageButton": "Poista varastosta",
+    "allowedHarvestTypes": "Sallitut sadonkorjuun tyypit"
 }
