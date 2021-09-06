@@ -2254,6 +2254,10 @@ components:
           items:
             type: "string"
             format: "uuid"
+        allowedHarvestTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/HarvestEventType'
         isSubcontractorProduct:
           type: "boolean"
         active:
@@ -2469,7 +2473,13 @@ components:
           items:
             type: "string"
             format: "uuid"
-            
+    HarvestEventType:
+      type: "string"
+      enum:
+        - BAGGING
+        - CUTTING
+        - BOXING
+  
     HarvestEventData:
       required:
         - amount
@@ -2483,11 +2493,7 @@ components:
           type: "integer"
           format: "int32"
         type:
-          type: "string"
-          enum:
-            - BAGGING
-            - CUTTING
-            - BOXING
+          $ref: '#/components/schemas/HarvestEventType'
         productionLineId:
           description: "Production line id"
           type: "string"
