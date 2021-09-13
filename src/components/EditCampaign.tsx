@@ -66,7 +66,7 @@ class EditCampaign extends React.Component<Props, State> {
 
     this.setState({ loading: true });
     const productsService = await Api.getProductsService(this.props.keycloak);
-    const products = await productsService.listProducts({includeSubcontractorProducts: true});
+    const products = await productsService.listProducts({includeSubcontractorProducts: true, includeInActiveProducts: true});
 
     const campaignsService = await Api.getCampaignsService(this.props.keycloak);
     const campaign = await campaignsService.findCampaign({campaignId: this.props.campaignId});
@@ -100,13 +100,15 @@ class EditCampaign extends React.Component<Props, State> {
     }));
 
     const addedCampaignProducts = this.state.addedCampaignProducts.map((campaignProduct, i) => {
+      const cProduct = productOptions.find(product => product.value === campaignProduct.productId);
+      const title = `${ (cProduct || {}).text } x ${ campaignProduct.count }`
       return (
         <List.Item key={ i }>
           <List.Content floated='right'>
             <Button icon="remove" onClick={ () => this.removeAddedCampaignProduct(i) }/>
           </List.Content>
           <List.Content>
-          <List.Header>{ `${ productOptions.find(product => product.value === campaignProduct.productId)!.text } x ${ campaignProduct.count }` }</List.Header>
+          <List.Header>{ title }</List.Header>
           </List.Content>
         </List.Item>
       );
@@ -124,7 +126,7 @@ class EditCampaign extends React.Component<Props, State> {
           <FormContainer>    
             <Form.Field>
               <label>{ strings.product }</label>
-              <Select options={ productOptions } value={ this.state.productId } onChange={ this.onCampaignProductChange }></Select>
+              <Select options={ (productOptions || []) } value={ this.state.productId } onChange={ this.onCampaignProductChange }></Select>
             </Form.Field>
             <Form.Field>
               <label>{ strings.productCount }</label>
