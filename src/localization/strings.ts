@@ -139,6 +139,7 @@ export interface IStrings extends LocalizedStringsMethods {
   harvestTypeBOXING: string
   potTypeSMALL: string
   potTypeLARGE: string
+  potTypePAPER: string
   phasePLANTING: string
   phaseSOWING: string
   phaseTABLE_SPREAD: string

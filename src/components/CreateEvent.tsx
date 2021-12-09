@@ -399,7 +399,6 @@ class CreateEvent extends React.Component<Props, State> {
         case "SOWING":
           data = {
             amount: eventData.amount,
-            potType: eventData.potType,
             productionLineId: eventData.productionLineId,
             seedBatchIds: eventData.seedBatchIds
           } as SowingEventData;
@@ -656,20 +655,11 @@ class CreateEvent extends React.Component<Props, State> {
       };
     });
 
-    const potTypeOptions = ['SMALL', 'LARGE'].map((potType) => {
-      return {
-        key: potType,
-        value: potType,
-        text: strings.getString(`potType${potType}`, strings.getLanguage())
-      };
-    });
-
     return (
       <React.Fragment>
         <Form.Input required label={strings.labelTrayCount} name="amount" type="number" value={data.amount} onChange={this.handleDataChange} />
         <Form.Select required label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
         <Form.Select required label={strings.labelSeedBatch} name="seedBatchIds" options={seedBatchOptions} multiple value={data.seedBatchIds} onChange={this.handleDataChange} />
-        <Form.Select required label={strings.labelPotType} name="potType" options={potTypeOptions} value={data.potType} onChange={this.handleDataChange} />
       </React.Fragment>
     );
   }

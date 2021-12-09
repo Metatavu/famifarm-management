@@ -19,7 +19,8 @@
  */
 export enum PotType {
     Small = 'SMALL',
-    Large = 'LARGE'
+    Large = 'LARGE',
+    Paper = 'PAPER'
 }
 
 export function PotTypeFromJSON(json: any): PotType {
