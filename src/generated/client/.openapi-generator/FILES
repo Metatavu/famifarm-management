@@ -25,6 +25,7 @@ models/ErrorResponse.ts
 models/Event.ts
 models/EventType.ts
 models/HarvestEventData.ts
+models/HarvestEventType.ts
 models/LocalizedValue.ts
 models/PackageSize.ts
 models/Packing.ts

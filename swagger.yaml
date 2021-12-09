@@ -2317,6 +2317,7 @@ components:
       enum:
         - SMALL
         - LARGE
+        - PAPER
 
     Event:
       type: "object"
@@ -2438,6 +2439,8 @@ components:
             type: "string"
             format: "uuid"
         potType:
+          readOnly: true
+          description: Will always be Pottype.PAPER, kept here for past events
           $ref: "#/components/schemas/PotType"
         amount:
           type: "integer"

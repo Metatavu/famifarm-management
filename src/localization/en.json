@@ -121,6 +121,7 @@
   "harvestTypeBOXING" : "Boxing",
   "potTypeSMALL" : "Small",
   "potTypeLARGE" : "Large",
+  "potTypePAPER" : "Paper",
   "phasePLANTING" : "Planting",
   "phaseSOWING" : "Sowing",
   "phaseTABLE_SPREAD" : "Trays to nursery",
