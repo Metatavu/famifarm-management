@@ -30,7 +30,7 @@
     "semantic-ui-calendar-react": "^0.11.0",
     "semantic-ui-css": "^2.3.3",
     "semantic-ui-react": "^0.82.3",
-    "urijs": "^1.19.1"
+    "urijs": "^1.19.10"
   },
   "scripts": {
     "build-css": "node-sass-chokidar --include-path ./src --include-path ./node_modules src/ -o src/",
