@@ -58,7 +58,8 @@ class ReportDownload extends React.Component<Props, State> {
       "HARVESTED",
       "PACKED",
       "PACKED_CAMPAINGS",
-      "PRODUCT_PHASE_COUNT"
+      "PRODUCT_PHASE_COUNT",
+      "SEEDLING_TIME"
     ].map((reportType) => {
       return {
         key: reportType,
