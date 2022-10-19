@@ -1,10 +1,10 @@
 import * as React from "react";
-import * as Keycloak from 'keycloak-js';
+import Keycloak from 'keycloak-js';
 import * as actions from "../actions";
 import { StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import { Route, NavLink } from 'react-router-dom';
+import { Route, NavLink, useParams, Routes } from 'react-router-dom';
 import Root from './Root';
 import strings from "../localization/strings";
 
@@ -56,6 +56,7 @@ import EventList from "./EventList";
 import DiscardList from "./DiscardList";
 import CreateDiscard from "./CreateDiscard";
 import EditDiscard from "./EditDiscard";
+import { WithParams } from "./WithParams";
 
 export interface Props {
   authenticated: boolean,
@@ -76,11 +77,11 @@ class WelcomePage extends React.Component<Props, any> {
    */
   componentDidMount() {
     const kcConf = {
-      "realm": process.env.REACT_APP_KEYCLOAK_REALM,
-      "url": process.env.REACT_APP_AUTH_SERVER_URL,
-      "clientId": process.env.REACT_APP_AUTH_RESOURCE
+      "realm": process.env.REACT_APP_KEYCLOAK_REALM as string,
+      "url": process.env.REACT_APP_AUTH_SERVER_URL as string,
+      "clientId": process.env.REACT_APP_AUTH_RESOURCE as string
     };
-    const keycloak = Keycloak(kcConf);
+    const keycloak = new Keycloak(kcConf);
     keycloak.init({onLoad: "login-required", checkLoginIframe: false}).success((authenticated) => {
       this.props.onLogin && this.props.onLogin(keycloak, authenticated);
     });
@@ -171,387 +172,308 @@ class WelcomePage extends React.Component<Props, any> {
             </Grid>
           </div>
         ) : (
-          <div>
+          <Routes>
             <Route
                 path="/"
-                exact={true}
-                render={props => (
+                element={
                   <Root
                     keycloak={this.state.keycloak}
                   />
-                )}
+                }
               />
               <Route
                 path="/events"
-                exact={true}
-                render={props => (
+                element={
                   <EventList
                     keycloak={this.state.keycloak}
                   />
-                )}
+                }
               />
               <Route
                 path="/packings"
-                exact={true}
-                render={props => (
+                element={
                   <PackingList
                     keycloak={this.state.keycloak}
                   />
-                )}
+                }
               />
               <Route
                 path="/cutPackings"
-                exact={ true }
-                render={ props => (
+                element={
                   <CutPackingsList
                     keycloak={ this.state.keycloak }
                   />
-                )}
+                }
               />
               <Route
                 path="/discards"
-                exact
-                render={ () => <DiscardList keycloak={ this.state.keycloak }/> }
+                element={
+                  <DiscardList keycloak={ this.state.keycloak }/>
+                }
               />
               <Route
                 path="/campaigns"
-                exact={true}
-                render={props => (
+                element={
                   <CampaignList
                     keycloak={this.state.keycloak}
                   />
-                )}
+                }
               />
               <Route
                 path="/store"
-                exact={true}
-                render={props => (
+                element={
                   <ViewStore
                     keycloak={this.state.keycloak}
                   />
-                )}
+                }
               />
               <Route 
                 path="/packings/:packingId"
-                exact={true}
-                render={props => (
-                  <EditPacking
-                    keycloak={this.state.keycloak}
-                    packingId={props.match.params.packingId as string}
-                />
-                )}
+                element={
+                  <WithParams Component={EditPacking} keycloak={this.state.keycloak} routeParamNames={["packingId"]} />
+                }
               />
               <Route 
                 path="/cutPackings/:cutPackingId"
-                exact={ true }
-                render={ props => (
-                  <EditCutPacking
-                    keycloak={ this.state.keycloak }
-                    cutPackingId={ props.match.params.cutPackingId as string }
-                  />
-                ) }
+                element={
+                  <WithParams Component={EditCutPacking} keycloak={this.state.keycloak} routeParamNames={["cutPackingId"]} />
+                }
               />
               <Route 
                 path="/campaigns/:campaignId"
-                exact={ true }
-                render={ props => (
-                  <EditCampaign
-                    keycloak={ this.state.keycloak }
-                    campaignId={ props.match.params.campaignId as string }
-                />
-                )}
+                element={
+                  <WithParams Component={EditCampaign} keycloak={this.state.keycloak} routeParamNames={["campaignId"]} />
+                }
               />
               <Route
                 path="/discards/:discardId"
-                exact
-                render={ props => (
-                  <EditDiscard
-                    keycloak={ this.state.keycloak }
-                    discardId={ props.match.params.discardId as string }
-                  />
-                )}
+                element={
+                  <WithParams Component={EditDiscard} keycloak={this.state.keycloak} routeParamNames={["discardId"]} />
+                }
               />
               <Route
                 path="/createPacking"
-                exact
-                render={ props => (
+                element={
                   <CreatePacking keycloak={ this.state.keycloak }/>
-                )}
+                }
               />
               <Route
                 path="/createDiscard"
-                exact
-                render={ props => (
+                element={
                   <CreateDiscard keycloak={ this.state.keycloak }/>
-                )}
+                }
               />
               <Route
                 path="/createCutPacking"
-                exact={true}
-                render={props => (
+                element={
                   <CreateCutPacking keycloak={ this.state.keycloak }/>
-                )}
+                }
               />
               <Route
                 path="/createCampaign"
-                exact={true}
-                render={props => (
+                element={
                   <CreateCampaign keycloak={this.state.keycloak}/>
-                )}
+                }
               />
               <Route
                 path="/products"
-                exact={true}
-                render={props => (
+                element={
                   <ProductList
                     keycloak={this.state.keycloak}
                   />
-                )}
+                }
               />
               <Route
                 path="/products/:productId"
-                exact={true}
-                render={props => (
-                    <EditProduct
-                      keycloak={this.state.keycloak}
-                      productId={props.match.params.productId as string}
-                    />
-                )}
+                element={
+                  <WithParams Component={EditProduct} keycloak={this.state.keycloak} routeParamNames={["productId"]} />
+                }
               />
               <Route
                 path="/events/:eventId"
-                exact={true}
-                render={props => (
-                    <EditEvent
-                      keycloak={this.state.keycloak}
-                      eventId={props.match.params.eventId as string}
-                    />
-                )}
+                element={
+                  <WithParams Component={EditEvent} keycloak={this.state.keycloak} routeParamNames={["eventId"]} />
+                }
               />
               <Route
                 path="/createEvent"
-                exact={true}
-                render={props => (
-                    <CreateEvent
-                      keycloak={this.state.keycloak}
-                    />
-                )}
+                element={
+                  <CreateEvent
+                    keycloak={this.state.keycloak}
+                  />
+                }
               />
               <Route
                 path="/createProduct"
-                exact={true}
-                render={props => (
+                element={
                   <CreateProduct
                     keycloak={this.state.keycloak}
                   />
-                )}
+                }
               />
               <Route
                 path="/packageSizes"
-                exact={true}
-                render={props => (
+                element={
                   <PackageSizeList
                     keycloak={this.state.keycloak}
                   />
-                )}
+                }
               />
               <Route
                 path="/packageSizes/:packageSizeId"
-                exact={true}
-                render={props => (
-                    <EditPackageSize
-                      keycloak={this.state.keycloak}
-                      packageSizeId={props.match.params.packageSizeId as string}
-                    />
-                )}
+                element={
+                  <WithParams Component={EditPackageSize} keycloak={this.state.keycloak} routeParamNames={["packageSizeId"]} />
+                }
               />
               <Route
                 path="/createPackageSize"
-                exact={true}
-                render={props => (
+                element={
                   <CreatePackageSize
                     keycloak={this.state.keycloak}
                   />
-                )}
+                }
               />
               <Route
                 path="/seeds"
-                exact={true}
-                render={props => (
+                element={
                   <SeedList
                     keycloak={this.state.keycloak}
                   />
-                )}
+                }
               />
               <Route
                 path="/seeds/:seedId"
-                exact={true}
-                render={props => (
-                    <EditSeed
-                      keycloak={this.state.keycloak}
-                      seedId={props.match.params.seedId as string}
-                    />
-                )}
+                element={
+                  <WithParams Component={EditSeed} keycloak={this.state.keycloak} routeParamNames={["seedId"]} />
+                }
               />
               <Route
                 path="/createSeed"
-                exact={true}
-                render={props => (
+                element={
                   <CreateSeed
                     keycloak={this.state.keycloak}
                   />
-                )}
+                }
               />
               <Route
                 path="/pests"
-                exact={true}
-                render={props => (
+                element={
                   <PestList
                     keycloak={this.state.keycloak}
                   />
-                )}
+                }
               />
               <Route
                 path="/pests/:pestId"
-                exact={true}
-                render={props => (
-                    <EditPest
-                      keycloak={this.state.keycloak}
-                      pestId={props.match.params.pestId as string}
-                    />
-                )}
+                element={
+                  <WithParams Component={EditPest} keycloak={this.state.keycloak} routeParamNames={["pestId"]} />
+                }
               />
               <Route
                 path="/createPest"
-                exact={true}
-                render={props => (
+                element={
                   <CreatePest
                     keycloak={this.state.keycloak}
                   />
-                )}
+                }
               />
               <Route
                 path="/productionLines"
-                exact={true}
-                render={props => (
+                element={
                   <ProductionLineList
                     keycloak={this.state.keycloak}
                   />
-                )}
+                }
               />
               <Route
                 path="/productionLines/:productionLineId"
-                exact={true}
-                render={props => (
-                    <EditProductionLine
-                      keycloak={this.state.keycloak}
-                      productionLineId={props.match.params.productionLineId as string}
-                    />
-                )}
+                element={
+                  <WithParams Component={EditProductionLine} keycloak={this.state.keycloak} routeParamNames={["productionLineId"]} />
+                }
               />
               <Route
                 path="/createProductionLine"
-                exact={true}
-                render={props => (
+                element={
                   <CreateProductionLine
                     keycloak={this.state.keycloak}
                   />
-                )}
+                }
               />
               <Route
                 path="/seedBatches"
-                exact={true}
-                render={props => (
+                element={
                   <SeedBatchList
                     keycloak={this.state.keycloak}
                   />
-                )}
+                }
               />
               <Route
                 path="/seedBatches/:seedBatchId"
-                exact={true}
-                render={props => (
-                    <EditSeedBatch
-                      keycloak={this.state.keycloak}
-                      seedBatchId={props.match.params.seedBatchId as string}
-                    />
-                )}
+                element={
+                  <WithParams Component={EditSeedBatch} keycloak={this.state.keycloak} routeParamNames={["seedBatchId"]} />
+                }
               />
               <Route
                 path="/createSeedBatch"
-                exact={true}
-                render={props => (
+                element={
                   <CreateSeedBatch
                     keycloak={this.state.keycloak}
                   />
-                )}
+                }
               />
               <Route
                 path="/performedCultivationActions"
-                exact={true}
-                render={props => (
+                element={
                   <PerformedCultivationActionList
                     keycloak={this.state.keycloak}
                   />
-                )}
+                }
               />
               <Route
                 path="/createPerformedCultivationAction"
-                exact={true}
-                render={props => (
+                element={
                   <CreatePerformedCultivationAction
                     keycloak={this.state.keycloak}
                   />
-                )}
+                }
               />
               <Route
                 path="/performedCultivationActions/:createPerformedCultivationActionId"
-                exact={true}
-                render={props => (
-                  <EditPerformedCultivationAction
-                    keycloak={this.state.keycloak}
-                    performedCultivationActionId={props.match.params.createPerformedCultivationActionId as string}
-                  />
-                )}
+                element={
+                  <WithParams Component={EditPerformedCultivationAction} keycloak={this.state.keycloak} routeParamNames={["performedCultivationActionId"]} />
+                }
               />
               <Route
                 path="/wastageReasons"
-                exact={true}
-                render={props => (
+                element={
                   <WastageReasonList
                     keycloak={this.state.keycloak}
                   />
-                )}
+                }
               />
               <Route
                 path="/wastageReasons/:wastageReasonId"
-                exact={true}
-                render={props => (
-                    <EditWastageReason
-                      keycloak={this.state.keycloak}
-                      wastageReasonId={props.match.params.wastageReasonId as string}
-                    />
-                )}
+                element={
+                  <WithParams Component={EditWastageReason} keycloak={this.state.keycloak} routeParamNames={["wastageReasonId"]} />
+                }
               />
               <Route
                 path="/createWastageReason"
-                exact={true}
-                render={props => (
+                element={
                   <CreateWastageReason
                     keycloak={this.state.keycloak}
                   />
-                )}
+                }
               />
               <Route
                 path="/reports"
-                exact={true}
-                render={props => (
+                element={
                   <ReportDownload
                     keycloak={this.state.keycloak}
                   />
-                )}
+                }
               />
-            </div>
+            </Routes>
         )}
       </BasicLayout>
     );

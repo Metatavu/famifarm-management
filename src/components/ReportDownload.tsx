@@ -1,16 +1,16 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import strings from "src/localization/strings";
+import strings from "../localization/strings";
 import { DateInput } from 'semantic-ui-calendar-react';
 
 import {
   Grid,
   Button,
   Form,
-  InputOnChangeData,
+  DropdownProps,
 } from "semantic-ui-react";
-import * as moment from "moment";
+import moment from "moment";
 
 /**
  * Component props
@@ -125,27 +125,27 @@ class ReportDownload extends React.Component<Props, State> {
   /**
    * Updates report type
    */
-  private updateReportType = (e: any, { value }: InputOnChangeData) => {
+  private updateReportType = (e: any, { value }: DropdownProps) => {
     this.setState({
-      reportType: value
+      reportType: value as string
     });
   }
 
   /**
    * Updates start time to state
    */
-  private updateStartTime =  (e: any, { value }: InputOnChangeData) => {
+  private updateStartTime =  (e: any, { value }: DropdownProps) => {
     this.setState({
-      startTime: moment(value, "DD.MM.YYYY").toISOString()
+      startTime: moment(value as any, "DD.MM.YYYY").toISOString()
     });
   }
 
   /**
    * Updates end time to state
    */
-  private updateEndTime =  (e: any, { value }: InputOnChangeData) => {
+  private updateEndTime =  (e: any, { value }: DropdownProps) => {
     this.setState({
-      endTime: moment(value, "DD.MM.YYYY").toISOString()
+      endTime: moment(value as any, "DD.MM.YYYY").toISOString()
     });
   }
 }

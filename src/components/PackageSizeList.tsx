@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
 import { NavLink } from 'react-router-dom';
 import { PackageSize } from "../generated/client";
-import strings from "src/localization/strings";
+import strings from "../localization/strings";
 
 import {
   List,
@@ -14,13 +14,13 @@ import {
   Grid,
   Loader
 } from "semantic-ui-react";
-import LocalizedUtils from "src/localization/localizedutils";
+import LocalizedUtils from "../localization/localizedutils";
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   packageSizes?: PackageSize[];
   onPackageSizesFound?: (packageSizes: PackageSize[]) => void,
-  onError: (error: ErrorMessage) => void
+   onError: (error: ErrorMessage | undefined) => void
 }
 
 export interface State {
@@ -48,7 +48,7 @@ class PackageSizeList extends React.Component<Props, State> {
       const packageSizes = await packageSizeService.listPackageSizes({});
   
       this.props.onPackageSizesFound && this.props.onPackageSizesFound(packageSizes);
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -125,7 +125,7 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onPackageSizesFound: (packageSizes: PackageSize[]) => dispatch(actions.packageSizesFound(packageSizes)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

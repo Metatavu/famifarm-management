@@ -7,7 +7,7 @@ import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
 import { Pest } from "../generated/client";
-import strings from "src/localization/strings";
+import strings from "../localization/strings";
 
 import {
   List,
@@ -15,7 +15,7 @@ import {
   Grid,
   Loader
 } from "semantic-ui-react";
-import LocalizedUtils from "src/localization/localizedutils";
+import LocalizedUtils from "../localization/localizedutils";
 
 /**
  * Component props
@@ -24,7 +24,7 @@ interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   pests?: Pest[];
   onPestsFound?: (pests: Pest[]) => void,
-  onError: (error: ErrorMessage) => void
+   onError: (error: ErrorMessage | undefined) => void
 }
 
 /**
@@ -61,7 +61,7 @@ class PestList extends React.Component<Props, State> {
         return 0;
       });
       this.props.onPestsFound && this.props.onPestsFound(pests);
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -137,7 +137,7 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onPestsFound: (pests: Pest[]) => dispatch(actions.pestsFound(pests)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

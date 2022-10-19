@@ -5,8 +5,8 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
 import { Product, PackageSize, LocalizedValue, HarvestEventType } from "../generated/client";
-import { Redirect } from 'react-router';
-import strings from "src/localization/strings";
+import { redirect } from 'react-router-dom';
+import strings from "../localization/strings";
 
 import {
   Grid,
@@ -18,7 +18,7 @@ import {
   CheckboxProps,
   DropdownProps
 } from "semantic-ui-react";
-import LocalizedUtils from "src/localization/localizedutils";
+import LocalizedUtils from "../localization/localizedutils";
 import LocalizedValueInput from "./LocalizedValueInput";
 import { FormContainer } from "./FormContainer";
 
@@ -33,7 +33,7 @@ interface Props {
   onProductSelected?: (product: Product) => void;
   onProductDeleted?: (productId: string) => void;
   onPackageSizesFound?: (packageSizes: PackageSize[]) => void;
-  onError: (error: ErrorMessage) => void;
+   onError: (error: ErrorMessage | undefined) => void;
 }
 
 /**
@@ -90,7 +90,7 @@ class EditProduct extends React.Component<Props, State> {
   
       const packageSizes = await packageSizeService.listPackageSizes({ });
       onPackageSizesFound && onPackageSizesFound(packageSizes);
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -120,7 +120,7 @@ class EditProduct extends React.Component<Props, State> {
       setTimeout(() => {
         this.setState({ messageVisible: false });
       }, 3000);
-    } catch (e) {
+    } catch (e: any) {
       onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -200,7 +200,7 @@ class EditProduct extends React.Component<Props, State> {
     this.setState({
       product: {
         ...this.state.product,
-        isSubcontractorProduct: checked || false
+        isSubcontractorProduct: checked || false
       }
     })
   }
@@ -223,7 +223,7 @@ class EditProduct extends React.Component<Props, State> {
    */
   public render() {
     const { packageSizes } = this.props;
-    const { redirect, product, saving } = this.state;
+    const { product, saving } = this.state;
 
     if (!this.props.product) {
       return (
@@ -233,8 +233,9 @@ class EditProduct extends React.Component<Props, State> {
       );
     }
 
-    if (redirect) {
-      return <Redirect push to="/products" />;
+    if (this.state.redirect) {
+      redirect("/products");
+      return null;
     }
 
     const packageSizeOptions = (packageSizes || []).map(packageSize => ({
@@ -362,7 +363,7 @@ const mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({
   onProductSelected: (product: Product) => dispatch(actions.productSelected(product)),
   onProductDeleted: (productId: string) => dispatch(actions.productDeleted(productId)),
   onPackageSizesFound: (packageSizes: PackageSize[]) => dispatch(actions.packageSizesFound(packageSizes)),
-  onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+   onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditProduct);

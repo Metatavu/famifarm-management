@@ -3,6 +3,7 @@ import * as React from "react";
 import {
   Form,
   Input,
+  DropdownProps,
   InputOnChangeData
 } from "semantic-ui-react";
 import { LocalizedValue } from "../generated/client";
@@ -30,12 +31,12 @@ class LocalizedValueInput extends React.Component<Props, State> {
    * @param {name, value} Input name and value
    */
   private handleValueChange = (e: any, { name, value }: InputOnChangeData) => {
-    const currentValue = this.props.value || [];
+    const currentValue = this.props.value || [];
 
     let updated = false;
     currentValue.forEach((localizedValue) => {
       if (localizedValue.language === name) {
-        localizedValue.value = value;
+        localizedValue.value = value as string;
         updated = true;
       }
     })
@@ -43,7 +44,7 @@ class LocalizedValueInput extends React.Component<Props, State> {
     if (!updated) {
       currentValue.push({
         language: name,
-        value: value
+        value: value as string
       });
     }
     this.props.onValueChange(currentValue);

@@ -7,7 +7,7 @@ import * as actions from "../actions";
 import { StoreState } from "../types/index";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import { Redirect } from 'react-router';
+import { redirect } from 'react-router-dom';
 
 
 /**
@@ -72,9 +72,8 @@ class ToggleLocalization extends React.Component<Props, State> {
    */
   render() {
     if (this.state.languageChanged) {
-      return (
-        <Redirect to="/" />
-      );
+      redirect("/");
+      return null;
     }
     return (
       <Menu.Item onClick={() => this.toggleLocale()} position={"right"}>

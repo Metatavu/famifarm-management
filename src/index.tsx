@@ -10,12 +10,7 @@ import { StoreState } from './types/index';
 import { AppAction } from './actions';
 import { Provider } from 'react-redux';
 
-const store = createStore<StoreState, AppAction, any, any>(processAction, {
-  authenticated: false,
-  locale: "fi",
-  events: [],
-  eventListFilters: {}
-});
+const store = createStore<StoreState, AppAction, any, any>(processAction);
 
 ReactDOM.render(
   <Provider store={store}>

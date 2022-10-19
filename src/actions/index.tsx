@@ -217,7 +217,7 @@ export type AppAction = UserLogin | UserLogout
   | ProductionLineDeleted | SeedBatchesFound | SeedBatchSelected | SeedBatchCreated | SeedBatchDeleted
   | PerformedCultivationActionsFound | PerformedCultivationActionSelected | PerformedCultivationActionCreated
   | PerformedCultivationActionDeleted | LocaleUpdate | WastageReasonsFound | WastageReasonSelected | EventsFound
-  | WastageReasonCreated | WastageReasonDeleted| PestsFound | ErrorOccurred | PackingsFound | CampaignsFound | EventListFiltersUpdated;
+  | WastageReasonCreated | WastageReasonDeleted| PestsFound | ErrorOccurred | PackingsFound | CampaignsFound | EventListFiltersUpdated;
 
   /**
    * Redux store update method for campaigns

@@ -3,8 +3,8 @@ import * as Keycloak from 'keycloak-js';
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
 import { Campaign, PackageSize, Packing, PackingState, Product } from "../generated/client";
-import strings from "src/localization/strings";
-import * as moment from "moment";
+import strings from "../localization/strings";
+import moment from "moment";
 import * as actions from "../actions";
 import { StoreState, ErrorMessage } from "../types/index";
 import { connect } from "react-redux";
@@ -15,14 +15,14 @@ import {
   Grid,
   Loader,
   Form,
-  InputOnChangeData,
+  DropdownProps,
   TextAreaProps,
   Table,
   Visibility,
   Transition
 } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
-import LocalizedUtils from "src/localization/localizedutils";
+import LocalizedUtils from "../localization/localizedutils";
 
 const ALL_PRODUCTS_KEY = "all-products";
 const ALL_CAMPAIGNS_KEY = "all-campaigns";
@@ -41,7 +41,7 @@ interface Props {
   onProductsFound?: (products: Product[]) => void;
   onCampaignsFound?: (campaigns: Campaign[]) => void;
   onPackageSizesFound?: (packageSizes: PackageSize[]) => void;
-  onError: (error: ErrorMessage) => void;
+   onError: (error: ErrorMessage | undefined) => void;
 }
 
 /**
@@ -94,7 +94,7 @@ class PackingList extends React.Component<Props, State> {
   public async componentDidMount() {
     try {
       await this.updatePackings(this.state.filters, false);
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -235,7 +235,7 @@ class PackingList extends React.Component<Props, State> {
                   options={
                     [{ value: "all-status", text: strings.allPackingStates }].concat(
                     Object.keys(PackingState).map(state => ({
-                      value: PackingState[state], text: this.resolveLocalizedPackingState(PackingState[state])
+                      value: (PackingState as any)[state], text: this.resolveLocalizedPackingState((PackingState as any)[state])
                     })))
                   }
                   value={ filters.packingState || "all-status" }
@@ -349,9 +349,9 @@ class PackingList extends React.Component<Props, State> {
    * Handles changing packing state
    *
    * @param e event
-   * @param value value from InputOnChangeData
+   * @param value value from DropdownProps
    */
-  private onChangeState = async (e: any, { value }: InputOnChangeData) => {
+  private onChangeState = async (e: any, { value }: DropdownProps) => {
     const updatedFilters: Filters = {
       ...this.state.filters,
       packingState: value && value != "all-status" ? value as PackingState : undefined
@@ -371,12 +371,12 @@ class PackingList extends React.Component<Props, State> {
    * Handles changing date
    *
    * @param e event
-   * @param value value from InputOnChangeData
+   * @param value value from DropdownProps
    */
-  private onChangeDateAfter = async (e: any, { value }: InputOnChangeData) => {
+  private onChangeDateAfter = async (e: any, { value }: DropdownProps) => {
     const updatedFilters: Filters = {
       ...this.state.filters,
-      dateAfter: moment(value, "DD.MM.YYYY").toISOString()
+      dateAfter: moment(value as any, "DD.MM.YYYY").toISOString()
     };
 
     this.setState({ filters: updatedFilters });
@@ -394,12 +394,12 @@ class PackingList extends React.Component<Props, State> {
    * Handles changing date
    *
    * @param e event
-   * @param value value from InputOnChangeData
+   * @param value value from DropdownProps
    */
-  private onChangeDateBefore = async (e: any, { value }: InputOnChangeData) => {
+  private onChangeDateBefore = async (e: any, { value }: DropdownProps) => {
     const updatedFilters: Filters = {
       ...this.state.filters,
-      dateBefore: moment(value, "DD.MM.YYYY").toISOString()
+      dateBefore: moment(value as any, "DD.MM.YYYY").toISOString()
     };
     this.setState({ filters: updatedFilters });
 
@@ -418,7 +418,7 @@ class PackingList extends React.Component<Props, State> {
    * @param e event
    * @param value value from event data
    */
-  private onChangeProduct = async (e: any, { value }: InputOnChangeData | TextAreaProps) => {
+  private onChangeProduct = async (e: any, { value }: DropdownProps | TextAreaProps) => {
     const { products } = this.props;
 
     if (!products) {
@@ -448,7 +448,7 @@ class PackingList extends React.Component<Props, State> {
    * @param e event
    * @param value value from event data
    */
-  private onChangeCampaing = async (e: any, { value }: InputOnChangeData | TextAreaProps) => {
+  private onChangeCampaing = async (e: any, { value }: DropdownProps | TextAreaProps) => {
     const { campaigns } = this.props;
 
     if (!campaigns) {
@@ -579,7 +579,7 @@ const mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({
   onProductsFound: (products: Product[]) => dispatch(actions.productsFound(products)),
   onPackingsFound: (packings: Packing[]) => dispatch(actions.packingsFound(packings)),
   onCampaignsFound: (campaigns: Campaign[]) => dispatch(actions.campaignsFound(campaigns)),
-  onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error)),
+   onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error)),
   onPackageSizesFound: (packageSizes: PackageSize[]) => dispatch(actions.packageSizesFound(packageSizes))
 });
 

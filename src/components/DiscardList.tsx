@@ -3,8 +3,8 @@ import * as Keycloak from 'keycloak-js';
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
 import { Campaign, PackageSize, Packing, PackingState, Product, StorageDiscard } from "../generated/client";
-import strings from "src/localization/strings";
-import * as moment from "moment";
+import strings from "../localization/strings";
+import moment from "moment";
 import * as actions from "../actions";
 import { StoreState, ErrorMessage } from "../types/index";
 import { connect } from "react-redux";
@@ -15,14 +15,14 @@ import {
   Grid,
   Loader,
   Form,
-  InputOnChangeData,
+  DropdownProps,
   TextAreaProps,
   Table,
   Visibility,
   Transition
 } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
-import LocalizedUtils from "src/localization/localizedutils";
+import LocalizedUtils from "../localization/localizedutils";
 import { keysIn } from "lodash";
 import { Profiler } from "inspector";
 
@@ -32,7 +32,7 @@ import { Profiler } from "inspector";
  */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  onError: (error: ErrorMessage) => void;
+   onError: (error: ErrorMessage | undefined) => void;
 }
 
 /**
@@ -82,7 +82,7 @@ class DiscardList extends React.Component<Props, State> {
   public async componentDidMount() {
     try {
       await this.fetchData(this.state.filters, false);
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -275,7 +275,7 @@ class DiscardList extends React.Component<Props, State> {
     this.setState({ loading: true });
 
     const productsService = await Api.getProductsService(keycloak);
-    const products = await productsService.listProducts({ includeSubcontractorProducts: true });
+    const products = await productsService.listProducts({ includeSubcontractorProducts: true, includeInActiveProducts: true });
 
     const packageSizesService = await Api.getPackageSizesService(keycloak);
     const packageSizes = await packageSizesService.listPackageSizes({});
@@ -318,10 +318,10 @@ class DiscardList extends React.Component<Props, State> {
    * @param event event
    * @param data input on change data
    */
-     private onChangeDateAfter = async (event: any, { value }: InputOnChangeData) => {
+     private onChangeDateAfter = async (event: any, { value }: DropdownProps) => {
       const updatedFilters: Filters = {
         ...this.state.filters,
-        dateAfter: moment(value, "DD.MM.YYYY").toISOString()
+        dateAfter: moment(value as any, "DD.MM.YYYY").toISOString()
       };
   
       this.setState({ filters: updatedFilters });
@@ -341,10 +341,10 @@ class DiscardList extends React.Component<Props, State> {
      * @param event event
      * @param data input on change data
      */
-    private onChangeDateBefore = async (event: any, { value }: InputOnChangeData) => {
+    private onChangeDateBefore = async (event: any, { value }: DropdownProps) => {
       const updatedFilters: Filters = {
         ...this.state.filters,
-        dateBefore: moment(value, "DD.MM.YYYY").toISOString()
+        dateBefore: moment(value as any, "DD.MM.YYYY").toISOString()
       };
 
       this.setState({ filters: updatedFilters });
@@ -364,7 +364,7 @@ class DiscardList extends React.Component<Props, State> {
    * @param event event
    * @param data input on change data
    */
-  private onChangeProduct = async (event: any, { value }: InputOnChangeData | TextAreaProps) => {
+  private onChangeProduct = async (event: any, { value }: DropdownProps | TextAreaProps) => {
     const { products } = this.state;
 
     if (!products) {
@@ -424,7 +424,7 @@ const mapStateToProps = (state: StoreState) => ({ });
  * @param dispatch dispatch method
  */
 const mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({
-  onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error)),
+   onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DiscardList);

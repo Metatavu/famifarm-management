@@ -3,8 +3,8 @@ import * as Keycloak from 'keycloak-js';
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
 import { Event, EventType, Product, ProductionLine, SowingEventData } from "../generated/client";
-import strings from "src/localization/strings";
-import * as moment from "moment";
+import strings from "../localization/strings";
+import moment from "moment";
 import * as actions from "../actions";
 import { StoreState, ErrorMessage, EventListFilters } from "../types/index";
 import { connect } from "react-redux";
@@ -15,13 +15,13 @@ import {
   Grid,
   Loader,
   Form,
-  InputOnChangeData,
+  DropdownProps,
   TextAreaProps,
   Visibility,
   Table
 } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
-import LocalizedUtils from "src/localization/localizedutils";
+import LocalizedUtils from "../localization/localizedutils";
 
 
 /**
@@ -212,15 +212,15 @@ class EventList extends React.Component<Props, State> {
   /**
    * Handles changing date
    */
-  private onChangeDate = async (e: any, { value }: InputOnChangeData) => {
-    const date =  moment(value, "DD.MM.YYYY");
+  private onChangeDate = async (e: any, { value }: DropdownProps) => {
+    const date =  moment(value as any, "DD.MM.YYYY");
     await this.updateEvents({...this.props.eventListFilters, date: date.toDate()});
   }
 
   /**
    * Handles changing selected product
    */
-  private onChangeProduct = async (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
+  private onChangeProduct = async (e: any, { name, value }: DropdownProps | TextAreaProps) => {
     const product = (this.props.products || []).find(product => product.id === value);
     await this.updateEvents({...this.props.eventListFilters, product});
   }
@@ -228,7 +228,7 @@ class EventList extends React.Component<Props, State> {
   /**
    * Handles changing selected product
    */
-  private onChangeEventTypeFilter = async (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
+  private onChangeEventTypeFilter = async (e: any, { name, value }: DropdownProps | TextAreaProps) => {
     const type = (value || undefined) as any;
     await this.updateEvents({...this.props.eventListFilters, type});
   }
@@ -236,7 +236,7 @@ class EventList extends React.Component<Props, State> {
   /**
    * Handles the change of production line filter
    */
-  private onChangeProductionLineFilter = (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
+  private onChangeProductionLineFilter = (e: any, { name, value }: DropdownProps | TextAreaProps) => {
     const productionLine = (this.state.productionLines || []).find(productionLine => productionLine.id === value);
     this.props.onEventListFiltersUpdated && this.props.onEventListFiltersUpdated({
       ...this.props.eventListFilters,
@@ -347,7 +347,7 @@ class EventList extends React.Component<Props, State> {
       });
       this.props.onProductsFound && this.props.onProductsFound(products);
       this.setState({loading: false, loadingFirstTime: false})
-    } catch(e) {
+    } catch(e: any) {
       this.props.onError && this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -380,7 +380,7 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
     onProductsFound: (products: Product[]) => dispatch(actions.productsFound(products)),
     onEventListFiltersUpdated: (filters: EventListFilters) => dispatch(actions.eventListFiltersUpdated(filters)),
     onEventsFound: (events: Event[]) => dispatch(actions.eventsFound(events)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

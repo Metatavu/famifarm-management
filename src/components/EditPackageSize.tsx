@@ -5,8 +5,8 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
 import { LocalizedValue, PackageSize } from "../generated/client";
-import { Redirect } from 'react-router';
-import strings from "src/localization/strings";
+import { redirect } from 'react-router-dom';
+import strings from "../localization/strings";
 
 import {
   Grid,
@@ -18,7 +18,7 @@ import {
   Input
 } from "semantic-ui-react";
 import LocalizedValueInput from "./LocalizedValueInput";
-import LocalizedUtils from "src/localization/localizedutils";
+import LocalizedUtils from "../localization/localizedutils";
 import { FormContainer } from "./FormContainer";
 
 /**
@@ -30,7 +30,7 @@ interface Props {
   packageSize?: PackageSize;
   onPackageSizeSelected?: (packageSize: PackageSize) => void;
   onPackageSizeDeleted?: (packageSizeId: string) => void,
-  onError: (error: ErrorMessage) => void
+   onError: (error: ErrorMessage | undefined) => void
 }
 
 /**
@@ -81,7 +81,7 @@ class EditPackageSize extends React.Component<Props, State> {
       const packageSize = await packageSizeService.findPackageSize({packageSizeId: this.props.packageSizeId});
       this.props.onPackageSizeSelected && this.props.onPackageSizeSelected(packageSize);
       this.setState({packageSize: packageSize});
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -107,7 +107,7 @@ class EditPackageSize extends React.Component<Props, State> {
       setTimeout(() => {
         this.setState({messageVisible: false});
       }, 3000);
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -130,7 +130,7 @@ class EditPackageSize extends React.Component<Props, State> {
       await packageSizeService.deletePackageSize({packageSizeId: id});
       this.props.onPackageSizeDeleted && this.props.onPackageSizeDeleted(id!);
       this.setState({redirect: true});
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -174,7 +174,8 @@ class EditPackageSize extends React.Component<Props, State> {
     }
 
     if (this.state.redirect) {
-      return <Redirect to="/packageSizes" push={true} />;
+      redirect("/packageSizes");
+      return null;
     }
 
     return (
@@ -249,7 +250,7 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onPackageSizeSelected: (packageSize: PackageSize) => dispatch(actions.packageSizeSelected(packageSize)),
     onPackageSizeDeleted: (packageSizeId: string) => dispatch(actions.packageSizeDeleted(packageSizeId)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

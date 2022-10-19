@@ -1,15 +1,15 @@
 import { Product, ProductionLine } from "../generated/client";
 import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
-import { Button, Form, Grid, InputOnChangeData, Loader } from "semantic-ui-react";
+import { Button, DropdownProps, Form, Grid, InputOnChangeData, Loader } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
-import strings from "src/localization/strings";
+import strings from "../localization/strings";
 import Api from "../api";
-import * as moment from "moment";
-import LocalizedUtils from "src/localization/localizedutils";
-import { Redirect } from "react-router";
+import moment from "moment";
+import LocalizedUtils from "../localization/localizedutils";
+import { redirect } from "react-router-dom";
 import { FormContainer } from "./FormContainer";
-import { ErrorMessage, StoreState } from "src/types";
+import { ErrorMessage, StoreState } from "../types";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import * as actions from "../actions";
@@ -84,7 +84,7 @@ class CreateCutPacking extends React.Component<Props, State> {
       }
 
       this.setState({ loading: false });
-    } catch (exception) {
+    } catch (exception: any) {
       onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -95,7 +95,6 @@ class CreateCutPacking extends React.Component<Props, State> {
 
   public render = () => {
     const { 
-      redirect, 
       loading, 
       cutPackingId, 
       selectedProductName, 
@@ -110,8 +109,9 @@ class CreateCutPacking extends React.Component<Props, State> {
       storageCondition
     } = this.state;
 
-    if (redirect) {
-      return <Redirect to={`/cutPackings/${ cutPackingId }`} push={ true } />;
+    if (this.state.redirect) {
+      redirect(`/cutPackings/${ cutPackingId }`);
+      return null;
     }
 
     if (loading) {
@@ -287,15 +287,15 @@ class CreateCutPacking extends React.Component<Props, State> {
   /**
    * Handles changing sowing day
    */
-  private onSowingDayChange = async (e: any, { value }: InputOnChangeData) => {
-    this.setState({ sowingDay: moment(value, "DD.MM.YYYY").toISOString() });
+  private onSowingDayChange = async (e: any, { value }: DropdownProps) => {
+    this.setState({ sowingDay: moment(value as any, "DD.MM.YYYY").toISOString() });
   }
 
   /**
    * Handles changing cutting day
    */
-  private onCuttingDayChange = async (e: any, { value }: InputOnChangeData) => {
-    this.setState({ cuttingDay: moment(value, "DD.MM.YYYY").toISOString() });
+  private onCuttingDayChange = async (e: any, { value }: DropdownProps) => {
+    this.setState({ cuttingDay: moment(value as any, "DD.MM.YYYY").toISOString() });
   }
 
   /**
@@ -330,7 +330,7 @@ class CreateCutPacking extends React.Component<Props, State> {
         redirect: true,
         loading: false
       });
-    } catch (exception) {
+    } catch (exception: any) {
       onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -362,7 +362,7 @@ class CreateCutPacking extends React.Component<Props, State> {
   /**
    * Handles changing selected product
    */
-  private onChangeProduct = async (e: any, { name, value }: InputOnChangeData) => {
+  private onChangeProduct = async (e: any, { name, value }: DropdownProps) => {
     const { products } = this.props;
 
     if (!products) {
@@ -409,7 +409,7 @@ class CreateCutPacking extends React.Component<Props, State> {
   /**
    * Handles changing selected product
    */
-  private onChangeProductionLine = async (e: any, { name, value }: InputOnChangeData) => {
+  private onChangeProductionLine = async (e: any, { name, value }: DropdownProps) => {
     const { productionLines } = this.props;
 
     if (!productionLines) {
@@ -453,7 +453,7 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error)),
+    onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error)),
     onProductsFound: (products: Product[]) => dispatch(actions.productsFound(products)),
     onProductionLinesFound: (productionLines: ProductionLine[]) => dispatch(actions.productionLinesFound(productionLines))
   };

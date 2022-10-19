@@ -5,8 +5,8 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
 import { ProductionLine } from "../generated/client";
-import { Redirect } from 'react-router';
-import strings from "src/localization/strings";
+import { redirect } from 'react-router-dom';
+import strings from "../localization/strings";
 
 import {
   Grid,
@@ -28,7 +28,7 @@ interface Props {
   productionLine?: ProductionLine;
   onProductionLineSelected?: (productionLine: ProductionLine) => void;
   onProductionLineDeleted?: (productionLineId: string) => void,
-  onError: (error: ErrorMessage) => void
+   onError: (error: ErrorMessage | undefined) => void
 }
 
 /**
@@ -81,7 +81,7 @@ class EditProductionLine extends React.Component<Props, State> {
   
       this.props.onProductionLineSelected && this.props.onProductionLineSelected(productionLine);
       this.setState({productionLine: productionLine});
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -127,7 +127,7 @@ class EditProductionLine extends React.Component<Props, State> {
       setTimeout(() => {
         this.setState({messageVisible: false});
       }, 3000);
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -152,7 +152,7 @@ class EditProductionLine extends React.Component<Props, State> {
       
       this.props.onProductionLineDeleted && this.props.onProductionLineDeleted(id);
       this.setState({redirect: true});
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -174,7 +174,8 @@ class EditProductionLine extends React.Component<Props, State> {
     }
 
     if (this.state.redirect) {
-      return <Redirect to="/productionLines" push={true} />;
+      redirect("/productionLines");
+      return null;
     }
 
     return (
@@ -249,7 +250,7 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onProductionLineSelected: (productionLine: ProductionLine) => dispatch(actions.productionLineSelected(productionLine)),
     onProductionLineDeleted: (productionLineId: string) => dispatch(actions.productionLineDeleted(productionLineId)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

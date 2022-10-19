@@ -18,8 +18,8 @@ import {
   Seed, 
   EventType,
   Product} from "../generated/client";
-import { Redirect } from 'react-router';
-import strings from "src/localization/strings";
+import { redirect } from 'react-router-dom';
+import strings from "../localization/strings";
 import { DateTimeInput, DateInput } from 'semantic-ui-calendar-react';
 import * as actions from "../actions";
 import { StoreState } from "../types/index";
@@ -32,15 +32,15 @@ import {
   Loader,
   Form,
   Message,
-  InputOnChangeData,
+  DropdownProps,
   Confirm,
   TextAreaProps,
   DropdownItemProps,
-  DropdownProps
+  InputOnChangeData,
 } from "semantic-ui-react";
-import LocalizedUtils from "src/localization/localizedutils";
-import * as moment from "moment";
-import { ErrorMessage } from "src/types";
+import LocalizedUtils from "../localization/localizedutils";
+import moment from "moment";
+import { ErrorMessage } from "../types";
 import { FormContainer } from "./FormContainer";
 import { Select } from "semantic-ui-react";
 
@@ -49,7 +49,7 @@ import { Select } from "semantic-ui-react";
  */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  onError: (error: ErrorMessage) => void;
+   onError: (error: ErrorMessage | undefined) => void;
 }
 
 /**
@@ -180,7 +180,8 @@ class CreateEvent extends React.Component<Props, State> {
     }
 
     if (this.state.redirect) {
-      return <Redirect to={"/events"} push={true} />;
+      redirect("/events");
+      return null;
     }
 
     if (!this.state.event) {
@@ -197,7 +198,7 @@ class CreateEvent extends React.Component<Props, State> {
       return {
         key: eventType,
         value: eventType,
-        text: strings[`phase${eventType}`]
+        text: (strings as any)[`phase${eventType}`]
       };
     });
 
@@ -224,7 +225,7 @@ class CreateEvent extends React.Component<Props, State> {
             <FormContainer>
               <Form.Field required>
                 <label>{strings.batchProduct}</label>
-                <Select options={ productOptions } value={ event.productId || "" } onChange={ this.handleProductChange }/>
+                <Select options={ productOptions } value={ event.productId || "" } onChange={ this.handleProductChange }/>
               </Form.Field>
               <Form.Field required>
                 <label>{strings.labelStartTime}</label>
@@ -266,13 +267,13 @@ class CreateEvent extends React.Component<Props, State> {
    * 
    * @param event event
    */
-  private handleTimeChange = (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
-    const eventData = this.state.event;
+  private handleTimeChange = (e: any, { name, value }: DropdownProps | TextAreaProps) => {
+    const eventData: any = this.state.event;
     if (!eventData) {
       return;
     }
 
-    eventData[name] = moment(value, "DD.MM.YYYY HH:mm").toDate()
+    eventData[name] = moment(value as any, "DD.MM.YYYY HH:mm").toDate()
     this.setState({ event: eventData });
   }
 
@@ -290,8 +291,8 @@ class CreateEvent extends React.Component<Props, State> {
    * 
    * @param event event
    */
-  private handleBaseChange = (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
-    const eventData = this.state.event;
+  private handleBaseChange = (e: any, { name, value }: DropdownProps | TextAreaProps) => {
+    const eventData: any = this.state.event;
     if (!eventData) {
       return;
     }
@@ -305,7 +306,7 @@ class CreateEvent extends React.Component<Props, State> {
    * 
    * @param event event
    */
-  private handleDataChange = (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
+  private handleDataChange = (e: any, { name, value }: InputOnChangeData | DropdownProps | TextAreaProps) => {
     const eventData = {...this.state.event} as any;
     if (!eventData) {
       return;
@@ -321,14 +322,14 @@ class CreateEvent extends React.Component<Props, State> {
    * 
    * @param event event
    */
-  private handleDataTimeChange = (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
+  private handleDataTimeChange = (e: any, { name, value }: DropdownProps | TextAreaProps) => {
     const eventData = {...this.state.event} as any;
     if (!eventData) {
       return;
     }
 
     eventData.data = {...this.state.event!.data};
-    eventData.data[name] = moment(value, "DD.MM.YYYY").toDate()
+    eventData.data[name] = moment(value as any, "DD.MM.YYYY").toDate()
     console.log(eventData);
     this.setState({ event: { ...eventData } });
   }
@@ -424,7 +425,7 @@ class CreateEvent extends React.Component<Props, State> {
       setTimeout(() => {
         this.setState({messageVisible: false});
       }, 3000);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
       this.props.onError({
         message: strings.defaultApiErrorMessage,
@@ -449,7 +450,7 @@ class CreateEvent extends React.Component<Props, State> {
       await eventsService.deleteEvent({eventId: id});
       
       this.setState({redirect: true});
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -868,7 +869,7 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 
