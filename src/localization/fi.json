@@ -14,6 +14,7 @@
     "date": "Päivämäärä",
     "dateBefore": "Luotu ennen",
     "dateAfter": "Luotu jälkeen",
+    "selectDate": "Valitse päivämäärä",
     "open": "Avaa",
     "savedSuccessfully": "Tallennettu onnistuneesti!",
     "delete": "Poista",
@@ -175,6 +176,7 @@
     "print": "Tulosta",
     "selectPrinter": "Valitse tulostin",
     "update": "Päivitä",
+    "dashboard": "Hallintanäkymä",
 
     "amountInStore": "Määrä varastossa",
     "oldestPackingInStore": "Vanhin pakkaus varastossa",

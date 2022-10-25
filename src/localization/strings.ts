@@ -19,6 +19,7 @@ export interface IStrings extends LocalizedStringsMethods {
   date: string;
   dateAfter: string;
   dateBefore: string;
+  selectDate: string;
   open: string;
   savedSuccessfully: string;
   delete: string;
@@ -198,6 +199,7 @@ export interface IStrings extends LocalizedStringsMethods {
   print: string
   selectPrinter: string
   update: string
+  dashboard: string
 
   amountInStore: string
   oldestPackingInStore: string
