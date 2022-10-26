@@ -48,6 +48,7 @@ interface State {
 interface Filters {
   dateBefore?: string;
   dateAfter?: string;
+  selectDate?: string;
 };
 
 /**
@@ -90,7 +91,8 @@ class Dashboard extends React.Component<Props, State> {
   private onChangeDateBefore = async (e: any, { value }: DropdownProps) => {
     const updatedFilters: Filters = {
       ...this.state.filters,
-      dateBefore: moment(value as any, "DD.MM.YYYY").toISOString()
+      dateBefore: moment(value as any, "DD.MM.YYYY").toISOString(),
+      selectDate: ""
     };
     this.setState({ filters: updatedFilters });
 
@@ -112,7 +114,8 @@ class Dashboard extends React.Component<Props, State> {
   private onChangeDateAfter = async (e: any, { value }: DropdownProps) => {
     const updatedFilters: Filters = {
       ...this.state.filters,
-      dateAfter: moment(value as any, "DD.MM.YYYY").toISOString()
+      dateAfter: moment(value as any, "DD.MM.YYYY").toISOString(),
+      selectDate: ""
     };
 
     this.setState({ filters: updatedFilters });
@@ -135,9 +138,9 @@ class Dashboard extends React.Component<Props, State> {
   private onChangeDate = async (e: any, { value }: DropdownProps) => {
     const updatedFilters: Filters = {
       ...this.state.filters,
-      // TODO: Could use a new date param instead of setting before and after like this? Would require changes to the API.
-      dateAfter: moment(value as any, "L").subtract(1, "days").toISOString(),
-      dateBefore: moment(value as any, "L").add(1, "days").toISOString()
+      dateAfter: moment(value as any, "L").toISOString(),
+      dateBefore: moment(value as any, "L").add(1, "days").toISOString(),
+      selectDate: value?.toString()
     };
 
     this.setState({ filters: updatedFilters });
@@ -253,7 +256,7 @@ class Dashboard extends React.Component<Props, State> {
                 options={ this.renderDateOptions() }
                 onChange={ this.onChangeDate }
                 // TODO: have the value reset if date changed in other form inputs?
-                value={ moment(filters.dateAfter).add(1, "days").format("L") || "" }
+                value={ filters.selectDate }
                 placeholder=""
               />
             </div>
