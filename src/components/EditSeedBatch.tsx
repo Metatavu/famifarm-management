@@ -7,7 +7,8 @@ import { Dispatch } from "redux";import Api from "../api";
 import { SeedBatch, Seed } from "../generated/client";
 import { redirect } from 'react-router-dom';
 import { DateInput } from 'semantic-ui-calendar-react';
-import strings from "../localization/strings";import {
+import strings from "../localization/strings";
+import {
   Grid,
   Button,
   Loader,
