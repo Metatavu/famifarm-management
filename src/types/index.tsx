@@ -53,3 +53,13 @@ export interface ErrorMessage {
   value?: string;
   text?: string;
 }
+
+/**
+ * An interface describing visualize packings data
+ */
+export interface VisualizePackingsData {
+  time: Date;
+  count: number | undefined;
+  labelDate: string;
+  labelTime: string;
+};
