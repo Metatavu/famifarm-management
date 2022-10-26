@@ -110,7 +110,7 @@ class CreateCutPacking extends React.Component<Props, State> {
     } = this.state;
 
     if (this.state.redirect) {
-      redirect(`/cutPackings/${ cutPackingId }`);
+      redirect(`/cutPackings/${cutPackingId}`);
       return null;
     }
 
