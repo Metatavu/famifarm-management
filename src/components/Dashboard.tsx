@@ -19,7 +19,6 @@ import { DateInput } from 'semantic-ui-calendar-react';
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
-
 /**
  * Interface representing component properties
  */
@@ -88,21 +87,21 @@ class Dashboard extends React.Component<Props, State> {
    * @param e event
    * @param value value from DropdownProps
    */
-    private onChangeDateBefore = async (e: any, { value }: DropdownProps) => {
-      const updatedFilters: Filters = {
-        ...this.state.filters,
-        dateBefore: moment(value as any, "DD.MM.YYYY").toISOString()
-      };
-      this.setState({ filters: updatedFilters });
-  
-      await this.updatePackings(updatedFilters, false).catch((err) => {
-        this.props.onError({
-          message: strings.defaultApiErrorMessage,
-          title: strings.defaultApiErrorTitle,
-          exception: err
-        });
-      });
+  private onChangeDateBefore = async (e: any, { value }: DropdownProps) => {
+    const updatedFilters: Filters = {
+      ...this.state.filters,
+      dateBefore: moment(value as any, "DD.MM.YYYY").toISOString()
     };
+    this.setState({ filters: updatedFilters });
+
+    await this.updatePackings(updatedFilters, false).catch((err) => {
+      this.props.onError({
+        message: strings.defaultApiErrorMessage,
+        title: strings.defaultApiErrorTitle,
+        exception: err
+      });
+    });
+  };
 
   /**
    * Handles changing date
