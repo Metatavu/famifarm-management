@@ -68,7 +68,7 @@ class CreateCampaign extends React.Component<Props, State> {
 
   public render () {
     if (this.state.redirect) {
-      redirect(`/campaigns/${ this.state.campaignId }`);
+      redirect(`/campaigns/${this.state.campaignId}`);
       return null;
     }
 
