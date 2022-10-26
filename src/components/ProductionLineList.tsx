@@ -7,7 +7,7 @@ import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
 import { ProductionLine } from "../generated/client";
-import strings from "src/localization/strings";
+import strings from "../localization/strings";
 
 import {
   List,
@@ -20,7 +20,7 @@ export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   productionLines?: ProductionLine[];
   onProductionLinesFound?: (productionLines: ProductionLine[]) => void,
-  onError: (error: ErrorMessage) => void
+   onError: (error: ErrorMessage | undefined) => void
 }
 
 export interface State {
@@ -55,7 +55,7 @@ class ProductionLineList extends React.Component<Props, State> {
         return 0;
       });
       this.props.onProductionLinesFound && this.props.onProductionLinesFound(productionLines);
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -160,7 +160,7 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onProductionLinesFound: (productionLines: ProductionLine[]) => dispatch(actions.productionLinesFound(productionLines)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

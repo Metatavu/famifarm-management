@@ -1,23 +1,23 @@
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import { StoreState, ErrorMessage } from "src/types";
+import { StoreState, ErrorMessage } from "../types";
 import * as actions from "../actions";
 import { Packing, Product, PackageSize, PackingState, Printer, PackingType, Campaign } from "../generated/client";
 import Api from "../api";
 import { KeycloakInstance } from "keycloak-js";
-import strings from "src/localization/strings";
-import LocalizedUtils from "src/localization/localizedutils";
-import { Grid, Button, Form, Select, Input, DropdownItemProps, DropdownProps, InputOnChangeData, Loader, Message, Confirm } from "semantic-ui-react";
+import strings from "../localization/strings";
+import LocalizedUtils from "../localization/localizedutils";
+import { Grid, Button, Form, Select, Input, DropdownItemProps, DropdownProps, Loader, Message, Confirm, InputOnChangeData } from "semantic-ui-react";
 import { FormContainer } from "./FormContainer";
 import { DateTimeInput } from 'semantic-ui-calendar-react';
-import * as moment from "moment";
-import { Redirect } from "react-router";
+import moment from "moment";
+import { redirect } from "react-router-dom";
 
 export interface Props {
   keycloak: KeycloakInstance,
   packingId: string,
-  onError: (error: ErrorMessage) => void
+   onError: (error: ErrorMessage | undefined) => void
 }
 
 export interface State {
@@ -92,7 +92,7 @@ class EditPacking extends React.Component<Props, State> {
 
       if (packing.type == "BASIC") {
         const product = await productsService.findProduct({productId: packing.productId!});
-        const packedCount = packing.packedCount || 0;
+        const packedCount = packing.packedCount || 0;
   
         await this.refreshPrinters();
         
@@ -141,7 +141,7 @@ class EditPacking extends React.Component<Props, State> {
       }
 
 
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -160,7 +160,8 @@ class EditPacking extends React.Component<Props, State> {
     }
     
     if (this.state.redirect) {
-      return <Redirect to="/packings" push={true} />;
+      redirect("/packings");
+      return null;
     }
     
     const productOptions: DropdownItemProps[] = this.state.products.map((product) => {
@@ -344,7 +345,7 @@ class EditPacking extends React.Component<Props, State> {
           <Grid.Column width={8}>
           <Select
             options={ printers }
-            text={ this.state.selectedPrinter ? this.state.selectedPrinter.name : strings.selectPrinter }
+            text={ this.state.selectedPrinter ? this.state.selectedPrinter.name : strings.selectPrinter }
             value={ this.state.selectedPrinter ? this.state.selectedPrinter.id : undefined }
             onChange={ this.onPrinterChange }
           />
@@ -428,7 +429,7 @@ class EditPacking extends React.Component<Props, State> {
    /**
     * @summary Handles updating printers
     */
-   private onPrinterChange = (event: any, { value }: InputOnChangeData) => {
+   private onPrinterChange = (event: any, { value }: DropdownProps) => {
     this.setState({ selectedPrinter: this.state.printers.find(printer => printer.id == value)! });
   }
 
@@ -436,7 +437,7 @@ class EditPacking extends React.Component<Props, State> {
    * @summary prints a packing label
    */
   private print = async () => {
-    if (!this.props.keycloak || !this.state.packing || !this.state.packing.id || !this.state.selectedPrinter) {
+    if (!this.props.keycloak || !this.state.packing || !this.state.packing.id || !this.state.selectedPrinter) {
       return;
     }
 
@@ -453,7 +454,7 @@ class EditPacking extends React.Component<Props, State> {
     if (!this.props.keycloak) {
       return;
     }
-    this.setState({ refreshingPrinters: true })
+    this.setState({ refreshingPrinters: true })
     const printingService = await Api.getPrintersService(this.props.keycloak);
     const printers = await printingService.listPrinters();
     this.setState({ printers, refreshingPrinters: false });
@@ -496,7 +497,7 @@ class EditPacking extends React.Component<Props, State> {
   /**
     * Event handler for packing status
     */
-  private onStatusChange = (event: any, { value }: InputOnChangeData) => {
+  private onStatusChange = (event: any, { value }: DropdownProps) => {
     this.setState({packingStatus: value as PackingState})
   }
 
@@ -511,8 +512,8 @@ class EditPacking extends React.Component<Props, State> {
   /**
     * Handles changing date
     */
-    private onChangeDate = (e: any, { value }: InputOnChangeData) => {
-      this.setState({date: moment(value, "DD.MM.YYYY HH:mm").toDate()});
+    private onChangeDate = (e: any, { value }: DropdownProps) => {
+      this.setState({date: moment(value as any, "DD.MM.YYYY HH:mm").toDate()});
   }
 
   /**
@@ -561,7 +562,7 @@ class EditPacking extends React.Component<Props, State> {
       setTimeout(() => {
         this.setState({messageVisible: false});
       }, 3000);
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -589,7 +590,7 @@ class EditPacking extends React.Component<Props, State> {
 
       this.setState({redirect: true});
 
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -618,7 +619,7 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };  
 };
 

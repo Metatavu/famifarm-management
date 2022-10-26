@@ -31,6 +31,7 @@ import {
   CAMPAIGNS_FOUND,
   EVENT_LIST_FILTERS_UPDATED,
   EVENTS_FOUND} from '../constants/index';
+import { Reducer } from 'redux';
 
 /**
  * Process action 
@@ -38,7 +39,33 @@ import {
  * @param state state
  * @param action action
  */
-export function processAction(state: StoreState, action: AppAction): StoreState {
+export const processAction: Reducer<StoreState, AppAction> = (state: StoreState | undefined, action: AppAction): StoreState => {
+  if (!state) {
+    state = {
+      authenticated: false,
+      locale: "fi",
+      events: [],
+      eventListFilters: {},
+      campaigns: [],
+      packageSize: {} as any,
+      packageSizes: [],
+      packings: [],
+      performedCultivationAction: {} as any,
+      performedCultivationActions: [],
+      pests: [],
+      product: {} as any,
+      productionLine: {} as any,
+      productionLines: [],
+      products: [],
+      seed: {} as any,
+      seedBatch: {} as any,
+      seedBatches: [],
+      seeds: [],
+      storageDiscards: [],
+      wastageReason: {} as any,
+      wastageReasons: []
+    }
+  }
   switch (action.type) {
     case USER_LOGIN:
       return { ...state, keycloak: action.keycloak, authenticated: action.authenticated};

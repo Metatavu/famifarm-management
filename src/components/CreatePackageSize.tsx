@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { LocalizedValue, PackageSize } from "../generated/client";
-import { Redirect } from 'react-router';
+import { redirect } from 'react-router-dom';
 import strings from "../localization/strings";
 
 import {
@@ -22,7 +22,7 @@ export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   packageSize?: PackageSize;
   onPackageSizeCreated?: (packageSize: PackageSize) => void,
-  onError: (error: ErrorMessage) => void
+   onError: (error: ErrorMessage | undefined) => void
 }
 
 export interface State {
@@ -53,7 +53,7 @@ class CreatePackageSize extends React.Component<Props, State> {
       const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
       await packageSizeService.createPackageSize({packageSize: this.state.packageSizeData});
       this.setState({redirect: true});
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -89,7 +89,8 @@ class CreatePackageSize extends React.Component<Props, State> {
    */
   public render() {
     if (this.state.redirect) {
-      return <Redirect to="/packageSizes" push={true} />;
+      redirect("/packageSizes");
+      return null;
     }
     return (
       <Grid>
@@ -146,7 +147,7 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onPackageSizeCreated: (packageSize: PackageSize) => dispatch(actions.packageSizeCreated(packageSize)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

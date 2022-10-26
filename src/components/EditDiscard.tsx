@@ -1,25 +1,25 @@
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import { StoreState, ErrorMessage } from "src/types";
+import { StoreState, ErrorMessage } from "../types";
 import * as actions from "../actions";
 import { Packing, Product, PackageSize, PackingState, Printer, PackingType, Campaign, StorageDiscard } from "../generated/client";
 import Api from "../api";
 import { KeycloakInstance } from "keycloak-js";
-import strings from "src/localization/strings";
-import LocalizedUtils from "src/localization/localizedutils";
-import { Grid, Button, Form, Select, Input, DropdownItemProps, DropdownProps, InputOnChangeData, Loader, Message, Confirm } from "semantic-ui-react";
+import strings from "../localization/strings";
+import LocalizedUtils from "../localization/localizedutils";
+import { Grid, Button, Form, Select, Input, DropdownItemProps, DropdownProps, Loader, Message, Confirm, InputOnChangeData } from "semantic-ui-react";
 import { FormContainer } from "./FormContainer";
 import { DateInput } from 'semantic-ui-calendar-react';
-import * as moment from "moment";
-import { Redirect } from "react-router";
+import moment from "moment";
+import { redirect } from "react-router-dom";
 
 /**
  * Interface representing component properties
  */
 export interface Props {
   keycloak: KeycloakInstance,
-  onError: (error: ErrorMessage) => void;
+   onError: (error: ErrorMessage | undefined) => void;
   discardId: string;
 }
 
@@ -68,7 +68,7 @@ class EditDiscard extends React.Component<Props, State> {
   public async componentDidMount() {
     try {
       await this.fetchData();
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -83,7 +83,6 @@ class EditDiscard extends React.Component<Props, State> {
   render = () =>  {
     const { 
       loading,
-      redirect,
       products,
       packageSizes,
       productId,
@@ -101,8 +100,9 @@ class EditDiscard extends React.Component<Props, State> {
       );
     }
     
-    if (redirect) {
-      return <Redirect to="/discards" push={ true } />;
+    if (this.state.redirect) {
+      redirect("/discards");
+      return null;
     }
     
     const productOptions = products.map(({ id, name }) => ({
@@ -243,7 +243,7 @@ class EditDiscard extends React.Component<Props, State> {
     const packageSizes = await packageSizesSerivce.listPackageSizes({ });
 
     const product = (products || []).find(product => product.id == discard.productId);
-    const date = discard.discardDate || new Date();
+    const date = discard.discardDate || new Date();
     const discardCount = discard.discardAmount || 0;
     const packageSizeId = discard.packageSizeId;
     const productId = discard.productId;
@@ -294,7 +294,7 @@ class EditDiscard extends React.Component<Props, State> {
         setTimeout(() => {
           this.setState({ messageVisible: false });
         }, 3000);
-      } catch (e) {
+      } catch (e: any) {
         this.props.onError({
           message: strings.defaultApiErrorMessage,
           title: strings.defaultApiErrorTitle,
@@ -324,7 +324,7 @@ class EditDiscard extends React.Component<Props, State> {
 
       this.setState({ redirect: true });
 
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -361,7 +361,7 @@ class EditDiscard extends React.Component<Props, State> {
    * @param data input change data
    */
     private onDiscardedCountChange = (event: any, { value }: InputOnChangeData) => {
-      const { discardCount } = this.state;
+      const { discardCount } = this.state;
       const count = Number(value);
       !Number.isNaN(discardCount) && this.setState({
         discardCount: count > 0 ? count : 0
@@ -374,8 +374,8 @@ class EditDiscard extends React.Component<Props, State> {
    * @param event React change event
    * @param data input change data
    */
-    private onChangeDate = (e: any, { value }: InputOnChangeData) => {
-      this.setState({date: moment(value, "DD.MM.YYYY HH:mm").toDate()});
+    private onChangeDate = (e: any, { value }: DropdownProps) => {
+      this.setState({date: moment(value as any, "DD.MM.YYYY HH:mm").toDate()});
     }
 }
 
@@ -395,7 +395,7 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };  
 };
 

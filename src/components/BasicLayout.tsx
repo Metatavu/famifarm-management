@@ -18,6 +18,7 @@ interface Props {
   sidebarItems: JSX.Element[],
   error?: ErrorMessage,
   onError: (error?: ErrorMessage) => void
+  children: React.ReactNode
 }
 
 /**

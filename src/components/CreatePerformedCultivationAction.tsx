@@ -6,8 +6,8 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { LocalizedValue, PerformedCultivationAction } from "../generated/client";
-import { Redirect } from 'react-router';
-import strings from "src/localization/strings";
+import { redirect } from 'react-router-dom';
+import strings from "../localization/strings";
 
 import {
   Grid,
@@ -21,7 +21,7 @@ export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   performedCultivationAction?: PerformedCultivationAction;
   onPerformedCultivationActionCreated?: (performedCultivationAction: PerformedCultivationAction) => void,
-  onError: (error: ErrorMessage) => void
+   onError: (error: ErrorMessage | undefined) => void
 }
 
 export interface State {
@@ -56,7 +56,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
       const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
       await performedCultivationActionService.createPerformedCultivationAction({performedCultivationAction: performedCultivationActionObject})
       this.setState({redirect: true});
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -81,7 +81,8 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
    */
   public render() {
     if (this.state.redirect) {
-      return <Redirect to="/performedCultivationActions" push={true} />;
+      redirect("/performedCultivationActions")
+      return null;
     }
     return (
       <Grid>
@@ -130,7 +131,7 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onPerformedCultivationActionCreated: (performedCultivationAction: PerformedCultivationAction) => dispatch(actions.performedCultivationActionCreated(performedCultivationAction)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

@@ -5,8 +5,8 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
 import { LocalizedValue, PerformedCultivationAction } from "../generated/client";
-import { Redirect } from 'react-router';
-import strings from "src/localization/strings";
+import { redirect } from 'react-router-dom';
+import strings from "../localization/strings";
 
 import {
   Grid,
@@ -28,7 +28,7 @@ interface Props {
   performedCultivationAction?: PerformedCultivationAction;
   onPerformedCultivationActionSelected?: (performedCultivationAction: PerformedCultivationAction) => void;
   onPerformedCultivationActionDeleted?: (performedCultivationActionId: string) => void,
-  onError: (error: ErrorMessage) => void
+   onError: (error: ErrorMessage | undefined) => void
 }
 
 /**
@@ -79,7 +79,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
       this.props.onPerformedCultivationActionSelected && this.props.onPerformedCultivationActionSelected(performedCultivationAction);
       this.setState({performedCultivationAction: performedCultivationAction});
 
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -119,7 +119,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
       setTimeout(() => {
         this.setState({messageVisible: false});
       }, 3000);
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -143,7 +143,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
   
       this.props.onPerformedCultivationActionDeleted && this.props.onPerformedCultivationActionDeleted(id!);
       this.setState({redirect: true});
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -165,7 +165,8 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
     }
 
     if (this.state.redirect) {
-      return <Redirect to="/performedCultivationActions" push={true} />;
+      redirect("/performedCultivationActions");
+      return null;
     }
 
     return (
@@ -232,7 +233,7 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onPerformedCultivationActionSelected: (performedCultivationAction: PerformedCultivationAction) => dispatch(actions.performedCultivationActionSelected(performedCultivationAction)),
     onPerformedCultivationActionDeleted: (performedCultivationActionId: string) => dispatch(actions.performedCultivationActionDeleted(performedCultivationActionId)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

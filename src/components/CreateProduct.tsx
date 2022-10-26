@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { Product, PackageSize, LocalizedValue, HarvestEventType } from "../generated/client";
-import { Redirect } from 'react-router';
+import { redirect } from 'react-router-dom';
 import strings from "../localization/strings";
 
 import {
@@ -16,7 +16,7 @@ import {
   CheckboxProps,
   DropdownProps
 } from "semantic-ui-react";
-import LocalizedUtils from "src/localization/localizedutils";
+import LocalizedUtils from "../localization/localizedutils";
 import LocalizedValueInput from "./LocalizedValueInput";
 import { FormContainer } from "./FormContainer";
 
@@ -28,7 +28,7 @@ interface Props {
   packageSizes?: PackageSize[];
   onProductCreated?: (product: Product) => void;
   onPackageSizesFound?: (packageSizes: PackageSize[]) => void,
-  onError: (error: ErrorMessage) => void
+   onError: (error: ErrorMessage | undefined) => void
 }
 
 /**
@@ -67,7 +67,7 @@ class CreateProduct extends React.Component<Props, State> {
       const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
       const packageSizes = await packageSizeService.listPackageSizes({});
       this.props.onPackageSizesFound && this.props.onPackageSizesFound(packageSizes);
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -98,7 +98,7 @@ class CreateProduct extends React.Component<Props, State> {
       });
   
       this.setState({ redirect: true });
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -181,10 +181,11 @@ class CreateProduct extends React.Component<Props, State> {
    */
   public render = () => {
     const { packageSizes } = this.props;
-    const { redirect, productData } = this.state;
+    const { productData } = this.state;
 
-    if (redirect) {
-      return <Redirect push to="/products"/>;
+    if (this.state.redirect) {
+      redirect("/products");
+      return null;
     }
 
     const packageSizeOptions = (packageSizes || []).map(packageSize => ({
@@ -289,7 +290,7 @@ const mapStateToProps = (state: StoreState) => ({
 const mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({
   onProductCreated: (product: Product) => dispatch(actions.productCreated(product)),
   onPackageSizesFound: (packageSizes: PackageSize[]) => dispatch(actions.packageSizesFound(packageSizes)),
-  onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+   onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateProduct);

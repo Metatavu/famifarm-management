@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import { Header, Icon, Grid } from 'semantic-ui-react';
-import strings from "src/localization/strings";
+import strings from "../localization/strings";
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance,

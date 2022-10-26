@@ -1,20 +1,20 @@
 import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
-import { StoreState, ErrorMessage } from "src/types";
+import { StoreState, ErrorMessage } from "../types";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import * as actions from "../actions"
 import { Product, CampaignProducts } from "../generated/client";
-import strings from "src/localization/strings";
-import Api from "src/api";
-import { Grid, Loader, DropdownItemProps, Button, Form, Select, Input, InputOnChangeData, DropdownProps, List, Message, Confirm } from "semantic-ui-react";
-import LocalizedUtils from "src/localization/localizedutils";
+import strings from "../localization/strings";
+import Api from "../api";
+import { Grid, Loader, DropdownItemProps, Button, Form, Select, Input, DropdownProps, List, Message, Confirm, InputOnChangeData } from "semantic-ui-react";
+import LocalizedUtils from "../localization/localizedutils";
 import { FormContainer } from "./FormContainer";
-import { Redirect } from "react-router";
+import { redirect } from "react-router-dom";
 
 interface Props {
   keycloak?: KeycloakInstance,
-  onError: (error: ErrorMessage) => void,
+   onError: (error: ErrorMessage | undefined) => void,
   campaignId: string
 }
 
@@ -50,7 +50,7 @@ class EditCampaign extends React.Component<Props, State> {
   public async componentDidMount () {
     try {
       await this.initView();
-    } catch (exception) {
+    } catch (exception: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -77,7 +77,8 @@ class EditCampaign extends React.Component<Props, State> {
 
   public render () {
     if (this.state.redirect) {
-      return <Redirect to={`/campaigns`} push={true} />;
+      redirect(`/campaigns`);
+      return null;
     }
 
     if (this.state.loading) {
@@ -216,7 +217,7 @@ class EditCampaign extends React.Component<Props, State> {
    * Handles submitting a new campaign
    */
   private handleSubmit = async () => {
-    if (!this.props.keycloak || !this.state.campaignId) {
+    if (!this.props.keycloak || !this.state.campaignId) {
       return;
     }
 
@@ -229,7 +230,7 @@ class EditCampaign extends React.Component<Props, State> {
       setTimeout(() => {
         this.setState({messageVisible: false});
       }, 3000);
-    } catch (exception) {
+    } catch (exception: any) {
       this.setState({ loading: false });
       this.props.onError({
         message: strings.defaultApiErrorMessage,
@@ -242,7 +243,7 @@ class EditCampaign extends React.Component<Props, State> {
 
   private handleDelete = async () => {
     try {
-      if (!this.props.keycloak || !this.state.campaignId) {
+      if (!this.props.keycloak || !this.state.campaignId) {
         throw new Error("Either Keycloak or campaign id is undefined");
       }
 
@@ -250,7 +251,7 @@ class EditCampaign extends React.Component<Props, State> {
       await campaignsService.deleteCampaign({campaignId: this.state.campaignId});
 
       this.setState({redirect: true});
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -279,7 +280,7 @@ export function mapStateToProps(state: StoreState) {
    */
   export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
   }
   

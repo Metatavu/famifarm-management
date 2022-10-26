@@ -5,8 +5,8 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
 import { LocalizedValue, WastageReason } from "../generated/client";
-import { Redirect } from 'react-router';
-import strings from "src/localization/strings";
+import { redirect } from 'react-router-dom';
+import strings from "../localization/strings";
 
 import {
   Grid,
@@ -22,7 +22,7 @@ import { FormContainer } from "./FormContainer";
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   onWastageReasonCreated?: (wastageReason: WastageReason) => void,
-  onError: (error: ErrorMessage) => void
+   onError: (error: ErrorMessage | undefined) => void
 }
 
 /**
@@ -67,7 +67,7 @@ class CreateWastageReason extends React.Component<Props, State> {
       await wastageReasonService.createWastageReason({wastageReason: wastageReasonObject});
       
       this.setState({redirect: true});
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -92,7 +92,8 @@ class CreateWastageReason extends React.Component<Props, State> {
    */
   public render() {
     if (this.state.redirect) {
-      return <Redirect to="/wastageReasons" push={true} />;
+      redirect("/wastageReasons");
+      return null;
     }
 
     return (
@@ -142,7 +143,7 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onWastageReasonCreated: (wastageReason: WastageReason) => dispatch(actions.wastageReasonCreated(wastageReason)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

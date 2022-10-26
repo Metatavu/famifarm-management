@@ -1,16 +1,16 @@
 import { Printer, Product, ProductionLine } from "../generated/client";
 import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
-import { Button, Confirm, Form, Grid, InputOnChangeData, Loader, Message, Select } from "semantic-ui-react";
+import { Button, Confirm, Form, Grid, DropdownProps, Loader, Message, Select, InputOnChangeData } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
-import strings from "src/localization/strings";
+import strings from "../localization/strings";
 import Api from "../api";
-import * as moment from "moment";
-import LocalizedUtils from "src/localization/localizedutils";
-import { Redirect } from "react-router";
+import moment from "moment";
+import LocalizedUtils from "../localization/localizedutils";
+import { redirect } from "react-router-dom";
 import { FormContainer } from "./FormContainer";
 import { connect } from "react-redux";
-import { ErrorMessage, StoreState } from "src/types";
+import { ErrorMessage, StoreState } from "../types";
 import { Dispatch } from "redux";
 import * as actions from "../actions";
 
@@ -105,7 +105,7 @@ class EditCutPacking extends React.Component<Props, State> {
         selectedProductionLineId: productionLineId,
         loading: false
       });
-    } catch (exception) {
+    } catch (exception: any) {
       onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -117,7 +117,6 @@ class EditCutPacking extends React.Component<Props, State> {
 
   public render = () => {
     const { 
-      redirect, 
       loading, 
       printers, 
       selectedProductName, 
@@ -137,8 +136,9 @@ class EditCutPacking extends React.Component<Props, State> {
       confirmOpen
     } = this.state;
 
-    if (redirect) {
-      return <Redirect to={`/cutPackings`} />;
+    if (this.state.redirect) {
+      redirect(`/cutPackings`);
+      return null;
     }
 
     if (loading) {
@@ -292,7 +292,7 @@ class EditCutPacking extends React.Component<Props, State> {
           <Grid.Column width={8}>
           <Select
             options={ printerOptions }
-            text={ selectedPrinter ? selectedPrinter.name : strings.selectPrinter }
+            text={ selectedPrinter ? selectedPrinter.name : strings.selectPrinter }
             value={ selectedPrinter ? selectedPrinter.id : undefined }
             onChange={ this.onPrinterChange }
           />
@@ -376,7 +376,7 @@ class EditCutPacking extends React.Component<Props, State> {
 
       this.setState({ redirect: true });
 
-    } catch (e) {
+    } catch (e: any) {
       onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -442,15 +442,15 @@ class EditCutPacking extends React.Component<Props, State> {
   /**
    * Handles sowing day change
    */
-  private onSowingDayChange = async (e: any, { value }: InputOnChangeData) => {
-    this.setState({ sowingDay: moment(value, "DD.MM.YYYY").toDate() });
+  private onSowingDayChange = async (e: any, { value }: DropdownProps) => {
+    this.setState({ sowingDay: moment(value as any, "DD.MM.YYYY").toDate() });
   }
 
   /**
    * Handles cutting day change
    */
-  private onCuttingDayChange = async (e: any, { value }: InputOnChangeData) => {
-    this.setState({ cuttingDay: moment(value, "DD.MM.YYYY").toDate() });
+  private onCuttingDayChange = async (e: any, { value }: DropdownProps) => {
+    this.setState({ cuttingDay: moment(value as any, "DD.MM.YYYY").toDate() });
   }
 
 
@@ -473,7 +473,7 @@ class EditCutPacking extends React.Component<Props, State> {
       setTimeout(() => {
          this.setState({messageVisible: false});
        }, 3000);
-    } catch (exception) {
+    } catch (exception: any) {
       onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -505,7 +505,7 @@ class EditCutPacking extends React.Component<Props, State> {
   /**
    * Handles changing selected product
    */
-  private onChangeProduct = async (e: any, { name, value }: InputOnChangeData) => {
+  private onChangeProduct = async (e: any, { name, value }: DropdownProps) => {
     const { products } = this.props;
 
     if (!products) {
@@ -532,7 +532,7 @@ class EditCutPacking extends React.Component<Props, State> {
      /**
     * @summary Handles updating printers
     */
-   private onPrinterChange = (event: any, { value }: InputOnChangeData) => {
+   private onPrinterChange = (event: any, { value }: DropdownProps) => {
     this.setState({ selectedPrinter: this.state.printers.find(printer => printer.id == value)! });
   }
 
@@ -542,7 +542,7 @@ class EditCutPacking extends React.Component<Props, State> {
   private print = async () => {
     const { keycloak, cutPackingId } = this.props;
     const { selectedPrinter } = this.state;
-    if (!keycloak || !selectedPrinter) {
+    if (!keycloak || !selectedPrinter) {
       return;
     }
 
@@ -559,7 +559,7 @@ class EditCutPacking extends React.Component<Props, State> {
     if (!this.props.keycloak) {
       return;
     }
-    this.setState({ refreshingPrinters: true })
+    this.setState({ refreshingPrinters: true })
     const printingService = await Api.getPrintersService(this.props.keycloak);
     const printers = await printingService.listPrinters();
     this.setState({ printers, refreshingPrinters: false });
@@ -588,7 +588,7 @@ class EditCutPacking extends React.Component<Props, State> {
   /**
    * Handles changing selected producion line
    */
-  private onChangeProductionLine = async (e: any, { name, value }: InputOnChangeData) => {
+  private onChangeProductionLine = async (e: any, { name, value }: DropdownProps) => {
     const { productionLines } = this.props;
 
     if (!productionLines) {
@@ -625,7 +625,7 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error)),
+    onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error)),
     onProductsFound: (products: Product[]) => dispatch(actions.productsFound(products)),
     onProductionLinesFound: (productionLines: ProductionLine[]) => dispatch(actions.productionLinesFound(productionLines))
   };

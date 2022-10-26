@@ -3,7 +3,7 @@ import * as Keycloak from 'keycloak-js';
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
 import { Campaign } from "../generated/client";
-import strings from "src/localization/strings";
+import strings from "../localization/strings";
 import * as actions from "../actions";
 import { StoreState, ErrorMessage } from "../types/index";
 import { connect } from "react-redux";
@@ -24,7 +24,7 @@ interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   campaigns?: Campaign[];
   onCampaignsFound?: (campaigns: Campaign[]) => void;
-  onError: (error: ErrorMessage) => void;
+   onError: (error: ErrorMessage | undefined) => void;
 }
 
 /**
@@ -53,7 +53,7 @@ class CampaignList extends React.Component<Props, State> {
   public async componentDidMount() {
     try {
       await this.updateCampaigns();
-    } catch (exception) {
+    } catch (exception: any) {
       console.log(exception);
       this.props.onError({
         message: strings.defaultApiErrorMessage,
@@ -146,7 +146,7 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onCampaignsFound: (campaigns: Campaign[]) => dispatch(actions.campaignsFound(campaigns)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

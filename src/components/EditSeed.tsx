@@ -5,8 +5,8 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
 import { LocalizedValue, Seed } from "../generated/client";
-import { Redirect } from 'react-router';
-import strings from "src/localization/strings";
+import { redirect } from 'react-router-dom';
+import strings from "../localization/strings";
 
 import {
   Grid,
@@ -28,7 +28,7 @@ interface Props {
   seed?: Seed;
   onSeedSelected?: (seed: Seed) => void;
   onSeedDeleted?: (seedId: string) => void,
-  onError: (error: ErrorMessage) => void
+   onError: (error: ErrorMessage | undefined) => void
 }
 
 /**
@@ -80,7 +80,7 @@ class EditSeed extends React.Component<Props, State> {
       
       this.props.onSeedSelected && this.props.onSeedSelected(seed);
       this.setState({seed: seed});
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -120,7 +120,7 @@ class EditSeed extends React.Component<Props, State> {
       setTimeout(() => {
         this.setState({messageVisible: false});
       }, 3000);
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -144,7 +144,7 @@ class EditSeed extends React.Component<Props, State> {
   
       this.props.onSeedDeleted && this.props.onSeedDeleted(id);
       this.setState({redirect: true});
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -166,7 +166,8 @@ class EditSeed extends React.Component<Props, State> {
     }
 
     if (this.state.redirect) {
-      return <Redirect to="/seeds" push={true} />;
+      redirect("/seeds");
+      return null;
     }
 
     return (
@@ -232,7 +233,7 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onSeedSelected: (seed: Seed) => dispatch(actions.seedSelected(seed)),
     onSeedDeleted: (seedId: string) => dispatch(actions.seedDeleted(seedId)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

@@ -1,13 +1,13 @@
-import Api  from "src/api";
+import Api  from "../api";
 import * as React from "react";
-import { StoreState } from "src/types";
+import { StoreState } from "../types";
 import { Dispatch } from "redux";
 import * as actions from "../actions";
 import { connect } from "react-redux";
 import { Campaign, PackageSize, Packing, PackingState, PackingType, Product } from "../generated/client";
-import LocalizedUtils from "src/localization/localizedutils";
+import LocalizedUtils from "../localization/localizedutils";
 import { Accordion, Button, Grid, Icon, Loader, Table } from "semantic-ui-react";
-import strings from "src/localization/strings";
+import strings from "../localization/strings";
 import AnimateHeight from "react-animate-height";
 import { DateTimeInput } from 'semantic-ui-calendar-react';
 import * as Moment from 'moment';
@@ -531,7 +531,7 @@ class ViewStore extends React.Component<Props, State> {
    * @param e React change event
    * @param updatedData updated data from DateTimeInput
    */
-  private onSelectDate = async (e: React.ChangeEvent<HTMLInputElement>, updatedData: { name: string, value: string }) => {
+  private onSelectDate = async (e: React.SyntheticEvent<HTMLElement>, updatedData: { name: string, value: string }) => {
     if (!updatedData || !updatedData.value) {
       return;
     }

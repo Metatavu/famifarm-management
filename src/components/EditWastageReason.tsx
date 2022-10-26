@@ -5,8 +5,8 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
 import { LocalizedValue, WastageReason } from "../generated/client";
-import { Redirect } from 'react-router';
-import strings from "src/localization/strings";
+import { redirect } from 'react-router-dom';
+import strings from "../localization/strings";
 
 import {
   Grid,
@@ -17,7 +17,7 @@ import {
   Confirm
 } from "semantic-ui-react";
 import LocalizedValueInput from "./LocalizedValueInput";
-import LocalizedUtils from "src/localization/localizedutils";
+import LocalizedUtils from "../localization/localizedutils";
 import { FormContainer } from "./FormContainer";
 
 /**
@@ -29,7 +29,7 @@ interface Props {
   wastageReason?: WastageReason;
   onWastageReasonSelected?: (wastageReason: WastageReason) => void;
   onWastageReasonDeleted?: (wastageReasonId: string) => void,
-  onError: (error: ErrorMessage) => void
+   onError: (error: ErrorMessage | undefined) => void
 }
 
 /**
@@ -83,7 +83,7 @@ class EditWastageReason extends React.Component<Props, State> {
       
       this.props.onWastageReasonSelected && this.props.onWastageReasonSelected(wastageReason);
       this.setState({wastageReason: wastageReason});
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -130,7 +130,7 @@ class EditWastageReason extends React.Component<Props, State> {
       setTimeout(() => {
         this.setState({messageVisible: false});
       }, 3000);
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -154,7 +154,7 @@ class EditWastageReason extends React.Component<Props, State> {
       
       this.props.onWastageReasonDeleted && this.props.onWastageReasonDeleted(id);
       this.setState({redirect: true});
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -187,7 +187,8 @@ class EditWastageReason extends React.Component<Props, State> {
     }
 
     if (this.state.redirect) {
-      return <Redirect to="/wastageReasons" push={true} />;
+      redirect("/wastageReasons");
+      return null;
     }
 
     return (
@@ -254,7 +255,7 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onWastageReasonSelected: (wastageReason: WastageReason) => dispatch(actions.wastageReasonSelected(wastageReason)),
     onWastageReasonDeleted: (wastageReasonId: string) => dispatch(actions.wastageReasonDeleted(wastageReasonId)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

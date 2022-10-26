@@ -6,8 +6,8 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { LocalizedValue, Pest } from "../generated/client";
-import { Redirect } from 'react-router';
-import strings from "src/localization/strings";
+import { redirect } from 'react-router-dom';
+import strings from "../localization/strings";
 
 import {
   Grid,
@@ -18,8 +18,8 @@ import {
   Confirm
 } from "semantic-ui-react";
 import LocalizedValueInput from "./LocalizedValueInput";
-import LocalizedUtils from "src/localization/localizedutils";
-import { ErrorMessage } from "src/types";
+import LocalizedUtils from "../localization/localizedutils";
+import { ErrorMessage } from "../types";
 import { FormContainer } from "./FormContainer";
 
 /**
@@ -28,7 +28,7 @@ import { FormContainer } from "./FormContainer";
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   pestId: string,
-  onError: (error: ErrorMessage) => void
+   onError: (error: ErrorMessage | undefined) => void
 }
 
 /**
@@ -79,7 +79,7 @@ class EditPest extends React.Component<Props, State> {
       const pest = await pestsService.findPest({pestId: this.props.pestId});
       this.setState({pest: pest});
 
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -119,7 +119,7 @@ class EditPest extends React.Component<Props, State> {
       setTimeout(() => {
         this.setState({messageVisible: false});
       }, 3000);
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -142,7 +142,7 @@ class EditPest extends React.Component<Props, State> {
       await pestsService.deletePest({pestId: id});
       
       this.setState({redirect: true});
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -164,7 +164,8 @@ class EditPest extends React.Component<Props, State> {
     }
 
     if (this.state.redirect) {
-      return <Redirect to="/pests" push={true} />;
+      redirect("/pests");
+      return null;
     }
 
     return (
@@ -231,7 +232,7 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

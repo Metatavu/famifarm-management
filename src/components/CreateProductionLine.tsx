@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { ProductionLine } from "../generated/client";
-import { Redirect } from 'react-router';
+import { redirect } from 'react-router-dom';
 
 import {
   Grid,
@@ -14,14 +14,14 @@ import {
   Form,
   Input
 } from "semantic-ui-react";
-import strings from "src/localization/strings";
+import strings from "../localization/strings";
 import { FormContainer } from "./FormContainer";
 
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   productionLine?: ProductionLine;
   onProductionLineCreated?: (productionLine: ProductionLine) => void,
-  onError: (error: ErrorMessage) => void
+   onError: (error: ErrorMessage | undefined) => void
 }
 
 interface State {
@@ -68,7 +68,7 @@ class CreateProductionLine extends React.Component<Props, State> {
       await productionLineService.createProductionLine({productionLine: productionLineObject});
   
       this.setState({redirect: true});
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -82,7 +82,8 @@ class CreateProductionLine extends React.Component<Props, State> {
    */
   public render() {
     if (this.state.redirect) {
-      return <Redirect to="/productionLines" push={true} />;
+      redirect("/productionLines");
+      return null;
     }
 
     return (
@@ -140,7 +141,7 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onProductionLineCreated: (productionLine: ProductionLine) => dispatch(actions.productionLineCreated(productionLine)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

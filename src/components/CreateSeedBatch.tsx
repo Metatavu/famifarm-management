@@ -6,17 +6,17 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { SeedBatch, Seed } from "../generated/client";
-import { Redirect } from 'react-router';
-import { DateInput } from 'semantic-ui-calendar-react';;
-import strings from "src/localization/strings";
+import { redirect } from 'react-router-dom';
+import { DateInput } from 'semantic-ui-calendar-react';
+import strings from "../localization/strings";
 import { FormContainer } from "./FormContainer";
-import * as moment from "moment";
+import moment from "moment";
 
 import {
   Grid,
   Button,
   Input,
-  InputOnChangeData,
+  DropdownProps,
   Form
 } from "semantic-ui-react";
 
@@ -28,7 +28,7 @@ interface Props {
   onSeedBatchCreated?: (seedBatch: SeedBatch) => void;
   seeds?: Seed[];
   onSeedsFound?: (seeds: Seed[]) => void,
-  onError: (error: ErrorMessage) => void
+   onError: (error: ErrorMessage | undefined) => void
 }
 
 interface State {
@@ -63,7 +63,7 @@ class CreateSeedBatch extends React.Component<Props, State> {
       const seedsService = await Api.getSeedsService(this.props.keycloak);
       const seeds = await seedsService.listSeeds({});
       this.props.onSeedsFound && this.props.onSeedsFound(seeds);
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -78,8 +78,8 @@ class CreateSeedBatch extends React.Component<Props, State> {
    * @param e event
    * @param {value} value
    */
-  onSelectChange = (e: any, { value }: InputOnChangeData) => {
-    this.setState({seedId: value});
+  onSelectChange = (e: any, { value }: DropdownProps) => {
+    this.setState({seedId: value as string});
   }
 
   /**
@@ -111,7 +111,7 @@ class CreateSeedBatch extends React.Component<Props, State> {
       await seedBatchService.createSeedBatch({seedBatch: seedBatchObject});
   
       this.setState({redirect: true});
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -125,7 +125,8 @@ class CreateSeedBatch extends React.Component<Props, State> {
    */
   render() {
     if (this.state.redirect) {
-      return <Redirect to="/seedBatches" push={true} />;
+      redirect("/seedBatches");
+      return null;
     }
 
     const seedOptions = (this.props.seeds || []).map((seed) => {
@@ -205,7 +206,7 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onSeedBatchCreated: (seedBatch: SeedBatch) => dispatch(actions.seedBatchCreated(seedBatch)),
     onSeedsFound: (seeds: Seed[]) => dispatch(actions.seedsFound(seeds)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

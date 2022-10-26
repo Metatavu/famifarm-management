@@ -6,8 +6,8 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { LocalizedValue, Seed } from "../generated/client";
-import { Redirect } from 'react-router';
-import strings from "src/localization/strings";
+import { redirect } from 'react-router-dom';
+import strings from "../localization/strings";
 
 import {
   Grid,
@@ -24,7 +24,7 @@ interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   seed?: Seed;
   onSeedCreated?: (seed: Seed) => void,
-  onError: (error: ErrorMessage) => void
+   onError: (error: ErrorMessage | undefined) => void
 }
 
 /**
@@ -62,7 +62,7 @@ class CreateSeed extends React.Component<Props, State> {
       const seedService = await Api.getSeedsService(this.props.keycloak);
       await seedService.createSeed({seed: seedObject});
       this.setState({redirect: true});
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -87,7 +87,8 @@ class CreateSeed extends React.Component<Props, State> {
    */
   render() {
     if (this.state.redirect) {
-      return <Redirect to="/seeds" push={true} />;
+      redirect("/seeds");
+      return null;
     }
 
     return (
@@ -137,7 +138,7 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onSeedCreated: (seed: Seed) => dispatch(actions.seedCreated(seed)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

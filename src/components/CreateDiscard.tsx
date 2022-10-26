@@ -1,17 +1,17 @@
 import * as React from "react";
 import * as actions from "../actions"
 import { connect } from "react-redux";
-import { ErrorMessage, PackageSizeOptions, StoreState } from "src/types";
+import { ErrorMessage, PackageSizeOptions, StoreState } from "../types";
 import { Dispatch } from "redux";
-import strings from "src/localization/strings";
-import { Grid, Form, Button, Select, DropdownProps, Input, InputOnChangeData, Loader } from "semantic-ui-react";
+import strings from "../localization/strings";
+import { Grid, Form, Button, Select, DropdownProps, Input, Loader, InputOnChangeData } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import { FormContainer } from "./FormContainer";
 import { Packing, Product, PackageSize, PackingState, PackingType, Campaign, StorageDiscard } from "../generated/client";
-import LocalizedUtils from "src/localization/localizedutils";
-import * as moment from "moment";
+import LocalizedUtils from "../localization/localizedutils";
+import moment from "moment";
 import Api from "../api";
-import { Redirect } from "react-router";
+import { redirect } from "react-router-dom";
 
 /**
  * Interface representing component properties
@@ -19,7 +19,7 @@ import { Redirect } from "react-router";
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   onPackingCreated?: (packing: Packing) => void;
-  onError: (error: ErrorMessage) => void;
+   onError: (error: ErrorMessage | undefined) => void;
 }
 
 /**
@@ -61,7 +61,7 @@ class CreateDiscard extends React.Component<Props, State> {
   public async componentDidMount() {
     try {
       await this.fetchData();
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -76,7 +76,6 @@ class CreateDiscard extends React.Component<Props, State> {
   render = () => {
     const {
       loading,
-      redirect,
       discardCount,
       productId,
       packageSizeId,
@@ -92,8 +91,9 @@ class CreateDiscard extends React.Component<Props, State> {
       );
     }
       
-    if (redirect) {
-      return <Redirect to={ `/discards/${this.state.discardId}` } push />;
+    if (this.state.redirect) {
+      redirect(`/discards/${this.state.discardId}`)
+      return null;
     }
 
     const productOptions = products.map(({ id, name }) => ({
@@ -195,7 +195,7 @@ class CreateDiscard extends React.Component<Props, State> {
    * @param data input change data
    */
   private onDiscardedCountChange = (event: any, { value }: InputOnChangeData) => {
-    const { discardCount } = this.state;
+    const { discardCount } = this.state;
     const count = Number(value);
     !Number.isNaN(discardCount) && this.setState({
       discardCount: count > 0 ? count : 0
@@ -209,8 +209,8 @@ class CreateDiscard extends React.Component<Props, State> {
    * @param event React change event
    * @param data input change data
    */
-  private onChangeDate = async (event: any, { value }: InputOnChangeData) => {
-    this.setState({ date: moment(value, "DD.MM.YYYY HH:mm").toDate() });
+  private onChangeDate = async (event: any, { value }: DropdownProps) => {
+    this.setState({ date: moment(value as any, "DD.MM.YYYY HH:mm").toDate() });
   }
 
   /**
@@ -242,7 +242,7 @@ class CreateDiscard extends React.Component<Props, State> {
         discardId: discarded.id,
         redirect: true
       });
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -314,7 +314,7 @@ const mapStateToProps = (state: StoreState) => ({ });
  * @param dispatch dispatch method
  */
 const mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({
-  onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+   onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
 });
   
 export default connect(mapStateToProps, mapDispatchToProps)(CreateDiscard);

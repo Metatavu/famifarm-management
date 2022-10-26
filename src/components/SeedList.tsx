@@ -4,7 +4,7 @@ import * as actions from "../actions";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
 import { Seed } from "../generated/client";
-import strings from "src/localization/strings";
+import strings from "../localization/strings";
 import { StoreState, ErrorMessage } from "../types/index";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
@@ -15,13 +15,13 @@ import {
   Grid,
   Loader
 } from "semantic-ui-react";
-import LocalizedUtils from "src/localization/localizedutils";
+import LocalizedUtils from "../localization/localizedutils";
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   seeds?: Seed[];
   onSeedsFound?: (seeds: Seed[]) => void,
-  onError: (error: ErrorMessage) => void
+   onError: (error: ErrorMessage | undefined) => void
 }
 
 export interface State {
@@ -55,7 +55,7 @@ class SeedsList extends React.Component<Props, State> {
         return 0;
       });
       this.props.onSeedsFound && this.props.onSeedsFound(seeds);
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -132,7 +132,7 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onSeedsFound: (seeds: Seed[]) => dispatch(actions.seedsFound(seeds)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error)),
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error)),
   };
 }
 

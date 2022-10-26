@@ -5,21 +5,22 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
 import { SeedBatch, Seed } from "../generated/client";
-import { Redirect } from 'react-router';
+import { redirect } from 'react-router-dom';
 import { DateInput } from 'semantic-ui-calendar-react';
-import strings from "src/localization/strings";import {
+import strings from "../localization/strings";
+import {
   Grid,
   Button,
   Loader,
   Form,
   Input,
   Message,
-  InputOnChangeData,
+  DropdownProps,
   Confirm,
   Checkbox
 } from "semantic-ui-react";
 import { FormContainer } from "./FormContainer";
-import * as moment from "moment";
+import moment from "moment";
 
 const DATE_FORMAT = "DD.MM.YYYY";
 
@@ -34,7 +35,7 @@ interface Props {
   onSeedBatchDeleted?: (seedBatchId: string) => void;
   seeds?: Seed[];
   onSeedsFound?: (seeds: Seed[]) => void,
-  onError: (error: ErrorMessage) => void
+   onError: (error: ErrorMessage | undefined) => void
 }
 /**
  * Interface representing component state
@@ -92,7 +93,7 @@ class EditSeedBatch extends React.Component<Props, State> {
       const seeds = await seedsService.listSeeds({});      
       this.props.onSeedsFound && this.props.onSeedsFound(seeds);
       this.setState({seeds: seeds});
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -124,14 +125,14 @@ class EditSeedBatch extends React.Component<Props, State> {
    * @param e event
    * @param {value} value
    */
-  private onSelectChange = (e: any, { value }: InputOnChangeData) => {
+  private onSelectChange = (e: any, { value }: DropdownProps) => {
     if (!this.state.seedBatch) {
       return;
     }    
     const seedBatch = {
       id: this.state.seedBatch.id,
       code: this.state.seedBatch.code,
-      seedId: value,
+      seedId: value as string,
       time: this.state.seedBatch.time,
       active: this.state.seedBatch.active
     };    
@@ -151,7 +152,7 @@ class EditSeedBatch extends React.Component<Props, State> {
       id: this.state.seedBatch.id,
       code: this.state.seedBatch.code,
       seedId: this.state.seedBatch.seedId,
-      time: moment(value, DATE_FORMAT).toDate(),
+      time: moment(value as any, DATE_FORMAT).toDate(),
       active: this.state.seedBatch.active
     };    
     this.setState({seedBatch: seedBatch});
@@ -193,7 +194,7 @@ class EditSeedBatch extends React.Component<Props, State> {
       setTimeout(() => {
         this.setState({messageVisible: false});
       }, 3000);
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -214,7 +215,7 @@ class EditSeedBatch extends React.Component<Props, State> {
       await seedBatchesService.deleteSeedBatch({seedBatchId: id});      
       this.props.onSeedBatchDeleted && this.props.onSeedBatchDeleted(id!);
       this.setState({redirect: true});
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -234,7 +235,8 @@ class EditSeedBatch extends React.Component<Props, State> {
       );
     }    
     if (this.state.redirect) {
-      return <Redirect to="/seedBatches" push={true} />;
+      redirect("/seedBatches");
+      return null;
     }    
     const seedOptions = (this.props.seeds || []).map((seed) => {
       return {
@@ -328,6 +330,6 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
     onSeedBatchSelected: (seedBatch: SeedBatch) => dispatch(actions.seedBatchSelected(seedBatch)),
     onSeedBatchDeleted: (seedBatchId: string) => dispatch(actions.seedBatchDeleted(seedBatchId)),
     onSeedsFound: (seeds: Seed[]) => dispatch(actions.seedsFound(seeds)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }export default connect(mapStateToProps, mapDispatchToProps)(EditSeedBatch);

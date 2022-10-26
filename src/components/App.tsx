@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BrowserRouter, Route } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import WelcomePage from "./WelcomePage";
 import ConnectionStatus from "./ConnectionStatus";
 
@@ -12,7 +12,7 @@ class App extends React.Component {
     return (
       <BrowserRouter>
         <div className="App">
-          <Route path="/" component={WelcomePage} />
+          <WelcomePage />
           <ConnectionStatus />
         </div>
       </BrowserRouter>

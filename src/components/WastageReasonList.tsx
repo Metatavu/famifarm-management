@@ -7,7 +7,7 @@ import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
 import { WastageReason } from "../generated/client";
-import strings from "src/localization/strings";
+import strings from "../localization/strings";
 
 import {
   List,
@@ -15,7 +15,7 @@ import {
   Grid,
   Loader
 } from "semantic-ui-react";
-import LocalizedUtils from "src/localization/localizedutils";
+import LocalizedUtils from "../localization/localizedutils";
 
 /**
  * Interface representing component properties
@@ -24,7 +24,7 @@ interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   wastageReasons?: WastageReason[];
   onWastageReasonsFound?: (wastageReasons: WastageReason[]) => void,
-  onError: (error: ErrorMessage) => void
+   onError: (error: ErrorMessage | undefined) => void
 }
 
 /**
@@ -67,7 +67,7 @@ class WastageReasonList extends React.Component<Props, State> {
         return 0;
       });
       this.props.onWastageReasonsFound && this.props.onWastageReasonsFound(wastageReasons);
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -144,7 +144,7 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onWastageReasonsFound: (wastageReasons: WastageReason[]) => dispatch(actions.wastageReasonsFound(wastageReasons)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

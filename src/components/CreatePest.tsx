@@ -2,7 +2,7 @@ import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
 import { LocalizedValue, Pest } from "../generated/client";
-import { Redirect } from 'react-router';
+import { redirect } from 'react-router-dom';
 import strings from "../localization/strings";
 import * as actions from "../actions";
 import { StoreState, ErrorMessage } from "../types/index";
@@ -23,7 +23,7 @@ import { FormContainer } from "./FormContainer";
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   pest?: Pest,
-  onError: (error: ErrorMessage) => void
+   onError: (error: ErrorMessage | undefined) => void
 }
 
 /**
@@ -62,7 +62,7 @@ class CreatePest extends React.Component<Props, State> {
       await pestService.createPest({pest: pestObject});
       
       this.setState({redirect: true});
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -87,7 +87,8 @@ class CreatePest extends React.Component<Props, State> {
    */
   render() {
     if (this.state.redirect) {
-      return <Redirect to="/pests" push={true} />;
+      redirect("/pests");
+      return null;
     }
 
     return (
@@ -134,7 +135,7 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

@@ -2,13 +2,13 @@ import { CutPacking, Product } from "../generated/client";
 import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
 import Api from "../api";
-import strings from "src/localization/strings";
-import LocalizedUtils from "src/localization/localizedutils";
-import { Button, Form, Grid, InputOnChangeData, List, Loader } from "semantic-ui-react";
+import strings from "../localization/strings";
+import LocalizedUtils from "../localization/localizedutils";
+import { Button, Form, Grid, DropdownProps, List, Loader } from "semantic-ui-react";
 import { NavLink } from "react-router-dom";
 import { DateInput } from 'semantic-ui-calendar-react';
-import * as moment from "moment";
-import { ErrorMessage, StoreState } from "src/types";
+import moment from "moment";
+import { ErrorMessage, StoreState } from "../types";
 import { Dispatch } from "redux";
 import * as actions from "../actions";
 import { connect } from "react-redux";
@@ -74,7 +74,7 @@ class CutPackingsList extends React.Component<Props, State> {
         onProductsFound(foundProducts);
         this.setState({ listItems, loading: false });
       }
-    } catch (exception) {
+    } catch (exception: any) {
       console.log(exception);
       onError({
         message: strings.defaultApiErrorMessage,
@@ -155,7 +155,7 @@ class CutPackingsList extends React.Component<Props, State> {
       const listItems = this.getListItems(cutPackings, products);
   
       this.setState({ listItems, loading: false });
-    } catch (exception) {
+    } catch (exception: any) {
       onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -185,23 +185,23 @@ class CutPackingsList extends React.Component<Props, State> {
   /**
    * Handles changing "created after"-date filter
    */
-  private onChangeCreatedAfter = async (e: any, { value }: InputOnChangeData) => {
-    this.setState({ createdAfterFilter: moment(value, "DD.MM.YYYY").toISOString() });
-    await this.updatePackingsList(this.state.selectedProductId, this.state.createdBeforeFilter, moment(value, "DD.MM.YYYY").toISOString());
+  private onChangeCreatedAfter = async (e: any, { value }: DropdownProps) => {
+    this.setState({ createdAfterFilter: moment(value as any, "DD.MM.YYYY").toISOString() });
+    await this.updatePackingsList(this.state.selectedProductId, this.state.createdBeforeFilter, moment(value as any, "DD.MM.YYYY").toISOString());
   }
 
   /**
    * Handles changing "created before"-date filter
    */
-  private onChangeCreatedBefore = async (e: any, { value }: InputOnChangeData) => {
-    this.setState({ createdBeforeFilter: moment(value, "DD.MM.YYYY").toISOString() });
-    await this.updatePackingsList(this.state.selectedProductId, moment(value, "DD.MM.YYYY").toISOString(), this.state.createdAfterFilter);
+  private onChangeCreatedBefore = async (e: any, { value }: DropdownProps) => {
+    this.setState({ createdBeforeFilter: moment(value as any, "DD.MM.YYYY").toISOString() });
+    await this.updatePackingsList(this.state.selectedProductId, moment(value as any, "DD.MM.YYYY").toISOString(), this.state.createdAfterFilter);
   }
 
   /**
    * Handles changing selected product
    */
-  private onChangeProduct = async (e: any, { value }: InputOnChangeData) => {
+  private onChangeProduct = async (e: any, { value }: DropdownProps) => {
     const { products } = this.props;
     if (!products) {
       return;
@@ -217,7 +217,7 @@ class CutPackingsList extends React.Component<Props, State> {
       selectedProductName: productName
     });
 
-    await this.updatePackingsList(value, this.state.createdBeforeFilter, this.state.createdAfterFilter);
+    await this.updatePackingsList(value as string, this.state.createdBeforeFilter, this.state.createdAfterFilter);
 
   }
 
@@ -285,7 +285,7 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error)),
+    onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error)),
     onProductsFound: (products: Product[]) => dispatch(actions.productsFound(products))
   };
 }

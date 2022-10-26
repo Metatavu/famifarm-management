@@ -1,22 +1,22 @@
 import * as React from "react";
 import * as actions from "../actions"
 import { connect } from "react-redux";
-import { ErrorMessage, StoreState } from "src/types";
+import { ErrorMessage, StoreState } from "../types";
 import { Dispatch } from "redux";
-import strings from "src/localization/strings";
-import { Grid, Form, Button, Select, DropdownProps, Input, InputOnChangeData, Loader } from "semantic-ui-react";
+import strings from "../localization/strings";
+import { Grid, Form, Button, Select, DropdownProps, Input, Loader, InputOnChangeData } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import { FormContainer } from "./FormContainer";
 import { Packing, Product, PackageSize, PackingState, PackingType, Campaign } from "../generated/client";
-import LocalizedUtils from "src/localization/localizedutils";
-import * as moment from "moment";
+import LocalizedUtils from "../localization/localizedutils";
+import moment from "moment";
 import Api from "../api";
-import { Redirect } from "react-router";
+import { redirect } from "react-router-dom";
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   onPackingCreated?: (packing: Packing) => void,
-  onError: (error: ErrorMessage) => void
+   onError: (error: ErrorMessage | undefined) => void
 }
 
 export interface State {
@@ -77,7 +77,7 @@ class CreatePacking extends React.Component<Props, State> {
         loading: false
       });
     
-      } catch (e) {
+      } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -96,7 +96,7 @@ class CreatePacking extends React.Component<Props, State> {
       }
       
     if (this.state.redirect) {
-      return <Redirect to={`/packings/${this.state.packingId}`} push={true} />;
+      redirect(`/packings/${this.state.packingId}`);
     }
 
     const productOptions = this.state.products.map((product) => {
@@ -317,7 +317,7 @@ class CreatePacking extends React.Component<Props, State> {
   /**
    * Event handler for packing status
    */
-  private onStatusChange = (event: any, { value }: InputOnChangeData) => {
+  private onStatusChange = (event: any, { value }: DropdownProps) => {
     this.setState({packingStatus: value as PackingState})
   }
 
@@ -327,15 +327,15 @@ class CreatePacking extends React.Component<Props, State> {
    * @param event event
    * @param value value from input on change data
    */
-  private onPackingTypeChange = (event: any, { value }: InputOnChangeData) => {
+  private onPackingTypeChange = (event: any, { value }: DropdownProps) => {
     this.setState({ packingType: value as PackingType });
   }
   
   /**
    * Handles changing date
    */
-  private onChangeDate = async (e: any, { value }: InputOnChangeData) => {
-    this.setState({date: moment(value, "DD.MM.YYYY HH:mm").toDate()});
+  private onChangeDate = async (e: any, { value }: DropdownProps) => {
+    this.setState({date: moment(value as any, "DD.MM.YYYY HH:mm").toDate()});
   }
   /**
    * Handle form submit
@@ -377,7 +377,7 @@ class CreatePacking extends React.Component<Props, State> {
         packingId: packing.id,
         redirect: true
       });
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -405,7 +405,7 @@ export function mapStateToProps(state: StoreState) {
    */
   export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
   }
   
