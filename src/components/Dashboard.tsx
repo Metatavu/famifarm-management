@@ -14,6 +14,7 @@ import {
   Loader,
   Form,
   DropdownProps,
+  Header
 } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 
@@ -39,7 +40,6 @@ interface State {
   packings?: Packing[];
   filters: Filters;
   loading: boolean;
-  allFound: boolean;
 };
 
 /**
@@ -51,6 +51,9 @@ interface Filters {
   selectDate?: string;
 };
 
+const YESTERDAY = moment().subtract(1, "days").toISOString();
+const TOMORROW = moment().add(1, "days").toISOString();
+        
 /**
  * React component for displaying list of packings
  */
@@ -58,10 +61,11 @@ class Dashboard extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      packings: [],
       loading: false,
-      allFound: false,
-      filters: {}
+      filters: {
+        dateAfter: YESTERDAY,
+        dateBefore: TOMORROW
+      }
     };
   };
 
@@ -78,8 +82,6 @@ class Dashboard extends React.Component<Props, State> {
         exception: e
       });
     }
-    // TODO: Could be better to make the api call to packings in this screen rather than get from the redux?
-    this.state.packings?.length === 0 && this.setState({ packings: this.props.packings });
   };
 
   /**
@@ -138,8 +140,8 @@ class Dashboard extends React.Component<Props, State> {
   private onChangeDate = async (e: any, { value }: DropdownProps) => {
     const updatedFilters: Filters = {
       ...this.state.filters,
-      dateAfter: moment(value as any, "L").toISOString(),
-      dateBefore: moment(value as any, "L").add(1, "days").toISOString(),
+      dateAfter: moment(value as any, "L").toISOString(true),
+      dateBefore: moment(value as any, "L").add(1, "days").subtract(1, "minute").toISOString(true),
       selectDate: value?.toString()
     };
 
@@ -174,17 +176,17 @@ class Dashboard extends React.Component<Props, State> {
 
     const packings  = await packingsService.listPackings({
       createdAfter: dateAfter,
-      createdBefore: dateBefore,
+      createdBefore: dateBefore
     });
     onPackingsFound && onPackingsFound(append ? (this.props.packings || []).concat(packings) : packings);
-    this.setState({ filters: filters, loading: false, allFound: packings.length < 20 });
+    this.setState({ filters: filters, loading: false });
   };
   
   /**
    * Renders date dropdown options
    */
   private renderDateOptions = () => {
-    const { packings } =  this.state?.packings?.length ? this.state : this.props;
+    const { packings } =  this.props;
     const options = [];
 
     if (packings) {
@@ -223,32 +225,39 @@ class Dashboard extends React.Component<Props, State> {
     const renderForm = () => {
       const filterStyles: React.CSSProperties = {
         display:"inline-block",
-        paddingTop: "2rem",
-        paddingBottom: "2rem",
+        paddingTop: "1rem",
+        paddingBottom: "1rem",
         paddingRight: "2rem"
+      };
+      const headerStyles: React.CSSProperties = {
+        paddingTop: "1rem",
       };
 
       return (
         <Form>
           <Form.Field>
-            <div style={ filterStyles }>
-              <label>{ strings.dateBefore }</label>
-              <DateInput
-                dateFormat="DD.MM.YYYY"
-                onChange={ this.onChangeDateBefore }
-                name="dateBefore"
-                value={ filters.dateBefore ? moment(filters.dateBefore).format("DD.MM.YYYY") : "" }
-              />
+            <div>
+              <Header style={ headerStyles }>Select date range to load packings data for:</Header>
+              <div style={ filterStyles }>
+                <label>{ strings.dateBefore }</label>
+                <DateInput
+                  dateFormat="DD.MM.YYYY"
+                  onChange={ this.onChangeDateBefore }
+                  name="dateBefore"
+                  value={ filters.dateBefore ? moment(filters.dateBefore).format("DD.MM.YYYY") : "" }
+                />
+              </div>
+              <div style={ filterStyles }>
+                <label>{ strings.dateAfter }</label>
+                <DateInput
+                  dateFormat="DD.MM.YYYY"
+                  onChange={ this.onChangeDateAfter }
+                  name="dateAfter"
+                  value={ filters.dateAfter ? moment(filters.dateAfter).format("DD.MM.YYYY") : "" }
+                />
+              </div>
             </div>
-            <div style={ filterStyles }>
-              <label>{ strings.dateAfter }</label>
-              <DateInput
-                dateFormat="DD.MM.YYYY"
-                onChange={ this.onChangeDateAfter }
-                name="dateAfter"
-                value={ filters.dateAfter ? moment(filters.dateAfter).format("DD.MM.YYYY") : "" }
-              />
-            </div>
+            <Header style={ headerStyles }>Select date to display cumulative packings data for:</Header>
             <div style={ filterStyles }>
               <label>{ strings.selectDate }</label>
               <Form.Select
