@@ -38,22 +38,10 @@ interface Props {
  */
 interface State {
   packings?: Packing[];
-  filters: Filters;
   loading: boolean;
+  selectedDate: string;
 };
 
-/**
- * Interface describing filters
- */
-interface Filters {
-  dateBefore?: string;
-  dateAfter?: string;
-  selectDate?: string;
-};
-
-const YESTERDAY = moment().subtract(1, "days").toISOString();
-const TOMORROW = moment().add(1, "days").toISOString();
-        
 /**
  * React component for displaying list of packings
  */
@@ -62,10 +50,7 @@ class Dashboard extends React.Component<Props, State> {
     super(props);
     this.state = {
       loading: false,
-      filters: {
-        dateAfter: YESTERDAY,
-        dateBefore: TOMORROW
-      }
+      selectedDate: moment().toISOString()
     };
   };
 
@@ -74,7 +59,7 @@ class Dashboard extends React.Component<Props, State> {
    */
   public async componentDidMount() {
     try {
-      await this.updatePackings(this.state.filters, false);
+      await this.updatePackings(this.state.selectedDate, false);
     } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
@@ -90,64 +75,10 @@ class Dashboard extends React.Component<Props, State> {
    * @param e event
    * @param value value from DropdownProps
    */
-  private onChangeDateBefore = async (e: any, { value }: DropdownProps) => {
-    const updatedFilters: Filters = {
-      ...this.state.filters,
-      dateBefore: moment(value as any, "DD.MM.YYYY").toISOString(),
-      selectDate: ""
-    };
-    this.setState({ filters: updatedFilters });
-
-    await this.updatePackings(updatedFilters, false).catch((err) => {
-      this.props.onError({
-        message: strings.defaultApiErrorMessage,
-        title: strings.defaultApiErrorTitle,
-        exception: err
-      });
-    });
-  };
-
-  /**
-   * Handles changing date
-   *
-   * @param e event
-   * @param value value from DropdownProps
-   */
   private onChangeDateAfter = async (e: any, { value }: DropdownProps) => {
-    const updatedFilters: Filters = {
-      ...this.state.filters,
-      dateAfter: moment(value as any, "DD.MM.YYYY").toISOString(),
-      selectDate: ""
-    };
-
-    this.setState({ filters: updatedFilters });
-
-    await this.updatePackings(updatedFilters, false).catch(err => {
-      this.props.onError({
-        message: strings.defaultApiErrorMessage,
-        title: strings.defaultApiErrorTitle,
-        exception: err
-      });
-    });
-  };
-  
-  /**
-   * Handles changing date
-   *
-   * @param e event
-   * @param value value from DropdownProps
-   */
-  private onChangeDate = async (e: any, { value }: DropdownProps) => {
-    const updatedFilters: Filters = {
-      ...this.state.filters,
-      dateAfter: moment(value as any, "L").toISOString(true),
-      dateBefore: moment(value as any, "L").add(1, "days").subtract(1, "minute").toISOString(true),
-      selectDate: value?.toString()
-    };
-
-    this.setState({ filters: updatedFilters });
-
-    await this.updatePackings(updatedFilters, false).catch(err => {
+    const selectedDate = moment(value as any, "DD.MM.YYYY").toISOString()
+    this.setState({ selectedDate: selectedDate });
+    await this.updatePackings(selectedDate, false).catch(err => {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -162,47 +93,21 @@ class Dashboard extends React.Component<Props, State> {
    * @param filters filters
    * @param append boolean
    */
-  private updatePackings = async (filters: Filters, append: boolean) => {
+  private updatePackings = async (selectedDate: string, append: boolean) => {
     const { keycloak, onPackingsFound } = this.props;
-    const { dateAfter, dateBefore } = filters;
     if (!keycloak) {
       return;
     }
 
     this.setState({ loading: true });
-    const [ packingsService ] = await Promise.all([
-      Api.getPackingsService(keycloak),
-    ]);
-
+    const packingsService = await Api.getPackingsService(keycloak);
+    const selectedMoment = moment(selectedDate);
     const packings  = await packingsService.listPackings({
-      createdAfter: dateAfter,
-      createdBefore: dateBefore
+      createdAfter: selectedMoment.startOf("day").toISOString(),
+      createdBefore: selectedMoment.endOf("day").toISOString()
     });
     onPackingsFound && onPackingsFound(append ? (this.props.packings || []).concat(packings) : packings);
-    this.setState({ filters: filters, loading: false });
-  };
-  
-  /**
-   * Renders date dropdown options
-   */
-  private renderDateOptions = () => {
-    const { packings } =  this.props;
-    const options = [];
-
-    if (packings) {
-      options.push(
-        ...packings.map(({ time }) => ({
-          text: moment(time as any, "LLLL").format("L") || "",
-          value: moment(time as any, "LLLL").format("L") || ""
-        }))
-      );
-    }
-
-    const uniqueOptions = options.filter((item, index, self) => self.findIndex(t => t.value === item.value) === index);
-
-    uniqueOptions.sort((a, b) => moment(a.value, "L").toDate().getTime() + moment(b.value, "L").toDate().getTime());
-
-    return uniqueOptions;
+    this.setState({ selectedDate: selectedDate, loading: false });
   };
 
   /**
@@ -210,7 +115,7 @@ class Dashboard extends React.Component<Props, State> {
    */
   public render() {
     const { packings } = this.props;
-    const { filters } = this.state;
+    const { selectedDate } = this.state;
 
     const possibleLoader = (): any => {
       if (this.state.loading) {
@@ -236,38 +141,15 @@ class Dashboard extends React.Component<Props, State> {
       return (
         <Form>
           <Form.Field>
-            <div>
-              <Header style={ headerStyles }>Select date range to load packings data for:</Header>
-              <div style={ filterStyles }>
-                <label>{ strings.dateBefore }</label>
-                <DateInput
-                  dateFormat="DD.MM.YYYY"
-                  onChange={ this.onChangeDateBefore }
-                  name="dateBefore"
-                  value={ filters.dateBefore ? moment(filters.dateBefore).format("DD.MM.YYYY") : "" }
-                />
-              </div>
-              <div style={ filterStyles }>
-                <label>{ strings.dateAfter }</label>
-                <DateInput
-                  dateFormat="DD.MM.YYYY"
-                  onChange={ this.onChangeDateAfter }
-                  name="dateAfter"
-                  value={ filters.dateAfter ? moment(filters.dateAfter).format("DD.MM.YYYY") : "" }
-                />
-              </div>
-            </div>
             <Header style={ headerStyles }>Select date to display cumulative packings data for:</Header>
             <div style={ filterStyles }>
               <label>{ strings.selectDate }</label>
-              <Form.Select
-                name="Date"
-                options={ this.renderDateOptions() }
-                onChange={ this.onChangeDate }
-                // TODO: have the value reset if date changed in other form inputs?
-                value={ filters.selectDate }
-                placeholder=""
-              />
+              <DateInput
+                  dateFormat="DD.MM.YYYY"
+                  onChange={ this.onChangeDateAfter }
+                  name="selectedDate"
+                  value={ selectedDate ? moment(selectedDate).format("DD.MM.YYYY") : "" }
+                />
             </div>
           </Form.Field>
         </Form>
