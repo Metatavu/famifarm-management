@@ -236,7 +236,7 @@
     "allowedHarvestTypes": "Sallitut sadonkorjuun tyypit",
 
     "dashboard": "Työpöytä",
-    "dashboardFormDescription": "Valitse päivämäärä näyttääksesi kumulatiiviset pakettitiedot",
+    "dashboardFormDescription": "Valitse päivä nähdäksesi kumulatiiviset pakkaukset",
     "dashboardCount": "Pakkauksien määrä"
 
 }
