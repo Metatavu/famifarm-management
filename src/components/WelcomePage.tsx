@@ -57,6 +57,7 @@ import DiscardList from "./DiscardList";
 import CreateDiscard from "./CreateDiscard";
 import EditDiscard from "./EditDiscard";
 import { WithParams } from "./WithParams";
+import Dashboard from "./Dashboard";
 
 export interface Props {
   authenticated: boolean,
@@ -138,6 +139,9 @@ class WelcomePage extends React.Component<Props, any> {
     },{
       "text": strings.reportDownloadHeader,
       "route": "/reports"
+    },{
+      "text": strings.dashboard,
+      "route": "/dashboard"
     },{
       "text": strings.userManagementLink,
       "route": process.env.REACT_APP_ACCOUNT_MANAGEMENT_URL,
@@ -469,6 +473,14 @@ class WelcomePage extends React.Component<Props, any> {
                 path="/reports"
                 element={
                   <ReportDownload
+                    keycloak={this.state.keycloak}
+                  />
+                }
+              />
+              <Route
+                path="/dashboard"
+                element={
+                  <Dashboard
                     keycloak={this.state.keycloak}
                   />
                 }
