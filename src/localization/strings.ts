@@ -199,7 +199,6 @@ export interface IStrings extends LocalizedStringsMethods {
   print: string
   selectPrinter: string
   update: string
-  dashboard: string
 
   amountInStore: string
   oldestPackingInStore: string
@@ -262,6 +261,10 @@ export interface IStrings extends LocalizedStringsMethods {
   allCampaings: string;
   removeFromStorageButton: string;
   allowedHarvestTypes: string;
+
+  dashboard: string
+  dashboardFormDescription: string;
+  dashboardCount: string;
 }
 
 const strings: IStrings = new LocalizedStrings({

@@ -43,7 +43,7 @@ interface State {
 };
 
 /**
- * React component for displaying list of packings
+ * React component for displaying packings visualization
  */
 class Dashboard extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -141,15 +141,15 @@ class Dashboard extends React.Component<Props, State> {
       return (
         <Form>
           <Form.Field>
-            <Header style={ headerStyles }>Select date to display cumulative packings data for:</Header>
+            <Header style={ headerStyles }>{ strings.dashboardFormDescription }</Header>
             <div style={ filterStyles }>
               <label>{ strings.selectDate }</label>
               <DateInput
-                  dateFormat="DD.MM.YYYY"
-                  onChange={ this.onChangeDateAfter }
-                  name="selectedDate"
-                  value={ selectedDate ? moment(selectedDate).format("DD.MM.YYYY") : "" }
-                />
+                dateFormat="DD.MM.YYYY"
+                onChange={ this.onChangeDateAfter }
+                name="selectedDate"
+                value={ selectedDate ? moment(selectedDate).format("DD.MM.YYYY") : "" }
+              />
             </div>
           </Form.Field>
         </Form>
@@ -165,58 +165,27 @@ class Dashboard extends React.Component<Props, State> {
         {
           time: packing.time,
           count: packing.packedCount,
-          labelDate: moment(packing.time).format("L"),
-          labelTime: moment(packing.time).format("LT")
         }
       ));
 
       packingsData.sort((a, b) => moment(a.time).toDate().getTime() - moment(b.time).toDate().getTime());
 
-      const isMoreThanOneDay = packingsData?.some(packing => {
-        return moment(packing.time).format("L") > moment(packingsData[0].time).format("L");
-      });
-
       /**
        * Accumulate the counts for packings data
        * 
        * @param packingsData packings data to visualize
-       * @param isMoreThanOneDay
        * @returns packings data with cumulative counts
        */
-      const cumulativeCounts = (packingsData: VisualizePackingsData[], isMoreThanOneDay: boolean) => {
-        if (!isMoreThanOneDay) {
-          packingsData.reduce((acc, packing, i) => {
-            if (!packing.count) {
-              return acc;
-            } else {
-              packingsData[i] = { ...packingsData[i], count: acc + packing.count };
-              return acc + packing.count;
-            }
-          }, 0);
-        }
+      const cumulativeCounts = (packingsData: VisualizePackingsData[]) => {
+        packingsData.reduce((acc, packing, i) => {
+          if (!packing.count) {
+            return acc;
+          } else {
+            packingsData[i] = { ...packingsData[i], count: acc + packing.count };
+            return acc + packing.count;
+          }
+        }, 0);
         return packingsData;
-      };
-
-      /**
-       * Format tick label depending on time range of data being visualized
-       * 
-       * @param value tick label
-       * @param isMoreThanOneDay 
-       * @returns formatted tick label depending on time range
-       */
-      const formatTicks = (value: any, isMoreThanOneDay: boolean) => {
-        return isMoreThanOneDay ? moment(value).format("L") : moment(value).format("LT");
-      };
-
-      /**
-       * Format tooltips label depending on time range of data being visualized
-       * 
-       * @param value tooltips label
-       * @param isMoreThanOneDay 
-       * @returns formatted tooltips label depending on time range
-       */
-      const formatTooltips = (value: any, isMoreThanOneDay: boolean) => {
-        return isMoreThanOneDay ? moment(value).format("L") : moment(value).format("LTS");
       };
       
       return (  
@@ -224,7 +193,7 @@ class Dashboard extends React.Component<Props, State> {
           <LineChart
             width={1000}
             height={500}
-            data={cumulativeCounts(packingsData, isMoreThanOneDay)}
+            data={ cumulativeCounts(packingsData) }
             margin={{
               top: 5,
               right: 30,
@@ -235,16 +204,21 @@ class Dashboard extends React.Component<Props, State> {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis 
               dataKey="time"
-              tickFormatter={ (value) => formatTicks(value, isMoreThanOneDay) }
+              tickFormatter={ value => moment(value).format("LT") }
               interval="preserveStartEnd"
               padding={{ left: 100, right: 100 }}
             />
             <YAxis />
             <Tooltip
-              labelFormatter={ (value) => formatTooltips(value, isMoreThanOneDay) }
+              labelFormatter={ value => moment(value).format("LTS") }
             />
             <Legend />
-            <Line type="monotone" dataKey="count" stroke="#82ca9d" />
+            <Line 
+              type="monotone"
+              dataKey="count"
+              stroke="#82ca9d"
+              name={ strings.dashboardCount }
+            />
           </LineChart>
         </>
       );

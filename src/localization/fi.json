@@ -176,7 +176,6 @@
     "print": "Tulosta",
     "selectPrinter": "Valitse tulostin",
     "update": "Päivitä",
-    "dashboard": "Hallintanäkymä",
 
     "amountInStore": "Määrä varastossa",
     "oldestPackingInStore": "Vanhin pakkaus varastossa",
@@ -234,5 +233,10 @@
     "edit": "Muokkaa",
     "allCampaings": "Kaikki kampanjat",
     "removeFromStorageButton": "Poista varastosta",
-    "allowedHarvestTypes": "Sallitut sadonkorjuun tyypit"
+    "allowedHarvestTypes": "Sallitut sadonkorjuun tyypit",
+
+    "dashboard": "Hallintanäkymä",
+    "dashboardFormDescription": "Valitse päivämäärä näyttääksesi kumulatiiviset pakettitiedot",
+    "dashboardCount": "Pakkauksien määrä"
+
 }

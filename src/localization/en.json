@@ -177,7 +177,6 @@
   "print": "Print",
   "selectPrinter": "Select printer",
   "update": "Refresh",
-  "dashboard": "Dashboard",
 
   "amountInStore": "Amount in store",
   "oldestPackingInStore": "Oldest packing in store",
@@ -235,6 +234,10 @@
   "edit": "Edit",
   "allCampaings": "All campaings",
   "removeFromStorageButton": "Remove from storage",
-  "allowedHarvestTypes": "Allowed harvest types"
+  "allowedHarvestTypes": "Allowed harvest types",
+
+  "dashboard": "Dashboard",
+  "dashboardFormDescription": "Select date to display cumulative packings data:",
+  "dashboardCount": "Package count"
 
 }

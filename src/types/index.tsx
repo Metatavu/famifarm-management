@@ -60,6 +60,4 @@ export interface ErrorMessage {
 export interface VisualizePackingsData {
   time: Date;
   count: number | undefined;
-  labelDate: string;
-  labelTime: string;
 };
