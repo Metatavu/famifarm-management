@@ -235,7 +235,7 @@
     "removeFromStorageButton": "Poista varastosta",
     "allowedHarvestTypes": "Sallitut sadonkorjuun tyypit",
 
-    "dashboard": "Hallintanäkymä",
+    "dashboard": "Työpöytä",
     "dashboardFormDescription": "Valitse päivämäärä näyttääksesi kumulatiiviset pakettitiedot",
     "dashboardCount": "Pakkauksien määrä"
 
