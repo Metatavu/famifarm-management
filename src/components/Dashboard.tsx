@@ -102,7 +102,7 @@ class Dashboard extends React.Component<Props, State> {
     this.setState({ loading: true });
     const packingsService = await Api.getPackingsService(keycloak);
     const selectedMoment = moment(selectedDate);
-    const packings  = await packingsService.listPackings({
+    const packings = await packingsService.listPackings({
       createdAfter: selectedMoment.startOf("day").toISOString(),
       createdBefore: selectedMoment.endOf("day").toISOString()
     });
@@ -119,7 +119,7 @@ class Dashboard extends React.Component<Props, State> {
 
     const possibleLoader = (): any => {
       if (this.state.loading) {
-        return <Loader 
+        return <Loader
           style={{ marginLeft: "auto", marginRight: "auto" }}
           inline
           active
@@ -129,7 +129,7 @@ class Dashboard extends React.Component<Props, State> {
 
     const renderForm = () => {
       const filterStyles: React.CSSProperties = {
-        display:"inline-block",
+        display: "inline-block",
         paddingTop: "1rem",
         paddingBottom: "1rem",
         paddingRight: "2rem"
@@ -141,14 +141,14 @@ class Dashboard extends React.Component<Props, State> {
       return (
         <Form>
           <Form.Field>
-            <Header style={ headerStyles }>{ strings.dashboardFormDescription }</Header>
-            <div style={ filterStyles }>
-              <label>{ strings.selectDate }</label>
+            <Header style={headerStyles}>{strings.dashboardFormDescription}</Header>
+            <div style={filterStyles}>
+              <label>{strings.selectDate}</label>
               <DateInput
                 dateFormat="DD.MM.YYYY"
-                onChange={ this.onChangeDateAfter }
+                onChange={this.onChangeDateAfter}
                 name="selectedDate"
-                value={ selectedDate ? moment(selectedDate).format("DD.MM.YYYY") : "" }
+                value={selectedDate ? moment(selectedDate).format("DD.MM.YYYY") : ""}
               />
             </div>
           </Form.Field>
@@ -163,7 +163,7 @@ class Dashboard extends React.Component<Props, State> {
 
       const packingsData: VisualizePackingsData[] = packings?.map(packing => (
         {
-          time: packing.time,
+          time: packing.time.toString(),
           count: packing.packedCount,
         }
       ));
@@ -187,13 +187,13 @@ class Dashboard extends React.Component<Props, State> {
         }, 0);
         return packingsData;
       };
-      
-      return (  
+
+      return (
         <>
           <LineChart
             width={1000}
             height={500}
-            data={ cumulativeCounts(packingsData) }
+            data={cumulativeCounts(packingsData)}
             margin={{
               top: 5,
               right: 30,
@@ -202,22 +202,28 @@ class Dashboard extends React.Component<Props, State> {
             }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis 
+            <XAxis
               dataKey="time"
-              tickFormatter={ value => moment(value).format("LT") }
-              interval="preserveStartEnd"
+              tickFormatter={value => moment(value).format("LT")}
               padding={{ left: 100, right: 100 }}
+              // NOTE: Some props that might be useful
+              // interval={20}
+              // domain={[packingsData[0].time.valueOf(), packingsData[packingsData.length -1].time.valueOf()]}
+              // tickCount={10}
+              // scale="point"
+              // type="number"
+              ticks={[packingsData[0].time, packingsData[packingsData.length -1].time ]}
             />
             <YAxis />
             <Tooltip
-              labelFormatter={ value => moment(value).format("LTS") }
+              labelFormatter={value => moment(value).format("LTS")}
             />
             <Legend />
-            <Line 
+            <Line
               type="monotone"
               dataKey="count"
               stroke="#82ca9d"
-              name={ strings.dashboardCount }
+              name={strings.dashboardCount}
             />
           </LineChart>
         </>
@@ -228,19 +234,19 @@ class Dashboard extends React.Component<Props, State> {
       <Grid>
         <Grid.Row
           className="content-page-header-row"
-          style={{ flex: 1,justifyContent: "space-between", paddingLeft: 10, paddingRight: 10 }}
+          style={{ flex: 1, justifyContent: "space-between", paddingLeft: 10, paddingRight: 10 }}
         >
-          <h2>{ strings.dashboard }</h2>
+          <h2>{strings.dashboard}</h2>
         </Grid.Row>
         <Grid.Row>
+          <Grid.Row>
+            {renderForm()}
+          </Grid.Row>
+          {renderLineChart()}
+        </Grid.Row>
         <Grid.Row>
-          { renderForm() }
         </Grid.Row>
-          { renderLineChart() }
-        </Grid.Row>
-        <Grid.Row>
-        </Grid.Row>
-        { possibleLoader() }
+        {possibleLoader()}
       </Grid>
     );
   };

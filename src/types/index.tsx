@@ -58,6 +58,6 @@ export interface ErrorMessage {
  * An interface describing visualize packings data
  */
 export interface VisualizePackingsData {
-  time: Date;
+  time: string;
   count: number | undefined;
 };
