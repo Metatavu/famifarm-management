@@ -156,6 +156,11 @@ class Dashboard extends React.Component<Props, State> {
       );
     };
 
+    /**
+     * Render visualizaton of packings data
+     * 
+     * @returns recharts visualization
+     */
     const renderLineChart = () => {
       if (!packings?.length) {
         return;
@@ -163,10 +168,53 @@ class Dashboard extends React.Component<Props, State> {
 
       const packingsData: VisualizePackingsData[] = packings?.map(packing => (
         {
-          time: packing.time.toString(),
-          count: packing.packedCount,
+          time: packing.time.valueOf(),
+          count: packing.packedCount
         }
       ));
+
+      /**
+       * Get the timestamps for label times on a given day 
+       * 
+       * @param time timestamp
+       * @returns static times timestamps
+       */
+      const addStaticLabels = (time: number, packingsData: VisualizePackingsData[]) => {
+        const staticHours = [6,9,12,15];
+
+        const staticTimestamps = staticHours.map(hour => setTimestamps(time, hour));
+        const labelData = createLabelPackings(staticTimestamps);
+        labelData.forEach(label => packingsData.push(label))
+
+        return staticTimestamps;
+      };
+
+      /**
+       * Get timestamps for a particular hour on the same day as the provided time
+       * 
+       * @param time timestamp on a given day
+       * @param hour hour of timestamp to return
+       * @returns timestamp
+       */
+      const setTimestamps = (time: number, hour: number) =>  {
+        return moment(time).set("hour", hour).set("minutes", 0).valueOf();
+      };
+
+      /**
+       * Create a placeholder data to contain the x-axis static label
+       * 
+       * @param staticHours 
+       * @returns List of VisualizePackingsData
+       */
+      const createLabelPackings = (staticHours: number[]): VisualizePackingsData[] => (
+        staticHours.map(hour => ({
+          label: hour,
+          time: hour,
+          count: 0
+        }))
+      );
+
+      const staticLabels = addStaticLabels(packingsData[0].time, packingsData);
 
       packingsData.sort((a, b) => moment(a.time).toDate().getTime() - moment(b.time).toDate().getTime());
 
@@ -178,12 +226,9 @@ class Dashboard extends React.Component<Props, State> {
        */
       const cumulativeCounts = (packingsData: VisualizePackingsData[]) => {
         packingsData.reduce((acc, packing, i) => {
-          if (!packing.count) {
-            return acc;
-          } else {
-            packingsData[i] = { ...packingsData[i], count: acc + packing.count };
-            return acc + packing.count;
-          }
+          const count = packing.count || 0;
+          packingsData[i] = { ...packingsData[i], count: acc + count };
+          return acc + count;
         }, 0);
         return packingsData;
       };
@@ -206,13 +251,7 @@ class Dashboard extends React.Component<Props, State> {
               dataKey="time"
               tickFormatter={value => moment(value).format("LT")}
               padding={{ left: 100, right: 100 }}
-              // NOTE: Some props that might be useful
-              // interval={20}
-              // domain={[packingsData[0].time.valueOf(), packingsData[packingsData.length -1].time.valueOf()]}
-              // tickCount={10}
-              // scale="point"
-              // type="number"
-              ticks={[packingsData[0].time, packingsData[packingsData.length -1].time ]}
+              ticks={staticLabels}
             />
             <YAxis />
             <Tooltip
