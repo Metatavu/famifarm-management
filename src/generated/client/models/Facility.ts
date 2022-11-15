@@ -17,20 +17,20 @@
  * @export
  * @enum {string}
  */
-export enum PackingType {
-    Basic = 'BASIC',
-    Campaign = 'CAMPAIGN'
+export enum Facility {
+    Juva = 'JUVA',
+    Joroinen = 'JOROINEN'
 }
 
-export function PackingTypeFromJSON(json: any): PackingType {
-    return PackingTypeFromJSONTyped(json, false);
+export function FacilityFromJSON(json: any): Facility {
+    return FacilityFromJSONTyped(json, false);
 }
 
-export function PackingTypeFromJSONTyped(json: any, ignoreDiscriminator: boolean): PackingType {
-    return json as PackingType;
+export function FacilityFromJSONTyped(json: any, ignoreDiscriminator: boolean): Facility {
+    return json as Facility;
 }
 
-export function PackingTypeToJSON(value?: PackingType | null): any {
+export function FacilityToJSON(value?: Facility | null): any {
     return value as any;
 }
 

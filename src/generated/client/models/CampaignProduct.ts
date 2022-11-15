@@ -16,32 +16,39 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface ErrorResponse
+ * @interface CampaignProduct
  */
-export interface ErrorResponse {
+export interface CampaignProduct {
     /**
-     * The error message
+     * 
      * @type {string}
-     * @memberof ErrorResponse
+     * @memberof CampaignProduct
      */
-    message: string;
+    productId: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof CampaignProduct
+     */
+    count: number;
 }
 
-export function ErrorResponseFromJSON(json: any): ErrorResponse {
-    return ErrorResponseFromJSONTyped(json, false);
+export function CampaignProductFromJSON(json: any): CampaignProduct {
+    return CampaignProductFromJSONTyped(json, false);
 }
 
-export function ErrorResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): ErrorResponse {
+export function CampaignProductFromJSONTyped(json: any, ignoreDiscriminator: boolean): CampaignProduct {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
-        'message': json['message'],
+        'productId': json['productId'],
+        'count': json['count'],
     };
 }
 
-export function ErrorResponseToJSON(value?: ErrorResponse | null): any {
+export function CampaignProductToJSON(value?: CampaignProduct | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -50,7 +57,8 @@ export function ErrorResponseToJSON(value?: ErrorResponse | null): any {
     }
     return {
         
-        'message': value.message,
+        'productId': value.productId,
+        'count': value.count,
     };
 }
 

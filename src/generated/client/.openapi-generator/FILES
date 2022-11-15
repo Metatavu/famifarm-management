@@ -17,13 +17,14 @@ apis/WastageReasonsApi.ts
 apis/index.ts
 index.ts
 models/Campaign.ts
-models/CampaignProducts.ts
+models/CampaignProduct.ts
 models/CultivationObservationEventData.ts
 models/CutPacking.ts
 models/Draft.ts
 models/ErrorResponse.ts
 models/Event.ts
 models/EventType.ts
+models/Facility.ts
 models/HarvestEventData.ts
 models/HarvestEventType.ts
 models/LocalizedValue.ts

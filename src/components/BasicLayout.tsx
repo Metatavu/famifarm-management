@@ -10,6 +10,7 @@ import LogoutButton from "./LogoutButton";
 import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
+import FacilitySelect from "./FacilitySelect";
 
 /**
  * Interface representing component properties
@@ -79,6 +80,7 @@ class BasicLayout extends React.Component<Props, State> {
           <Menu.Item as={NavLink} to="/" header>
             {strings.managementHeaderText}
           </Menu.Item>
+          <FacilitySelect/>
           <ToggleLocalization />
           <LogoutButton />
         </Menu>

@@ -1,6 +1,6 @@
 import * as constants from '../constants'
 import { KeycloakInstance } from 'keycloak-js';
-import { Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, WastageReason, Pest, Packing, Campaign, Event } from "../generated/client";
+import { Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, WastageReason, Pest, Packing, Campaign, Event, Facility } from "../generated/client";
 import { ErrorMessage, EventListFilters } from '../types';
 
 export interface UserLogin {
@@ -137,12 +137,21 @@ export interface PerformedCultivationActionDeleted {
   type: constants.PERFORMED_CULTIVATION_ACTION_DELETED;
   performedCultivationActionId: string;
 }
+
 /**
  * Locale update data
  */
 export interface LocaleUpdate {
   type: constants.LOCALE_UPDATE,
   locale: string
+}
+
+/**
+ * Facility update data
+ */
+ export interface FacilityUpdate {
+  type: constants.FACILITY_UPDATE,
+  facility: Facility
 }
 
 /**
@@ -217,7 +226,7 @@ export type AppAction = UserLogin | UserLogout
   | ProductionLineDeleted | SeedBatchesFound | SeedBatchSelected | SeedBatchCreated | SeedBatchDeleted
   | PerformedCultivationActionsFound | PerformedCultivationActionSelected | PerformedCultivationActionCreated
   | PerformedCultivationActionDeleted | LocaleUpdate | WastageReasonsFound | WastageReasonSelected | EventsFound
-  | WastageReasonCreated | WastageReasonDeleted| PestsFound | ErrorOccurred | PackingsFound | CampaignsFound | EventListFiltersUpdated;
+  | WastageReasonCreated | WastageReasonDeleted| PestsFound | ErrorOccurred | PackingsFound | CampaignsFound | EventListFiltersUpdated | FacilityUpdate;
 
   /**
    * Redux store update method for campaigns
@@ -419,6 +428,7 @@ export function performedCultivationActionDeleted(performedCultivationActionId: 
     performedCultivationActionId: performedCultivationActionId
   }
 }
+
 /**
  * Store update method for locale
  * 
@@ -518,5 +528,17 @@ export function eventsFound(events: Event[]): EventsFound {
   return {
     type: constants.EVENTS_FOUND,
     events: events
+  }
+}
+
+/**
+ * Store update method for facility
+ * 
+ * @param facility facility
+ */
+ export function facilityUpdate(facility: Facility): FacilityUpdate {
+  return {
+    type: constants.FACILITY_UPDATE,
+    facility: facility
   }
 }
