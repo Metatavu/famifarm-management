@@ -19,6 +19,7 @@ import {
 import { DateInput } from 'semantic-ui-calendar-react';
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { X_AXIS_TIMES } from "../constants";
 
 /**
  * Interface representing component properties
@@ -174,22 +175,6 @@ class Dashboard extends React.Component<Props, State> {
       ));
 
       /**
-       * Get the timestamps for label times on a given day 
-       * 
-       * @param time timestamp
-       * @returns static times timestamps
-       */
-      const addStaticLabels = (time: number, packingsData: VisualizePackingsData[]) => {
-        const staticHours = [6,9,12,15];
-
-        const staticTimestamps = staticHours.map(hour => setTimestamps(time, hour));
-        const labelData = createLabelPackings(staticTimestamps);
-        labelData.forEach(label => packingsData.push(label))
-
-        return staticTimestamps;
-      };
-
-      /**
        * Get timestamps for a particular hour on the same day as the provided time
        * 
        * @param time timestamp on a given day
@@ -213,6 +198,27 @@ class Dashboard extends React.Component<Props, State> {
           count: 0
         }))
       );
+
+      /**
+       * Get the timestamps for label times on a given day 
+       * 
+       * @param time timestamp
+       * @param packingsData
+       * @returns static times timestamps
+       */
+      const addStaticLabels = (time: number, packingsData: VisualizePackingsData[]) => {
+        const staticTimestamps = X_AXIS_TIMES.map(hour => setTimestamps(time, hour));
+        const filteredStaticTimes = staticTimestamps.filter(hour => {
+          return packingsData.some(packing => {
+            return packing.time > hour;
+          });
+        });
+        // TODO: why do i get an unlabled first tick outside of the x-axis (left) when using the filtered static times (disappears when use staticTimestamps). Also see console errors when using filteredStaticTimes rather than staticTimestamps?
+        const labelData = createLabelPackings(filteredStaticTimes);
+        labelData.forEach(label => packingsData.push(label))
+
+        return staticTimestamps;
+      };
 
       const staticLabels = addStaticLabels(packingsData[0].time, packingsData);
 
@@ -250,8 +256,11 @@ class Dashboard extends React.Component<Props, State> {
             <XAxis
               dataKey="time"
               tickFormatter={value => moment(value).format("LT")}
-              padding={{ left: 100, right: 100 }}
+              padding={{ right: 100 }}
               ticks={staticLabels}
+              interval={0}
+              angle={320}
+              tickSize={10}
             />
             <YAxis />
             <Tooltip
