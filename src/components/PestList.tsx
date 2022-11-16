@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Pest } from "../generated/client";
+import { Facility, Pest } from "../generated/client";
 import strings from "../localization/strings";
 
 import {
@@ -23,8 +23,9 @@ import LocalizedUtils from "../localization/localizedutils";
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   pests?: Pest[];
+  facility: Facility;
   onPestsFound?: (pests: Pest[]) => void,
-   onError: (error: ErrorMessage | undefined) => void
+  onError: (error: ErrorMessage | undefined) => void
 }
 
 /**
@@ -46,13 +47,14 @@ class PestList extends React.Component<Props, State> {
    * Component did mount life-sycle event
    */
   public async componentDidMount() {
+    const { keycloak, facility, onError, onPestsFound } = this.props;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
   
-      const pestsService = await Api.getPestsService(this.props.keycloak);
-      const pests = await pestsService.listPests({});
+      const pestsService = await Api.getPestsService(keycloak);
+      const pests = await pestsService.listPests({ facility: facility });
       pests.sort((a, b) => {
         let nameA = LocalizedUtils.getLocalizedValue(a.name)
         let nameB = LocalizedUtils.getLocalizedValue(b.name)
@@ -60,9 +62,9 @@ class PestList extends React.Component<Props, State> {
         if(nameA > nameB) { return 1; }
         return 0;
       });
-      this.props.onPestsFound && this.props.onPestsFound(pests);
+      onPestsFound && onPestsFound(pests);
     } catch (e: any) {
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -125,7 +127,8 @@ class PestList extends React.Component<Props, State> {
  */
 export function mapStateToProps(state: StoreState) {
   return {
-    pests: state.pests
+    pests: state.pests,
+    facility: state.facility
   };
 }
 

@@ -2,7 +2,7 @@ import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Campaign, PackageSize, Packing, PackingState, Product } from "../generated/client";
+import { Campaign, Facility, PackageSize, Packing, PackingState, Product } from "../generated/client";
 import strings from "../localization/strings";
 import moment from "moment";
 import * as actions from "../actions";
@@ -37,6 +37,7 @@ interface Props {
   packageSizes?: PackageSize[];
   campaigns?: Campaign[];
   location?: any;
+  facility: Facility;
   onPackingsFound?: (packings: Packing[]) => void;
   onProductsFound?: (products: Product[]) => void;
   onCampaignsFound?: (campaigns: Campaign[]) => void;
@@ -139,14 +140,18 @@ class PackingList extends React.Component<Props, State> {
    * @param packing Packing to remove from storage
    */
   private removePackingFromStorage = async (packing: Packing) => {
-    const { packings, keycloak, onPackingsFound } = this.props;
+    const { packings, keycloak, facility, onPackingsFound } = this.props;
     if (!keycloak || !packing.id) {
       return;
     }
     this.setState({removingFromStorageIds: [ ...this.state.removingFromStorageIds, packing.id ]})
     packing.state = PackingState.Removed;
     const packingService = await Api.getPackingsService(keycloak);
-    const updatedPacking = await packingService.updatePacking({packingId: packing.id, packing: packing});
+    const updatedPacking = await packingService.updatePacking({
+      packingId: packing.id,
+      packing: packing,
+      facility: facility
+    });
     onPackingsFound && onPackingsFound((packings || []).map(p => p.id == updatedPacking.id ? updatedPacking : p));
     this.setState({removingFromStorageIds: this.state.removingFromStorageIds.filter(id => id !== packing.id)});
   }
@@ -516,7 +521,7 @@ class PackingList extends React.Component<Props, State> {
    * @param filters filters
    */
   private updatePackings = async (filters: Filters, append: boolean) => {
-    const { keycloak, onPackingsFound, onProductsFound, onCampaignsFound, onPackageSizesFound } = this.props;
+    const { keycloak, facility, onPackingsFound, onProductsFound, onCampaignsFound, onPackageSizesFound } = this.props;
     const { productId, campaingId, packingState, dateAfter, dateBefore, firstResult } = filters;
     if (!keycloak) {
       return;
@@ -531,16 +536,16 @@ class PackingList extends React.Component<Props, State> {
     ]);
 
     if (!this.props.packageSizes || this.props.packageSizes.length < 1) {
-      const packageSizes = await packageSizesService.listPackageSizes({ });
+      const packageSizes = await packageSizesService.listPackageSizes({ facility: facility });
       onPackageSizesFound && onPackageSizesFound(packageSizes);
     }
 
     if (!this.props.products || this.props.products.length < 1) {
-      const products = await productsService.listProducts({ })
+      const products = await productsService.listProducts({ facility: facility });
       onProductsFound && onProductsFound(products);
     }
     if (!this.props.campaigns || this.props.campaigns.length < 1) {
-      const campaigns = await campaignsService.listCampaigns();
+      const campaigns = await campaignsService.listCampaigns({ facility: facility });
       onCampaignsFound && onCampaignsFound(campaigns);
     }
     const fr = append ? firstResult : 0;
@@ -551,7 +556,8 @@ class PackingList extends React.Component<Props, State> {
       createdAfter: dateAfter,
       createdBefore: dateBefore,
       firstResult: fr,
-      maxResults: 20
+      maxResults: 20,
+      facility: facility
     });
     onPackingsFound && onPackingsFound(append ? (this.props.packings || []).concat(packings) : packings);
     this.setState({ filters: {...filters, firstResult: fr}, loading: false, allFound: packings.length < 20 });
@@ -567,7 +573,8 @@ const mapStateToProps = (state: StoreState) => ({
   products: state.products,
   packings: state.packings,
   campaigns: state.campaigns,
-  packageSizes: state.packageSizes
+  packageSizes: state.packageSizes,
+  facility: state.facility
 });
 
 /**
@@ -579,7 +586,7 @@ const mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({
   onProductsFound: (products: Product[]) => dispatch(actions.productsFound(products)),
   onPackingsFound: (packings: Packing[]) => dispatch(actions.packingsFound(packings)),
   onCampaignsFound: (campaigns: Campaign[]) => dispatch(actions.campaignsFound(campaigns)),
-   onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error)),
+  onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error)),
   onPackageSizesFound: (packageSizes: PackageSize[]) => dispatch(actions.packageSizesFound(packageSizes))
 });
 

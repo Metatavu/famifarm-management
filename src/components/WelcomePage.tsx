@@ -58,11 +58,14 @@ import CreateDiscard from "./CreateDiscard";
 import EditDiscard from "./EditDiscard";
 import { WithParams } from "./WithParams";
 import Dashboard from "./Dashboard";
+import { Facility } from "../generated/client";
 
 export interface Props {
   authenticated: boolean,
   keycloak?: Keycloak.KeycloakInstance,
+  facility: Facility,
   onLogin?: (keycloak: Keycloak.KeycloakInstance, authenticated: boolean) => void
+  onFacilityUpdate: (facility: Facility) => void
 }
 
 class WelcomePage extends React.Component<Props, any> {
@@ -89,6 +92,15 @@ class WelcomePage extends React.Component<Props, any> {
 
     this.setState({keycloak: keycloak});
   }
+
+  /* componentDidUpdate() {
+    const { keycloak, onFacilityUpdate } = this.props;
+    if (keycloak) {
+      if (keycloak.hasRealmRole("juva")) {
+        onFacilityUpdate(Facility.Juva);
+      }
+    }
+  } */
 
   /**
    * Render welcome page view
@@ -465,7 +477,8 @@ class WelcomePage extends React.Component<Props, any> {
                 path="/createWastageReason"
                 element={
                   <CreateWastageReason
-                    keycloak={this.state.keycloak}
+                    keycloak={ this.state.keycloak }
+                    facility={ this.props.facility }
                   />
                 }
               />
@@ -507,7 +520,8 @@ export function mapStateToProps(state: StoreState) {
   return {
     authenticated: state.authenticated,
     keycloak: state.keycloak,
-    locale: state.locale
+    locale: state.locale,
+    facility: state.facility
   }
 }
 
@@ -518,7 +532,8 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onLogin: (keycloak: Keycloak.KeycloakInstance, authenticated: boolean) => dispatch(actions.userLogin(keycloak, authenticated))
+    onLogin: (keycloak: Keycloak.KeycloakInstance, authenticated: boolean) => dispatch(actions.userLogin(keycloak, authenticated)),
+    onFacilityUpdate: (facility: Facility) => dispatch(actions.facilityUpdate(facility)),
   };
 }
 

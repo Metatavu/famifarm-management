@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Seed, SeedBatch } from "../generated/client";
+import { Facility, Seed, SeedBatch } from "../generated/client";
 import strings from "../localization/strings";
 
 import {
@@ -21,8 +21,9 @@ import LocalizedUtils from "../localization/localizedutils";
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   seedBatches?: SeedBatch[];
+  facility: Facility;
   onSeedBatchesFound?: (seedBatches: SeedBatch[]) => void,
-   onError: (error: ErrorMessage | undefined) => void
+  onError: (error: ErrorMessage | undefined) => void
 }
 
 export interface State {
@@ -52,9 +53,12 @@ class SeedBatchList extends React.Component<Props, State> {
         return;
       }
       const seedService = await Api.getSeedsService(this.props.keycloak);
-      const seeds = await seedService.listSeeds({});
+      const seeds = await seedService.listSeeds({ facility: this.props.facility });
       const seedBatchService = await Api.getSeedBatchesService(this.props.keycloak);
-      const seedBatches = await seedBatchService.listSeedBatches({includePassive: this.state.showPassive});
+      const seedBatches = await seedBatchService.listSeedBatches({
+        includePassive: this.state.showPassive,
+        facility: this.props.facility
+      });
       seedBatches.sort((a, b) => {
         let nameA = a.code || "";
         let nameB = b.code || "";
@@ -149,7 +153,10 @@ class SeedBatchList extends React.Component<Props, State> {
 
     this.setState({loading: true});
     const seedBatchesService = Api.getSeedBatchesService(this.props.keycloak);
-    const seedBatches = await (await seedBatchesService).listSeedBatches({includePassive: this.state.showPassive});
+    const seedBatches = await (await seedBatchesService).listSeedBatches({
+      includePassive: this.state.showPassive,
+      facility: this.props.facility
+    });
     seedBatches.sort((a, b) => {
       let nameA = a.code || "";
       let nameB = b.code || "";
@@ -170,7 +177,8 @@ class SeedBatchList extends React.Component<Props, State> {
 export function mapStateToProps(state: StoreState) {
   return {
     seedBatches: state.seedBatches,
-    seedBatch: state.seedBatch
+    seedBatch: state.seedBatch,
+    facility: state.facility
   };
 }
 

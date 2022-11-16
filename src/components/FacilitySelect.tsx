@@ -12,6 +12,7 @@ import { Facility } from "../generated/client";
  * Interface representing component properties
  */
 interface Props {
+  keycloak?: Keycloak.KeycloakInstance;
   facility: Facility;
   onFacilityChange: (facility: Facility) => void;
 }
@@ -40,8 +41,8 @@ class FacilitySelect extends React.Component<Props, State> {
    * Render facility select
    */
   render() {
-    const { facility, onFacilityChange } = this.props;
-    if (!facility) {
+    const { facility, keycloak, onFacilityChange } = this.props;
+    if (!facility || !(keycloak?.hasRealmRole("juva") && keycloak?.hasRealmRole("joroinen"))) {
       return null;
     }
 
@@ -67,7 +68,8 @@ class FacilitySelect extends React.Component<Props, State> {
  */
 function mapStateToProps(state: StoreState) {
   return {
-    facility: state.facility
+    facility: state.facility,
+    keycloak: state.keycloak
   };
 }
 

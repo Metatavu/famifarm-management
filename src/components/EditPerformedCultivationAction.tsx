@@ -4,7 +4,7 @@ import * as actions from "../actions";
 import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
-import { LocalizedValue, PerformedCultivationAction } from "../generated/client";
+import { Facility, LocalizedValue, PerformedCultivationAction } from "../generated/client";
 import { redirect } from 'react-router-dom';
 import strings from "../localization/strings";
 
@@ -24,11 +24,12 @@ import { FormContainer } from "./FormContainer";
  */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
+  facility: Facility;
   performedCultivationActionId: string;
   performedCultivationAction?: PerformedCultivationAction;
   onPerformedCultivationActionSelected?: (performedCultivationAction: PerformedCultivationAction) => void;
-  onPerformedCultivationActionDeleted?: (performedCultivationActionId: string) => void,
-   onError: (error: ErrorMessage | undefined) => void
+  onPerformedCultivationActionDeleted?: (performedCultivationActionId: string) => void;
+  onError: (error: ErrorMessage | undefined) => void
 }
 
 /**
@@ -69,18 +70,22 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   public async componentDidMount() {
+    const { performedCultivationActionId, keycloak, facility, onError, onPerformedCultivationActionSelected } = this.props;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
       
-      const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
-      const performedCultivationAction = await performedCultivationActionService.findPerformedCultivationAction({performedCultivationActionId: this.props.performedCultivationActionId});
-      this.props.onPerformedCultivationActionSelected && this.props.onPerformedCultivationActionSelected(performedCultivationAction);
+      const performedCultivationActionService = await Api.getPerformedCultivationActionsService(keycloak);
+      const performedCultivationAction = await performedCultivationActionService.findPerformedCultivationAction({
+        performedCultivationActionId: performedCultivationActionId,
+        facility: facility
+      });
+      onPerformedCultivationActionSelected && onPerformedCultivationActionSelected(performedCultivationAction);
       this.setState({performedCultivationAction: performedCultivationAction});
 
     } catch (e: any) {
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -103,15 +108,21 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
    * Handle form submit
    */
   private async handleSubmit() {
+    const { keycloak, facility, onError } = this.props;
+    const { performedCultivationAction } = this.state;
     try {
-      if (!this.props.keycloak || !this.state.performedCultivationAction) {
+      if (!keycloak || !performedCultivationAction) {
         return;
       }
   
       this.setState({saving: true});
   
-      const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
-      await performedCultivationActionService.updatePerformedCultivationAction({performedCultivationActionId: this.state.performedCultivationAction.id!, performedCultivationAction: this.state.performedCultivationAction});
+      const performedCultivationActionService = await Api.getPerformedCultivationActionsService(keycloak);
+      await performedCultivationActionService.updatePerformedCultivationAction({
+        performedCultivationActionId: performedCultivationAction.id!,
+        performedCultivationAction: performedCultivationAction,
+        facility: facility
+      });
       
       this.setState({saving: false});
   
@@ -120,7 +131,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
         this.setState({messageVisible: false});
       }, 3000);
     } catch (e: any) {
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -132,19 +143,24 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
    * Handle performedCultivationAction delete
    */
   private async handleDelete() {
+    const { keycloak, facility, onError, onPerformedCultivationActionDeleted } = this.props;
+    const { performedCultivationAction } = this.state;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
   
-      const id = this.state.performedCultivationAction!.id;
-      const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
-      await performedCultivationActionService.deletePerformedCultivationAction({performedCultivationActionId: id!});
+      const id = performedCultivationAction!.id;
+      const performedCultivationActionService = await Api.getPerformedCultivationActionsService(keycloak);
+      await performedCultivationActionService.deletePerformedCultivationAction({
+        performedCultivationActionId: id!,
+        facility: facility
+      });
   
-      this.props.onPerformedCultivationActionDeleted && this.props.onPerformedCultivationActionDeleted(id!);
+      onPerformedCultivationActionDeleted && onPerformedCultivationActionDeleted(id!);
       this.setState({redirect: true});
     } catch (e: any) {
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -220,7 +236,8 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
 export function mapStateToProps(state: StoreState) {
   return {
     performedCultivationActions: state.performedCultivationActions,
-    performedCultivationAction: state.performedCultivationAction
+    performedCultivationAction: state.performedCultivationAction,
+    facility: state.facility
   };
 }
 
@@ -233,7 +250,7 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onPerformedCultivationActionSelected: (performedCultivationAction: PerformedCultivationAction) => dispatch(actions.performedCultivationActionSelected(performedCultivationAction)),
     onPerformedCultivationActionDeleted: (performedCultivationActionId: string) => dispatch(actions.performedCultivationActionDeleted(performedCultivationActionId)),
-     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
+    onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

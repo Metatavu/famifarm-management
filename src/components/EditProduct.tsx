@@ -4,7 +4,7 @@ import * as actions from "../actions";
 import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
-import { Product, PackageSize, LocalizedValue, HarvestEventType } from "../generated/client";
+import { Product, PackageSize, LocalizedValue, HarvestEventType, Facility } from "../generated/client";
 import { redirect } from 'react-router-dom';
 import strings from "../localization/strings";
 
@@ -30,10 +30,11 @@ interface Props {
   productId: string;
   product?: Product;
   packageSizes?: PackageSize[];
+  facility: Facility;
   onProductSelected?: (product: Product) => void;
   onProductDeleted?: (productId: string) => void;
   onPackageSizesFound?: (packageSizes: PackageSize[]) => void;
-   onError: (error: ErrorMessage | undefined) => void;
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 /**
@@ -74,7 +75,7 @@ class EditProduct extends React.Component<Props, State> {
    * Component did mount life cycle method
    */
   public componentDidMount = async () => {
-    const { keycloak, productId, onPackageSizesFound, onProductSelected } = this.props;
+    const { keycloak, productId, facility, onPackageSizesFound, onProductSelected, onError } = this.props;
 
     if (!keycloak) {
       return;
@@ -83,15 +84,18 @@ class EditProduct extends React.Component<Props, State> {
     try {
       const packageSizeService = await Api.getPackageSizesService(keycloak);
       const productsService = await Api.getProductsService(keycloak);
-      const product = await productsService.findProduct({ productId });
+      const product = await productsService.findProduct({
+        productId: productId,
+        facility: facility
+      });
   
       onProductSelected && onProductSelected(product);
       this.setState({ product });
   
-      const packageSizes = await packageSizeService.listPackageSizes({ });
+      const packageSizes = await packageSizeService.listPackageSizes({ facility: facility });
       onPackageSizesFound && onPackageSizesFound(packageSizes);
     } catch (e: any) {
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -103,7 +107,7 @@ class EditProduct extends React.Component<Props, State> {
    * Handle form submit
    */
   private handleSubmit = async () => {
-    const { keycloak, onError } = this.props;
+    const { keycloak, facility, onError } = this.props;
     const { product } = this.state;
     try {
       if (!keycloak || !product) {
@@ -113,7 +117,11 @@ class EditProduct extends React.Component<Props, State> {
       const productsService = await Api.getProductsService(keycloak);
 
       this.setState({ saving: true });
-      await productsService.updateProduct({ productId: product.id!, product });
+      await productsService.updateProduct({
+        productId: product.id!,
+        product: product,
+        facility: facility
+      });
       this.setState({ saving: false });
   
       this.setState({ messageVisible: true });
@@ -133,7 +141,7 @@ class EditProduct extends React.Component<Props, State> {
    * Handle product delete
    */
   private handleDelete = async () => {
-    const { keycloak } = this.props;
+    const { keycloak, facility } = this.props;
     const { product } = this.state;
     if (!keycloak || !product) {
       return;
@@ -142,7 +150,10 @@ class EditProduct extends React.Component<Props, State> {
     const productsService = await Api.getProductsService(keycloak);
     const productId = product.id || "";
 
-    await productsService.deleteProduct({ productId });
+    await productsService.deleteProduct({
+      productId: productId,
+      facility: facility
+    });
 
     this.props.onProductDeleted && this.props.onProductDeleted(productId!);
     this.setState({ redirect: true });
@@ -351,7 +362,8 @@ class EditProduct extends React.Component<Props, State> {
 const mapStateToProps = (state: StoreState) => ({
   products: state.products,
   product: state.product,
-  packageSizes: state.packageSizes
+  packageSizes: state.packageSizes,
+  facility: state.facility
 });
 
 /**
@@ -363,7 +375,7 @@ const mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({
   onProductSelected: (product: Product) => dispatch(actions.productSelected(product)),
   onProductDeleted: (productId: string) => dispatch(actions.productDeleted(productId)),
   onPackageSizesFound: (packageSizes: PackageSize[]) => dispatch(actions.packageSizesFound(packageSizes)),
-   onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
+  onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditProduct);

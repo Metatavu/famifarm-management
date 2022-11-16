@@ -2,6 +2,7 @@ import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
 import strings from "../localization/strings";
+import * as actions from "../actions";
 import { DateInput } from 'semantic-ui-calendar-react';
 
 import {
@@ -11,12 +12,16 @@ import {
   DropdownProps,
 } from "semantic-ui-react";
 import moment from "moment";
+import { connect } from "react-redux";
+import { Facility, SeedBatch } from "../generated/client";
+import { StoreState, ErrorMessage } from "../types";
 
 /**
  * Component props
  */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
+  facility: Facility;
 }
 
 /**
@@ -100,15 +105,20 @@ class ReportDownload extends React.Component<Props, State> {
    * Handle form submit
    */
   private handleSubmit = async () => {
-    if (!this.props.keycloak) {
+    const { keycloak, facility } = this.props;
+    if (!keycloak) {
       return;
     }
 
     this.setState({loading: true});
     const fromTime = moment(this.state.startTime).startOf("day").toISOString();
     const toTime = moment(this.state.endTime).endOf("day").toISOString();
-    const reportsService = await Api.getReportsService(this.props.keycloak);
-    const reportData = await reportsService.getReport({type: this.state.reportType, fromTime, toTime});
+    const reportsService = await Api.getReportsService(keycloak);
+    const reportData = await reportsService.getReport({
+      type: this.state.reportType,
+      fromTime, toTime,
+      facility: facility
+    });
 
     const dataObj = window.URL.createObjectURL(reportData);
     const link = document.createElement('a');
@@ -150,4 +160,25 @@ class ReportDownload extends React.Component<Props, State> {
   }
 }
 
-export default ReportDownload;
+/**
+ * Redux mapper for mapping store state to component props
+ * 
+ * @param state store state
+ */
+ export function mapStateToProps(state: StoreState) {
+  return {
+    facility: state.facility
+  };
+}
+
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: React.Dispatch<actions.AppAction>) {
+  return {
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ReportDownload);
