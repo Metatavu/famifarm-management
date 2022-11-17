@@ -264,7 +264,7 @@ class Dashboard extends React.Component<Props, State> {
             />
             <YAxis />
             <Tooltip
-              labelFormatter={value => moment(value).format("LTS")}
+              labelFormatter={ value => moment(value).format("LTS") }
             />
             <Legend />
             <Line
