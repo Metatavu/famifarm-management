@@ -271,7 +271,7 @@ class Dashboard extends React.Component<Props, State> {
               type="monotone"
               dataKey="count"
               stroke="#82ca9d"
-              name={strings.dashboardCount}
+              name={ strings.dashboardCount }
             />
           </LineChart>
         </>
