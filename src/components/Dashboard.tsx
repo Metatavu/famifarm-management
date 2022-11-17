@@ -257,7 +257,7 @@ class Dashboard extends React.Component<Props, State> {
               dataKey="time"
               tickFormatter={value => moment(value).format("LT")}
               padding={{ right: 100 }}
-              ticks={staticLabels}
+              ticks={ staticLabels }
               interval={0}
               angle={320}
               tickSize={10}
