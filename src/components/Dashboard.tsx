@@ -258,9 +258,9 @@ class Dashboard extends React.Component<Props, State> {
               tickFormatter={value => moment(value).format("LT")}
               padding={{ right: 100 }}
               ticks={ staticLabels }
-              interval={0}
-              angle={320}
-              tickSize={10}
+              interval={ 0 }
+              angle={ 320 }
+              tickSize={ 10 }
             />
             <YAxis />
             <Tooltip
