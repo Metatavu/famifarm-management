@@ -18,7 +18,7 @@ import {
 } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { X_AXIS_TIMES } from "../constants";
 
 /**
@@ -241,39 +241,41 @@ class Dashboard extends React.Component<Props, State> {
 
       return (
         <>
-          <LineChart
-            width={1000}
-            height={500}
-            data={cumulativeCounts(packingsData)}
-            margin={{
-              top: 5,
-              right: 30,
-              left: 20,
-              bottom: 5
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis
-              dataKey="time"
-              tickFormatter={value => moment(value).format("LT")}
-              padding={{ right: 100 }}
-              ticks={ staticLabels }
-              interval={ 0 }
-              angle={ 320 }
-              tickSize={ 10 }
-            />
-            <YAxis />
-            <Tooltip
-              labelFormatter={ value => moment(value).format("LTS") }
-            />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="count"
-              stroke="#82ca9d"
-              name={ strings.dashboardCount }
-            />
-          </LineChart>
+          <ResponsiveContainer width={"100%"} height={500} minWidth={"300px"}>
+            <LineChart
+              data={cumulativeCounts(packingsData)}
+              margin={{
+                top: 5,
+                right: 30,
+                left: 20,
+                bottom: 5
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="time"
+                tickFormatter={value => moment(value).format("LT")}
+                padding={{ right: 100 }}
+                ticks={ staticLabels }
+                interval={ 0 }
+                angle={ 320 }
+                tickSize={ 10 }
+              />
+              <YAxis />
+              <Tooltip
+                labelFormatter={ value => moment(value).format("LTS") }
+              />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="count"
+                stroke="#82ca9d"
+                name={ strings.dashboardCount }
+                dot={ false }
+                isAnimationActive={ false }
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </>
       );
     };
