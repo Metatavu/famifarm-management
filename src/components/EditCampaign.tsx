@@ -4,7 +4,7 @@ import { StoreState, ErrorMessage } from "../types";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import * as actions from "../actions"
-import { Product, CampaignProducts } from "../generated/client";
+import { Product, Facility, CampaignProduct } from "../generated/client";
 import strings from "../localization/strings";
 import Api from "../api";
 import { Grid, Loader, DropdownItemProps, Button, Form, Select, Input, DropdownProps, List, Message, Confirm, InputOnChangeData } from "semantic-ui-react";
@@ -14,8 +14,9 @@ import { redirect } from "react-router-dom";
 
 interface Props {
   keycloak?: KeycloakInstance,
-   onError: (error: ErrorMessage | undefined) => void,
-  campaignId: string
+  onError: (error: ErrorMessage | undefined) => void,
+  campaignId: string;
+  facility: Facility;
 }
 
 interface State {
@@ -23,7 +24,7 @@ interface State {
   campaignName: string;
   productId: string;
   count: string;
-  addedCampaignProducts: CampaignProducts[];
+  addedCampaignProducts: CampaignProduct[];
   loading: boolean;
   redirect: boolean;
   campaignId?: string;
@@ -60,16 +61,24 @@ class EditCampaign extends React.Component<Props, State> {
   }
 
   private initView = async () => {
-    if (!this.props.keycloak) {
+    const { keycloak, onError, campaignId, facility } = this.props;
+    if (!keycloak) {
       return;
     }
 
     this.setState({ loading: true });
-    const productsService = await Api.getProductsService(this.props.keycloak);
-    const products = await productsService.listProducts({includeSubcontractorProducts: true, includeInActiveProducts: true});
+    const productsService = await Api.getProductsService(keycloak);
+    const products = await productsService.listProducts({
+      includeSubcontractorProducts: true,
+      includeInActiveProducts: true,
+      facility: facility
+    });
 
-    const campaignsService = await Api.getCampaignsService(this.props.keycloak);
-    const campaign = await campaignsService.findCampaign({campaignId: this.props.campaignId});
+    const campaignsService = await Api.getCampaignsService(keycloak);
+    const campaign = await campaignsService.findCampaign({
+      campaignId: campaignId,
+      facility: facility
+    });
     const campaignName = campaign.name;
     const addedCampaignProducts = campaign.products;
     this.setState({ products, loading: false, campaignName, addedCampaignProducts, campaignId: campaign.id! });
@@ -217,15 +226,25 @@ class EditCampaign extends React.Component<Props, State> {
    * Handles submitting a new campaign
    */
   private handleSubmit = async () => {
-    if (!this.props.keycloak || !this.state.campaignId) {
+    const { keycloak, facility } = this.props;
+    const { campaignId } = this.state;
+    if (!keycloak || !campaignId) {
       return;
     }
 
     try {
       this.setState({ loading: true });
       const { campaignName, addedCampaignProducts } = this.state;
-      const campaignsService = await Api.getCampaignsService(this.props.keycloak);
-      await campaignsService.updateCampaign({campaignId: this.state.campaignId, campaign: { id: this.state.campaignId, name: campaignName, products: addedCampaignProducts }});
+      const campaignsService = await Api.getCampaignsService(keycloak);
+      await campaignsService.updateCampaign({
+        campaignId: campaignId,
+        facility: facility,
+        campaign: {
+          id: campaignId,
+          name: campaignName,
+          products: addedCampaignProducts
+        }
+      });
       this.setState({ messageVisible: true, loading: false });
       setTimeout(() => {
         this.setState({messageVisible: false});
@@ -242,13 +261,18 @@ class EditCampaign extends React.Component<Props, State> {
   }
 
   private handleDelete = async () => {
+    const { keycloak, facility } = this.props;
+    const { campaignId } = this.state;
     try {
-      if (!this.props.keycloak || !this.state.campaignId) {
+      if (!keycloak || !campaignId) {
         throw new Error("Either Keycloak or campaign id is undefined");
       }
 
-      const campaignsService = await Api.getCampaignsService(this.props.keycloak);
-      await campaignsService.deleteCampaign({campaignId: this.state.campaignId});
+      const campaignsService = await Api.getCampaignsService(keycloak);
+      await campaignsService.deleteCampaign({
+        campaignId: campaignId,
+        facility: facility
+      });
 
       this.setState({redirect: true});
     } catch (e: any) {
@@ -270,18 +294,19 @@ class EditCampaign extends React.Component<Props, State> {
  */
 export function mapStateToProps(state: StoreState) {
   return {
+    facility: state.facility
   };
-  }
+}
   
-  /**
-   * Redux mapper for mapping component dispatches 
-   * 
-   * @param dispatch dispatch method
-   */
-  export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
+    onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
-  }
-  
-  export default connect(mapStateToProps, mapDispatchToProps)(EditCampaign);
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditCampaign);

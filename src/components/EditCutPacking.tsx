@@ -1,4 +1,4 @@
-import { Printer, Product, ProductionLine } from "../generated/client";
+import { Facility, Printer, Product, ProductionLine } from "../generated/client";
 import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
 import { Button, Confirm, Form, Grid, DropdownProps, Loader, Message, Select, InputOnChangeData } from "semantic-ui-react";
@@ -19,6 +19,7 @@ interface Props {
   cutPackingId: string;
   products?: Product[];
   productionLines?: ProductionLine[];
+  facility: Facility;
   onProductionLinesFound: typeof actions.productionLinesFound;
   onProductsFound: typeof actions.productsFound;
   onError: typeof actions.onErrorOccurred;
@@ -71,7 +72,7 @@ class EditCutPacking extends React.Component<Props, State> {
   }
 
   public componentDidMount = async () => {
-    const { keycloak, cutPackingId, onError } = this.props;
+    const { keycloak, cutPackingId, facility, onError } = this.props;
 
     if (!keycloak) {
       return;
@@ -80,7 +81,10 @@ class EditCutPacking extends React.Component<Props, State> {
     try {
       this.setState({ loading: true });
       const cutPackingsApi = await Api.getCutPackingsService(keycloak);
-      const cutPacking = await cutPackingsApi.findCutPacking({cutPackingId});
+      const cutPacking = await cutPackingsApi.findCutPacking({
+        cutPackingId: cutPackingId,
+        facility: facility
+      });
       const { products, productionLines } = await this.loadDataForDropdowns(keycloak);
       const { weight, gutterCount, gutterHoleCount, contactInformation, producer, cuttingDay, sowingDay, storageCondition, productId, productionLineId } = cutPacking;
       const selectedProduct = products.find(product => product.id === productId);
@@ -339,13 +343,13 @@ class EditCutPacking extends React.Component<Props, State> {
    * @returns data for dropdowns
    */
   private loadDataForDropdowns = async (keycloak: KeycloakInstance): Promise<{ products: Product[], productionLines: ProductionLine[] }> => {
-    const { products, productionLines, onProductsFound, onProductionLinesFound } = this.props;
+    const { products, productionLines, facility, onProductsFound, onProductionLinesFound } = this.props;
     
     const dropdownsData = { products, productionLines };
 
     if (!products) {
      const productsApi = await Api.getProductsService(keycloak);
-     const foundProducts = await productsApi.listProducts({});
+     const foundProducts = await productsApi.listProducts({ facility: facility });
 
      dropdownsData.products = foundProducts;
      onProductsFound(foundProducts);
@@ -353,7 +357,7 @@ class EditCutPacking extends React.Component<Props, State> {
 
     if (!productionLines) {
      const productionLinesApi = await Api.getProductionLinesService(keycloak);
-     const foundProductionLines = await productionLinesApi.listProductionLines({});
+     const foundProductionLines = await productionLinesApi.listProductionLines({ facility: facility });
 
      dropdownsData.productionLines = foundProductionLines;
      onProductionLinesFound(foundProductionLines);
@@ -366,13 +370,16 @@ class EditCutPacking extends React.Component<Props, State> {
    * Deletes a packing
    */
   private handleDelete = async () => {
-    const { keycloak, cutPackingId, onError } = this.props;
+    const { keycloak, cutPackingId, facility, onError } = this.props;
     if  (!keycloak) {
       return;
     }
     try {
       const cutPackingsApi = await Api.getCutPackingsService(keycloak);
-      await cutPackingsApi.deleteCutPacking({cutPackingId});
+      await cutPackingsApi.deleteCutPacking({
+        cutPackingId: cutPackingId,
+        facility: facility
+      });
 
       this.setState({ redirect: true });
 
@@ -458,7 +465,7 @@ class EditCutPacking extends React.Component<Props, State> {
    * Updates cut packing
    */
   private updateCutPacking = async () => {
-    const { keycloak, cutPackingId, onError } = this.props;
+    const { keycloak, cutPackingId, facility, onError } = this.props;
     const { weight, sowingDay, cuttingDay, gutterCount, gutterHoleCount, selectedProductId, selectedProductionLineId, producer, contactInformation, storageCondition } = this.state;
 
     if (!keycloak) {
@@ -467,7 +474,23 @@ class EditCutPacking extends React.Component<Props, State> {
 
     try {
       const cutPackingsApi = await Api.getCutPackingsService(keycloak);
-      await cutPackingsApi.updateCutPacking({cutPackingId, cutPacking: { id: cutPackingId, weight, sowingDay, cuttingDay, gutterCount, gutterHoleCount, productId: selectedProductId!, productionLineId: selectedProductionLineId!, producer, contactInformation, storageCondition }});
+      await cutPackingsApi.updateCutPacking({
+        facility: facility,
+        cutPackingId: cutPackingId,
+        cutPacking: {
+          id: cutPackingId,
+          weight,
+          sowingDay,
+          cuttingDay,
+          gutterCount,
+          gutterHoleCount,
+          productId: selectedProductId!,
+          productionLineId: selectedProductionLineId!,
+          producer,
+          contactInformation,
+          storageCondition
+        }
+      });
     
       this.setState({messageVisible: true});
       setTimeout(() => {
@@ -540,7 +563,7 @@ class EditCutPacking extends React.Component<Props, State> {
    * @summary prints a packing label
    */
   private print = async () => {
-    const { keycloak, cutPackingId } = this.props;
+    const { keycloak, cutPackingId, facility } = this.props;
     const { selectedPrinter } = this.state;
     if (!keycloak || !selectedPrinter) {
       return;
@@ -548,7 +571,11 @@ class EditCutPacking extends React.Component<Props, State> {
 
     this.setState({ printing: true });
     const printingService = await Api.getPrintersService(keycloak);
-    await printingService.print({ printerId: selectedPrinter.id, printData: {packingId: cutPackingId }});
+    await printingService.print({
+      printerId: selectedPrinter.id,
+      printData: { packingId: cutPackingId },
+      facility: facility
+    });
     this.setState({ printing: false });
   }
 
@@ -556,12 +583,13 @@ class EditCutPacking extends React.Component<Props, State> {
    * @summary Refreshes the list of printers
    */
   private refreshPrinters = async () => {
-    if (!this.props.keycloak) {
+    const { keycloak, facility } = this.props;
+    if (!keycloak) {
       return;
     }
     this.setState({ refreshingPrinters: true })
-    const printingService = await Api.getPrintersService(this.props.keycloak);
-    const printers = await printingService.listPrinters();
+    const printingService = await Api.getPrintersService(keycloak);
+    const printers = await printingService.listPrinters({ facility: facility });
     this.setState({ printers, refreshingPrinters: false });
   }
 
@@ -614,7 +642,8 @@ class EditCutPacking extends React.Component<Props, State> {
 export function mapStateToProps(state: StoreState) {
   return {
     products: state.products,
-    productionLines: state.productionLines
+    productionLines: state.productionLines,
+    facility: state.facility
   };
 }
 

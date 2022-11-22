@@ -7,7 +7,7 @@ import strings from "../localization/strings";
 import { Grid, Form, Button, Select, DropdownProps, Input, Loader, InputOnChangeData } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import { FormContainer } from "./FormContainer";
-import { Packing, Product, PackageSize, PackingState, PackingType, Campaign, StorageDiscard } from "../generated/client";
+import { Packing, Product, PackageSize, PackingState, PackingType, Campaign, StorageDiscard, Facility } from "../generated/client";
 import LocalizedUtils from "../localization/localizedutils";
 import moment from "moment";
 import Api from "../api";
@@ -18,8 +18,9 @@ import { redirect } from "react-router-dom";
  */
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
+  facility: Facility;
   onPackingCreated?: (packing: Packing) => void;
-   onError: (error: ErrorMessage | undefined) => void;
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 /**
@@ -218,7 +219,7 @@ class CreateDiscard extends React.Component<Props, State> {
    */
   private handleSubmit = async () => {
     const { packageSizeId, discardCount } = this.state;
-    const { keycloak } = this.props;
+    const { keycloak, facility } = this.props;
     if (!keycloak) {
       return;
     }
@@ -231,6 +232,7 @@ class CreateDiscard extends React.Component<Props, State> {
 
       const storageDiscardService = await Api.getStorageDiscardsService(keycloak);
       const discarded = await storageDiscardService.createStorageDiscard({
+        facility: facility,
         storageDiscard: {
           productId: this.state.productId,
           discardDate: new Date(),
@@ -278,7 +280,7 @@ class CreateDiscard extends React.Component<Props, State> {
    * method for fetching data
    */
   private fetchData = async () => {
-    const { keycloak } = this.props;
+    const { keycloak, facility } = this.props;
     if (!keycloak) {
       return;
     }
@@ -288,8 +290,11 @@ class CreateDiscard extends React.Component<Props, State> {
     const productsService = await Api.getProductsService(keycloak);
     const packageSizeService = await Api.getPackageSizesService(keycloak);
 
-    const products = await productsService.listProducts({ includeSubcontractorProducts: true });
-    const packageSizes = await packageSizeService.listPackageSizes({});
+    const products = await productsService.listProducts({
+      includeSubcontractorProducts: true,
+      facility: facility
+    });
+    const packageSizes = await packageSizeService.listPackageSizes({ facility: facility });
       
     this.setState({
       products,
@@ -306,7 +311,9 @@ class CreateDiscard extends React.Component<Props, State> {
  * 
  * @param state store state
  */
-const mapStateToProps = (state: StoreState) => ({ });
+const mapStateToProps = (state: StoreState) => ({
+  facility: state.facility
+});
   
 /**
  * Redux mapper for mapping component dispatches 

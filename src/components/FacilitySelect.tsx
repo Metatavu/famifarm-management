@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Dropdown } from "semantic-ui-react";
-import strings from "../localization/strings";
 import * as actions from "../actions";
 import { StoreState } from "../types/index";
 import { connect } from "react-redux";
@@ -42,22 +41,29 @@ class FacilitySelect extends React.Component<Props, State> {
    */
   render() {
     const { facility, keycloak, onFacilityChange } = this.props;
-    if (!facility || !(keycloak?.hasRealmRole("juva") && keycloak?.hasRealmRole("joroinen"))) {
+    if (!facility || !keycloak?.hasRealmRole("admin")) {
       return null;
     }
 
-    return (
-      <Dropdown position="right" item text={ facility }>
-        <Dropdown.Menu>
-          <Dropdown.Item
-            value={ facility == Facility.Joroinen ? Facility.Juva : Facility.Joroinen }
-            onClick={ (event, item) => { onFacilityChange(item.value as Facility) } }
-          >
-            { facility == Facility.Joroinen ? Facility.Juva : Facility.Joroinen }
-          </Dropdown.Item>
-        </Dropdown.Menu>
-      </Dropdown>
-    );
+    if (keycloak.hasRealmRole("juva") && keycloak.hasRealmRole("joroinen")) {
+      return (
+        <Dropdown position="right" item text={ facility }>
+          <Dropdown.Menu>
+            <Dropdown.Item
+              value={ facility === Facility.Joroinen ? Facility.Juva : Facility.Joroinen }
+              onClick={ (event, item) => { onFacilityChange(item.value as Facility) } }
+            >
+              { facility === Facility.Joroinen ? Facility.Juva : Facility.Joroinen }
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+      );
+    } else {
+      return (
+        <Dropdown position="right" item text={ keycloak.hasRealmRole("joroinen") ? Facility.Joroinen : Facility.Juva }>
+        </Dropdown>
+      );
+    }
   }
 }
 

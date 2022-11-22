@@ -2,7 +2,7 @@ import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Campaign, PackageSize, Packing, PackingState, Product, StorageDiscard } from "../generated/client";
+import { Facility, PackageSize, PackingState, Product, StorageDiscard } from "../generated/client";
 import strings from "../localization/strings";
 import moment from "moment";
 import * as actions from "../actions";
@@ -32,7 +32,8 @@ import { Profiler } from "inspector";
  */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-   onError: (error: ErrorMessage | undefined) => void;
+  facility: Facility;
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 /**
@@ -264,7 +265,7 @@ class DiscardList extends React.Component<Props, State> {
    * @param append is append operation
    */
   private fetchData = async (filters: Filters, append: boolean) => {
-    const { keycloak } = this.props;
+    const { keycloak, facility } = this.props;
     const { productId, dateAfter, dateBefore, firstResult } = filters;
     const { discardedProducts } = this.state;
 
@@ -275,15 +276,20 @@ class DiscardList extends React.Component<Props, State> {
     this.setState({ loading: true });
 
     const productsService = await Api.getProductsService(keycloak);
-    const products = await productsService.listProducts({ includeSubcontractorProducts: true, includeInActiveProducts: true });
+    const products = await productsService.listProducts({
+      includeSubcontractorProducts: true,
+      includeInActiveProducts: true,
+      facility: facility
+    });
 
     const packageSizesService = await Api.getPackageSizesService(keycloak);
-    const packageSizes = await packageSizesService.listPackageSizes({});
+    const packageSizes = await packageSizesService.listPackageSizes({ facility: facility });
 
     const storageDiscardService  = await Api.getStorageDiscardsService(keycloak);
 
     const fr = append ? firstResult : 0;
-    const discards = await storageDiscardService.listStorageDiscards({ 
+    const discards = await storageDiscardService.listStorageDiscards({
+      facility: facility,
       productId: productId !== "all-products" ? productId : undefined,
       toTime: dateBefore,
       fromTime: dateAfter,
@@ -416,7 +422,9 @@ class DiscardList extends React.Component<Props, State> {
  * 
  * @param state store state
  */
-const mapStateToProps = (state: StoreState) => ({ });
+const mapStateToProps = (state: StoreState) => ({
+  facility: state.facility
+});
 
 /**
  * Redux mapper for mapping component dispatches 

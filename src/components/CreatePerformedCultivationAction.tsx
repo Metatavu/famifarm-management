@@ -5,7 +5,7 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
-import { LocalizedValue, PerformedCultivationAction } from "../generated/client";
+import { Facility, LocalizedValue, PerformedCultivationAction } from "../generated/client";
 import { redirect } from 'react-router-dom';
 import strings from "../localization/strings";
 
@@ -20,8 +20,9 @@ import { FormContainer } from "./FormContainer";
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   performedCultivationAction?: PerformedCultivationAction;
-  onPerformedCultivationActionCreated?: (performedCultivationAction: PerformedCultivationAction) => void,
-   onError: (error: ErrorMessage | undefined) => void
+  facility: Facility;
+  onPerformedCultivationActionCreated?: (performedCultivationAction: PerformedCultivationAction) => void;
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 export interface State {
@@ -44,20 +45,25 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
    * Handle form submit
    */
   public async handleSubmit() {
+    const { keycloak, facility, onError } = this.props;
+    const { performedCultivationActionData } = this.state;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return
       }
   
       const performedCultivationActionObject: PerformedCultivationAction = {
-        name: this.state.performedCultivationActionData.name
+        name: performedCultivationActionData.name
       };
   
-      const performedCultivationActionService = await Api.getPerformedCultivationActionsService(this.props.keycloak);
-      await performedCultivationActionService.createPerformedCultivationAction({performedCultivationAction: performedCultivationActionObject})
+      const performedCultivationActionService = await Api.getPerformedCultivationActionsService(keycloak);
+      await performedCultivationActionService.createPerformedCultivationAction({
+        performedCultivationAction: performedCultivationActionObject,
+        facility: facility
+      })
       this.setState({redirect: true});
     } catch (e: any) {
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -119,7 +125,8 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
 export function mapStateToProps(state: StoreState) {
   return {
     performedCultivationActions: state.performedCultivationActions,
-    performedCultivationAction: state.performedCultivationAction
+    performedCultivationAction: state.performedCultivationAction,
+    facility: state.facility
   };
 }
 

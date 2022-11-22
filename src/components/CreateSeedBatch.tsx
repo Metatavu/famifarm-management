@@ -5,7 +5,7 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
-import { SeedBatch, Seed } from "../generated/client";
+import { SeedBatch, Seed, Facility } from "../generated/client";
 import { redirect } from 'react-router-dom';
 import { DateInput } from 'semantic-ui-calendar-react';
 import strings from "../localization/strings";
@@ -25,10 +25,11 @@ const DATE_FORMAT = "DD.MM.YYYY";
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   seedBatch?: SeedBatch;
+  facility: Facility;
   onSeedBatchCreated?: (seedBatch: SeedBatch) => void;
   seeds?: Seed[];
-  onSeedsFound?: (seeds: Seed[]) => void,
-   onError: (error: ErrorMessage | undefined) => void
+  onSeedsFound?: (seeds: Seed[]) => void;
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 interface State {
@@ -55,16 +56,17 @@ class CreateSeedBatch extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   public async componentDidMount() {
+    const { keycloak, facility, onSeedsFound, onError } = this.props;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
   
-      const seedsService = await Api.getSeedsService(this.props.keycloak);
-      const seeds = await seedsService.listSeeds({});
-      this.props.onSeedsFound && this.props.onSeedsFound(seeds);
+      const seedsService = await Api.getSeedsService(keycloak);
+      const seeds = await seedsService.listSeeds({ facility: facility });
+      onSeedsFound && onSeedsFound(seeds);
     } catch (e: any) {
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -96,23 +98,28 @@ class CreateSeedBatch extends React.Component<Props, State> {
    * Handle form submit
    */
   private async handleSubmit() {
+    const { keycloak, facility, onError } = this.props;
+    const { code, seedId, time } = this.state;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
   
       const seedBatchObject = {
-        code: this.state.code,
-        seedId: this.state.seedId,
-        time: moment(this.state.time, DATE_FORMAT).toDate()
+        code: code,
+        seedId: seedId,
+        time: moment(time, DATE_FORMAT).toDate()
       };
   
-      const seedBatchService = await Api.getSeedBatchesService(this.props.keycloak);
-      await seedBatchService.createSeedBatch({seedBatch: seedBatchObject});
+      const seedBatchService = await Api.getSeedBatchesService(keycloak);
+      await seedBatchService.createSeedBatch({
+        seedBatch: seedBatchObject,
+        facility: facility
+      });
   
       this.setState({redirect: true});
     } catch (e: any) {
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -193,7 +200,8 @@ export function mapStateToProps(state: StoreState) {
   return {
     seedBatches: state.seedBatches,
     seedBatch: state.seedBatch,
-    seeds: state.seeds
+    seeds: state.seeds,
+    facility: state.facility
   };
 }
 
@@ -206,7 +214,7 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onSeedBatchCreated: (seedBatch: SeedBatch) => dispatch(actions.seedBatchCreated(seedBatch)),
     onSeedsFound: (seeds: Seed[]) => dispatch(actions.seedsFound(seeds)),
-     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
+    onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

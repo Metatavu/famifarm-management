@@ -5,7 +5,7 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
-import { ProductionLine } from "../generated/client";
+import { Facility, ProductionLine } from "../generated/client";
 import { redirect } from 'react-router-dom';
 
 import {
@@ -20,8 +20,9 @@ import { FormContainer } from "./FormContainer";
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   productionLine?: ProductionLine;
+  facility: Facility;
   onProductionLineCreated?: (productionLine: ProductionLine) => void,
-   onError: (error: ErrorMessage | undefined) => void
+  onError: (error: ErrorMessage | undefined) => void
 }
 
 interface State {
@@ -54,22 +55,27 @@ class CreateProductionLine extends React.Component<Props, State> {
    * Handle form submit
    */
   private async handleSubmit() {
+    const { keycloak, facility, onError } = this.props;
+    const { lineNumber, defaultGutterHoleCount } = this.state;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
       
       const productionLineObject = {
-        lineNumber: this.state.lineNumber,
-        defaultGutterHoleCount: this.state.defaultGutterHoleCount
+        lineNumber: lineNumber,
+        defaultGutterHoleCount: defaultGutterHoleCount
       };
   
-      const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
-      await productionLineService.createProductionLine({productionLine: productionLineObject});
+      const productionLineService = await Api.getProductionLinesService(keycloak);
+      await productionLineService.createProductionLine({
+        productionLine: productionLineObject,
+        facility: facility
+      });
   
       this.setState({redirect: true});
     } catch (e: any) {
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -129,7 +135,8 @@ class CreateProductionLine extends React.Component<Props, State> {
 export function mapStateToProps(state: StoreState) {
   return {
     productionLines: state.productionLines,
-    productionLine: state.productionLine
+    productionLine: state.productionLine,
+    facility: state.facility
   };
 }
 
