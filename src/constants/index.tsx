@@ -108,3 +108,8 @@ export type EVENT_LIST_FILTERS_UPDATED = typeof EVENT_LIST_FILTERS_UPDATED;
 
 export const EVENTS_FOUND = "EVENTS_FOUND";
 export type EVENTS_FOUND = typeof EVENTS_FOUND;
+
+/**
+ * X axis times for labels/ ticks
+ */
+export const X_AXIS_TIMES = [6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21];
