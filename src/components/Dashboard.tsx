@@ -257,7 +257,7 @@ class Dashboard extends React.Component<Props, State> {
                 bottom: 5
               }}
             >
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray="3 3"/>
               <XAxis
                 dataKey="time"
                 tickFormatter={ value => moment(value).format("LT") }
