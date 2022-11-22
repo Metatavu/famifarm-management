@@ -4,7 +4,7 @@ import * as actions from "../actions";
 import { StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import { Route, NavLink, useParams, Routes } from 'react-router-dom';
+import { Route, NavLink, Routes } from 'react-router-dom';
 import Root from './Root';
 import strings from "../localization/strings";
 
@@ -79,28 +79,26 @@ class WelcomePage extends React.Component<Props, any> {
   /**
    * Component did mount life-sycle event
    */
-  componentDidMount() {
+  componentDidMount = async () => {
+    const { onFacilityUpdate, onLogin } = this.props;
     const kcConf = {
       "realm": process.env.REACT_APP_KEYCLOAK_REALM as string,
       "url": process.env.REACT_APP_AUTH_SERVER_URL as string,
       "clientId": process.env.REACT_APP_AUTH_RESOURCE as string
     };
     const keycloak = new Keycloak(kcConf);
-    keycloak.init({onLoad: "login-required", checkLoginIframe: false}).success((authenticated) => {
-      this.props.onLogin && this.props.onLogin(keycloak, authenticated);
+    await keycloak.init({onLoad: "login-required", checkLoginIframe: false}).success((authenticated) => {
+    onLogin && onLogin(keycloak, authenticated);
     });
+
+    if (keycloak.hasRealmRole("juva") && keycloak.hasRealmRole("joroinen")) {
+      onFacilityUpdate(Facility.Joroinen);
+    } else {
+      onFacilityUpdate(keycloak.hasRealmRole("joroinen") ? Facility.Joroinen : Facility.Juva);
+    }
 
     this.setState({keycloak: keycloak});
   }
-
-  /* componentDidUpdate() {
-    const { keycloak, onFacilityUpdate } = this.props;
-    if (keycloak) {
-      if (keycloak.hasRealmRole("juva")) {
-        onFacilityUpdate(Facility.Juva);
-      }
-    }
-  } */
 
   /**
    * Render welcome page view

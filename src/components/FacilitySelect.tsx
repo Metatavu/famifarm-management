@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Dropdown } from "semantic-ui-react";
+import { Item, Dropdown } from "semantic-ui-react";
 import * as actions from "../actions";
 import { StoreState } from "../types/index";
 import { connect } from "react-redux";
@@ -60,8 +60,7 @@ class FacilitySelect extends React.Component<Props, State> {
       );
     } else {
       return (
-        <Dropdown position="right" item text={ keycloak.hasRealmRole("joroinen") ? Facility.Joroinen : Facility.Juva }>
-        </Dropdown>
+        <Item>{ keycloak.hasRealmRole("joroinen") ? Facility.Joroinen : Facility.Juva }</Item>
       );
     }
   }
