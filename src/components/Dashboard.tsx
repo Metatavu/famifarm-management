@@ -208,13 +208,7 @@ class Dashboard extends React.Component<Props, State> {
        */
       const addStaticLabels = (time: number, packingsData: VisualizePackingsData[]) => {
         const staticTimestamps = X_AXIS_TIMES.map(hour => setTimestamps(time, hour));
-        const filteredStaticTimes = staticTimestamps.filter(hour => {
-          return packingsData.some(packing => {
-            return packing.time > hour;
-          });
-        });
-        // TODO: why do i get an unlabled first tick outside of the x-axis (left) when using the filtered static times (disappears when use staticTimestamps). Also see console errors when using filteredStaticTimes rather than staticTimestamps?
-        const labelData = createLabelPackings(filteredStaticTimes);
+        const labelData = createLabelPackings(staticTimestamps);
         labelData.forEach(label => packingsData.push(label))
 
         return staticTimestamps;
@@ -223,6 +217,35 @@ class Dashboard extends React.Component<Props, State> {
       const staticLabels = addStaticLabels(packingsData[0].time, packingsData);
 
       packingsData.sort((a, b) => moment(a.time).toDate().getTime() - moment(b.time).toDate().getTime());
+
+      /**
+       * Accumulate the counts for packings data by hour
+       * 
+       * @param staticLabels timestamps for each hour
+       * @param packingsData packings data to visualize
+       * @returns packings data with cumulative counts
+       */
+      const hourlyCumulativeCounts = (staticLabels: number[], packingsData: VisualizePackingsData[]) => {
+        const hourlyPackingsaData = staticLabels.map((staticLabel, i: number) => {
+          let total = 0;
+          packingsData.forEach(packing => {
+            const count = packing.count || 0;
+            if (i === 0 && packing.time < staticLabel) {
+              total += count;
+            } else if (packing.time < staticLabel) {
+              total += count;
+            }
+          })
+
+          return {
+            time: staticLabel,
+            count: total ,
+            label: staticLabel
+          }
+        })
+
+        return hourlyPackingsaData;
+      };
 
       /**
        * Accumulate the counts for packings data
@@ -243,7 +266,7 @@ class Dashboard extends React.Component<Props, State> {
         <>
           <ResponsiveContainer width={"100%"} height={500} minWidth={"300px"}>
             <LineChart
-              data={cumulativeCounts(packingsData)}
+              data={ hourlyCumulativeCounts(staticLabels, packingsData) }
               margin={{
                 top: 5,
                 right: 30,
