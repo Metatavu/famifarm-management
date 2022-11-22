@@ -226,13 +226,11 @@ class Dashboard extends React.Component<Props, State> {
        * @returns packings data with cumulative counts
        */
       const hourlyCumulativeCounts = (staticLabels: number[], packingsData: VisualizePackingsData[]) => {
-        const hourlyPackingsaData = staticLabels.map((staticLabel, i: number) => {
+        const hourlyPackingsaData = staticLabels.map((staticLabel, i) => {
           let total = 0;
           packingsData.forEach(packing => {
             const count = packing.count || 0;
-            if (i === 0 && packing.time < staticLabel) {
-              total += count;
-            } else if (packing.time < staticLabel) {
+            if (packing.time < staticLabel) {
               total += count;
             }
           })
@@ -245,21 +243,6 @@ class Dashboard extends React.Component<Props, State> {
         })
 
         return hourlyPackingsaData;
-      };
-
-      /**
-       * Accumulate the counts for packings data
-       * 
-       * @param packingsData packings data to visualize
-       * @returns packings data with cumulative counts
-       */
-      const cumulativeCounts = (packingsData: VisualizePackingsData[]) => {
-        packingsData.reduce((acc, packing, i) => {
-          const count = packing.count || 0;
-          packingsData[i] = { ...packingsData[i], count: acc + count };
-          return acc + count;
-        }, 0);
-        return packingsData;
       };
 
       return (
