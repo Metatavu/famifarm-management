@@ -300,7 +300,7 @@ class WelcomePage extends React.Component<Props, any> {
                 }
               />
               <Route
-                path="/:facility/products/:productId"
+                path="/products/:productId"
                 element={
                   <WithParams Component={EditProduct} keycloak={this.state.keycloak} routeParamNames={["productId"]} />
                 }
