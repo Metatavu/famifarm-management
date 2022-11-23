@@ -5,7 +5,7 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
 import { SeedBatch, Seed, Facility } from "../generated/client";
-import { redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { DateInput } from 'semantic-ui-calendar-react';
 import strings from "../localization/strings";
 import {
@@ -249,8 +249,7 @@ class EditSeedBatch extends React.Component<Props, State> {
       );
     }    
     if (this.state.redirect) {
-      redirect("/seedBatches");
-      return null;
+      return <Navigate to="/seedBatches" replace={true} />;
     }    
     const seedOptions = (this.props.seeds || []).map((seed) => {
       return {
