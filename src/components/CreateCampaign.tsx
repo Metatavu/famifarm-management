@@ -223,7 +223,7 @@ class CreateCampaign extends React.Component<Props, State> {
       this.setState({ campaignId: createdCampaign.id!, redirect: true });
     } catch (exception: any) {
       this.setState({ loading: false });
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception

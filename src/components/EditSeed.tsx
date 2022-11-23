@@ -144,7 +144,7 @@ class EditSeed extends React.Component<Props, State> {
    * Handle seed delete
    */
   private async handleDelete() {
-    const { keycloak, facility, seedId, onSeedDeleted, onError } = this.props;
+    const { keycloak, facility, onSeedDeleted, onError } = this.props;
     const { seed } = this.state;
     try {
       if (!keycloak || !seed) {

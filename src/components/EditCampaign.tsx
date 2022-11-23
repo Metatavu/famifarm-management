@@ -61,7 +61,7 @@ class EditCampaign extends React.Component<Props, State> {
   }
 
   private initView = async () => {
-    const { keycloak, onError, campaignId, facility } = this.props;
+    const { keycloak, campaignId, facility } = this.props;
     if (!keycloak) {
       return;
     }
