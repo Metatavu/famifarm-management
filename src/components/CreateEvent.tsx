@@ -793,7 +793,7 @@ class CreateEvent extends React.Component<Props, State> {
    * Loads data required for planting event
    */
   private loadPlantingData = async () => {
-    const { keycloak, facility } = this.props;
+    const { facility, keycloak } = this.props;
     if (!keycloak) {
       return;
     }

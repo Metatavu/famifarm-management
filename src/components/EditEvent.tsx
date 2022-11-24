@@ -84,7 +84,7 @@ class EditEvent extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   public async componentDidMount() {
-    const { keycloak, facility, eventId, onError } = this.props;
+    const { keycloak, eventId, onError, facility } = this.props;
     try {
       if (!keycloak) {
         return;
@@ -278,7 +278,7 @@ class EditEvent extends React.Component<Props, State> {
    * Handle form submit
    */
   private handleSubmit = async () => {
-    const { keycloak, facility, onError } = this.props;
+    const { keycloak, onError, facility } = this.props;
     const { event } = this.state;
     try {
       if (!keycloak || !event) {
@@ -381,7 +381,7 @@ class EditEvent extends React.Component<Props, State> {
    * Handle product delete
    */
   private handleDelete = async () => {
-    const { keycloak, facility, onError } = this.props;
+    const { keycloak, onError, facility } = this.props;
     const { event } = this.state;
     try {
       if (!keycloak || !event) {
