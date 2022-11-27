@@ -2,7 +2,7 @@ import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
 import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, ProductionLine, SeedBatch, WastageReason, Seed, Product, Facility } from "../generated/client";
-import { redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import strings from "../localization/strings";
 import { DateTimeInput, DateInput } from 'semantic-ui-calendar-react';
 import * as actions from "../actions";
@@ -128,8 +128,7 @@ class EditEvent extends React.Component<Props, State> {
     }
 
     if (this.state.redirect) {
-      redirect("/events");
-      return null;
+      return <Navigate replace={true} to="/events"/>;
     }
 
     if (!this.state.event) {

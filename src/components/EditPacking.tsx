@@ -12,7 +12,7 @@ import { Grid, Button, Form, Select, Input, DropdownItemProps, DropdownProps, Lo
 import { FormContainer } from "./FormContainer";
 import { DateTimeInput } from 'semantic-ui-calendar-react';
 import moment from "moment";
-import { redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 export interface Props {
   keycloak: KeycloakInstance;
@@ -171,8 +171,7 @@ class EditPacking extends React.Component<Props, State> {
     }
     
     if (this.state.redirect) {
-      redirect("/packings");
-      return null;
+      return <Navigate replace={true} to="/packings"/>;
     }
     
     const productOptions: DropdownItemProps[] = this.state.products.map((product) => {

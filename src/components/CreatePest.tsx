@@ -2,7 +2,7 @@ import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
 import { Facility, LocalizedValue, Pest } from "../generated/client";
-import { redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import strings from "../localization/strings";
 import * as actions from "../actions";
 import { StoreState, ErrorMessage } from "../types/index";
@@ -93,8 +93,7 @@ class CreatePest extends React.Component<Props, State> {
    */
   render() {
     if (this.state.redirect) {
-      redirect("/pests");
-      return null;
+      return <Navigate replace={true} to="/pests"/>;
     }
 
     return (

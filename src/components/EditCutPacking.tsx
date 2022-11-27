@@ -7,7 +7,7 @@ import strings from "../localization/strings";
 import Api from "../api";
 import moment from "moment";
 import LocalizedUtils from "../localization/localizedutils";
-import { redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { FormContainer } from "./FormContainer";
 import { connect } from "react-redux";
 import { ErrorMessage, StoreState } from "../types";
@@ -141,8 +141,7 @@ class EditCutPacking extends React.Component<Props, State> {
     } = this.state;
 
     if (this.state.redirect) {
-      redirect(`/cutPackings`);
-      return null;
+      return <Navigate replace={true} to={`/cutPackings`}/>;
     }
 
     if (loading) {

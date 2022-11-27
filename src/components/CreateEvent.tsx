@@ -19,7 +19,7 @@ import {
   EventType,
   Product,
   Facility} from "../generated/client";
-import { redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import strings from "../localization/strings";
 import { DateTimeInput, DateInput } from 'semantic-ui-calendar-react';
 import * as actions from "../actions";
@@ -183,8 +183,7 @@ class CreateEvent extends React.Component<Props, State> {
     }
 
     if (this.state.redirect) {
-      redirect("/events");
-      return null;
+      return <Navigate replace={true} to="/events"/>;
     }
 
     if (!this.state.event) {

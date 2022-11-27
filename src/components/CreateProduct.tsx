@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { Product, PackageSize, LocalizedValue, HarvestEventType, Facility } from "../generated/client";
-import { redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import strings from "../localization/strings";
 
 import {
@@ -188,8 +188,7 @@ class CreateProduct extends React.Component<Props, State> {
     const { productData } = this.state;
 
     if (this.state.redirect) {
-      redirect("/products");
-      return null;
+      return <Navigate replace={true} to="/products"/>;
     }
 
     const packageSizeOptions = (packageSizes || []).map(packageSize => ({

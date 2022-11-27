@@ -10,7 +10,7 @@ import Api from "../api";
 import { Grid, Loader, DropdownItemProps, Button, Form, Select, Input, DropdownProps, List, Message, Confirm, InputOnChangeData } from "semantic-ui-react";
 import LocalizedUtils from "../localization/localizedutils";
 import { FormContainer } from "./FormContainer";
-import { redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 interface Props {
   keycloak?: KeycloakInstance,
@@ -86,8 +86,7 @@ class EditCampaign extends React.Component<Props, State> {
 
   public render () {
     if (this.state.redirect) {
-      redirect(`/campaigns`);
-      return null;
+      return <Navigate replace={true} to={`/campaigns`}/>;
     }
 
     if (this.state.loading) {

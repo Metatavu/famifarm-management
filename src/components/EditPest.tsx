@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { Facility, LocalizedValue, Pest } from "../generated/client";
-import { redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import strings from "../localization/strings";
 
 import {
@@ -180,8 +180,7 @@ class EditPest extends React.Component<Props, State> {
     }
 
     if (this.state.redirect) {
-      redirect("/pests");
-      return null;
+      return <Navigate replace={true} to="/pests"/>;
     }
 
     return (

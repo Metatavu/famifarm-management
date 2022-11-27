@@ -5,7 +5,7 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
 import { Product, PackageSize, LocalizedValue, HarvestEventType, Facility } from "../generated/client";
-import { redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import strings from "../localization/strings";
 
 import {
@@ -245,8 +245,7 @@ class EditProduct extends React.Component<Props, State> {
     }
 
     if (this.state.redirect) {
-      redirect("/products");
-      return null;
+      return <Navigate to={"/products"} replace={true}/>;
     }
 
     const packageSizeOptions = (packageSizes || []).map(packageSize => ({

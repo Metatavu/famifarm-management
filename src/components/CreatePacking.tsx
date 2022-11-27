@@ -11,7 +11,7 @@ import { Packing, Product, PackageSize, PackingState, PackingType, Campaign, Fac
 import LocalizedUtils from "../localization/localizedutils";
 import moment from "moment";
 import Api from "../api";
-import { redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
@@ -98,7 +98,7 @@ class CreatePacking extends React.Component<Props, State> {
       }
       
     if (this.state.redirect) {
-      redirect(`/packings/${this.state.packingId}`);
+      return <Navigate replace={true} to={`/packings/${this.state.packingId}`}/>;
     }
 
     const productOptions = this.state.products.map((product) => {
