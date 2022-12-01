@@ -88,7 +88,7 @@ class WelcomePage extends React.Component<Props, any> {
     };
     const keycloak = new Keycloak(kcConf);
     await keycloak.init({onLoad: "login-required", checkLoginIframe: false}).success((authenticated) => {
-    onLogin && onLogin(keycloak, authenticated);
+      onLogin && onLogin(keycloak, authenticated);
     });
 
     if (keycloak.hasRealmRole("juva") && keycloak.hasRealmRole("joroinen")) {
