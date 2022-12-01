@@ -25,7 +25,7 @@ interface Props {
   seed?: Seed;
   facility: Facility;
   onSeedCreated?: (seed: Seed) => void,
-  onError: (error: ErrorMessage | undefined) => void
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 /**
