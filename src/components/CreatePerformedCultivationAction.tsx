@@ -60,7 +60,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
       await performedCultivationActionService.createPerformedCultivationAction({
         performedCultivationAction: performedCultivationActionObject,
         facility: facility
-      })
+      });
       this.setState({redirect: true});
     } catch (e: any) {
       onError({
