@@ -356,7 +356,7 @@ class CreatePacking extends React.Component<Props, State> {
         return;
       }
 
-      if (type == "CAMPAIGN" && !campaignId) {
+      if (type === "CAMPAIGN" && !campaignId) {
         return;
       }
 
