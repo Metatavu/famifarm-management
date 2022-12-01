@@ -21,7 +21,7 @@ export interface Props {
   packageSizes?: PackageSize[];
   facility: Facility;
   onPackageSizesFound?: (packageSizes: PackageSize[]) => void,
-  onError: (error: ErrorMessage | undefined) => void
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 export interface State {
