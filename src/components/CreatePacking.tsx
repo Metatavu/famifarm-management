@@ -352,7 +352,7 @@ class CreatePacking extends React.Component<Props, State> {
 
       const type = packingType;
 
-      if (type == "BASIC" && !productId) {
+      if (type === "BASIC" && !productId) {
         return;
       }
 
