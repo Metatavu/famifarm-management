@@ -40,7 +40,7 @@ class FacilitySelect extends React.Component<Props, State> {
    * Render facility select
    */
   render() {
-    const { facility, keycloak, onFacilityChange } = this.props;
+    const { facility, keycloak } = this.props;
     if (!facility || !keycloak?.hasRealmRole("admin")) {
       return null;
     }
@@ -51,7 +51,7 @@ class FacilitySelect extends React.Component<Props, State> {
           <Dropdown.Menu>
             <Dropdown.Item
               value={ facility === Facility.Joroinen ? Facility.Juva : Facility.Joroinen }
-              onClick={ (event, item) => { onFacilityChange(item.value as Facility) } }
+              onClick={ (event, item) => { this.handleFacilityChange(item.value as Facility) } }
             >
               { facility === Facility.Joroinen ? Facility.Juva : Facility.Joroinen }
             </Dropdown.Item>
@@ -62,6 +62,17 @@ class FacilitySelect extends React.Component<Props, State> {
       return (
         <Item>{ keycloak.hasRealmRole("joroinen") ? Facility.Joroinen : Facility.Juva }</Item>
       );
+    }
+  }
+
+  /**
+   * Handle facility change
+   * @param facility 
+   */
+  private handleFacilityChange = (facility: Facility) => {
+    if (this.props.facility !== facility) {
+      window.localStorage.setItem("facility", facility);
+      window.location.reload();
     }
   }
 }

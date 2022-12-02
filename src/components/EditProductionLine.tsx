@@ -101,7 +101,7 @@ class EditProductionLine extends React.Component<Props, State> {
    * @param event event
    */
   private handeLineNumberChange(event: React.FormEvent<HTMLInputElement>) {
-    this.setState({productionLine: { ... this.state.productionLine, lineNumber: event.currentTarget.value }});
+    this.setState({productionLine: { ...this.state.productionLine, lineNumber: event.currentTarget.value }});
   }
 
   /**
@@ -110,7 +110,7 @@ class EditProductionLine extends React.Component<Props, State> {
    * @param event event
    */
   private handeDefaultGutterHoleCountChange(event: React.FormEvent<HTMLInputElement>) {
-    this.setState({productionLine: { ... this.state.productionLine, defaultGutterHoleCount: parseInt(event.currentTarget.value) || undefined }});
+    this.setState({productionLine: { ...this.state.productionLine, defaultGutterHoleCount: parseInt(event.currentTarget.value) || undefined }});
   }
 
   /**
