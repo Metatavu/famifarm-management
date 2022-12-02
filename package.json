@@ -32,7 +32,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "npm run build-client && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "build-client": "openapi-generator-cli generate -i famifarm-api-spec/swagger.yaml -o ./src/generated/client -c generator-config.json -g typescript-fetch"
