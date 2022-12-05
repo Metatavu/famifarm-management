@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { Facility, LocalizedValue, Seed } from "../generated/client";
-import { redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import strings from "../localization/strings";
 
 import {
@@ -93,8 +93,7 @@ class CreateSeed extends React.Component<Props, State> {
    */
   render() {
     if (this.state.redirect) {
-      redirect("/seeds");
-      return null;
+      return <Navigate replace={true} to="/seeds"/>;
     }
 
     return (

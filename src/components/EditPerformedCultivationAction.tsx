@@ -5,7 +5,7 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
 import { Facility, LocalizedValue, PerformedCultivationAction } from "../generated/client";
-import { redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import strings from "../localization/strings";
 
 import {
@@ -181,15 +181,15 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
     }
 
     if (this.state.redirect) {
-      redirect("/performedCultivationActions");
-      return null;
+      return <Navigate replace={true} to="/performedCultivationActions"/>;
     }
-
+    const actionName = this.props.performedCultivationAction && this.props.performedCultivationAction.name ? this.props.performedCultivationAction!.name![0].value : "";
+    
     return (
       <Grid>
         <Grid.Row className="content-page-header-row">
           <Grid.Column width={6}>
-            <h2>{this.props.performedCultivationAction!.name![0].value}</h2>
+            <h2>{actionName}</h2>
           </Grid.Column>
           <Grid.Column width={3} floated="right">
             <Button className="danger-button" onClick={()=>this.setState({open:true})}>{strings.delete}</Button>
@@ -222,7 +222,7 @@ class EditPerformedCultivationAction extends React.Component<Props, State> {
             </FormContainer>
           </Grid.Column>
         </Grid.Row>
-        <Confirm open={this.state.open} size={"mini"} content={strings.deleteConfirmationText + this.props.performedCultivationAction!.name![0].value} onCancel={()=>this.setState({open:false})} onConfirm={this.handleDelete} />
+        <Confirm open={this.state.open} size={"mini"} content={strings.deleteConfirmationText + actionName} onCancel={()=>this.setState({open:false})} onConfirm={this.handleDelete} />
       </Grid>
     );
   }

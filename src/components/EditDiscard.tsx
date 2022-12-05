@@ -12,7 +12,7 @@ import { Grid, Button, Form, Select, Input, DropdownProps, Loader, Message, Conf
 import { FormContainer } from "./FormContainer";
 import { DateInput } from "semantic-ui-calendar-react";
 import moment from "moment";
-import { redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 /**
  * Interface representing component properties
@@ -102,8 +102,7 @@ class EditDiscard extends React.Component<Props, State> {
     }
     
     if (this.state.redirect) {
-      redirect("/discards");
-      return null;
+      return <Navigate replace={true} to="/discards"/>;
     }
     
     const productOptions = products.map(({ id, name }) => ({

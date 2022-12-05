@@ -71,7 +71,7 @@ class ProductList extends React.Component<Props, State> {
     const products = this.props.products.map((product, i) => {
       const productPath = `/products/${product.id}`;
       return (
-        <List.Item style={i % 2 == 0 ? {backgroundColor: "#ddd"} : {}} key={product.id}>
+        <List.Item style={i % 2 === 0 ? {backgroundColor: "#ddd"} : {}} key={product.id}>
           <List.Content floated='right'>
             <NavLink to={productPath}>
               <Button className="submit-button">{strings.open}</Button>

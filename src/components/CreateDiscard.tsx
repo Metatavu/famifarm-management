@@ -11,7 +11,7 @@ import { Packing, Product, PackageSize, PackingState, PackingType, Campaign, Sto
 import LocalizedUtils from "../localization/localizedutils";
 import moment from "moment";
 import Api from "../api";
-import { redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 /**
  * Interface representing component properties
@@ -93,8 +93,7 @@ class CreateDiscard extends React.Component<Props, State> {
     }
       
     if (this.state.redirect) {
-      redirect(`/discards/${this.state.discardId}`)
-      return null;
+      return <Navigate replace={true} to={`/discards/${this.state.discardId}`}/>;
     }
 
     const productOptions = products.map(({ id, name }) => ({
