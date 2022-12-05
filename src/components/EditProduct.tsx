@@ -344,7 +344,7 @@ class EditProduct extends React.Component<Props, State> {
         <Confirm
           open={ this.state.open }
           size="mini"
-          content={ this.props.product ? `${strings.deleteConfirmationText}${this.props.product!.name![0].value}` : "" }
+          content={ this.props.product.name ? `${strings.deleteConfirmationText}${this.props.product.name[0].value}` : "" }
           onCancel={ () => this.setState({ open:false }) }
           onConfirm={ this.handleDelete }
         />

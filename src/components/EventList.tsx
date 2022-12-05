@@ -2,7 +2,7 @@ import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Event, EventType, Facility, Product, ProductionLine, SowingEventData } from "../generated/client";
+import { Event, EventType, Facility, Product, ProductionLine } from "../generated/client";
 import strings from "../localization/strings";
 import moment from "moment";
 import * as actions from "../actions";
@@ -91,9 +91,9 @@ class EventList extends React.Component<Props, State> {
     const eventProduct = products.find((product) => product.id === event.productId);
     const productName = eventProduct ? LocalizedUtils.getLocalizedValue(eventProduct.name) : event.id;
     const startTime = moment(event.startTime).format("DD.MM.YYYY");
-    const eventTypeString = strings[`phase${event.type}`];
+    const eventTypeString = strings[`phase${event.type}`] as string;
     const eventData = event.data as any;
-    const productionLine = eventData.productionLineId ? this.state.productionLines.find(line => line.id == eventData.productionLineId) : undefined;
+    const productionLine = eventData.productionLineId ? this.state.productionLines.find(line => line.id === eventData.productionLineId) : undefined;
     if (this.props.eventListFilters && this.props.eventListFilters.productionLine) {
       if (!productionLine) {
         return null;

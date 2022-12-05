@@ -243,7 +243,13 @@ class EditWastageReason extends React.Component<Props, State> {
             </FormContainer>
           </Grid.Column>
         </Grid.Row>
-        <Confirm open={this.state.open} size={"mini"} content={strings.deleteConfirmationText + this.props.wastageReason!.reason![0].value} onCancel={()=>this.setState({open:false})} onConfirm={this.handleDelete} />
+        <Confirm
+          open={this.state.open}
+          size={"mini"}
+          content={ this.props.wastageReason.reason ? strings.deleteConfirmationText + this.props.wastageReason.reason[0].value : ""}
+          onCancel={()=>this.setState({open:false})}
+          onConfirm={this.handleDelete}
+        />
       </Grid>
     );
   }

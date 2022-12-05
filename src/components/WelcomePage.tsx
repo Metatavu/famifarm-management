@@ -454,7 +454,7 @@ class WelcomePage extends React.Component<Props, any> {
                 }
               />
               <Route
-                path="/performedCultivationActions/:createPerformedCultivationActionId"
+                path="/performedCultivationActions/:performedCultivationActionId"
                 element={
                   <WithParams Component={EditPerformedCultivationAction} keycloak={this.state.keycloak} routeParamNames={["performedCultivationActionId"]} />
                 }

@@ -98,10 +98,10 @@ class SeedBatchList extends React.Component<Props, State> {
 
     const seedBatches = this.props.seedBatches.map((seedBatch, i) => {
       const seedBatchPath = `/seedBatches/${seedBatch.id}`;
-      const seed = this.state.seeds.find(s => s.id == seedBatch.seedId);
+      const seed = this.state.seeds.find(s => s.id === seedBatch.seedId);
       const seedText = seed ? LocalizedUtils.getLocalizedValue(seed.name) : "";
       return (
-        <List.Item style={i % 2 == 0 ? {backgroundColor: "#ddd"} : {}} key={seedBatch.id}>
+        <List.Item style={i % 2 === 0 ? {backgroundColor: "#ddd"} : {}} key={seedBatch.id}>
           <List.Content floated='right'>
             <NavLink to={seedBatchPath}>
               <Button className="submit-button">{strings.open}</Button>
