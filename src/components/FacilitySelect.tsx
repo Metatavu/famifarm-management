@@ -41,7 +41,7 @@ class FacilitySelect extends React.Component<Props, State> {
    */
   render() {
     const { facility, keycloak } = this.props;
-    if (!facility || !keycloak?.hasRealmRole("admin")) {
+    if (!facility || !keycloak) {
       return null;
     }
 
