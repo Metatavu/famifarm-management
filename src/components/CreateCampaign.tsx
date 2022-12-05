@@ -73,7 +73,7 @@ class CreateCampaign extends React.Component<Props, State> {
 
   public render () {
     if (this.state.redirect) {
-      return <Navigate replace={true} to={`/campaigns/${this.state.campaignId}`}/>;
+      return <Navigate replace={true} to={`/campaigns/${this.state.campaignId}`} />;
     }
 
     if (this.state.loading) {
