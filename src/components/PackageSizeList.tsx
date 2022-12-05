@@ -5,7 +5,7 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { PackageSize } from "../generated/client";
+import { Facility, PackageSize } from "../generated/client";
 import strings from "../localization/strings";
 
 import {
@@ -19,8 +19,9 @@ import LocalizedUtils from "../localization/localizedutils";
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   packageSizes?: PackageSize[];
+  facility: Facility;
   onPackageSizesFound?: (packageSizes: PackageSize[]) => void,
-   onError: (error: ErrorMessage | undefined) => void
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 export interface State {
@@ -39,17 +40,18 @@ class PackageSizeList extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   public async componentDidMount() {
+    const { keycloak, facility, onError, onPackageSizesFound } = this.props;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
   
-      const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-      const packageSizes = await packageSizeService.listPackageSizes({});
+      const packageSizeService = await Api.getPackageSizesService(keycloak);
+      const packageSizes = await packageSizeService.listPackageSizes({ facility: facility });
   
-      this.props.onPackageSizesFound && this.props.onPackageSizesFound(packageSizes);
+      onPackageSizesFound && onPackageSizesFound(packageSizes);
     } catch (e: any) {
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -113,7 +115,8 @@ class PackageSizeList extends React.Component<Props, State> {
 export function mapStateToProps(state: StoreState) {
   return {
     packageSizes: state.packageSizes,
-    packageSize: state.packageSize
+    packageSize: state.packageSize,
+    facility: state.facility
   };
 }
 

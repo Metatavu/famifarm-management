@@ -4,7 +4,7 @@ import * as actions from "../actions";
 import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
-import { LocalizedValue, WastageReason } from "../generated/client";
+import { Facility, LocalizedValue, WastageReason } from "../generated/client";
 import { redirect } from 'react-router-dom';
 import strings from "../localization/strings";
 
@@ -21,8 +21,9 @@ import { FormContainer } from "./FormContainer";
  */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  onWastageReasonCreated?: (wastageReason: WastageReason) => void,
-   onError: (error: ErrorMessage | undefined) => void
+  facility: Facility;
+  onWastageReasonCreated?: (wastageReason: WastageReason) => void;
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 /**
@@ -54,8 +55,9 @@ class CreateWastageReason extends React.Component<Props, State> {
    * Handle form submit
    */
   private async handleSubmit() {
+    const { keycloak, facility } = this.props;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
   
@@ -63,11 +65,15 @@ class CreateWastageReason extends React.Component<Props, State> {
         reason: this.state.wastageReasonData.reason
       };
   
-      const wastageReasonService = await Api.getWastageReasonsService(this.props.keycloak);
-      await wastageReasonService.createWastageReason({wastageReason: wastageReasonObject});
+      const wastageReasonService = await Api.getWastageReasonsService(keycloak);
+      await wastageReasonService.createWastageReason({
+        wastageReason: wastageReasonObject,
+        facility: facility
+      });
       
       this.setState({redirect: true});
     } catch (e: any) {
+      console.error(e);
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,

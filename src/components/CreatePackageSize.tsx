@@ -5,7 +5,7 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
-import { LocalizedValue, PackageSize } from "../generated/client";
+import { Facility, LocalizedValue, PackageSize } from "../generated/client";
 import { redirect } from 'react-router-dom';
 import strings from "../localization/strings";
 
@@ -21,8 +21,9 @@ import { FormContainer } from "./FormContainer";
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   packageSize?: PackageSize;
-  onPackageSizeCreated?: (packageSize: PackageSize) => void,
-   onError: (error: ErrorMessage | undefined) => void
+  facility: Facility;
+  onPackageSizeCreated?: (packageSize: PackageSize) => void;
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 export interface State {
@@ -45,16 +46,21 @@ class CreatePackageSize extends React.Component<Props, State> {
    * Handle form submit
    */
   private async handleSubmit() {
+    const { keycloak, facility, onError } = this.props;
+    const { packageSizeData } = this.state;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
   
-      const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-      await packageSizeService.createPackageSize({packageSize: this.state.packageSizeData});
+      const packageSizeService = await Api.getPackageSizesService(keycloak);
+      await packageSizeService.createPackageSize({
+        packageSize: packageSizeData,
+        facility: facility
+      });
       this.setState({redirect: true});
     } catch (e: any) {
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -135,7 +141,8 @@ class CreatePackageSize extends React.Component<Props, State> {
 export function mapStateToProps(state: StoreState) {
   return {
     packageSizes: state.packageSizes,
-    packageSize: state.packageSize
+    packageSize: state.packageSize,
+    facility: state.facility
   };
 }
 
@@ -147,7 +154,7 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onPackageSizeCreated: (packageSize: PackageSize) => dispatch(actions.packageSizeCreated(packageSize)),
-     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
+    onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

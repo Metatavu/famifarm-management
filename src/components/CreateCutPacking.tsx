@@ -1,4 +1,4 @@
-import { Product, ProductionLine } from "../generated/client";
+import { Facility, Product, ProductionLine } from "../generated/client";
 import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
 import { Button, DropdownProps, Form, Grid, InputOnChangeData, Loader } from "semantic-ui-react";
@@ -18,6 +18,7 @@ interface Props {
   keycloak?: KeycloakInstance;
   products?: Product[];
   productionLines?: ProductionLine[];
+  facility: Facility;
   onProductionLinesFound: typeof actions.productionLinesFound;
   onProductsFound: typeof actions.productsFound;
   onError: typeof actions.onErrorOccurred;
@@ -62,7 +63,7 @@ class CreateCutPacking extends React.Component<Props, State> {
    * Loads options for products and production lines
    */
   public componentDidMount = async () => {
-    const { keycloak, products, productionLines, onProductionLinesFound, onProductsFound, onError } = this.props;
+    const { keycloak, facility, products, productionLines, onProductionLinesFound, onProductsFound, onError } = this.props;
 
     if (!keycloak) {
       return;
@@ -73,13 +74,13 @@ class CreateCutPacking extends React.Component<Props, State> {
 
       if (!products) {
         const productsApi = await Api.getProductsService(keycloak);
-        const foundProducts = await productsApi.listProducts({});
+        const foundProducts = await productsApi.listProducts({ facility: facility });
         onProductsFound(foundProducts);
       }
 
       if (!productionLines) {
         const productionLinesApi = await Api.getProductionLinesService(keycloak);
-        const foundProductionLines = await productionLinesApi.listProductionLines({});
+        const foundProductionLines = await productionLinesApi.listProductionLines({ facility: facility });
         onProductionLinesFound(foundProductionLines);
       }
 
@@ -302,7 +303,7 @@ class CreateCutPacking extends React.Component<Props, State> {
    * Sends a request to the API to create a cut packing and redirects to the edit page
    */
   private createCutPacking = async () => {
-    const { keycloak, onError } = this.props;
+    const { keycloak, facility, onError } = this.props;
     const { weight, sowingDay, cuttingDay, gutterCount, gutterHoleCount, selectedProductId, selectedProductionLineId, producer, contactInformation, storageCondition } = this.state;
 
     if (!keycloak) {
@@ -312,18 +313,21 @@ class CreateCutPacking extends React.Component<Props, State> {
     try {
       this.setState({ loading: true });
       const cutPackingsApi = await Api.getCutPackingsService(keycloak);
-      const newCutPacking = await cutPackingsApi.createCutPacking({cutPacking: { 
-        weight, 
-        sowingDay: new Date(sowingDay), 
-        cuttingDay: new Date(cuttingDay), 
-        gutterCount, 
-        gutterHoleCount, 
-        productId: selectedProductId!, 
-        productionLineId: selectedProductionLineId!, 
-        producer, 
-        contactInformation, 
-        storageCondition 
-      }});
+      const newCutPacking = await cutPackingsApi.createCutPacking({
+        facility: facility,
+        cutPacking: { 
+          weight, 
+          sowingDay: new Date(sowingDay), 
+          cuttingDay: new Date(cuttingDay), 
+          gutterCount, 
+          gutterHoleCount, 
+          productId: selectedProductId!, 
+          productionLineId: selectedProductionLineId!, 
+          producer, 
+          contactInformation, 
+          storageCondition 
+        }
+      });
   
       this.setState({
         cutPackingId: newCutPacking.id,
@@ -442,7 +446,8 @@ class CreateCutPacking extends React.Component<Props, State> {
 export function mapStateToProps(state: StoreState) {
   return {
     products: state.products,
-    productionLines: state.productionLines
+    productionLines: state.productionLines,
+    facility: state.facility
   };
 }
 

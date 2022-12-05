@@ -7,7 +7,7 @@ import strings from "../localization/strings";
 import { Grid, Form, Button, Select, DropdownProps, Input, Loader, InputOnChangeData } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import { FormContainer } from "./FormContainer";
-import { Packing, Product, PackageSize, PackingState, PackingType, Campaign } from "../generated/client";
+import { Packing, Product, PackageSize, PackingState, PackingType, Campaign, Facility } from "../generated/client";
 import LocalizedUtils from "../localization/localizedutils";
 import moment from "moment";
 import Api from "../api";
@@ -15,8 +15,9 @@ import { redirect } from "react-router-dom";
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  onPackingCreated?: (packing: Packing) => void,
-   onError: (error: ErrorMessage | undefined) => void
+  facility: Facility;
+  onPackingCreated?: (packing: Packing) => void;
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 export interface State {
@@ -53,21 +54,22 @@ class CreatePacking extends React.Component<Props, State> {
   }
 
   public async componentDidMount() {
+    const { keycloak, facility } = this.props;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
     
       this.setState({loading: true});
     
-      const productsService = await Api.getProductsService(this.props.keycloak);
-      const products = await productsService.listProducts({});
+      const productsService = await Api.getProductsService(keycloak);
+      const products = await productsService.listProducts({ facility: facility });
 
-      const campaignsService = await Api.getCampaignsService(this.props.keycloak);
-      const campaigns = await campaignsService.listCampaigns();
+      const campaignsService = await Api.getCampaignsService(keycloak);
+      const campaigns = await campaignsService.listCampaigns({ facility: facility });
 
-      const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-      const packageSizes = await packageSizeService.listPackageSizes({});
+      const packageSizeService = await Api.getPackageSizesService(keycloak);
+      const packageSizes = await packageSizeService.listPackageSizes({ facility: facility });
       
       this.setState({
         productId: products.length ? products[0].id! : "",
@@ -341,44 +343,49 @@ class CreatePacking extends React.Component<Props, State> {
    * Handle form submit
    */
   private async handleSubmit() {
+    const { packingType, productId, campaignId, packageSizeId, packedCount, packingStatus, date } = this.state;
+    const { keycloak, facility, onError } = this.props;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
 
-      const type = this.state.packingType;
+      const type = packingType;
 
-      if (type == "BASIC" && !this.state.productId) {
+      if (type === "BASIC" && !productId) {
         return;
       }
 
-      if (type == "CAMPAIGN" && !this.state.campaignId) {
+      if (type === "CAMPAIGN" && !campaignId) {
         return;
       }
 
       const packingObject = type == "BASIC" ? 
       {
-        state: this.state.packingStatus as PackingState,
-        productId: this.state.productId,
-        time: this.state.date,
-        packageSizeId: this.state.packageSizeId,
-        packedCount: this.state.packedCount,
+        state: packingStatus as PackingState,
+        productId: productId,
+        time: date,
+        packageSizeId: packageSizeId,
+        packedCount: packedCount,
         type
       } : {
-        state: this.state.packingStatus as PackingState,
+        state: packingStatus as PackingState,
         type,
-        time: this.state.date,
-        campaignId: this.state.campaignId
+        time: date,
+        campaignId: campaignId
       };
 
-      const packingsService = await Api.getPackingsService(this.props.keycloak);
-      const packing = await packingsService.createPacking({packing: packingObject});
+      const packingsService = await Api.getPackingsService(keycloak);
+      const packing = await packingsService.createPacking({
+        packing: packingObject,
+        facility: facility
+      });
       this.setState({
         packingId: packing.id,
         redirect: true
       });
     } catch (e: any) {
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -395,18 +402,19 @@ class CreatePacking extends React.Component<Props, State> {
  */
 export function mapStateToProps(state: StoreState) {
   return {
+    facility: state.facility
   };
-  }
+}
   
-  /**
-   * Redux mapper for mapping component dispatches 
-   * 
-   * @param dispatch dispatch method
-   */
-  export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
+    onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
-  }
-  
-  export default connect(mapStateToProps, mapDispatchToProps)(CreatePacking);
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreatePacking);

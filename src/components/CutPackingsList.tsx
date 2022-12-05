@@ -1,4 +1,4 @@
-import { CutPacking, Product } from "../generated/client";
+import { CutPacking, Facility, Product } from "../generated/client";
 import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
 import Api from "../api";
@@ -16,6 +16,7 @@ import { connect } from "react-redux";
 interface Props {
   keycloak?: KeycloakInstance;
   products?: Product[];
+  facility: Facility;
   onProductsFound: typeof actions.productsFound;
   onError: typeof actions.onErrorOccurred;
 }
@@ -51,7 +52,7 @@ class CutPackingsList extends React.Component<Props, State> {
    * Loads the list and product options
    */
   public componentDidMount = async () => {
-    const { keycloak, products, onProductsFound, onError } = this.props;
+    const { keycloak, products, facility, onProductsFound, onError } = this.props;
 
     if (!keycloak ) {
       return;
@@ -61,14 +62,14 @@ class CutPackingsList extends React.Component<Props, State> {
 
     try {
       const cutPackingsApi= await Api.getCutPackingsService(keycloak);
-      const cutPackings = await cutPackingsApi.listCutPackings({});
+      const cutPackings = await cutPackingsApi.listCutPackings({ facility: facility });
   
       if (products) {
         const listItems = this.getListItems(cutPackings, products);
         this.setState({ listItems, loading: false });
       } else {
         const productsApi = await Api.getProductsService(keycloak);
-        const foundProducts = await productsApi.listProducts({});
+        const foundProducts = await productsApi.listProducts({ facility: facility });
         const listItems = this.getListItems(cutPackings, foundProducts);
   
         onProductsFound(foundProducts);
@@ -142,7 +143,7 @@ class CutPackingsList extends React.Component<Props, State> {
    * @param createdAfter return only packings created after this date
    */
   private updatePackingsList = async (productId?: string, createdBefore?: string, createdAfter?: string) => {
-    const { keycloak, products, onError } = this.props;
+    const { keycloak, products, facility, onError } = this.props;
 
     if (!keycloak || !products) {
       return;
@@ -151,7 +152,12 @@ class CutPackingsList extends React.Component<Props, State> {
     try {
       this.setState({ loading: true });
       const cutPackingsApi = await Api.getCutPackingsService(keycloak);
-      const cutPackings = await cutPackingsApi.listCutPackings({productId, createdAfter, createdBefore});
+      const cutPackings = await cutPackingsApi.listCutPackings({
+        productId: productId,
+        createdAfter: createdAfter,
+        createdBefore: createdBefore,
+        facility: facility
+      });
       const listItems = this.getListItems(cutPackings, products);
   
       this.setState({ listItems, loading: false });
@@ -274,7 +280,8 @@ class CutPackingsList extends React.Component<Props, State> {
  */
 export function mapStateToProps(state: StoreState) {
   return {
-    products: state.products
+    products: state.products,
+    facility: state.facility
   };
 }
 

@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Product } from "../generated/client";
+import { Facility, Product } from "../generated/client";
 import strings from "../localization/strings";
 
 import {
@@ -21,8 +21,9 @@ import LocalizedUtils from "../localization/localizedutils";
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   products?: Product[];
+  facility: Facility;
   onProductsFound?: (products: Product[]) => void,
-   onError: (error: ErrorMessage | undefined) => void
+  onError: (error: ErrorMessage | undefined) => void
 }
 
 export interface State {
@@ -105,14 +106,18 @@ class ProductList extends React.Component<Props, State> {
 
   private loadData = async () => {
     const { showInActive } = this.state;
-    const { keycloak } = this.props;
+    const { keycloak, facility } = this.props;
     try {
       if (!keycloak) {
         return;
       }
   
       const productsService = await Api.getProductsService(keycloak);
-      const products = await productsService.listProducts({includeSubcontractorProducts: true, includeInActiveProducts: showInActive});
+      const products = await productsService.listProducts({
+        includeSubcontractorProducts: true,
+        includeInActiveProducts: showInActive,
+        facility: facility
+      });
       products.sort((a, b) => {
         let aActive = a.active as any;
         let bActive = b.active as any;
@@ -142,7 +147,8 @@ class ProductList extends React.Component<Props, State> {
 export function mapStateToProps(state: StoreState) {
   return {
     products: state.products,
-    product: state.product
+    product: state.product,
+    facility: state.facility
   };
 }
 
@@ -154,7 +160,7 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onProductsFound: (products: Product[]) => dispatch(actions.productsFound(products)),
-     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
+    onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

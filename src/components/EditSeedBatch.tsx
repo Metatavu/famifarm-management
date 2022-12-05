@@ -4,8 +4,8 @@ import * as actions from "../actions";
 import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
-import { SeedBatch, Seed } from "../generated/client";
-import { redirect } from 'react-router-dom';
+import { SeedBatch, Seed, Facility } from "../generated/client";
+import { Navigate } from 'react-router-dom';
 import { DateInput } from 'semantic-ui-calendar-react';
 import strings from "../localization/strings";
 import {
@@ -31,11 +31,12 @@ interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   seedBatchId: string;
   seedBatch?: SeedBatch;
+  facility: Facility;
   onSeedBatchSelected?: (seedBatch: SeedBatch) => void;
   onSeedBatchDeleted?: (seedBatchId: string) => void;
   seeds?: Seed[];
-  onSeedsFound?: (seeds: Seed[]) => void,
-   onError: (error: ErrorMessage | undefined) => void
+  onSeedsFound?: (seeds: Seed[]) => void;
+  onError: (error: ErrorMessage | undefined) => void;
 }
 /**
  * Interface representing component state
@@ -81,20 +82,24 @@ class EditSeedBatch extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   public async componentDidMount() {
+    const { keycloak, facility, onSeedsFound, onError, onSeedBatchSelected } = this.props;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }      
-      const seedBatchesService = await Api.getSeedBatchesService(this.props.keycloak);
-      const seedsService = await Api.getSeedsService(this.props.keycloak);      
-      const seedBatch = await seedBatchesService.findSeedBatch({seedBatchId: this.props.seedBatchId});
-      this.props.onSeedBatchSelected && this.props.onSeedBatchSelected(seedBatch);
+      const seedBatchesService = await Api.getSeedBatchesService(keycloak);
+      const seedsService = await Api.getSeedsService(keycloak);      
+      const seedBatch = await seedBatchesService.findSeedBatch({
+        seedBatchId: this.props.seedBatchId,
+        facility: facility
+      });
+      onSeedBatchSelected && onSeedBatchSelected(seedBatch);
       this.setState({seedBatch: seedBatch});      
-      const seeds = await seedsService.listSeeds({});      
-      this.props.onSeedsFound && this.props.onSeedsFound(seeds);
+      const seeds = await seedsService.listSeeds({ facility: facility });      
+      onSeedsFound && onSeedsFound(seeds);
       this.setState({seeds: seeds});
     } catch (e: any) {
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -181,21 +186,26 @@ class EditSeedBatch extends React.Component<Props, State> {
    * Handle form submit
    */
   private async handleSubmit() {
+    const { keycloak, facility, onError, onSeedBatchSelected } = this.props;
     try {
-      if (!this.props.keycloak || !this.state.seedBatch) {
+      if (!keycloak || !this.state.seedBatch) {
         return;
       }      
-      const seedBatchesService = await Api.getSeedBatchesService(this.props.keycloak);      
+      const seedBatchesService = await Api.getSeedBatchesService(keycloak);      
       this.setState({saving: true});
-      await seedBatchesService.updateSeedBatch({seedBatchId: this.state.seedBatch.id!, seedBatch: this.state.seedBatch});
-      this.props.onSeedBatchSelected && this.props.onSeedBatchSelected(this.state.seedBatch);
+      await seedBatchesService.updateSeedBatch({
+        seedBatchId: this.state.seedBatch.id!,
+        seedBatch: this.state.seedBatch,
+        facility: facility
+      });
+      onSeedBatchSelected && onSeedBatchSelected(this.state.seedBatch);
       this.setState({saving: false});      
       this.setState({messageVisible: true});
       setTimeout(() => {
         this.setState({messageVisible: false});
       }, 3000);
     } catch (e: any) {
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -206,17 +216,21 @@ class EditSeedBatch extends React.Component<Props, State> {
    * Handle seedBatch delete
    */
   private async handleDelete() {
+    const { keycloak, facility, onError, onSeedBatchDeleted } = this.props;
     try {
-      if (!this.props.keycloak || !this.state.seedBatch) {
+      if (!keycloak || !this.state.seedBatch) {
         return;
       }      
-      const seedBatchesService = await Api.getSeedBatchesService(this.props.keycloak);
+      const seedBatchesService = await Api.getSeedBatchesService(keycloak);
       const id = this.state.seedBatch.id || "";
-      await seedBatchesService.deleteSeedBatch({seedBatchId: id});      
-      this.props.onSeedBatchDeleted && this.props.onSeedBatchDeleted(id!);
+      await seedBatchesService.deleteSeedBatch({
+        seedBatchId: id,
+        facility: facility
+      });      
+      onSeedBatchDeleted && onSeedBatchDeleted(id!);
       this.setState({redirect: true});
     } catch (e: any) {
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -235,8 +249,7 @@ class EditSeedBatch extends React.Component<Props, State> {
       );
     }    
     if (this.state.redirect) {
-      redirect("/seedBatches");
-      return null;
+      return <Navigate to="/seedBatches" replace={true} />;
     }    
     const seedOptions = (this.props.seeds || []).map((seed) => {
       return {
@@ -318,7 +331,8 @@ export function mapStateToProps(state: StoreState) {
   return {
     seedBatches: state.seedBatches,
     seedBatch: state.seedBatch,
-    seeds: state.seeds
+    seeds: state.seeds,
+    facility: state.facility
   };
 }/**
  * Redux mapper for mapping component dispatches 
@@ -330,6 +344,6 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
     onSeedBatchSelected: (seedBatch: SeedBatch) => dispatch(actions.seedBatchSelected(seedBatch)),
     onSeedBatchDeleted: (seedBatchId: string) => dispatch(actions.seedBatchDeleted(seedBatchId)),
     onSeedsFound: (seeds: Seed[]) => dispatch(actions.seedsFound(seeds)),
-     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
+    onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }export default connect(mapStateToProps, mapDispatchToProps)(EditSeedBatch);

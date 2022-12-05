@@ -1,0 +1,3 @@
+[submodule "famifarm-api-spec"]
+	path = famifarm-api-spec
+	url = https://github.com/Metatavu/famifarm-api-spec

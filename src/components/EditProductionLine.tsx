@@ -4,7 +4,7 @@ import * as actions from "../actions";
 import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
-import { ProductionLine } from "../generated/client";
+import { Facility, ProductionLine } from "../generated/client";
 import { redirect } from 'react-router-dom';
 import strings from "../localization/strings";
 
@@ -26,9 +26,10 @@ interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   productionLineId: string;
   productionLine?: ProductionLine;
+  facility: Facility;
   onProductionLineSelected?: (productionLine: ProductionLine) => void;
-  onProductionLineDeleted?: (productionLineId: string) => void,
-   onError: (error: ErrorMessage | undefined) => void
+  onProductionLineDeleted?: (productionLineId: string) => void;
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 /**
@@ -39,7 +40,7 @@ interface State {
   redirect: boolean;
   saving: boolean;
   messageVisible: boolean;
-  open:boolean
+  open:boolean;
 }
 
 /**
@@ -71,18 +72,22 @@ class EditProductionLine extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   public async componentDidMount() {
+    const { keycloak, facility, productionLineId, onError, onProductionLineSelected } = this.props;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
   
-      const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
-      const productionLine = await productionLineService.findProductionLine({productionLineId: this.props.productionLineId});
+      const productionLineService = await Api.getProductionLinesService(keycloak);
+      const productionLine = await productionLineService.findProductionLine({
+        productionLineId: productionLineId,
+        facility: facility
+      });
   
-      this.props.onProductionLineSelected && this.props.onProductionLineSelected(productionLine);
+      onProductionLineSelected && onProductionLineSelected(productionLine);
       this.setState({productionLine: productionLine});
     } catch (e: any) {
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -96,7 +101,7 @@ class EditProductionLine extends React.Component<Props, State> {
    * @param event event
    */
   private handeLineNumberChange(event: React.FormEvent<HTMLInputElement>) {
-    this.setState({productionLine: { ... this.state.productionLine, lineNumber: event.currentTarget.value }});
+    this.setState({productionLine: { ...this.state.productionLine, lineNumber: event.currentTarget.value }});
   }
 
   /**
@@ -105,22 +110,28 @@ class EditProductionLine extends React.Component<Props, State> {
    * @param event event
    */
   private handeDefaultGutterHoleCountChange(event: React.FormEvent<HTMLInputElement>) {
-    this.setState({productionLine: { ... this.state.productionLine, defaultGutterHoleCount: parseInt(event.currentTarget.value) || undefined }});
+    this.setState({productionLine: { ...this.state.productionLine, defaultGutterHoleCount: parseInt(event.currentTarget.value) || undefined }});
   }
 
   /**
    * Handle form submit
    */
   private async handleSubmit() {
+    const { keycloak, facility, onError } = this.props;
+    const { productionLine } = this.state;
     try {
-      if (!this.props.keycloak || !this.state.productionLine) {
+      if (!keycloak || !productionLine) {
         return;
       }
   
-      const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
+      const productionLineService = await Api.getProductionLinesService(keycloak);
   
       this.setState({saving: true});
-      await productionLineService.updateProductionLine({productionLineId: this.state.productionLine.id!, productionLine: this.state.productionLine});
+      await productionLineService.updateProductionLine({
+        productionLineId: productionLine.id!,
+        productionLine: productionLine,
+        facility: facility
+      });
       this.setState({saving: false});
   
       this.setState({messageVisible: true});
@@ -128,7 +139,7 @@ class EditProductionLine extends React.Component<Props, State> {
         this.setState({messageVisible: false});
       }, 3000);
     } catch (e: any) {
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -140,20 +151,25 @@ class EditProductionLine extends React.Component<Props, State> {
    * Handle productionLine delete
    */
   private async handleDelete() {
+    const { keycloak, facility, onError, onProductionLineDeleted } = this.props;
+    const { productionLine } = this.state;
     try {
-      if (!this.props.keycloak || !this.state.productionLine) {
+      if (!keycloak || !productionLine) {
         return;
       }
   
-      const productionLineService = await Api.getProductionLinesService(this.props.keycloak);
-      const id = this.state.productionLine.id || "";
+      const productionLineService = await Api.getProductionLinesService(keycloak);
+      const id = productionLine.id || "";
   
-      await productionLineService.deleteProductionLine({productionLineId: id});
+      await productionLineService.deleteProductionLine({
+        productionLineId: id,
+        facility: facility
+      });
       
-      this.props.onProductionLineDeleted && this.props.onProductionLineDeleted(id);
+      onProductionLineDeleted && onProductionLineDeleted(id);
       this.setState({redirect: true});
     } catch (e: any) {
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -237,7 +253,8 @@ class EditProductionLine extends React.Component<Props, State> {
 export function mapStateToProps(state: StoreState) {
   return {
     productionLines: state.productionLines,
-    productionLine: state.productionLine
+    productionLine: state.productionLine,
+    facility: state.facility
   };
 }
 
@@ -250,7 +267,7 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onProductionLineSelected: (productionLine: ProductionLine) => dispatch(actions.productionLineSelected(productionLine)),
     onProductionLineDeleted: (productionLineId: string) => dispatch(actions.productionLineDeleted(productionLineId)),
-     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
+    onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

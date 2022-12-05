@@ -30,8 +30,10 @@ import {
   ERROR_OCCURRED,
   CAMPAIGNS_FOUND,
   EVENT_LIST_FILTERS_UPDATED,
-  EVENTS_FOUND} from '../constants/index';
+  EVENTS_FOUND,
+  FACILITY_UPDATE} from '../constants/index';
 import { Reducer } from 'redux';
+import { Facility } from '../generated/client/models/Facility';
 
 /**
  * Process action 
@@ -63,7 +65,8 @@ export const processAction: Reducer<StoreState, AppAction> = (state: StoreState 
       seeds: [],
       storageDiscards: [],
       wastageReason: {} as any,
-      wastageReasons: []
+      wastageReasons: [],
+      facility: Facility.Joroinen
     }
   }
   switch (action.type) {
@@ -128,6 +131,8 @@ export const processAction: Reducer<StoreState, AppAction> = (state: StoreState 
       return { ...state, eventListFilters: action.eventListFilters }
     case EVENTS_FOUND:
       return { ...state, events: action.events}
+    case FACILITY_UPDATE:
+      return { ...state, facility: action.facility}
     }
   return state;
 }

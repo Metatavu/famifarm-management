@@ -2,7 +2,7 @@ import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Event, EventType, Product, ProductionLine, SowingEventData } from "../generated/client";
+import { Event, EventType, Facility, Product, ProductionLine, SowingEventData } from "../generated/client";
 import strings from "../localization/strings";
 import moment from "moment";
 import * as actions from "../actions";
@@ -33,6 +33,7 @@ interface Props {
   eventListFilters?: EventListFilters;
   products?: Product[];
   location?: any,
+  facility: Facility;
   onEventListFiltersUpdated?: (filters: EventListFilters) => void,
   onEventsFound?: (events: Event[]) => void,
   onProductsFound?: (products: Product[]) => void,
@@ -69,16 +70,17 @@ class EventList extends React.Component<Props, State> {
    * Component did mount life-sycle event
    */
   public async componentDidMount() {
+    const { keycloak, facility, eventListFilters } = this.props;
     try {
-      if (this.props.keycloak) {
-        const productionLinesService = await Api.getProductionLinesService(this.props.keycloak);
-        const productionLines = await productionLinesService.listProductionLines({});
+      if (keycloak) {
+        const productionLinesService = await Api.getProductionLinesService(keycloak);
+        const productionLines = await productionLinesService.listProductionLines({ facility: facility });
         this.setState({
           productionLines: productionLines
         });
       }
       
-      await this.updateEvents(this.props.eventListFilters || {});
+      await this.updateEvents(eventListFilters || {});
     } catch(e) {
       console.error(e);
     }
@@ -310,10 +312,11 @@ class EventList extends React.Component<Props, State> {
    * Updates batch list
    */
   private updateEvents = async (filters: EventListFilters) => {
-    if (!this.props.keycloak) {
+    const { keycloak, facility, eventListFilters, onError, onEventListFiltersUpdated, onEventsFound, onProductsFound } = this.props;
+    if (!keycloak) {
       return;
     }
-    const prevFilters = this.props.eventListFilters;
+    const prevFilters = eventListFilters;
     const dateFilter = filters.date ? moment(filters.date) : moment();
     const createdBefore = dateFilter.endOf("day").toISOString();
     const createdAfter = dateFilter.startOf("day").toISOString();
@@ -321,8 +324,8 @@ class EventList extends React.Component<Props, State> {
     this.setState({loading: true});
     try {
       const [eventsService, productsService] = await Promise.all([
-        Api.getEventsService(this.props.keycloak),
-        Api.getProductsService(this.props.keycloak)
+        Api.getEventsService(keycloak),
+        Api.getProductsService(keycloak)
       ]);
 
       const [events, products] = await Promise.all([
@@ -332,23 +335,24 @@ class EventList extends React.Component<Props, State> {
           createdAfter: createdAfter,
           createdBefore: createdBefore,
           firstResult: firstResult,
-          maxResults: 20
+          maxResults: 20,
+          facility: facility
         }),
-        productsService.listProducts({}),
+        productsService.listProducts({ facility: facility }),
       ]);
 
       const updatedEvents = firstResult > 0 ? [...(this.props.events || []), ...events] : events;
-      this.props.onEventsFound && this.props.onEventsFound(updatedEvents);
-      this.props.onEventListFiltersUpdated && this.props.onEventListFiltersUpdated({
+      onEventsFound && onEventsFound(updatedEvents);
+      onEventListFiltersUpdated && onEventListFiltersUpdated({
         date: dateFilter.toDate(),
         firstResult: firstResult,
         product: filters.product || undefined,
         type: filters.type
       });
-      this.props.onProductsFound && this.props.onProductsFound(products);
+      onProductsFound && onProductsFound(products);
       this.setState({loading: false, loadingFirstTime: false})
     } catch(e: any) {
-      this.props.onError && this.props.onError({
+      onError && onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -366,7 +370,8 @@ export function mapStateToProps(state: StoreState) {
   return {
     products: state.products,
     eventListFilters: state.eventListFilters,
-    events: state.events
+    events: state.events,
+    facility: state.facility
   };
 }
 

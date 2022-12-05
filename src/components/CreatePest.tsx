@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { LocalizedValue, Pest } from "../generated/client";
+import { Facility, LocalizedValue, Pest } from "../generated/client";
 import { redirect } from 'react-router-dom';
 import strings from "../localization/strings";
 import * as actions from "../actions";
@@ -22,8 +22,9 @@ import { FormContainer } from "./FormContainer";
  */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  pest?: Pest,
-   onError: (error: ErrorMessage | undefined) => void
+  pest?: Pest;
+  facility: Facility;
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 /**
@@ -49,21 +50,26 @@ class CreatePest extends React.Component<Props, State> {
    * Handle form submit
    */
   private async handleSubmit() {
+    const { keycloak, facility, onError } = this.props;
+    const { pestData } = this.state;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
   
       const pestObject: Pest = {
-        name: this.state.pestData.name
+        name: pestData.name
       };
   
-      const pestService = await Api.getPestsService(this.props.keycloak);
-      await pestService.createPest({pest: pestObject});
+      const pestService = await Api.getPestsService(keycloak);
+      await pestService.createPest({
+        pest: pestObject,
+        facility: facility
+      });
       
       this.setState({redirect: true});
     } catch (e: any) {
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -125,6 +131,7 @@ class CreatePest extends React.Component<Props, State> {
  */
 export function mapStateToProps(state: StoreState) {
   return {
+    facility: state.facility
   };
 }
 

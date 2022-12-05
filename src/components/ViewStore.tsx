@@ -4,7 +4,7 @@ import { StoreState } from "../types";
 import { Dispatch } from "redux";
 import * as actions from "../actions";
 import { connect } from "react-redux";
-import { Campaign, PackageSize, Packing, PackingState, PackingType, Product } from "../generated/client";
+import { Campaign, Facility, PackageSize, Packing, PackingState, PackingType, Product } from "../generated/client";
 import LocalizedUtils from "../localization/localizedutils";
 import { Accordion, Button, Grid, Icon, Loader, Table } from "semantic-ui-react";
 import strings from "../localization/strings";
@@ -25,6 +25,7 @@ const moment = extendMoment(Moment);
  */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
+  facility: Facility;
 }
 
 /**
@@ -375,7 +376,7 @@ class ViewStore extends React.Component<Props, State> {
    * Fetch data needed by component from API
    */
   private fetchData = async () => {
-    const { keycloak } = this.props;
+    const { keycloak, facility } = this.props;
 
     if (!keycloak) {
       return;
@@ -389,10 +390,13 @@ class ViewStore extends React.Component<Props, State> {
     ]);
 
     const [ products, packings, packingSizes, campaigns ] = await Promise.all([
-      productsApi.listProducts({}),
-      packingsApi.listPackings({ status: PackingState.InStore }),
-      packingSizesApi.listPackageSizes({}),
-      campaignsApi.listCampaigns()
+      productsApi.listProducts({ facility: facility }),
+      packingsApi.listPackings({
+        status: PackingState.InStore,
+        facility: facility
+      }),
+      packingSizesApi.listPackageSizes({ facility: facility }),
+      campaignsApi.listCampaigns({ facility: facility })
     ]);
 
     return { products, packings, packingSizes, campaigns };
@@ -549,6 +553,7 @@ class ViewStore extends React.Component<Props, State> {
  */
 export function mapStateToProps(state: StoreState) {
   return {
+    facility: state.facility
   };
 }
 

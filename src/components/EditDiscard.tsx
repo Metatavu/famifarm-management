@@ -3,14 +3,14 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { StoreState, ErrorMessage } from "../types";
 import * as actions from "../actions";
-import { Packing, Product, PackageSize, PackingState, Printer, PackingType, Campaign, StorageDiscard } from "../generated/client";
+import { Product, PackageSize, StorageDiscard, Facility } from "../generated/client";
 import Api from "../api";
 import { KeycloakInstance } from "keycloak-js";
 import strings from "../localization/strings";
 import LocalizedUtils from "../localization/localizedutils";
-import { Grid, Button, Form, Select, Input, DropdownItemProps, DropdownProps, Loader, Message, Confirm, InputOnChangeData } from "semantic-ui-react";
+import { Grid, Button, Form, Select, Input, DropdownProps, Loader, Message, Confirm, InputOnChangeData } from "semantic-ui-react";
 import { FormContainer } from "./FormContainer";
-import { DateInput } from 'semantic-ui-calendar-react';
+import { DateInput } from "semantic-ui-calendar-react";
 import moment from "moment";
 import { redirect } from "react-router-dom";
 
@@ -19,8 +19,9 @@ import { redirect } from "react-router-dom";
  */
 export interface Props {
   keycloak: KeycloakInstance,
-   onError: (error: ErrorMessage | undefined) => void;
+  onError: (error: ErrorMessage | undefined) => void;
   discardId: string;
+  facility: Facility;
 }
 
 /**
@@ -225,7 +226,7 @@ class EditDiscard extends React.Component<Props, State> {
    * method for fetching data from api
    */
   private fetchData =  async () => {
-    const { keycloak, discardId } = this.props;
+    const { keycloak, discardId, facility } = this.props;
 
     if(!keycloak) {
       return;
@@ -234,13 +235,19 @@ class EditDiscard extends React.Component<Props, State> {
     this.setState({ loading: true })
 
     const productsService = await Api.getProductsService(keycloak);
-    const products = await productsService.listProducts({ includeSubcontractorProducts: true });
+    const products = await productsService.listProducts({
+      includeSubcontractorProducts: true,
+      facility: facility
+    });
 
     const discardsService = await Api.getStorageDiscardsService(keycloak);
-    const discard = await discardsService.getStorageDiscard({ storageDiscardId: discardId })
+    const discard = await discardsService.getStorageDiscard({
+      storageDiscardId: discardId,
+      facility: facility
+    })
         
     const packageSizesSerivce = await Api.getPackageSizesService(keycloak);
-    const packageSizes = await packageSizesSerivce.listPackageSizes({ });
+    const packageSizes = await packageSizesSerivce.listPackageSizes({ facility: facility });
 
     const product = (products || []).find(product => product.id == discard.productId);
     const date = discard.discardDate || new Date();
@@ -272,7 +279,7 @@ class EditDiscard extends React.Component<Props, State> {
    */
     private  handleSubmit = async () => {
       const { discard, productId, date, discardCount, packageSizeId } = this.state;
-      const { keycloak } = this.props;
+      const { keycloak, facility, onError } = this.props;
 
       try {
         const updatedDiscard = {
@@ -288,14 +295,18 @@ class EditDiscard extends React.Component<Props, State> {
         }
   
         const discardService = await Api.getStorageDiscardsService(keycloak);
-        await discardService.updateStorageDiscard({ storageDiscardId: updatedDiscard.id, storageDiscard: updatedDiscard });
+        await discardService.updateStorageDiscard({
+          storageDiscardId: updatedDiscard.id,
+          storageDiscard: updatedDiscard,
+          facility: facility
+        });
   
         this.setState({ messageVisible: true });
         setTimeout(() => {
           this.setState({ messageVisible: false });
         }, 3000);
       } catch (e: any) {
-        this.props.onError({
+        onError({
           message: strings.defaultApiErrorMessage,
           title: strings.defaultApiErrorTitle,
           exception: e
@@ -308,7 +319,7 @@ class EditDiscard extends React.Component<Props, State> {
    */
   private handleDelete = async () => {
     const { discard } = this.state;
-    const { keycloak } = this.props;
+    const { keycloak, facility, onError } = this.props;
 
     try {
       const discardService = await Api.getStorageDiscardsService(keycloak);
@@ -320,12 +331,15 @@ class EditDiscard extends React.Component<Props, State> {
         throw new Error("Discard id is undefined")
       }
 
-      await discardService.deleteStorageDiscard({ storageDiscardId: discard.id })
+      await discardService.deleteStorageDiscard({
+        storageDiscardId: discard.id,
+        facility: facility
+      })
 
       this.setState({ redirect: true });
 
     } catch (e: any) {
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -385,8 +399,10 @@ class EditDiscard extends React.Component<Props, State> {
  * @param state store state
  */
 export function mapStateToProps(state: StoreState) {
-  
-}
+  return {
+    facility: state.facility
+  };
+};
   
 /**
  * Redux mapper for mapping component dispatches 

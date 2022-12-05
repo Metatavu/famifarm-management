@@ -5,7 +5,7 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
-import { LocalizedValue, Seed } from "../generated/client";
+import { Facility, LocalizedValue, Seed } from "../generated/client";
 import { redirect } from 'react-router-dom';
 import strings from "../localization/strings";
 
@@ -23,8 +23,9 @@ import { FormContainer } from "./FormContainer";
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   seed?: Seed;
+  facility: Facility;
   onSeedCreated?: (seed: Seed) => void,
-   onError: (error: ErrorMessage | undefined) => void
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 /**
@@ -50,20 +51,25 @@ class CreateSeed extends React.Component<Props, State> {
    * Handle form submit
    */
   private async handleSubmit() {
+    const { keycloak, facility, onError } = this.props;
+    const { seedData } = this.state;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
   
       const seedObject: Seed = {
-        name: this.state.seedData.name
+        name: seedData.name
       };
   
-      const seedService = await Api.getSeedsService(this.props.keycloak);
-      await seedService.createSeed({seed: seedObject});
+      const seedService = await Api.getSeedsService(keycloak);
+      await seedService.createSeed({
+        seed: seedObject,
+        facility: facility
+      });
       this.setState({redirect: true});
     } catch (e: any) {
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -126,7 +132,8 @@ class CreateSeed extends React.Component<Props, State> {
 export function mapStateToProps(state: StoreState) {
   return {
     seeds: state.seeds,
-    seed: state.seed
+    seed: state.seed,
+    facility: state.facility
   };
 }
 
@@ -138,7 +145,7 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onSeedCreated: (seed: Seed) => dispatch(actions.seedCreated(seed)),
-     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
+    onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

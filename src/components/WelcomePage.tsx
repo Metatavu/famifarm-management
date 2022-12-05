@@ -4,7 +4,7 @@ import * as actions from "../actions";
 import { StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import { Route, NavLink, useParams, Routes } from 'react-router-dom';
+import { Route, NavLink, Routes } from 'react-router-dom';
 import Root from './Root';
 import strings from "../localization/strings";
 
@@ -58,11 +58,14 @@ import CreateDiscard from "./CreateDiscard";
 import EditDiscard from "./EditDiscard";
 import { WithParams } from "./WithParams";
 import Dashboard from "./Dashboard";
+import { Facility } from "../generated/client";
 
 export interface Props {
   authenticated: boolean,
   keycloak?: Keycloak.KeycloakInstance,
+  facility: Facility,
   onLogin?: (keycloak: Keycloak.KeycloakInstance, authenticated: boolean) => void
+  onFacilityUpdate: (facility: Facility) => void
 }
 
 class WelcomePage extends React.Component<Props, any> {
@@ -76,16 +79,25 @@ class WelcomePage extends React.Component<Props, any> {
   /**
    * Component did mount life-sycle event
    */
-  componentDidMount() {
+  componentDidMount = async () => {
+    const { onFacilityUpdate, onLogin } = this.props;
     const kcConf = {
       "realm": process.env.REACT_APP_KEYCLOAK_REALM as string,
       "url": process.env.REACT_APP_AUTH_SERVER_URL as string,
       "clientId": process.env.REACT_APP_AUTH_RESOURCE as string
     };
     const keycloak = new Keycloak(kcConf);
-    keycloak.init({onLoad: "login-required", checkLoginIframe: false}).success((authenticated) => {
-      this.props.onLogin && this.props.onLogin(keycloak, authenticated);
+    await keycloak.init({onLoad: "login-required", checkLoginIframe: false}).success((authenticated) => {
+      onLogin && onLogin(keycloak, authenticated);
     });
+
+    const previousFacility = window.localStorage.getItem("facility") ? (window.localStorage.getItem("facility")) as Facility || Facility.Joroinen : Facility.Joroinen;
+
+    if (keycloak.hasRealmRole("juva") && keycloak.hasRealmRole("joroinen")) {
+      onFacilityUpdate(previousFacility);
+    } else {
+      onFacilityUpdate(keycloak.hasRealmRole("joroinen") ? Facility.Joroinen : Facility.Juva);
+    }
 
     this.setState({keycloak: keycloak});
   }
@@ -169,7 +181,7 @@ class WelcomePage extends React.Component<Props, any> {
 
     const appContent = (
       <BasicLayout sidebarItems={sideBarNavigation}>
-        { !this.props.authenticated ? (
+        { !this.props.authenticated || !this.state.keycloak ? (
           <div>
             <Grid centered>
               <Loader active size="medium" />
@@ -465,7 +477,8 @@ class WelcomePage extends React.Component<Props, any> {
                 path="/createWastageReason"
                 element={
                   <CreateWastageReason
-                    keycloak={this.state.keycloak}
+                    keycloak={ this.state.keycloak }
+                    facility={ this.props.facility }
                   />
                 }
               />
@@ -507,7 +520,8 @@ export function mapStateToProps(state: StoreState) {
   return {
     authenticated: state.authenticated,
     keycloak: state.keycloak,
-    locale: state.locale
+    locale: state.locale,
+    facility: state.facility
   }
 }
 
@@ -518,7 +532,8 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onLogin: (keycloak: Keycloak.KeycloakInstance, authenticated: boolean) => dispatch(actions.userLogin(keycloak, authenticated))
+    onLogin: (keycloak: Keycloak.KeycloakInstance, authenticated: boolean) => dispatch(actions.userLogin(keycloak, authenticated)),
+    onFacilityUpdate: (facility: Facility) => dispatch(actions.facilityUpdate(facility)),
   };
 }
 

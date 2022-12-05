@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { Campaign, PackageSize, Packing, Product } from "../generated/client";
+import { Campaign, Facility, PackageSize, Packing, Product } from "../generated/client";
 import strings from "../localization/strings";
 import moment from "moment";
 import * as actions from "../actions";
@@ -30,6 +30,7 @@ interface Props {
   products?: Product[];
   packageSizes?: PackageSize[];
   campaigns?: Campaign[];
+  facility: Facility;
   onPackingsFound?: (packings: Packing[]) => void;
   onError: (error: ErrorMessage | undefined) => void;
 };
@@ -91,11 +92,11 @@ class Dashboard extends React.Component<Props, State> {
   /**
    * Updates packings
    *
-   * @param filters filters
+   * @param selectedDate selected date
    * @param append boolean
    */
   private updatePackings = async (selectedDate: string, append: boolean) => {
-    const { keycloak, onPackingsFound } = this.props;
+    const { keycloak, facility, onPackingsFound } = this.props;
     if (!keycloak) {
       return;
     }
@@ -104,6 +105,7 @@ class Dashboard extends React.Component<Props, State> {
     const packingsService = await Api.getPackingsService(keycloak);
     const selectedMoment = moment(selectedDate);
     const packings = await packingsService.listPackings({
+      facility: facility,
       createdAfter: selectedMoment.startOf("day").toISOString(),
       createdBefore: selectedMoment.endOf("day").toISOString()
     });
@@ -315,6 +317,7 @@ class Dashboard extends React.Component<Props, State> {
  */
 const mapStateToProps = (state: StoreState) => ({
   packings: state.packings,
+  facility: state.facility
 });
 
 /**
