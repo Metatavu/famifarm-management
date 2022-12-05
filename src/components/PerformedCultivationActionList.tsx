@@ -22,7 +22,7 @@ export interface Props {
   performedCultivationActions?: PerformedCultivationAction[];
   facility: Facility;
   onPerformedCultivationActionsFound?: (performedCultivationActions: PerformedCultivationAction[]) => void,
-  onError: (error: ErrorMessage | undefined) => void
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 export interface State {

@@ -11,6 +11,7 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import FacilitySelect from "./FacilitySelect";
+import { Facility } from "../generated/client";
 
 /**
  * Interface representing component properties
@@ -19,14 +20,16 @@ interface Props {
   sidebarItems: JSX.Element[],
   error?: ErrorMessage,
   onError: (error?: ErrorMessage) => void
-  children: React.ReactNode
+  children: React.ReactNode;
+  facility: Facility;
 }
 
 /**
  * Interface representing component state
  */
 interface State {
-  sidebarOpen: boolean
+  sidebarOpen: boolean;
+  facility: Facility;
 }
 
 /**
@@ -41,7 +44,8 @@ class BasicLayout extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      sidebarOpen: false
+      sidebarOpen: false,
+      facility: props.facility
     }
   }
   
@@ -136,7 +140,8 @@ class BasicLayout extends React.Component<Props, State> {
  */
 export function mapStateToProps(state: StoreState) {
   return {
-    error: state.error
+    error: state.error,
+    facility: state.facility
   };
 }
 

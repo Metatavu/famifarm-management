@@ -88,11 +88,13 @@ class WelcomePage extends React.Component<Props, any> {
     };
     const keycloak = new Keycloak(kcConf);
     await keycloak.init({onLoad: "login-required", checkLoginIframe: false}).success((authenticated) => {
-    onLogin && onLogin(keycloak, authenticated);
+      onLogin && onLogin(keycloak, authenticated);
     });
 
+    const previousFacility = window.localStorage.getItem("facility") ? (window.localStorage.getItem("facility")) as Facility || Facility.Joroinen : Facility.Joroinen;
+
     if (keycloak.hasRealmRole("juva") && keycloak.hasRealmRole("joroinen")) {
-      onFacilityUpdate(Facility.Joroinen);
+      onFacilityUpdate(previousFacility);
     } else {
       onFacilityUpdate(keycloak.hasRealmRole("joroinen") ? Facility.Joroinen : Facility.Juva);
     }
@@ -179,7 +181,7 @@ class WelcomePage extends React.Component<Props, any> {
 
     const appContent = (
       <BasicLayout sidebarItems={sideBarNavigation}>
-        { !this.props.authenticated ? (
+        { !this.props.authenticated || !this.state.keycloak ? (
           <div>
             <Grid centered>
               <Loader active size="medium" />

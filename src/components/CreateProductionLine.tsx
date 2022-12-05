@@ -22,7 +22,7 @@ interface Props {
   productionLine?: ProductionLine;
   facility: Facility;
   onProductionLineCreated?: (productionLine: ProductionLine) => void,
-  onError: (error: ErrorMessage | undefined) => void
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 interface State {
