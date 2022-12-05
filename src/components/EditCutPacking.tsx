@@ -141,7 +141,7 @@ class EditCutPacking extends React.Component<Props, State> {
     } = this.state;
 
     if (this.state.redirect) {
-      return <Navigate replace={true} to={`/cutPackings`}/>;
+      return <Navigate replace={true} to="/cutPackings"/>;
     }
 
     if (loading) {

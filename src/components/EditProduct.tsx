@@ -245,7 +245,7 @@ class EditProduct extends React.Component<Props, State> {
     }
 
     if (this.state.redirect) {
-      return <Navigate to={"/products"} replace={true}/>;
+      return <Navigate to="/products" replace={true}/>;
     }
 
     const packageSizeOptions = (packageSizes || []).map(packageSize => ({

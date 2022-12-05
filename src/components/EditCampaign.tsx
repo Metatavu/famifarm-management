@@ -86,7 +86,7 @@ class EditCampaign extends React.Component<Props, State> {
 
   public render () {
     if (this.state.redirect) {
-      return <Navigate replace={true} to={`/campaigns`}/>;
+      return <Navigate replace={true} to="/campaigns"/>;
     }
 
     if (this.state.loading) {
