@@ -2,9 +2,9 @@ import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Campaign, PackageSize, Packing, PackingState, Product } from "../generated/client";
-import strings from "src/localization/strings";
-import * as moment from "moment";
+import { Campaign, Facility, PackageSize, Packing, PackingState, Product } from "../generated/client";
+import strings from "../localization/strings";
+import moment from "moment";
 import * as actions from "../actions";
 import { StoreState, ErrorMessage } from "../types/index";
 import { connect } from "react-redux";
@@ -15,14 +15,14 @@ import {
   Grid,
   Loader,
   Form,
-  InputOnChangeData,
+  DropdownProps,
   TextAreaProps,
   Table,
   Visibility,
   Transition
 } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
-import LocalizedUtils from "src/localization/localizedutils";
+import LocalizedUtils from "../localization/localizedutils";
 
 const ALL_PRODUCTS_KEY = "all-products";
 const ALL_CAMPAIGNS_KEY = "all-campaigns";
@@ -37,11 +37,12 @@ interface Props {
   packageSizes?: PackageSize[];
   campaigns?: Campaign[];
   location?: any;
+  facility: Facility;
   onPackingsFound?: (packings: Packing[]) => void;
   onProductsFound?: (products: Product[]) => void;
   onCampaignsFound?: (campaigns: Campaign[]) => void;
   onPackageSizesFound?: (packageSizes: PackageSize[]) => void;
-  onError: (error: ErrorMessage) => void;
+   onError: (error: ErrorMessage | undefined) => void;
 }
 
 /**
@@ -94,7 +95,7 @@ class PackingList extends React.Component<Props, State> {
   public async componentDidMount() {
     try {
       await this.updatePackings(this.state.filters, false);
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -139,14 +140,18 @@ class PackingList extends React.Component<Props, State> {
    * @param packing Packing to remove from storage
    */
   private removePackingFromStorage = async (packing: Packing) => {
-    const { packings, keycloak, onPackingsFound } = this.props;
+    const { packings, keycloak, facility, onPackingsFound } = this.props;
     if (!keycloak || !packing.id) {
       return;
     }
     this.setState({removingFromStorageIds: [ ...this.state.removingFromStorageIds, packing.id ]})
     packing.state = PackingState.Removed;
     const packingService = await Api.getPackingsService(keycloak);
-    const updatedPacking = await packingService.updatePacking({packingId: packing.id, packing: packing});
+    const updatedPacking = await packingService.updatePacking({
+      packingId: packing.id,
+      packing: packing,
+      facility: facility
+    });
     onPackingsFound && onPackingsFound((packings || []).map(p => p.id == updatedPacking.id ? updatedPacking : p));
     this.setState({removingFromStorageIds: this.state.removingFromStorageIds.filter(id => id !== packing.id)});
   }
@@ -235,7 +240,7 @@ class PackingList extends React.Component<Props, State> {
                   options={
                     [{ value: "all-status", text: strings.allPackingStates }].concat(
                     Object.keys(PackingState).map(state => ({
-                      value: PackingState[state], text: this.resolveLocalizedPackingState(PackingState[state])
+                      value: (PackingState as any)[state], text: this.resolveLocalizedPackingState((PackingState as any)[state])
                     })))
                   }
                   value={ filters.packingState || "all-status" }
@@ -349,9 +354,9 @@ class PackingList extends React.Component<Props, State> {
    * Handles changing packing state
    *
    * @param e event
-   * @param value value from InputOnChangeData
+   * @param value value from DropdownProps
    */
-  private onChangeState = async (e: any, { value }: InputOnChangeData) => {
+  private onChangeState = async (e: any, { value }: DropdownProps) => {
     const updatedFilters: Filters = {
       ...this.state.filters,
       packingState: value && value != "all-status" ? value as PackingState : undefined
@@ -371,12 +376,12 @@ class PackingList extends React.Component<Props, State> {
    * Handles changing date
    *
    * @param e event
-   * @param value value from InputOnChangeData
+   * @param value value from DropdownProps
    */
-  private onChangeDateAfter = async (e: any, { value }: InputOnChangeData) => {
+  private onChangeDateAfter = async (e: any, { value }: DropdownProps) => {
     const updatedFilters: Filters = {
       ...this.state.filters,
-      dateAfter: moment(value, "DD.MM.YYYY").toISOString()
+      dateAfter: moment(value as any, "DD.MM.YYYY").toISOString()
     };
 
     this.setState({ filters: updatedFilters });
@@ -394,12 +399,12 @@ class PackingList extends React.Component<Props, State> {
    * Handles changing date
    *
    * @param e event
-   * @param value value from InputOnChangeData
+   * @param value value from DropdownProps
    */
-  private onChangeDateBefore = async (e: any, { value }: InputOnChangeData) => {
+  private onChangeDateBefore = async (e: any, { value }: DropdownProps) => {
     const updatedFilters: Filters = {
       ...this.state.filters,
-      dateBefore: moment(value, "DD.MM.YYYY").toISOString()
+      dateBefore: moment(value as any, "DD.MM.YYYY").toISOString()
     };
     this.setState({ filters: updatedFilters });
 
@@ -418,7 +423,7 @@ class PackingList extends React.Component<Props, State> {
    * @param e event
    * @param value value from event data
    */
-  private onChangeProduct = async (e: any, { value }: InputOnChangeData | TextAreaProps) => {
+  private onChangeProduct = async (e: any, { value }: DropdownProps | TextAreaProps) => {
     const { products } = this.props;
 
     if (!products) {
@@ -448,7 +453,7 @@ class PackingList extends React.Component<Props, State> {
    * @param e event
    * @param value value from event data
    */
-  private onChangeCampaing = async (e: any, { value }: InputOnChangeData | TextAreaProps) => {
+  private onChangeCampaing = async (e: any, { value }: DropdownProps | TextAreaProps) => {
     const { campaigns } = this.props;
 
     if (!campaigns) {
@@ -516,7 +521,7 @@ class PackingList extends React.Component<Props, State> {
    * @param filters filters
    */
   private updatePackings = async (filters: Filters, append: boolean) => {
-    const { keycloak, onPackingsFound, onProductsFound, onCampaignsFound, onPackageSizesFound } = this.props;
+    const { keycloak, facility, onPackingsFound, onProductsFound, onCampaignsFound, onPackageSizesFound } = this.props;
     const { productId, campaingId, packingState, dateAfter, dateBefore, firstResult } = filters;
     if (!keycloak) {
       return;
@@ -531,16 +536,16 @@ class PackingList extends React.Component<Props, State> {
     ]);
 
     if (!this.props.packageSizes || this.props.packageSizes.length < 1) {
-      const packageSizes = await packageSizesService.listPackageSizes({ });
+      const packageSizes = await packageSizesService.listPackageSizes({ facility: facility });
       onPackageSizesFound && onPackageSizesFound(packageSizes);
     }
 
     if (!this.props.products || this.props.products.length < 1) {
-      const products = await productsService.listProducts({ })
+      const products = await productsService.listProducts({ facility: facility });
       onProductsFound && onProductsFound(products);
     }
     if (!this.props.campaigns || this.props.campaigns.length < 1) {
-      const campaigns = await campaignsService.listCampaigns();
+      const campaigns = await campaignsService.listCampaigns({ facility: facility });
       onCampaignsFound && onCampaignsFound(campaigns);
     }
     const fr = append ? firstResult : 0;
@@ -551,7 +556,8 @@ class PackingList extends React.Component<Props, State> {
       createdAfter: dateAfter,
       createdBefore: dateBefore,
       firstResult: fr,
-      maxResults: 20
+      maxResults: 20,
+      facility: facility
     });
     onPackingsFound && onPackingsFound(append ? (this.props.packings || []).concat(packings) : packings);
     this.setState({ filters: {...filters, firstResult: fr}, loading: false, allFound: packings.length < 20 });
@@ -567,7 +573,8 @@ const mapStateToProps = (state: StoreState) => ({
   products: state.products,
   packings: state.packings,
   campaigns: state.campaigns,
-  packageSizes: state.packageSizes
+  packageSizes: state.packageSizes,
+  facility: state.facility
 });
 
 /**
@@ -579,7 +586,7 @@ const mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({
   onProductsFound: (products: Product[]) => dispatch(actions.productsFound(products)),
   onPackingsFound: (packings: Packing[]) => dispatch(actions.packingsFound(packings)),
   onCampaignsFound: (campaigns: Campaign[]) => dispatch(actions.campaignsFound(campaigns)),
-  onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error)),
+  onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error)),
   onPackageSizesFound: (packageSizes: PackageSize[]) => dispatch(actions.packageSizesFound(packageSizes))
 });
 

@@ -6,8 +6,8 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { ProductionLine } from "../generated/client";
-import strings from "src/localization/strings";
+import { Facility, ProductionLine } from "../generated/client";
+import strings from "../localization/strings";
 
 import {
   List,
@@ -19,8 +19,9 @@ import {
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   productionLines?: ProductionLine[];
+  facility: Facility;
   onProductionLinesFound?: (productionLines: ProductionLine[]) => void,
-  onError: (error: ErrorMessage) => void
+  onError: (error: ErrorMessage | undefined) => void
 }
 
 export interface State {
@@ -39,13 +40,14 @@ class ProductionLineList extends React.Component<Props, State> {
    * Component did mount life-sycle event
    */
   public async componentDidMount() {
+    const { keycloak, facility, onError, onProductionLinesFound } = this.props;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
   
-      const productionLinesService = await Api.getProductionLinesService(this.props.keycloak);
-      const productionLines = await productionLinesService.listProductionLines({});
+      const productionLinesService = await Api.getProductionLinesService(keycloak);
+      const productionLines = await productionLinesService.listProductionLines({ facility: facility });
 
       productionLines.sort((a, b) => {
         let nameA = this.getStringsNumber(a.lineNumber)
@@ -54,9 +56,9 @@ class ProductionLineList extends React.Component<Props, State> {
         if(nameA > nameB) { return 1; }
         return 0;
       });
-      this.props.onProductionLinesFound && this.props.onProductionLinesFound(productionLines);
-    } catch (e) {
-      this.props.onError({
+      onProductionLinesFound && onProductionLinesFound(productionLines);
+    } catch (e: any) {
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -148,7 +150,8 @@ class ProductionLineList extends React.Component<Props, State> {
 export function mapStateToProps(state: StoreState) {
   return {
     productionLines: state.productionLines,
-    productionLine: state.productionLine
+    productionLine: state.productionLine,
+    facility: state.facility
   };
 }
 
@@ -160,7 +163,7 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onProductionLinesFound: (productionLines: ProductionLine[]) => dispatch(actions.productionLinesFound(productionLines)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

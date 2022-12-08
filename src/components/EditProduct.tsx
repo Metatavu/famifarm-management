@@ -4,9 +4,9 @@ import * as actions from "../actions";
 import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
-import { Product, PackageSize, LocalizedValue, HarvestEventType } from "../generated/client";
-import { Redirect } from 'react-router';
-import strings from "src/localization/strings";
+import { Product, PackageSize, LocalizedValue, HarvestEventType, Facility } from "../generated/client";
+import { Navigate } from 'react-router-dom';
+import strings from "../localization/strings";
 
 import {
   Grid,
@@ -18,7 +18,7 @@ import {
   CheckboxProps,
   DropdownProps
 } from "semantic-ui-react";
-import LocalizedUtils from "src/localization/localizedutils";
+import LocalizedUtils from "../localization/localizedutils";
 import LocalizedValueInput from "./LocalizedValueInput";
 import { FormContainer } from "./FormContainer";
 
@@ -30,10 +30,11 @@ interface Props {
   productId: string;
   product?: Product;
   packageSizes?: PackageSize[];
+  facility: Facility;
   onProductSelected?: (product: Product) => void;
   onProductDeleted?: (productId: string) => void;
   onPackageSizesFound?: (packageSizes: PackageSize[]) => void;
-  onError: (error: ErrorMessage) => void;
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 /**
@@ -74,7 +75,7 @@ class EditProduct extends React.Component<Props, State> {
    * Component did mount life cycle method
    */
   public componentDidMount = async () => {
-    const { keycloak, productId, onPackageSizesFound, onProductSelected } = this.props;
+    const { keycloak, productId, facility, onPackageSizesFound, onProductSelected, onError } = this.props;
 
     if (!keycloak) {
       return;
@@ -83,15 +84,18 @@ class EditProduct extends React.Component<Props, State> {
     try {
       const packageSizeService = await Api.getPackageSizesService(keycloak);
       const productsService = await Api.getProductsService(keycloak);
-      const product = await productsService.findProduct({ productId });
+      const product = await productsService.findProduct({
+        productId: productId,
+        facility: facility
+      });
   
       onProductSelected && onProductSelected(product);
       this.setState({ product });
   
-      const packageSizes = await packageSizeService.listPackageSizes({ });
+      const packageSizes = await packageSizeService.listPackageSizes({ facility: facility });
       onPackageSizesFound && onPackageSizesFound(packageSizes);
-    } catch (e) {
-      this.props.onError({
+    } catch (e: any) {
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -103,7 +107,7 @@ class EditProduct extends React.Component<Props, State> {
    * Handle form submit
    */
   private handleSubmit = async () => {
-    const { keycloak, onError } = this.props;
+    const { keycloak, facility, onError } = this.props;
     const { product } = this.state;
     try {
       if (!keycloak || !product) {
@@ -113,14 +117,18 @@ class EditProduct extends React.Component<Props, State> {
       const productsService = await Api.getProductsService(keycloak);
 
       this.setState({ saving: true });
-      await productsService.updateProduct({ productId: product.id!, product });
+      await productsService.updateProduct({
+        productId: product.id!,
+        product: product,
+        facility: facility
+      });
       this.setState({ saving: false });
   
       this.setState({ messageVisible: true });
       setTimeout(() => {
         this.setState({ messageVisible: false });
       }, 3000);
-    } catch (e) {
+    } catch (e: any) {
       onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -133,7 +141,7 @@ class EditProduct extends React.Component<Props, State> {
    * Handle product delete
    */
   private handleDelete = async () => {
-    const { keycloak } = this.props;
+    const { keycloak, facility } = this.props;
     const { product } = this.state;
     if (!keycloak || !product) {
       return;
@@ -142,7 +150,10 @@ class EditProduct extends React.Component<Props, State> {
     const productsService = await Api.getProductsService(keycloak);
     const productId = product.id || "";
 
-    await productsService.deleteProduct({ productId });
+    await productsService.deleteProduct({
+      productId: productId,
+      facility: facility
+    });
 
     this.props.onProductDeleted && this.props.onProductDeleted(productId!);
     this.setState({ redirect: true });
@@ -200,7 +211,7 @@ class EditProduct extends React.Component<Props, State> {
     this.setState({
       product: {
         ...this.state.product,
-        isSubcontractorProduct: checked || false
+        isSubcontractorProduct: checked || false
       }
     })
   }
@@ -223,7 +234,7 @@ class EditProduct extends React.Component<Props, State> {
    */
   public render() {
     const { packageSizes } = this.props;
-    const { redirect, product, saving } = this.state;
+    const { product, saving } = this.state;
 
     if (!this.props.product) {
       return (
@@ -233,8 +244,8 @@ class EditProduct extends React.Component<Props, State> {
       );
     }
 
-    if (redirect) {
-      return <Redirect push to="/products" />;
+    if (this.state.redirect) {
+      return <Navigate to="/products" replace={true}/>;
     }
 
     const packageSizeOptions = (packageSizes || []).map(packageSize => ({
@@ -333,7 +344,7 @@ class EditProduct extends React.Component<Props, State> {
         <Confirm
           open={ this.state.open }
           size="mini"
-          content={ `${strings.deleteConfirmationText}${this.props.product!.name![0].value}` }
+          content={ this.props.product.name ? `${strings.deleteConfirmationText}${this.props.product.name[0].value}` : "" }
           onCancel={ () => this.setState({ open:false }) }
           onConfirm={ this.handleDelete }
         />
@@ -350,7 +361,8 @@ class EditProduct extends React.Component<Props, State> {
 const mapStateToProps = (state: StoreState) => ({
   products: state.products,
   product: state.product,
-  packageSizes: state.packageSizes
+  packageSizes: state.packageSizes,
+  facility: state.facility
 });
 
 /**
@@ -362,7 +374,7 @@ const mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({
   onProductSelected: (product: Product) => dispatch(actions.productSelected(product)),
   onProductDeleted: (productId: string) => dispatch(actions.productDeleted(productId)),
   onPackageSizesFound: (packageSizes: PackageSize[]) => dispatch(actions.packageSizesFound(packageSizes)),
-  onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditProduct);

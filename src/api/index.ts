@@ -16,7 +16,7 @@ import {
   SeedBatchesApi,
   SeedsApi,
   WastageReasonsApi,
-  StorageDiscardsApi } from 'src/generated/client';
+  StorageDiscardsApi } from '../generated/client';
 
 const API_URL = process.env.REACT_APP_FAMIFARM_API_BASE_PATH || "http://localhost:8080";
 

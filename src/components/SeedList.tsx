@@ -3,8 +3,8 @@ import * as Keycloak from 'keycloak-js';
 import * as actions from "../actions";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Seed } from "../generated/client";
-import strings from "src/localization/strings";
+import { Facility, Seed } from "../generated/client";
+import strings from "../localization/strings";
 import { StoreState, ErrorMessage } from "../types/index";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
@@ -15,13 +15,14 @@ import {
   Grid,
   Loader
 } from "semantic-ui-react";
-import LocalizedUtils from "src/localization/localizedutils";
+import LocalizedUtils from "../localization/localizedutils";
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   seeds?: Seed[];
-  onSeedsFound?: (seeds: Seed[]) => void,
-  onError: (error: ErrorMessage) => void
+  onSeedsFound?: (seeds: Seed[]) => void;
+  onError: (error: ErrorMessage | undefined) => void;
+  facility: Facility;
 }
 
 export interface State {
@@ -40,13 +41,14 @@ class SeedsList extends React.Component<Props, State> {
    * Component did mount life-sycle event
    */
   public async componentDidMount() {
+    const { keycloak, onSeedsFound, onError, facility } = this.props;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
 
-      const seedsService = await Api.getSeedsService(this.props.keycloak);
-      const seeds = await seedsService.listSeeds({});
+      const seedsService = await Api.getSeedsService(keycloak);
+      const seeds = await seedsService.listSeeds({ facility: facility });
       seeds.sort((a, b) => {
         let nameA = LocalizedUtils.getLocalizedValue(a.name)
         let nameB = LocalizedUtils.getLocalizedValue(b.name)
@@ -54,9 +56,9 @@ class SeedsList extends React.Component<Props, State> {
         if(nameA > nameB) { return 1; }
         return 0;
       });
-      this.props.onSeedsFound && this.props.onSeedsFound(seeds);
-    } catch (e) {
-      this.props.onError({
+      onSeedsFound && onSeedsFound(seeds);
+    } catch (e: any) {
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -120,7 +122,8 @@ class SeedsList extends React.Component<Props, State> {
 export function mapStateToProps(state: StoreState) {
   return {
     seeds: state.seeds,
-    seed: state.seed
+    seed: state.seed,
+    facility: state.facility
   };
 }
 
@@ -132,7 +135,7 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onSeedsFound: (seeds: Seed[]) => dispatch(actions.seedsFound(seeds)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error)),
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error)),
   };
 }
 

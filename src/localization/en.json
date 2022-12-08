@@ -14,6 +14,7 @@
   "date": "Date",
   "dateBefore": "Created before date",
   "dateAfter": "Created after date",
+  "selectDate": "Select date",
   "open": "Open",
   "savedSuccessfully": "Saved successfully!",
   "delete": "Delete",
@@ -233,6 +234,10 @@
   "edit": "Edit",
   "allCampaings": "All campaings",
   "removeFromStorageButton": "Remove from storage",
-  "allowedHarvestTypes": "Allowed harvest types"
+  "allowedHarvestTypes": "Allowed harvest types",
+
+  "dashboard": "Dashboard",
+  "dashboardFormDescription": "Select date to display cumulative packings data:",
+  "dashboardCount": "Package count"
 
 }

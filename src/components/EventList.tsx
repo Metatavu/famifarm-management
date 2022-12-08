@@ -2,9 +2,9 @@ import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Event, EventType, Product, ProductionLine, SowingEventData } from "../generated/client";
-import strings from "src/localization/strings";
-import * as moment from "moment";
+import { Event, EventType, Facility, Product, ProductionLine } from "../generated/client";
+import strings from "../localization/strings";
+import moment from "moment";
 import * as actions from "../actions";
 import { StoreState, ErrorMessage, EventListFilters } from "../types/index";
 import { connect } from "react-redux";
@@ -15,13 +15,13 @@ import {
   Grid,
   Loader,
   Form,
-  InputOnChangeData,
+  DropdownProps,
   TextAreaProps,
   Visibility,
   Table
 } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
-import LocalizedUtils from "src/localization/localizedutils";
+import LocalizedUtils from "../localization/localizedutils";
 
 
 /**
@@ -33,6 +33,7 @@ interface Props {
   eventListFilters?: EventListFilters;
   products?: Product[];
   location?: any,
+  facility: Facility;
   onEventListFiltersUpdated?: (filters: EventListFilters) => void,
   onEventsFound?: (events: Event[]) => void,
   onProductsFound?: (products: Product[]) => void,
@@ -69,16 +70,17 @@ class EventList extends React.Component<Props, State> {
    * Component did mount life-sycle event
    */
   public async componentDidMount() {
+    const { keycloak, facility, eventListFilters } = this.props;
     try {
-      if (this.props.keycloak) {
-        const productionLinesService = await Api.getProductionLinesService(this.props.keycloak);
-        const productionLines = await productionLinesService.listProductionLines({});
+      if (keycloak) {
+        const productionLinesService = await Api.getProductionLinesService(keycloak);
+        const productionLines = await productionLinesService.listProductionLines({ facility: facility });
         this.setState({
           productionLines: productionLines
         });
       }
       
-      await this.updateEvents(this.props.eventListFilters || {});
+      await this.updateEvents(eventListFilters || {});
     } catch(e) {
       console.error(e);
     }
@@ -89,9 +91,9 @@ class EventList extends React.Component<Props, State> {
     const eventProduct = products.find((product) => product.id === event.productId);
     const productName = eventProduct ? LocalizedUtils.getLocalizedValue(eventProduct.name) : event.id;
     const startTime = moment(event.startTime).format("DD.MM.YYYY");
-    const eventTypeString = strings[`phase${event.type}`];
+    const eventTypeString = strings[`phase${event.type}`] as string;
     const eventData = event.data as any;
-    const productionLine = eventData.productionLineId ? this.state.productionLines.find(line => line.id == eventData.productionLineId) : undefined;
+    const productionLine = eventData.productionLineId ? this.state.productionLines.find(line => line.id === eventData.productionLineId) : undefined;
     if (this.props.eventListFilters && this.props.eventListFilters.productionLine) {
       if (!productionLine) {
         return null;
@@ -212,15 +214,15 @@ class EventList extends React.Component<Props, State> {
   /**
    * Handles changing date
    */
-  private onChangeDate = async (e: any, { value }: InputOnChangeData) => {
-    const date =  moment(value, "DD.MM.YYYY");
+  private onChangeDate = async (e: any, { value }: DropdownProps) => {
+    const date =  moment(value as any, "DD.MM.YYYY");
     await this.updateEvents({...this.props.eventListFilters, date: date.toDate()});
   }
 
   /**
    * Handles changing selected product
    */
-  private onChangeProduct = async (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
+  private onChangeProduct = async (e: any, { name, value }: DropdownProps | TextAreaProps) => {
     const product = (this.props.products || []).find(product => product.id === value);
     await this.updateEvents({...this.props.eventListFilters, product});
   }
@@ -228,7 +230,7 @@ class EventList extends React.Component<Props, State> {
   /**
    * Handles changing selected product
    */
-  private onChangeEventTypeFilter = async (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
+  private onChangeEventTypeFilter = async (e: any, { name, value }: DropdownProps | TextAreaProps) => {
     const type = (value || undefined) as any;
     await this.updateEvents({...this.props.eventListFilters, type});
   }
@@ -236,7 +238,7 @@ class EventList extends React.Component<Props, State> {
   /**
    * Handles the change of production line filter
    */
-  private onChangeProductionLineFilter = (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
+  private onChangeProductionLineFilter = (e: any, { name, value }: DropdownProps | TextAreaProps) => {
     const productionLine = (this.state.productionLines || []).find(productionLine => productionLine.id === value);
     this.props.onEventListFiltersUpdated && this.props.onEventListFiltersUpdated({
       ...this.props.eventListFilters,
@@ -310,10 +312,11 @@ class EventList extends React.Component<Props, State> {
    * Updates batch list
    */
   private updateEvents = async (filters: EventListFilters) => {
-    if (!this.props.keycloak) {
+    const { keycloak, facility, eventListFilters, onError, onEventListFiltersUpdated, onEventsFound, onProductsFound } = this.props;
+    if (!keycloak) {
       return;
     }
-    const prevFilters = this.props.eventListFilters;
+    const prevFilters = eventListFilters;
     const dateFilter = filters.date ? moment(filters.date) : moment();
     const createdBefore = dateFilter.endOf("day").toISOString();
     const createdAfter = dateFilter.startOf("day").toISOString();
@@ -321,8 +324,8 @@ class EventList extends React.Component<Props, State> {
     this.setState({loading: true});
     try {
       const [eventsService, productsService] = await Promise.all([
-        Api.getEventsService(this.props.keycloak),
-        Api.getProductsService(this.props.keycloak)
+        Api.getEventsService(keycloak),
+        Api.getProductsService(keycloak)
       ]);
 
       const [events, products] = await Promise.all([
@@ -332,23 +335,24 @@ class EventList extends React.Component<Props, State> {
           createdAfter: createdAfter,
           createdBefore: createdBefore,
           firstResult: firstResult,
-          maxResults: 20
+          maxResults: 20,
+          facility: facility
         }),
-        productsService.listProducts({}),
+        productsService.listProducts({ facility: facility }),
       ]);
 
       const updatedEvents = firstResult > 0 ? [...(this.props.events || []), ...events] : events;
-      this.props.onEventsFound && this.props.onEventsFound(updatedEvents);
-      this.props.onEventListFiltersUpdated && this.props.onEventListFiltersUpdated({
+      onEventsFound && onEventsFound(updatedEvents);
+      onEventListFiltersUpdated && onEventListFiltersUpdated({
         date: dateFilter.toDate(),
         firstResult: firstResult,
         product: filters.product || undefined,
         type: filters.type
       });
-      this.props.onProductsFound && this.props.onProductsFound(products);
+      onProductsFound && onProductsFound(products);
       this.setState({loading: false, loadingFirstTime: false})
-    } catch(e) {
-      this.props.onError && this.props.onError({
+    } catch(e: any) {
+      onError && onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -366,7 +370,8 @@ export function mapStateToProps(state: StoreState) {
   return {
     products: state.products,
     eventListFilters: state.eventListFilters,
-    events: state.events
+    events: state.events,
+    facility: state.facility
   };
 }
 
@@ -380,7 +385,7 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
     onProductsFound: (products: Product[]) => dispatch(actions.productsFound(products)),
     onEventListFiltersUpdated: (filters: EventListFilters) => dispatch(actions.eventListFiltersUpdated(filters)),
     onEventsFound: (events: Event[]) => dispatch(actions.eventsFound(events)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

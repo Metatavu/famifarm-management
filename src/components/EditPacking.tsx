@@ -1,23 +1,24 @@
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import { StoreState, ErrorMessage } from "src/types";
+import { StoreState, ErrorMessage } from "../types";
 import * as actions from "../actions";
-import { Packing, Product, PackageSize, PackingState, Printer, PackingType, Campaign } from "../generated/client";
+import { Packing, Product, PackageSize, PackingState, Printer, PackingType, Campaign, Facility } from "../generated/client";
 import Api from "../api";
 import { KeycloakInstance } from "keycloak-js";
-import strings from "src/localization/strings";
-import LocalizedUtils from "src/localization/localizedutils";
-import { Grid, Button, Form, Select, Input, DropdownItemProps, DropdownProps, InputOnChangeData, Loader, Message, Confirm } from "semantic-ui-react";
+import strings from "../localization/strings";
+import LocalizedUtils from "../localization/localizedutils";
+import { Grid, Button, Form, Select, Input, DropdownItemProps, DropdownProps, Loader, Message, Confirm, InputOnChangeData } from "semantic-ui-react";
 import { FormContainer } from "./FormContainer";
 import { DateTimeInput } from 'semantic-ui-calendar-react';
-import * as moment from "moment";
-import { Redirect } from "react-router";
+import moment from "moment";
+import { Navigate } from "react-router-dom";
 
 export interface Props {
-  keycloak: KeycloakInstance,
-  packingId: string,
-  onError: (error: ErrorMessage) => void
+  keycloak: KeycloakInstance;
+  packingId: string;
+  facility: Facility;
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 export interface State {
@@ -68,20 +69,24 @@ class EditPacking extends React.Component<Props, State> {
 }
 
   public async componentDidMount() {
+    const { keycloak, packingId, facility } = this.props;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
       this.setState({loading: true});
 
-      const packingsService = await Api.getPackingsService(this.props.keycloak);
-      const packing = await packingsService.findPacking({packingId: this.props.packingId});
+      const packingsService = await Api.getPackingsService(keycloak);
+      const packing = await packingsService.findPacking({
+        packingId: packingId,
+        facility: facility
+      });
 
-      const productsService = await Api.getProductsService(this.props.keycloak);
-      const products = await productsService.listProducts({});
+      const productsService = await Api.getProductsService(keycloak);
+      const products = await productsService.listProducts({ facility: facility });
 
-      const campaignsService = await Api.getCampaignsService(this.props.keycloak);
-      const campaigns = await campaignsService.listCampaigns();
+      const campaignsService = await Api.getCampaignsService(keycloak);
+      const campaigns = await campaignsService.listCampaigns({ facility: facility });
 
       const packingStatus = packing.state;
       const date = packing.time;
@@ -91,8 +96,11 @@ class EditPacking extends React.Component<Props, State> {
       }
 
       if (packing.type == "BASIC") {
-        const product = await productsService.findProduct({productId: packing.productId!});
-        const packedCount = packing.packedCount || 0;
+        const product = await productsService.findProduct({
+          productId: packing.productId!,
+          facility: facility
+        });
+        const packedCount = packing.packedCount || 0;
   
         await this.refreshPrinters();
         
@@ -104,8 +112,8 @@ class EditPacking extends React.Component<Props, State> {
   
         const productName = LocalizedUtils.getLocalizedValue(product.name);
   
-        const packageSizesSerivce = await Api.getPackageSizesService(this.props.keycloak);
-        const packageSizes = await packageSizesSerivce.listPackageSizes({});
+        const packageSizesSerivce = await Api.getPackageSizesService(keycloak);
+        const packageSizes = await packageSizesSerivce.listPackageSizes({ facility: facility });
   
         this.setState({
           packing,
@@ -124,7 +132,10 @@ class EditPacking extends React.Component<Props, State> {
       }
 
       if (packing.type == "CAMPAIGN") {
-        const campaign = await campaignsService.findCampaign({campaignId: packing.campaignId!});
+        const campaign = await campaignsService.findCampaign({
+          campaignId: packing.campaignId!,
+          facility: facility
+        });
         const { name, id } = campaign;
 
         this.setState({
@@ -141,7 +152,7 @@ class EditPacking extends React.Component<Props, State> {
       }
 
 
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -160,7 +171,7 @@ class EditPacking extends React.Component<Props, State> {
     }
     
     if (this.state.redirect) {
-      return <Redirect to="/packings" push={true} />;
+      return <Navigate replace={true} to="/packings"/>;
     }
     
     const productOptions: DropdownItemProps[] = this.state.products.map((product) => {
@@ -344,7 +355,7 @@ class EditPacking extends React.Component<Props, State> {
           <Grid.Column width={8}>
           <Select
             options={ printers }
-            text={ this.state.selectedPrinter ? this.state.selectedPrinter.name : strings.selectPrinter }
+            text={ this.state.selectedPrinter ? this.state.selectedPrinter.name : strings.selectPrinter }
             value={ this.state.selectedPrinter ? this.state.selectedPrinter.id : undefined }
             onChange={ this.onPrinterChange }
           />
@@ -428,7 +439,7 @@ class EditPacking extends React.Component<Props, State> {
    /**
     * @summary Handles updating printers
     */
-   private onPrinterChange = (event: any, { value }: InputOnChangeData) => {
+   private onPrinterChange = (event: any, { value }: DropdownProps) => {
     this.setState({ selectedPrinter: this.state.printers.find(printer => printer.id == value)! });
   }
 
@@ -436,13 +447,19 @@ class EditPacking extends React.Component<Props, State> {
    * @summary prints a packing label
    */
   private print = async () => {
-    if (!this.props.keycloak || !this.state.packing || !this.state.packing.id || !this.state.selectedPrinter) {
+    const { packing, selectedPrinter } = this.state;
+    const { keycloak, facility } = this.props;
+    if (!keycloak || !packing || !packing.id || !selectedPrinter) {
       return;
     }
 
     this.setState({ printing: true });
     const printingService = await Api.getPrintersService(this.props.keycloak);
-    await printingService.print({printerId: this.state.selectedPrinter.id, printData: {packingId: this.state.packing.id}});
+    await printingService.print({
+      printerId: selectedPrinter.id,
+      printData: { packingId: packing.id },
+      facility: facility
+    });
     this.setState({ printing: false });
   }
 
@@ -450,12 +467,13 @@ class EditPacking extends React.Component<Props, State> {
    * @summary Refreshes the list of printers
    */
   private refreshPrinters = async () => {
-    if (!this.props.keycloak) {
+    const { keycloak, facility } = this.props;
+    if (!keycloak) {
       return;
     }
-    this.setState({ refreshingPrinters: true })
-    const printingService = await Api.getPrintersService(this.props.keycloak);
-    const printers = await printingService.listPrinters();
+    this.setState({ refreshingPrinters: true })
+    const printingService = await Api.getPrintersService(keycloak);
+    const printers = await printingService.listPrinters({ facility: facility });
     this.setState({ printers, refreshingPrinters: false });
   }
 
@@ -496,7 +514,7 @@ class EditPacking extends React.Component<Props, State> {
   /**
     * Event handler for packing status
     */
-  private onStatusChange = (event: any, { value }: InputOnChangeData) => {
+  private onStatusChange = (event: any, { value }: DropdownProps) => {
     this.setState({packingStatus: value as PackingState})
   }
 
@@ -511,22 +529,24 @@ class EditPacking extends React.Component<Props, State> {
   /**
     * Handles changing date
     */
-    private onChangeDate = (e: any, { value }: InputOnChangeData) => {
-      this.setState({date: moment(value, "DD.MM.YYYY HH:mm").toDate()});
+    private onChangeDate = (e: any, { value }: DropdownProps) => {
+      this.setState({date: moment(value as any, "DD.MM.YYYY HH:mm").toDate()});
   }
 
   /**
    * Submits an updated packing
    */
   private handleSubmit = async () => {
+    const { keycloak, facility, onError } = this.props;
+    const { packing, productId, campaignId, packageSizeId, packedCount, packingStatus, date, packingType } = this.state;
     try {
-      const type = this.state.packingType;
+      const type = packingType;
 
-      if (type == "BASIC" && !this.state.productId) {
+      if (type == "BASIC" && !productId) {
         return;
       }
 
-      if (type == "CAMPAIGN" && !this.state.campaignId) {
+      if (type == "CAMPAIGN" && !campaignId) {
         return;
       }
 
@@ -536,17 +556,17 @@ class EditPacking extends React.Component<Props, State> {
 
       const updatedPacking = type == "CAMPAIGN" ? {
         type,
-        id: this.state.packing ? this.state.packing.id : undefined,
-        campaignId: this.state.campaignId,
-        state: this.state.packingStatus,
-        time: this.state.date
+        id: packing ? packing.id : undefined,
+        campaignId: campaignId,
+        state: packingStatus,
+        time: date
       } : {
-        id: this.state.packing ? this.state.packing.id : undefined,
-        productId: this.state.productId,
-        time: this.state.date,
-        packedCount: this.state.packedCount,
-        packageSizeId: this.state.packageSizeId,
-        state: this.state.packingStatus,
+        id: packing ? packing.id : undefined,
+        productId: productId,
+        time: date,
+        packedCount: packedCount,
+        packageSizeId: packageSizeId,
+        state: packingStatus,
         type
       }
 
@@ -554,15 +574,19 @@ class EditPacking extends React.Component<Props, State> {
         throw new Error("Packing id is undefined.");
       }
 
-      const packingsService = await Api.getPackingsService(this.props.keycloak);
-      await packingsService.updatePacking({packingId: updatedPacking.id, packing: updatedPacking});
+      const packingsService = await Api.getPackingsService(keycloak);
+      await packingsService.updatePacking({
+        packingId: updatedPacking.id,
+        packing: updatedPacking,
+        facility: facility
+      });
 
       this.setState({messageVisible: true});
       setTimeout(() => {
         this.setState({messageVisible: false});
       }, 3000);
-    } catch (e) {
-      this.props.onError({
+    } catch (e: any) {
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -575,22 +599,27 @@ class EditPacking extends React.Component<Props, State> {
    * Deletes a packing
    */
   private handleDelete = async () => {
+    const { keycloak, facility, onError } = this.props;
+    const { packing } = this.state;
     try {
-      const packingsService = await Api.getPackingsService(this.props.keycloak);
-      if (!this.state.packing) {
+      const packingsService = await Api.getPackingsService(keycloak);
+      if (!packing) {
         throw new Error("Packing is undefined");
       }
   
-      if (!this.state.packing.id) {
+      if (!packing.id) {
         throw new Error("Packing id is undefined")
       }
 
-      await packingsService.deletePacking({packingId: this.state.packing.id});
+      await packingsService.deletePacking({
+        packingId: packing.id,
+        facility: facility
+      });
 
       this.setState({redirect: true});
 
-    } catch (e) {
-      this.props.onError({
+    } catch (e: any) {
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -607,7 +636,7 @@ class EditPacking extends React.Component<Props, State> {
  */
 export function mapStateToProps(state: StoreState) {
     return {
-
+      facility: state.facility
     };
 }
   
@@ -618,7 +647,7 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };  
 };
 

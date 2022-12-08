@@ -5,8 +5,8 @@ import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
-import { Product, PackageSize, LocalizedValue, HarvestEventType } from "../generated/client";
-import { Redirect } from 'react-router';
+import { Product, PackageSize, LocalizedValue, HarvestEventType, Facility } from "../generated/client";
+import { Navigate } from 'react-router-dom';
 import strings from "../localization/strings";
 
 import {
@@ -16,7 +16,7 @@ import {
   CheckboxProps,
   DropdownProps
 } from "semantic-ui-react";
-import LocalizedUtils from "src/localization/localizedutils";
+import LocalizedUtils from "../localization/localizedutils";
 import LocalizedValueInput from "./LocalizedValueInput";
 import { FormContainer } from "./FormContainer";
 
@@ -26,9 +26,10 @@ import { FormContainer } from "./FormContainer";
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   packageSizes?: PackageSize[];
+  facility: Facility;
   onProductCreated?: (product: Product) => void;
-  onPackageSizesFound?: (packageSizes: PackageSize[]) => void,
-  onError: (error: ErrorMessage) => void
+  onPackageSizesFound?: (packageSizes: PackageSize[]) => void;
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 /**
@@ -59,16 +60,17 @@ class CreateProduct extends React.Component<Props, State> {
    * Component did mount life cycle method
    */
   public componentDidMount = async () => {
+    const { keycloak, facility, onError, onPackageSizesFound } = this.props;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
 
-      const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-      const packageSizes = await packageSizeService.listPackageSizes({});
-      this.props.onPackageSizesFound && this.props.onPackageSizesFound(packageSizes);
-    } catch (e) {
-      this.props.onError({
+      const packageSizeService = await Api.getPackageSizesService(keycloak);
+      const packageSizes = await packageSizeService.listPackageSizes({ facility: facility });
+      onPackageSizesFound && onPackageSizesFound(packageSizes);
+    } catch (e: any) {
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -80,7 +82,8 @@ class CreateProduct extends React.Component<Props, State> {
    * Handle form submit
    */
   private handleSubmit = async () => {
-    const { keycloak } = this.props;
+    const { keycloak, facility } = this.props;
+    const { productData } = this.state;
 
     if (!keycloak) {
       return;
@@ -89,16 +92,17 @@ class CreateProduct extends React.Component<Props, State> {
     try {  
       const productsService = await Api.getProductsService(keycloak);  
       await productsService.createProduct({
+        facility: facility,
         product: {
-          name: this.state.productData.name,
-          defaultPackageSizeIds: this.state.productData.defaultPackageSizeIds,
-          isSubcontractorProduct: this.state.productData.isSubcontractorProduct!,
-          active: this.state.productData.active
+          name: productData.name,
+          defaultPackageSizeIds: productData.defaultPackageSizeIds,
+          isSubcontractorProduct: productData.isSubcontractorProduct!,
+          active: productData.active
         }
       });
   
       this.setState({ redirect: true });
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -181,10 +185,10 @@ class CreateProduct extends React.Component<Props, State> {
    */
   public render = () => {
     const { packageSizes } = this.props;
-    const { redirect, productData } = this.state;
+    const { productData } = this.state;
 
-    if (redirect) {
-      return <Redirect push to="/products"/>;
+    if (this.state.redirect) {
+      return <Navigate replace={true} to="/products"/>;
     }
 
     const packageSizeOptions = (packageSizes || []).map(packageSize => ({
@@ -278,7 +282,8 @@ class CreateProduct extends React.Component<Props, State> {
 const mapStateToProps = (state: StoreState) => ({
   products: state.products,
   product: state.product,
-  packageSizes: state.packageSizes
+  packageSizes: state.packageSizes,
+  facility: state.facility
 });
 
 /**
@@ -289,7 +294,7 @@ const mapStateToProps = (state: StoreState) => ({
 const mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({
   onProductCreated: (product: Product) => dispatch(actions.productCreated(product)),
   onPackageSizesFound: (packageSizes: PackageSize[]) => dispatch(actions.packageSizesFound(packageSizes)),
-  onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+  onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateProduct);

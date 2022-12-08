@@ -6,8 +6,8 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { PerformedCultivationAction } from "../generated/client";
-import strings from "src/localization/strings";
+import { Facility, PerformedCultivationAction } from "../generated/client";
+import strings from "../localization/strings";
 
 import {
   List,
@@ -15,13 +15,14 @@ import {
   Grid,
   Loader
 } from "semantic-ui-react";
-import LocalizedUtils from "src/localization/localizedutils";
+import LocalizedUtils from "../localization/localizedutils";
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   performedCultivationActions?: PerformedCultivationAction[];
+  facility: Facility;
   onPerformedCultivationActionsFound?: (performedCultivationActions: PerformedCultivationAction[]) => void,
-  onError: (error: ErrorMessage) => void
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 export interface State {
@@ -40,17 +41,18 @@ class PerformedCultivationActionList extends React.Component<Props, State> {
    * Component did mount life-sycle event
    */
   async componentDidMount() {
+    const { keycloak, facility, onError, onPerformedCultivationActionsFound } = this.props;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
   
-      const performedCultivationActionServer = await Api.getPerformedCultivationActionsService(this.props.keycloak);
-      const performedCultivationActions = await performedCultivationActionServer.listPerformedCultivationActions({});
+      const performedCultivationActionServer = await Api.getPerformedCultivationActionsService(keycloak);
+      const performedCultivationActions = await performedCultivationActionServer.listPerformedCultivationActions({facility: facility});
       
-      this.props.onPerformedCultivationActionsFound && this.props.onPerformedCultivationActionsFound(performedCultivationActions);
-    } catch (e) {
-      this.props.onError({
+      onPerformedCultivationActionsFound && onPerformedCultivationActionsFound(performedCultivationActions);
+    } catch (e: any) {
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -114,7 +116,8 @@ class PerformedCultivationActionList extends React.Component<Props, State> {
 export function mapStateToProps(state: StoreState) {
   return {
     performedCultivationActions: state.performedCultivationActions,
-    performedCultivationAction: state.performedCultivationAction
+    performedCultivationAction: state.performedCultivationAction,
+    facility: state.facility
   };
 }
 
@@ -126,7 +129,7 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onPerformedCultivationActionsFound: (performedCultivationActions: PerformedCultivationAction[]) => dispatch(actions.performedCultivationActionsFound(performedCultivationActions)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

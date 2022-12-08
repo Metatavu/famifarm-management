@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Form, FormProps, Message, Transition } from "semantic-ui-react";
-import strings from "src/localization/strings";
+import strings from "../localization/strings";
 
 
 /**
@@ -119,7 +119,7 @@ export class FormContainer extends React.Component<Props, State> {
       return [];
     }
 
-    return React.Children.map(this.props.children, (childComponent: any, i: number) => {
+    return React.Children.map(this.props.children as any, (childComponent: any, i: number) => {
       let child = childComponent;
 
       if (child && child.props && child.props.type && child.props.type == "submit" && child.props.onClick) {

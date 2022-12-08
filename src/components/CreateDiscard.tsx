@@ -1,25 +1,26 @@
 import * as React from "react";
 import * as actions from "../actions"
 import { connect } from "react-redux";
-import { ErrorMessage, PackageSizeOptions, StoreState } from "src/types";
+import { ErrorMessage, PackageSizeOptions, StoreState } from "../types";
 import { Dispatch } from "redux";
-import strings from "src/localization/strings";
-import { Grid, Form, Button, Select, DropdownProps, Input, InputOnChangeData, Loader } from "semantic-ui-react";
+import strings from "../localization/strings";
+import { Grid, Form, Button, Select, DropdownProps, Input, Loader, InputOnChangeData } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import { FormContainer } from "./FormContainer";
-import { Packing, Product, PackageSize, PackingState, PackingType, Campaign, StorageDiscard } from "../generated/client";
-import LocalizedUtils from "src/localization/localizedutils";
-import * as moment from "moment";
+import { Packing, Product, PackageSize, PackingState, PackingType, Campaign, StorageDiscard, Facility } from "../generated/client";
+import LocalizedUtils from "../localization/localizedutils";
+import moment from "moment";
 import Api from "../api";
-import { Redirect } from "react-router";
+import { Navigate } from "react-router-dom";
 
 /**
  * Interface representing component properties
  */
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
+  facility: Facility;
   onPackingCreated?: (packing: Packing) => void;
-  onError: (error: ErrorMessage) => void;
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 /**
@@ -61,7 +62,7 @@ class CreateDiscard extends React.Component<Props, State> {
   public async componentDidMount() {
     try {
       await this.fetchData();
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -76,7 +77,6 @@ class CreateDiscard extends React.Component<Props, State> {
   render = () => {
     const {
       loading,
-      redirect,
       discardCount,
       productId,
       packageSizeId,
@@ -92,8 +92,8 @@ class CreateDiscard extends React.Component<Props, State> {
       );
     }
       
-    if (redirect) {
-      return <Redirect to={ `/discards/${this.state.discardId}` } push />;
+    if (this.state.redirect) {
+      return <Navigate replace={true} to={`/discards/${this.state.discardId}`}/>;
     }
 
     const productOptions = products.map(({ id, name }) => ({
@@ -195,7 +195,7 @@ class CreateDiscard extends React.Component<Props, State> {
    * @param data input change data
    */
   private onDiscardedCountChange = (event: any, { value }: InputOnChangeData) => {
-    const { discardCount } = this.state;
+    const { discardCount } = this.state;
     const count = Number(value);
     !Number.isNaN(discardCount) && this.setState({
       discardCount: count > 0 ? count : 0
@@ -209,8 +209,8 @@ class CreateDiscard extends React.Component<Props, State> {
    * @param event React change event
    * @param data input change data
    */
-  private onChangeDate = async (event: any, { value }: InputOnChangeData) => {
-    this.setState({ date: moment(value, "DD.MM.YYYY HH:mm").toDate() });
+  private onChangeDate = async (event: any, { value }: DropdownProps) => {
+    this.setState({ date: moment(value as any, "DD.MM.YYYY HH:mm").toDate() });
   }
 
   /**
@@ -218,7 +218,7 @@ class CreateDiscard extends React.Component<Props, State> {
    */
   private handleSubmit = async () => {
     const { packageSizeId, discardCount } = this.state;
-    const { keycloak } = this.props;
+    const { keycloak, facility } = this.props;
     if (!keycloak) {
       return;
     }
@@ -231,6 +231,7 @@ class CreateDiscard extends React.Component<Props, State> {
 
       const storageDiscardService = await Api.getStorageDiscardsService(keycloak);
       const discarded = await storageDiscardService.createStorageDiscard({
+        facility: facility,
         storageDiscard: {
           productId: this.state.productId,
           discardDate: new Date(),
@@ -242,7 +243,7 @@ class CreateDiscard extends React.Component<Props, State> {
         discardId: discarded.id,
         redirect: true
       });
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -278,7 +279,7 @@ class CreateDiscard extends React.Component<Props, State> {
    * method for fetching data
    */
   private fetchData = async () => {
-    const { keycloak } = this.props;
+    const { keycloak, facility } = this.props;
     if (!keycloak) {
       return;
     }
@@ -288,8 +289,11 @@ class CreateDiscard extends React.Component<Props, State> {
     const productsService = await Api.getProductsService(keycloak);
     const packageSizeService = await Api.getPackageSizesService(keycloak);
 
-    const products = await productsService.listProducts({ includeSubcontractorProducts: true });
-    const packageSizes = await packageSizeService.listPackageSizes({});
+    const products = await productsService.listProducts({
+      includeSubcontractorProducts: true,
+      facility: facility
+    });
+    const packageSizes = await packageSizeService.listPackageSizes({ facility: facility });
       
     this.setState({
       products,
@@ -306,7 +310,9 @@ class CreateDiscard extends React.Component<Props, State> {
  * 
  * @param state store state
  */
-const mapStateToProps = (state: StoreState) => ({ });
+const mapStateToProps = (state: StoreState) => ({
+  facility: state.facility
+});
   
 /**
  * Redux mapper for mapping component dispatches 
@@ -314,7 +320,7 @@ const mapStateToProps = (state: StoreState) => ({ });
  * @param dispatch dispatch method
  */
 const mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({
-  onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+   onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
 });
   
 export default connect(mapStateToProps, mapDispatchToProps)(CreateDiscard);

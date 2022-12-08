@@ -79,6 +79,9 @@ export type PERFORMED_CULTIVATION_ACTION_DELETED = typeof PERFORMED_CULTIVATION_
 export const LOCALE_UPDATE = "LOCALE_UPDATE";
 export type LOCALE_UPDATE = typeof LOCALE_UPDATE;
 
+export const FACILITY_UPDATE = "FACILITY_UPDATE";
+export type FACILITY_UPDATE = typeof FACILITY_UPDATE;
+
 export const WASTAGE_REASONS_FOUND= "WASTAGE_REASONS_FOUND";
 export type WASTAGE_REASONS_FOUND = typeof WASTAGE_REASONS_FOUND;
 
@@ -108,3 +111,8 @@ export type EVENT_LIST_FILTERS_UPDATED = typeof EVENT_LIST_FILTERS_UPDATED;
 
 export const EVENTS_FOUND = "EVENTS_FOUND";
 export type EVENTS_FOUND = typeof EVENTS_FOUND;
+
+/**
+ * X axis times for labels/ ticks
+ */
+export const X_AXIS_TIMES = [6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21];

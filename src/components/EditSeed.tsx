@@ -4,9 +4,9 @@ import * as actions from "../actions";
 import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
-import { LocalizedValue, Seed } from "../generated/client";
-import { Redirect } from 'react-router';
-import strings from "src/localization/strings";
+import { Facility, LocalizedValue, Seed } from "../generated/client";
+import { Navigate } from 'react-router-dom';
+import strings from "../localization/strings";
 
 import {
   Grid,
@@ -26,9 +26,10 @@ interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   seedId: string;
   seed?: Seed;
+  facility: Facility;
   onSeedSelected?: (seed: Seed) => void;
-  onSeedDeleted?: (seedId: string) => void,
-  onError: (error: ErrorMessage) => void
+  onSeedDeleted?: (seedId: string) => void;
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 /**
@@ -70,18 +71,22 @@ class EditSeed extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   public async componentDidMount() {
+    const { keycloak, facility, seedId, onSeedSelected, onError } = this.props;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
   
-      const seedsService = await Api.getSeedsService(this.props.keycloak);
-      const seed = await seedsService.findSeed({seedId: this.props.seedId});
+      const seedsService = await Api.getSeedsService(keycloak);
+      const seed = await seedsService.findSeed({
+        seedId: seedId,
+        facility: facility
+      });
       
-      this.props.onSeedSelected && this.props.onSeedSelected(seed);
+      onSeedSelected && onSeedSelected(seed);
       this.setState({seed: seed});
-    } catch (e) {
-      this.props.onError({
+    } catch (e: any) {
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -105,23 +110,29 @@ class EditSeed extends React.Component<Props, State> {
    * Handle form submit
    */
   private async handleSubmit() {
+    const { keycloak, facility, onError } = this.props;
+    const { seed } = this.state;
     try {
-      if (!this.props.keycloak || !this.state.seed) {
+      if (!keycloak || !seed) {
         return;
       }
   
-      const seedsService = await Api.getSeedsService(this.props.keycloak);
+      const seedsService = await Api.getSeedsService(keycloak);
   
       this.setState({saving: true});
-      await seedsService.updateSeed({seedId: this.state.seed.id!, seed: this.state.seed});
+      await seedsService.updateSeed({
+        seedId: seed.id!,
+        seed: seed,
+        facility: facility
+      });
       this.setState({saving: false});
   
       this.setState({messageVisible: true});
       setTimeout(() => {
         this.setState({messageVisible: false});
       }, 3000);
-    } catch (e) {
-      this.props.onError({
+    } catch (e: any) {
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -133,19 +144,24 @@ class EditSeed extends React.Component<Props, State> {
    * Handle seed delete
    */
   private async handleDelete() {
+    const { keycloak, facility, onSeedDeleted, onError } = this.props;
+    const { seed } = this.state;
     try {
-      if (!this.props.keycloak || !this.state.seed) {
+      if (!keycloak || !seed) {
         return;
       }
   
-      const seedsService = await Api.getSeedsService(this.props.keycloak);
-      const id = this.state.seed.id || "";
-      await seedsService.deleteSeed({seedId: id});
+      const seedsService = await Api.getSeedsService(keycloak);
+      const id = seed.id || "";
+      await seedsService.deleteSeed({
+        seedId: id,
+        facility: facility
+      });
   
-      this.props.onSeedDeleted && this.props.onSeedDeleted(id);
+      onSeedDeleted && onSeedDeleted(id);
       this.setState({redirect: true});
-    } catch (e) {
-      this.props.onError({
+    } catch (e: any) {
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -166,7 +182,7 @@ class EditSeed extends React.Component<Props, State> {
     }
 
     if (this.state.redirect) {
-      return <Redirect to="/seeds" push={true} />;
+      return <Navigate replace={true} to="/seeds"/>;
     }
 
     return (
@@ -219,7 +235,8 @@ class EditSeed extends React.Component<Props, State> {
 export function mapStateToProps(state: StoreState) {
   return {
     seeds: state.seeds,
-    seed: state.seed
+    seed: state.seed,
+    facility: state.facility
   };
 }
 
@@ -232,7 +249,7 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onSeedSelected: (seed: Seed) => dispatch(actions.seedSelected(seed)),
     onSeedDeleted: (seedId: string) => dispatch(actions.seedDeleted(seedId)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+    onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

@@ -30,7 +30,10 @@ import {
   ERROR_OCCURRED,
   CAMPAIGNS_FOUND,
   EVENT_LIST_FILTERS_UPDATED,
-  EVENTS_FOUND} from '../constants/index';
+  EVENTS_FOUND,
+  FACILITY_UPDATE} from '../constants/index';
+import { Reducer } from 'redux';
+import { Facility } from '../generated/client/models/Facility';
 
 /**
  * Process action 
@@ -38,7 +41,34 @@ import {
  * @param state state
  * @param action action
  */
-export function processAction(state: StoreState, action: AppAction): StoreState {
+export const processAction: Reducer<StoreState, AppAction> = (state: StoreState | undefined, action: AppAction): StoreState => {
+  if (!state) {
+    state = {
+      authenticated: false,
+      locale: "fi",
+      events: [],
+      eventListFilters: {},
+      campaigns: [],
+      packageSize: {} as any,
+      packageSizes: [],
+      packings: [],
+      performedCultivationAction: {} as any,
+      performedCultivationActions: [],
+      pests: [],
+      product: {} as any,
+      productionLine: {} as any,
+      productionLines: [],
+      products: [],
+      seed: {} as any,
+      seedBatch: {} as any,
+      seedBatches: [],
+      seeds: [],
+      storageDiscards: [],
+      wastageReason: {} as any,
+      wastageReasons: [],
+      facility: Facility.Joroinen
+    }
+  }
   switch (action.type) {
     case USER_LOGIN:
       return { ...state, keycloak: action.keycloak, authenticated: action.authenticated};
@@ -101,6 +131,8 @@ export function processAction(state: StoreState, action: AppAction): StoreState 
       return { ...state, eventListFilters: action.eventListFilters }
     case EVENTS_FOUND:
       return { ...state, events: action.events}
+    case FACILITY_UPDATE:
+      return { ...state, facility: action.facility}
     }
   return state;
 }

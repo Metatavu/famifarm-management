@@ -17,9 +17,10 @@ import {
   WastageReason,
   Seed, 
   EventType,
-  Product} from "../generated/client";
-import { Redirect } from 'react-router';
-import strings from "src/localization/strings";
+  Product,
+  Facility} from "../generated/client";
+import { Navigate } from 'react-router-dom';
+import strings from "../localization/strings";
 import { DateTimeInput, DateInput } from 'semantic-ui-calendar-react';
 import * as actions from "../actions";
 import { StoreState } from "../types/index";
@@ -32,15 +33,15 @@ import {
   Loader,
   Form,
   Message,
-  InputOnChangeData,
+  DropdownProps,
   Confirm,
   TextAreaProps,
   DropdownItemProps,
-  DropdownProps
+  InputOnChangeData,
 } from "semantic-ui-react";
-import LocalizedUtils from "src/localization/localizedutils";
-import * as moment from "moment";
-import { ErrorMessage } from "src/types";
+import LocalizedUtils from "../localization/localizedutils";
+import moment from "moment";
+import { ErrorMessage } from "../types";
 import { FormContainer } from "./FormContainer";
 import { Select } from "semantic-ui-react";
 
@@ -49,27 +50,28 @@ import { Select } from "semantic-ui-react";
  */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  onError: (error: ErrorMessage) => void;
+  facility: Facility;
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 /**
  * Interface representing component state
  */
 interface State {
-  open: boolean
-  loading: boolean
-  saving: boolean
-  messageVisible: boolean,
-  redirect: boolean
-  event: Partial<Event>
-  performedCultivationActions?: PerformedCultivationAction[]
-  pests?: Pest[],
-  productionLines?: ProductionLine[]
-  packageSizes?: PackageSize[]
-  seedBatches?: SeedBatch[]
-  seeds: Seed[]
-  products: Product[]
-  wastageReasons?: WastageReason[]
+  open: boolean;
+  loading: boolean;
+  saving: boolean;
+  messageVisible: boolean;
+  redirect: boolean;
+  event: Partial<Event>;
+  performedCultivationActions?: PerformedCultivationAction[];
+  pests?: Pest[];
+  productionLines?: ProductionLine[];
+  packageSizes?: PackageSize[];
+  seedBatches?: SeedBatch[];
+  seeds: Seed[];
+  products: Product[];
+  wastageReasons?: WastageReason[];
 }
 
 /**
@@ -100,14 +102,15 @@ class CreateEvent extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   public componentDidMount = async () => {
-    if (!this.props.keycloak) {
+    const  { keycloak, facility } = this.props;
+    if (!keycloak) {
       return;
     }
 
     this.setState({loading: true});
 
-    const [seedsService, productsService] = await Promise.all([Api.getSeedsService(this.props.keycloak), Api.getProductsService(this.props.keycloak)]);
-    const [seeds, products] = await Promise.all([seedsService.listSeeds({}), productsService.listProducts({})]);
+    const [seedsService, productsService] = await Promise.all([Api.getSeedsService(keycloak), Api.getProductsService(keycloak)]);
+    const [seeds, products] = await Promise.all([seedsService.listSeeds({ facility: facility }), productsService.listProducts({ facility: facility })]);
 
     this.setState({
       loading: false,
@@ -180,7 +183,7 @@ class CreateEvent extends React.Component<Props, State> {
     }
 
     if (this.state.redirect) {
-      return <Redirect to={"/events"} push={true} />;
+      return <Navigate replace={true} to="/events"/>;
     }
 
     if (!this.state.event) {
@@ -197,7 +200,7 @@ class CreateEvent extends React.Component<Props, State> {
       return {
         key: eventType,
         value: eventType,
-        text: strings[`phase${eventType}`]
+        text: (strings as any)[`phase${eventType}`]
       };
     });
 
@@ -224,7 +227,7 @@ class CreateEvent extends React.Component<Props, State> {
             <FormContainer>
               <Form.Field required>
                 <label>{strings.batchProduct}</label>
-                <Select options={ productOptions } value={ event.productId || "" } onChange={ this.handleProductChange }/>
+                <Select options={ productOptions } value={ event.productId || "" } onChange={ this.handleProductChange }/>
               </Form.Field>
               <Form.Field required>
                 <label>{strings.labelStartTime}</label>
@@ -266,13 +269,13 @@ class CreateEvent extends React.Component<Props, State> {
    * 
    * @param event event
    */
-  private handleTimeChange = (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
-    const eventData = this.state.event;
+  private handleTimeChange = (e: any, { name, value }: DropdownProps | TextAreaProps) => {
+    const eventData: any = this.state.event;
     if (!eventData) {
       return;
     }
 
-    eventData[name] = moment(value, "DD.MM.YYYY HH:mm").toDate()
+    eventData[name] = moment(value as any, "DD.MM.YYYY HH:mm").toDate()
     this.setState({ event: eventData });
   }
 
@@ -290,8 +293,8 @@ class CreateEvent extends React.Component<Props, State> {
    * 
    * @param event event
    */
-  private handleBaseChange = (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
-    const eventData = this.state.event;
+  private handleBaseChange = (e: any, { name, value }: DropdownProps | TextAreaProps) => {
+    const eventData: any = this.state.event;
     if (!eventData) {
       return;
     }
@@ -305,7 +308,7 @@ class CreateEvent extends React.Component<Props, State> {
    * 
    * @param event event
    */
-  private handleDataChange = (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
+  private handleDataChange = (e: any, { name, value }: InputOnChangeData | DropdownProps | TextAreaProps) => {
     const eventData = {...this.state.event} as any;
     if (!eventData) {
       return;
@@ -321,14 +324,14 @@ class CreateEvent extends React.Component<Props, State> {
    * 
    * @param event event
    */
-  private handleDataTimeChange = (e: any, { name, value }: InputOnChangeData | TextAreaProps) => {
+  private handleDataTimeChange = (e: any, { name, value }: DropdownProps | TextAreaProps) => {
     const eventData = {...this.state.event} as any;
     if (!eventData) {
       return;
     }
 
     eventData.data = {...this.state.event!.data};
-    eventData.data[name] = moment(value, "DD.MM.YYYY").toDate()
+    eventData.data[name] = moment(value as any, "DD.MM.YYYY").toDate()
     console.log(eventData);
     this.setState({ event: { ...eventData } });
   }
@@ -358,13 +361,14 @@ class CreateEvent extends React.Component<Props, State> {
    */
   private handleSubmit = async () => {
     const { event } = this.state;
+    const { keycloak, facility, onError } = this.props;
     try {
-      if (!this.props.keycloak || !event) {
+      if (!keycloak || !event) {
         return;
       }
 
       this.setState({saving: true});
-      const eventsService = await Api.getEventsService(this.props.keycloak);
+      const eventsService = await Api.getEventsService(keycloak);
 
       const eventData = event.data as any;
       let data = {};
@@ -419,14 +423,17 @@ class CreateEvent extends React.Component<Props, State> {
       }
       event.data = data;
       
-      await eventsService.createEvent({ event: event as Event });
+      await eventsService.createEvent({
+        event: event as Event,
+        facility: facility
+      });
       this.setState({saving: false, messageVisible: true});
       setTimeout(() => {
         this.setState({messageVisible: false});
       }, 3000);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -438,19 +445,24 @@ class CreateEvent extends React.Component<Props, State> {
    * Handle product delete
    */
   private handleDelete = async () => {
+    const { event } = this.state;
+    const { keycloak, facility, onError } = this.props;
     try {
-      if (!this.props.keycloak || !this.state.event) {
+      if (!keycloak || !event) {
         return;
       }
   
-      const eventsService = await Api.getEventsService(this.props.keycloak);
-      const id = this.state.event.id || "";
+      const eventsService = await Api.getEventsService(keycloak);
+      const id = event.id || "";
   
-      await eventsService.deleteEvent({eventId: id});
+      await eventsService.deleteEvent({
+        eventId: id,
+        facility: facility
+      });
       
       this.setState({redirect: true});
-    } catch (e) {
-      this.props.onError({
+    } catch (e: any) {
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -731,14 +743,15 @@ class CreateEvent extends React.Component<Props, State> {
    * Loads data required for harvest event
    */
   private loadHarvestData = async () => {
-    if (!this.props.keycloak) {
+    const { keycloak, facility } = this.props;
+    if (!keycloak) {
       return;
     }
 
     this.setState({loading: true});
-    const productionLinesService = await Api.getProductionLinesService(this.props.keycloak);
+    const productionLinesService = await Api.getProductionLinesService(keycloak);
 
-    const productionLines = await productionLinesService.listProductionLines({});
+    const productionLines = await productionLinesService.listProductionLines({ facility: facility });
 
     this.setState({
       loading: false,
@@ -752,19 +765,20 @@ class CreateEvent extends React.Component<Props, State> {
    * Loads data required for observations event
    */
   private loadCultivationObservationData = async () => {
-    if (!this.props.keycloak) {
+    const { keycloak, facility } = this.props;
+    if (!keycloak) {
       return;
     }
 
     this.setState({loading: true});
     const [performedCultivationActionsService, pestsService] = await Promise.all([
-      Api.getPerformedCultivationActionsService(this.props.keycloak),
-      Api.getPestsService(this.props.keycloak)
+      Api.getPerformedCultivationActionsService(keycloak),
+      Api.getPestsService(keycloak)
     ]);
 
     const [performedCultivationActions, pests] = await Promise.all([
-      performedCultivationActionsService.listPerformedCultivationActions({}),
-      pestsService.listPests({})
+      performedCultivationActionsService.listPerformedCultivationActions({ facility: facility }),
+      pestsService.listPests({ facility: facility })
     ]);
 
     this.setState({
@@ -778,13 +792,14 @@ class CreateEvent extends React.Component<Props, State> {
    * Loads data required for planting event
    */
   private loadPlantingData = async () => {
-    if (!this.props.keycloak) {
+    const { facility, keycloak } = this.props;
+    if (!keycloak) {
       return;
     }
 
     this.setState({loading: true});
-    const getProductionLinesService = await Api.getProductionLinesService(this.props.keycloak);
-    const productionLines = await getProductionLinesService.listProductionLines({});
+    const getProductionLinesService = await Api.getProductionLinesService(keycloak);
+    const productionLines = await getProductionLinesService.listProductionLines({ facility: facility });
 
     this.setState({
       loading: false,
@@ -798,19 +813,20 @@ class CreateEvent extends React.Component<Props, State> {
    * Loads data required for sowing event
    */
   private loadSowingData = async () => {
-    if (!this.props.keycloak) {
+    const { keycloak, facility } = this.props;
+    if (!keycloak) {
       return;
     }
 
     this.setState({loading: true});
     const [seedBatchesService, productionLinesService] = await Promise.all([
-      Api.getSeedBatchesService(this.props.keycloak),
-      Api.getProductionLinesService(this.props.keycloak)
+      Api.getSeedBatchesService(keycloak),
+      Api.getProductionLinesService(keycloak)
     ]);
 
     const [seedBatches, productionLines] = await Promise.all([
-      seedBatchesService.listSeedBatches({}),
-      productionLinesService.listProductionLines({})
+      seedBatchesService.listSeedBatches({ facility: facility }),
+      productionLinesService.listProductionLines({ facility: facility })
     ]);
 
     this.setState({
@@ -826,19 +842,20 @@ class CreateEvent extends React.Component<Props, State> {
    * Loads data required for wastage event
    */
   private loadWastageData = async () => {
-    if (!this.props.keycloak) {
+    const { keycloak, facility } = this.props;
+    if (!keycloak) {
       return;
     }
 
     this.setState({loading: true});
     const [wastageReasonsService, productionLinesService] = await Promise.all([
-      Api.getWastageReasonsService(this.props.keycloak),
-      Api.getProductionLinesService(this.props.keycloak)
+      Api.getWastageReasonsService(keycloak),
+      Api.getProductionLinesService(keycloak)
     ]);
 
     const [wastageReasons, productionLines] = await Promise.all([
-      wastageReasonsService.listWastageReasons({}),
-      productionLinesService.listProductionLines({})
+      wastageReasonsService.listWastageReasons({ facility: facility }),
+      productionLinesService.listProductionLines({ facility: facility })
     ]);
 
     this.setState({
@@ -858,6 +875,7 @@ class CreateEvent extends React.Component<Props, State> {
  */
 export function mapStateToProps(state: StoreState) {
   return {
+    facility: state.facility
   };
 }
 
@@ -868,7 +886,7 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

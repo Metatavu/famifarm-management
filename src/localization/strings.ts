@@ -19,6 +19,7 @@ export interface IStrings extends LocalizedStringsMethods {
   date: string;
   dateAfter: string;
   dateBefore: string;
+  selectDate: string;
   open: string;
   savedSuccessfully: string;
   delete: string;
@@ -260,6 +261,10 @@ export interface IStrings extends LocalizedStringsMethods {
   allCampaings: string;
   removeFromStorageButton: string;
   allowedHarvestTypes: string;
+
+  dashboard: string
+  dashboardFormDescription: string;
+  dashboardCount: string;
 }
 
 const strings: IStrings = new LocalizedStrings({

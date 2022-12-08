@@ -1,13 +1,13 @@
-import Api  from "src/api";
+import Api  from "../api";
 import * as React from "react";
-import { StoreState } from "src/types";
+import { StoreState } from "../types";
 import { Dispatch } from "redux";
 import * as actions from "../actions";
 import { connect } from "react-redux";
-import { Campaign, PackageSize, Packing, PackingState, PackingType, Product } from "../generated/client";
-import LocalizedUtils from "src/localization/localizedutils";
+import { Campaign, Facility, PackageSize, Packing, PackingState, PackingType, Product } from "../generated/client";
+import LocalizedUtils from "../localization/localizedutils";
 import { Accordion, Button, Grid, Icon, Loader, Table } from "semantic-ui-react";
-import strings from "src/localization/strings";
+import strings from "../localization/strings";
 import AnimateHeight from "react-animate-height";
 import { DateTimeInput } from 'semantic-ui-calendar-react';
 import * as Moment from 'moment';
@@ -25,6 +25,7 @@ const moment = extendMoment(Moment);
  */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
+  facility: Facility;
 }
 
 /**
@@ -375,7 +376,7 @@ class ViewStore extends React.Component<Props, State> {
    * Fetch data needed by component from API
    */
   private fetchData = async () => {
-    const { keycloak } = this.props;
+    const { keycloak, facility } = this.props;
 
     if (!keycloak) {
       return;
@@ -389,10 +390,13 @@ class ViewStore extends React.Component<Props, State> {
     ]);
 
     const [ products, packings, packingSizes, campaigns ] = await Promise.all([
-      productsApi.listProducts({}),
-      packingsApi.listPackings({ status: PackingState.InStore }),
-      packingSizesApi.listPackageSizes({}),
-      campaignsApi.listCampaigns()
+      productsApi.listProducts({ facility: facility }),
+      packingsApi.listPackings({
+        status: PackingState.InStore,
+        facility: facility
+      }),
+      packingSizesApi.listPackageSizes({ facility: facility }),
+      campaignsApi.listCampaigns({ facility: facility })
     ]);
 
     return { products, packings, packingSizes, campaigns };
@@ -531,7 +535,7 @@ class ViewStore extends React.Component<Props, State> {
    * @param e React change event
    * @param updatedData updated data from DateTimeInput
    */
-  private onSelectDate = async (e: React.ChangeEvent<HTMLInputElement>, updatedData: { name: string, value: string }) => {
+  private onSelectDate = async (e: React.SyntheticEvent<HTMLElement>, updatedData: { name: string, value: string }) => {
     if (!updatedData || !updatedData.value) {
       return;
     }
@@ -549,6 +553,7 @@ class ViewStore extends React.Component<Props, State> {
  */
 export function mapStateToProps(state: StoreState) {
   return {
+    facility: state.facility
   };
 }
 

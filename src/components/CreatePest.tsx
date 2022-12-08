@@ -1,8 +1,8 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { LocalizedValue, Pest } from "../generated/client";
-import { Redirect } from 'react-router';
+import { Facility, LocalizedValue, Pest } from "../generated/client";
+import { Navigate } from 'react-router-dom';
 import strings from "../localization/strings";
 import * as actions from "../actions";
 import { StoreState, ErrorMessage } from "../types/index";
@@ -22,8 +22,9 @@ import { FormContainer } from "./FormContainer";
  */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  pest?: Pest,
-  onError: (error: ErrorMessage) => void
+  pest?: Pest;
+  facility: Facility;
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 /**
@@ -49,21 +50,26 @@ class CreatePest extends React.Component<Props, State> {
    * Handle form submit
    */
   private async handleSubmit() {
+    const { keycloak, facility, onError } = this.props;
+    const { pestData } = this.state;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
   
       const pestObject: Pest = {
-        name: this.state.pestData.name
+        name: pestData.name
       };
   
-      const pestService = await Api.getPestsService(this.props.keycloak);
-      await pestService.createPest({pest: pestObject});
+      const pestService = await Api.getPestsService(keycloak);
+      await pestService.createPest({
+        pest: pestObject,
+        facility: facility
+      });
       
       this.setState({redirect: true});
-    } catch (e) {
-      this.props.onError({
+    } catch (e: any) {
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -87,7 +93,7 @@ class CreatePest extends React.Component<Props, State> {
    */
   render() {
     if (this.state.redirect) {
-      return <Redirect to="/pests" push={true} />;
+      return <Navigate replace={true} to="/pests"/>;
     }
 
     return (
@@ -124,6 +130,7 @@ class CreatePest extends React.Component<Props, State> {
  */
 export function mapStateToProps(state: StoreState) {
   return {
+    facility: state.facility
   };
 }
 
@@ -134,7 +141,7 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

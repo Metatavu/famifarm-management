@@ -6,8 +6,8 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Seed, SeedBatch } from "../generated/client";
-import strings from "src/localization/strings";
+import { Facility, Seed, SeedBatch } from "../generated/client";
+import strings from "../localization/strings";
 
 import {
   List,
@@ -16,13 +16,14 @@ import {
   Loader,
   Checkbox
 } from "semantic-ui-react";
-import LocalizedUtils from "src/localization/localizedutils";
+import LocalizedUtils from "../localization/localizedutils";
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   seedBatches?: SeedBatch[];
+  facility: Facility;
   onSeedBatchesFound?: (seedBatches: SeedBatch[]) => void,
-  onError: (error: ErrorMessage) => void
+  onError: (error: ErrorMessage | undefined) => void
 }
 
 export interface State {
@@ -52,19 +53,22 @@ class SeedBatchList extends React.Component<Props, State> {
         return;
       }
       const seedService = await Api.getSeedsService(this.props.keycloak);
-      const seeds = await seedService.listSeeds({});
+      const seeds = await seedService.listSeeds({ facility: this.props.facility });
       const seedBatchService = await Api.getSeedBatchesService(this.props.keycloak);
-      const seedBatches = await seedBatchService.listSeedBatches({includePassive: this.state.showPassive});
+      const seedBatches = await seedBatchService.listSeedBatches({
+        includePassive: this.state.showPassive,
+        facility: this.props.facility
+      });
       seedBatches.sort((a, b) => {
         let nameA = a.code || "";
-        let nameB = b.code || "";
+        let nameB = b.code || "";
         if(nameA < nameB) { return -1; }
         if(nameA > nameB) { return 1; }
         return 0;
       });
       this.setState({ seeds });
       this.props.onSeedBatchesFound && this.props.onSeedBatchesFound(seedBatches);
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -94,10 +98,10 @@ class SeedBatchList extends React.Component<Props, State> {
 
     const seedBatches = this.props.seedBatches.map((seedBatch, i) => {
       const seedBatchPath = `/seedBatches/${seedBatch.id}`;
-      const seed = this.state.seeds.find(s => s.id == seedBatch.seedId);
+      const seed = this.state.seeds.find(s => s.id === seedBatch.seedId);
       const seedText = seed ? LocalizedUtils.getLocalizedValue(seed.name) : "";
       return (
-        <List.Item style={i % 2 == 0 ? {backgroundColor: "#ddd"} : {}} key={seedBatch.id}>
+        <List.Item style={i % 2 === 0 ? {backgroundColor: "#ddd"} : {}} key={seedBatch.id}>
           <List.Content floated='right'>
             <NavLink to={seedBatchPath}>
               <Button className="submit-button">{strings.open}</Button>
@@ -149,10 +153,13 @@ class SeedBatchList extends React.Component<Props, State> {
 
     this.setState({loading: true});
     const seedBatchesService = Api.getSeedBatchesService(this.props.keycloak);
-    const seedBatches = await (await seedBatchesService).listSeedBatches({includePassive: this.state.showPassive});
+    const seedBatches = await (await seedBatchesService).listSeedBatches({
+      includePassive: this.state.showPassive,
+      facility: this.props.facility
+    });
     seedBatches.sort((a, b) => {
       let nameA = a.code || "";
-      let nameB = b.code || "";
+      let nameB = b.code || "";
       if(nameA < nameB) { return -1; }
       if(nameA > nameB) { return 1; }
       return 0;
@@ -170,7 +177,8 @@ class SeedBatchList extends React.Component<Props, State> {
 export function mapStateToProps(state: StoreState) {
   return {
     seedBatches: state.seedBatches,
-    seedBatch: state.seedBatch
+    seedBatch: state.seedBatch,
+    facility: state.facility
   };
 }
 
@@ -182,7 +190,7 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onSeedBatchesFound: (seedBatches: SeedBatch[]) => dispatch(actions.seedBatchesFound(seedBatches)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

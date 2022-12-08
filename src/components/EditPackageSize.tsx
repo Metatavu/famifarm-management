@@ -4,9 +4,9 @@ import * as actions from "../actions";
 import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";import Api from "../api";
-import { LocalizedValue, PackageSize } from "../generated/client";
-import { Redirect } from 'react-router';
-import strings from "src/localization/strings";
+import { Facility, LocalizedValue, PackageSize } from "../generated/client";
+import { Navigate } from 'react-router-dom';
+import strings from "../localization/strings";
 
 import {
   Grid,
@@ -18,7 +18,7 @@ import {
   Input
 } from "semantic-ui-react";
 import LocalizedValueInput from "./LocalizedValueInput";
-import LocalizedUtils from "src/localization/localizedutils";
+import LocalizedUtils from "../localization/localizedutils";
 import { FormContainer } from "./FormContainer";
 
 /**
@@ -28,9 +28,10 @@ interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   packageSizeId: string;
   packageSize?: PackageSize;
+  facility: Facility;
   onPackageSizeSelected?: (packageSize: PackageSize) => void;
-  onPackageSizeDeleted?: (packageSizeId: string) => void,
-  onError: (error: ErrorMessage) => void
+  onPackageSizeDeleted?: (packageSizeId: string) => void;
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 /**
@@ -72,17 +73,21 @@ class EditPackageSize extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   public async componentDidMount() {
+    const { packageSizeId, keycloak, facility, onError, onPackageSizeSelected } = this.props;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
   
-      const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-      const packageSize = await packageSizeService.findPackageSize({packageSizeId: this.props.packageSizeId});
-      this.props.onPackageSizeSelected && this.props.onPackageSizeSelected(packageSize);
+      const packageSizeService = await Api.getPackageSizesService(keycloak);
+      const packageSize = await packageSizeService.findPackageSize({
+        packageSizeId: packageSizeId,
+        facility: facility
+      });
+      onPackageSizeSelected && onPackageSizeSelected(packageSize);
       this.setState({packageSize: packageSize});
-    } catch (e) {
-      this.props.onError({
+    } catch (e: any) {
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -94,21 +99,27 @@ class EditPackageSize extends React.Component<Props, State> {
    * Handle form submit
    */
   private async handleSubmit() {
+    const { keycloak, facility, onError } = this.props;
+    const { packageSize } = this.state;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
   
-      const packageSizeObject = this.state.packageSize || {};
-      const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
+      const packageSizeObject = packageSize || {};
+      const packageSizeService = await Api.getPackageSizesService(keycloak);
       this.setState({saving: true});
-      await packageSizeService.updatePackageSize({packageSizeId: packageSizeObject.id!, packageSize: packageSizeObject });
+      await packageSizeService.updatePackageSize({
+        packageSizeId: packageSizeObject.id!,
+        packageSize: packageSizeObject,
+        facility: facility
+      });
       this.setState({saving: false, messageVisible: true});
       setTimeout(() => {
         this.setState({messageVisible: false});
       }, 3000);
-    } catch (e) {
-      this.props.onError({
+    } catch (e: any) {
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -120,18 +131,23 @@ class EditPackageSize extends React.Component<Props, State> {
    * Handle packageSize delete
    */
   private async handleDelete() {
+    const { keycloak, facility, onError, onPackageSizeDeleted } = this.props;
+    const { packageSize } = this.state;
     try {
-      if (!this.props.keycloak || !this.state.packageSize) {
+      if (!keycloak || !packageSize) {
         return;
       }
   
-      const id = this.state.packageSize.id || "";
-      const packageSizeService = await Api.getPackageSizesService(this.props.keycloak);
-      await packageSizeService.deletePackageSize({packageSizeId: id});
-      this.props.onPackageSizeDeleted && this.props.onPackageSizeDeleted(id!);
+      const id = packageSize.id || "";
+      const packageSizeService = await Api.getPackageSizesService(keycloak);
+      await packageSizeService.deletePackageSize({
+        packageSizeId: id,
+        facility: facility
+      });
+      onPackageSizeDeleted && onPackageSizeDeleted(id!);
       this.setState({redirect: true});
-    } catch (e) {
-      this.props.onError({
+    } catch (e: any) {
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -174,7 +190,7 @@ class EditPackageSize extends React.Component<Props, State> {
     }
 
     if (this.state.redirect) {
-      return <Redirect to="/packageSizes" push={true} />;
+      return <Navigate replace={true} to="/packageSizes"/>;
     }
 
     return (
@@ -236,7 +252,8 @@ class EditPackageSize extends React.Component<Props, State> {
 export function mapStateToProps(state: StoreState) {
   return {
     packageSizes: state.packageSizes,
-    packageSize: state.packageSize
+    packageSize: state.packageSize,
+    facility: state.facility
   };
 }
 
@@ -249,7 +266,7 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onPackageSizeSelected: (packageSize: PackageSize) => dispatch(actions.packageSizeSelected(packageSize)),
     onPackageSizeDeleted: (packageSizeId: string) => dispatch(actions.packageSizeDeleted(packageSizeId)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+    onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

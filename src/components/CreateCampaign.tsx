@@ -1,20 +1,21 @@
 import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
-import { StoreState, ErrorMessage } from "src/types";
+import { StoreState, ErrorMessage } from "../types";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import * as actions from "../actions"
-import { Product, CampaignProducts } from "../generated/client";
-import strings from "src/localization/strings";
-import Api from "src/api";
-import { Grid, Loader, DropdownItemProps, Button, Form, Select, Input, InputOnChangeData, DropdownProps, List } from "semantic-ui-react";
-import LocalizedUtils from "src/localization/localizedutils";
+import { Product, CampaignProduct, Facility } from "../generated/client";
+import strings from "../localization/strings";
+import Api from "../api";
+import { Grid, Loader, DropdownItemProps, Button, Form, Select, Input, DropdownProps, List, InputOnChangeData } from "semantic-ui-react";
+import LocalizedUtils from "../localization/localizedutils";
 import { FormContainer } from "./FormContainer";
-import { Redirect } from "react-router";
+import { Navigate } from "react-router-dom";
 
 interface Props {
   keycloak?: KeycloakInstance,
-  onError: (error: ErrorMessage) => void
+  facility: Facility;
+  onError: (error: ErrorMessage | undefined) => void
 }
 
 interface State {
@@ -22,7 +23,7 @@ interface State {
   campaignName: string;
   productId: string;
   count: string;
-  addedCampaignProducts: CampaignProducts[];
+  addedCampaignProducts: CampaignProduct[];
   loading: boolean;
   redirect: boolean;
   campaignId: string;
@@ -46,7 +47,7 @@ class CreateCampaign extends React.Component<Props, State> {
   public async componentDidMount () {
     try {
       await this.initView();
-    } catch (exception) {
+    } catch (exception: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -56,19 +57,23 @@ class CreateCampaign extends React.Component<Props, State> {
   }
 
   private initView = async () => {
-    if (!this.props.keycloak) {
+    const { keycloak, facility } = this.props;
+    if (!keycloak) {
       return;
     }
 
     this.setState({ loading: true });
-    const productsService = await Api.getProductsService(this.props.keycloak);
-    const products = await productsService.listProducts({includeSubcontractorProducts: true});
+    const productsService = await Api.getProductsService(keycloak);
+    const products = await productsService.listProducts({
+      includeSubcontractorProducts: true,
+      facility: facility
+    });
     this.setState({ products, loading: false });
   }
 
   public render () {
     if (this.state.redirect) {
-      return <Redirect to={`/campaigns/${ this.state.campaignId }`} push={true} />;
+      return <Navigate replace={true} to={`/campaigns/${this.state.campaignId}`} />;
     }
 
     if (this.state.loading) {
@@ -198,19 +203,26 @@ class CreateCampaign extends React.Component<Props, State> {
    * Handles submitting a new campaign
    */
   private handleSubmit = async () => {
-    if (!this.props.keycloak) {
+    const { keycloak, onError, facility } = this.props;
+    if (!keycloak) {
       return;
     }
 
     try {
       this.setState({ loading: true });
       const { campaignName, addedCampaignProducts } = this.state;
-      const campaignsService = await Api.getCampaignsService(this.props.keycloak);
-      const createdCampaign = await campaignsService.createCampaign({campaign: {name: campaignName, products: addedCampaignProducts}});
+      const campaignsService = await Api.getCampaignsService(keycloak);
+      const createdCampaign = await campaignsService.createCampaign({
+        campaign: {
+          name: campaignName,
+          products: addedCampaignProducts
+        },
+        facility: facility
+      });
       this.setState({ campaignId: createdCampaign.id!, redirect: true });
-    } catch (exception) {
+    } catch (exception: any) {
       this.setState({ loading: false });
-      this.props.onError({
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception
@@ -228,18 +240,19 @@ class CreateCampaign extends React.Component<Props, State> {
  */
 export function mapStateToProps(state: StoreState) {
   return {
+    facility: state.facility
   };
-  }
+}
   
-  /**
-   * Redux mapper for mapping component dispatches 
-   * 
-   * @param dispatch dispatch method
-   */
-  export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
+/**
+ * Redux mapper for mapping component dispatches 
+ * 
+ * @param dispatch dispatch method
+ */
+export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+    onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
-  }
-  
-  export default connect(mapStateToProps, mapDispatchToProps)(CreateCampaign);
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreateCampaign);

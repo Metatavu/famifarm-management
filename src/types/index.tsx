@@ -1,5 +1,5 @@
 import { KeycloakInstance } from "keycloak-js";
-import { Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, WastageReason, Pest, Packing, Campaign, EventType, Event, StorageDiscard } from "../generated/client";
+import { Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, WastageReason, Pest, Packing, Campaign, EventType, Event, StorageDiscard, Facility } from "../generated/client";
 
 export interface EventListFilters {
   product?: Product,
@@ -33,7 +33,8 @@ export interface StoreState {
   error?: ErrorMessage,
   campaigns: Campaign[],
   eventListFilters: EventListFilters,
-  events: Event[]
+  events: Event[],
+  facility: Facility
 }
 
 /**
@@ -53,3 +54,12 @@ export interface ErrorMessage {
   value?: string;
   text?: string;
 }
+
+/**
+ * An interface describing visualize packings data
+ */
+export interface VisualizePackingsData {
+  time: number;
+  count: number | undefined;
+  label?: number;
+};

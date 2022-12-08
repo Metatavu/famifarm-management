@@ -1,26 +1,27 @@
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import { StoreState, ErrorMessage } from "src/types";
+import { StoreState, ErrorMessage } from "../types";
 import * as actions from "../actions";
-import { Packing, Product, PackageSize, PackingState, Printer, PackingType, Campaign, StorageDiscard } from "../generated/client";
+import { Product, PackageSize, StorageDiscard, Facility } from "../generated/client";
 import Api from "../api";
 import { KeycloakInstance } from "keycloak-js";
-import strings from "src/localization/strings";
-import LocalizedUtils from "src/localization/localizedutils";
-import { Grid, Button, Form, Select, Input, DropdownItemProps, DropdownProps, InputOnChangeData, Loader, Message, Confirm } from "semantic-ui-react";
+import strings from "../localization/strings";
+import LocalizedUtils from "../localization/localizedutils";
+import { Grid, Button, Form, Select, Input, DropdownProps, Loader, Message, Confirm, InputOnChangeData } from "semantic-ui-react";
 import { FormContainer } from "./FormContainer";
-import { DateInput } from 'semantic-ui-calendar-react';
-import * as moment from "moment";
-import { Redirect } from "react-router";
+import { DateInput } from "semantic-ui-calendar-react";
+import moment from "moment";
+import { Navigate } from "react-router-dom";
 
 /**
  * Interface representing component properties
  */
 export interface Props {
   keycloak: KeycloakInstance,
-  onError: (error: ErrorMessage) => void;
+  onError: (error: ErrorMessage | undefined) => void;
   discardId: string;
+  facility: Facility;
 }
 
 /**
@@ -68,7 +69,7 @@ class EditDiscard extends React.Component<Props, State> {
   public async componentDidMount() {
     try {
       await this.fetchData();
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -83,7 +84,6 @@ class EditDiscard extends React.Component<Props, State> {
   render = () =>  {
     const { 
       loading,
-      redirect,
       products,
       packageSizes,
       productId,
@@ -101,8 +101,8 @@ class EditDiscard extends React.Component<Props, State> {
       );
     }
     
-    if (redirect) {
-      return <Redirect to="/discards" push={ true } />;
+    if (this.state.redirect) {
+      return <Navigate replace={true} to="/discards"/>;
     }
     
     const productOptions = products.map(({ id, name }) => ({
@@ -225,7 +225,7 @@ class EditDiscard extends React.Component<Props, State> {
    * method for fetching data from api
    */
   private fetchData =  async () => {
-    const { keycloak, discardId } = this.props;
+    const { keycloak, discardId, facility } = this.props;
 
     if(!keycloak) {
       return;
@@ -234,16 +234,22 @@ class EditDiscard extends React.Component<Props, State> {
     this.setState({ loading: true })
 
     const productsService = await Api.getProductsService(keycloak);
-    const products = await productsService.listProducts({ includeSubcontractorProducts: true });
+    const products = await productsService.listProducts({
+      includeSubcontractorProducts: true,
+      facility: facility
+    });
 
     const discardsService = await Api.getStorageDiscardsService(keycloak);
-    const discard = await discardsService.getStorageDiscard({ storageDiscardId: discardId })
+    const discard = await discardsService.getStorageDiscard({
+      storageDiscardId: discardId,
+      facility: facility
+    })
         
     const packageSizesSerivce = await Api.getPackageSizesService(keycloak);
-    const packageSizes = await packageSizesSerivce.listPackageSizes({ });
+    const packageSizes = await packageSizesSerivce.listPackageSizes({ facility: facility });
 
     const product = (products || []).find(product => product.id == discard.productId);
-    const date = discard.discardDate || new Date();
+    const date = discard.discardDate || new Date();
     const discardCount = discard.discardAmount || 0;
     const packageSizeId = discard.packageSizeId;
     const productId = discard.productId;
@@ -272,7 +278,7 @@ class EditDiscard extends React.Component<Props, State> {
    */
     private  handleSubmit = async () => {
       const { discard, productId, date, discardCount, packageSizeId } = this.state;
-      const { keycloak } = this.props;
+      const { keycloak, facility, onError } = this.props;
 
       try {
         const updatedDiscard = {
@@ -288,14 +294,18 @@ class EditDiscard extends React.Component<Props, State> {
         }
   
         const discardService = await Api.getStorageDiscardsService(keycloak);
-        await discardService.updateStorageDiscard({ storageDiscardId: updatedDiscard.id, storageDiscard: updatedDiscard });
+        await discardService.updateStorageDiscard({
+          storageDiscardId: updatedDiscard.id,
+          storageDiscard: updatedDiscard,
+          facility: facility
+        });
   
         this.setState({ messageVisible: true });
         setTimeout(() => {
           this.setState({ messageVisible: false });
         }, 3000);
-      } catch (e) {
-        this.props.onError({
+      } catch (e: any) {
+        onError({
           message: strings.defaultApiErrorMessage,
           title: strings.defaultApiErrorTitle,
           exception: e
@@ -308,7 +318,7 @@ class EditDiscard extends React.Component<Props, State> {
    */
   private handleDelete = async () => {
     const { discard } = this.state;
-    const { keycloak } = this.props;
+    const { keycloak, facility, onError } = this.props;
 
     try {
       const discardService = await Api.getStorageDiscardsService(keycloak);
@@ -320,12 +330,15 @@ class EditDiscard extends React.Component<Props, State> {
         throw new Error("Discard id is undefined")
       }
 
-      await discardService.deleteStorageDiscard({ storageDiscardId: discard.id })
+      await discardService.deleteStorageDiscard({
+        storageDiscardId: discard.id,
+        facility: facility
+      })
 
       this.setState({ redirect: true });
 
-    } catch (e) {
-      this.props.onError({
+    } catch (e: any) {
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -361,7 +374,7 @@ class EditDiscard extends React.Component<Props, State> {
    * @param data input change data
    */
     private onDiscardedCountChange = (event: any, { value }: InputOnChangeData) => {
-      const { discardCount } = this.state;
+      const { discardCount } = this.state;
       const count = Number(value);
       !Number.isNaN(discardCount) && this.setState({
         discardCount: count > 0 ? count : 0
@@ -374,8 +387,8 @@ class EditDiscard extends React.Component<Props, State> {
    * @param event React change event
    * @param data input change data
    */
-    private onChangeDate = (e: any, { value }: InputOnChangeData) => {
-      this.setState({date: moment(value, "DD.MM.YYYY HH:mm").toDate()});
+    private onChangeDate = (e: any, { value }: DropdownProps) => {
+      this.setState({date: moment(value as any, "DD.MM.YYYY HH:mm").toDate()});
     }
 }
 
@@ -385,8 +398,10 @@ class EditDiscard extends React.Component<Props, State> {
  * @param state store state
  */
 export function mapStateToProps(state: StoreState) {
-  
-}
+  return {
+    facility: state.facility
+  };
+};
   
 /**
  * Redux mapper for mapping component dispatches 
@@ -395,7 +410,7 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };  
 };
 

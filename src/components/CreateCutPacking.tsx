@@ -1,15 +1,15 @@
-import { Product, ProductionLine } from "../generated/client";
+import { Facility, Product, ProductionLine } from "../generated/client";
 import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
-import { Button, Form, Grid, InputOnChangeData, Loader } from "semantic-ui-react";
+import { Button, DropdownProps, Form, Grid, InputOnChangeData, Loader } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
-import strings from "src/localization/strings";
+import strings from "../localization/strings";
 import Api from "../api";
-import * as moment from "moment";
-import LocalizedUtils from "src/localization/localizedutils";
-import { Redirect } from "react-router";
+import moment from "moment";
+import LocalizedUtils from "../localization/localizedutils";
+import { Navigate } from "react-router-dom";
 import { FormContainer } from "./FormContainer";
-import { ErrorMessage, StoreState } from "src/types";
+import { ErrorMessage, StoreState } from "../types";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import * as actions from "../actions";
@@ -18,6 +18,7 @@ interface Props {
   keycloak?: KeycloakInstance;
   products?: Product[];
   productionLines?: ProductionLine[];
+  facility: Facility;
   onProductionLinesFound: typeof actions.productionLinesFound;
   onProductsFound: typeof actions.productsFound;
   onError: typeof actions.onErrorOccurred;
@@ -62,7 +63,7 @@ class CreateCutPacking extends React.Component<Props, State> {
    * Loads options for products and production lines
    */
   public componentDidMount = async () => {
-    const { keycloak, products, productionLines, onProductionLinesFound, onProductsFound, onError } = this.props;
+    const { keycloak, facility, products, productionLines, onProductionLinesFound, onProductsFound, onError } = this.props;
 
     if (!keycloak) {
       return;
@@ -73,18 +74,18 @@ class CreateCutPacking extends React.Component<Props, State> {
 
       if (!products) {
         const productsApi = await Api.getProductsService(keycloak);
-        const foundProducts = await productsApi.listProducts({});
+        const foundProducts = await productsApi.listProducts({ facility: facility });
         onProductsFound(foundProducts);
       }
 
       if (!productionLines) {
         const productionLinesApi = await Api.getProductionLinesService(keycloak);
-        const foundProductionLines = await productionLinesApi.listProductionLines({});
+        const foundProductionLines = await productionLinesApi.listProductionLines({ facility: facility });
         onProductionLinesFound(foundProductionLines);
       }
 
       this.setState({ loading: false });
-    } catch (exception) {
+    } catch (exception: any) {
       onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -95,7 +96,6 @@ class CreateCutPacking extends React.Component<Props, State> {
 
   public render = () => {
     const { 
-      redirect, 
       loading, 
       cutPackingId, 
       selectedProductName, 
@@ -110,8 +110,8 @@ class CreateCutPacking extends React.Component<Props, State> {
       storageCondition
     } = this.state;
 
-    if (redirect) {
-      return <Redirect to={`/cutPackings/${ cutPackingId }`} push={ true } />;
+    if (this.state.redirect) {
+      return <Navigate replace={true} to={`/cutPackings/${cutPackingId}`}/>;
     }
 
     if (loading) {
@@ -287,22 +287,22 @@ class CreateCutPacking extends React.Component<Props, State> {
   /**
    * Handles changing sowing day
    */
-  private onSowingDayChange = async (e: any, { value }: InputOnChangeData) => {
-    this.setState({ sowingDay: moment(value, "DD.MM.YYYY").toISOString() });
+  private onSowingDayChange = async (e: any, { value }: DropdownProps) => {
+    this.setState({ sowingDay: moment(value as any, "DD.MM.YYYY").toISOString() });
   }
 
   /**
    * Handles changing cutting day
    */
-  private onCuttingDayChange = async (e: any, { value }: InputOnChangeData) => {
-    this.setState({ cuttingDay: moment(value, "DD.MM.YYYY").toISOString() });
+  private onCuttingDayChange = async (e: any, { value }: DropdownProps) => {
+    this.setState({ cuttingDay: moment(value as any, "DD.MM.YYYY").toISOString() });
   }
 
   /**
    * Sends a request to the API to create a cut packing and redirects to the edit page
    */
   private createCutPacking = async () => {
-    const { keycloak, onError } = this.props;
+    const { keycloak, facility, onError } = this.props;
     const { weight, sowingDay, cuttingDay, gutterCount, gutterHoleCount, selectedProductId, selectedProductionLineId, producer, contactInformation, storageCondition } = this.state;
 
     if (!keycloak) {
@@ -312,25 +312,28 @@ class CreateCutPacking extends React.Component<Props, State> {
     try {
       this.setState({ loading: true });
       const cutPackingsApi = await Api.getCutPackingsService(keycloak);
-      const newCutPacking = await cutPackingsApi.createCutPacking({cutPacking: { 
-        weight, 
-        sowingDay: new Date(sowingDay), 
-        cuttingDay: new Date(cuttingDay), 
-        gutterCount, 
-        gutterHoleCount, 
-        productId: selectedProductId!, 
-        productionLineId: selectedProductionLineId!, 
-        producer, 
-        contactInformation, 
-        storageCondition 
-      }});
+      const newCutPacking = await cutPackingsApi.createCutPacking({
+        facility: facility,
+        cutPacking: { 
+          weight, 
+          sowingDay: new Date(sowingDay), 
+          cuttingDay: new Date(cuttingDay), 
+          gutterCount, 
+          gutterHoleCount, 
+          productId: selectedProductId!, 
+          productionLineId: selectedProductionLineId!, 
+          producer, 
+          contactInformation, 
+          storageCondition 
+        }
+      });
   
       this.setState({
         cutPackingId: newCutPacking.id,
         redirect: true,
         loading: false
       });
-    } catch (exception) {
+    } catch (exception: any) {
       onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -362,7 +365,7 @@ class CreateCutPacking extends React.Component<Props, State> {
   /**
    * Handles changing selected product
    */
-  private onChangeProduct = async (e: any, { name, value }: InputOnChangeData) => {
+  private onChangeProduct = async (e: any, { name, value }: DropdownProps) => {
     const { products } = this.props;
 
     if (!products) {
@@ -409,7 +412,7 @@ class CreateCutPacking extends React.Component<Props, State> {
   /**
    * Handles changing selected product
    */
-  private onChangeProductionLine = async (e: any, { name, value }: InputOnChangeData) => {
+  private onChangeProductionLine = async (e: any, { name, value }: DropdownProps) => {
     const { productionLines } = this.props;
 
     if (!productionLines) {
@@ -442,7 +445,8 @@ class CreateCutPacking extends React.Component<Props, State> {
 export function mapStateToProps(state: StoreState) {
   return {
     products: state.products,
-    productionLines: state.productionLines
+    productionLines: state.productionLines,
+    facility: state.facility
   };
 }
 
@@ -453,7 +457,7 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error)),
+    onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error)),
     onProductsFound: (products: Product[]) => dispatch(actions.productsFound(products)),
     onProductionLinesFound: (productionLines: ProductionLine[]) => dispatch(actions.productionLinesFound(productionLines))
   };

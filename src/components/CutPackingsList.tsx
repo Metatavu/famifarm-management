@@ -1,14 +1,14 @@
-import { CutPacking, Product } from "../generated/client";
+import { CutPacking, Facility, Product } from "../generated/client";
 import { KeycloakInstance } from "keycloak-js";
 import * as React from "react";
 import Api from "../api";
-import strings from "src/localization/strings";
-import LocalizedUtils from "src/localization/localizedutils";
-import { Button, Form, Grid, InputOnChangeData, List, Loader } from "semantic-ui-react";
+import strings from "../localization/strings";
+import LocalizedUtils from "../localization/localizedutils";
+import { Button, Form, Grid, DropdownProps, List, Loader } from "semantic-ui-react";
 import { NavLink } from "react-router-dom";
 import { DateInput } from 'semantic-ui-calendar-react';
-import * as moment from "moment";
-import { ErrorMessage, StoreState } from "src/types";
+import moment from "moment";
+import { ErrorMessage, StoreState } from "../types";
 import { Dispatch } from "redux";
 import * as actions from "../actions";
 import { connect } from "react-redux";
@@ -16,6 +16,7 @@ import { connect } from "react-redux";
 interface Props {
   keycloak?: KeycloakInstance;
   products?: Product[];
+  facility: Facility;
   onProductsFound: typeof actions.productsFound;
   onError: typeof actions.onErrorOccurred;
 }
@@ -51,7 +52,7 @@ class CutPackingsList extends React.Component<Props, State> {
    * Loads the list and product options
    */
   public componentDidMount = async () => {
-    const { keycloak, products, onProductsFound, onError } = this.props;
+    const { keycloak, products, facility, onProductsFound, onError } = this.props;
 
     if (!keycloak ) {
       return;
@@ -61,20 +62,20 @@ class CutPackingsList extends React.Component<Props, State> {
 
     try {
       const cutPackingsApi= await Api.getCutPackingsService(keycloak);
-      const cutPackings = await cutPackingsApi.listCutPackings({});
+      const cutPackings = await cutPackingsApi.listCutPackings({ facility: facility });
   
       if (products) {
         const listItems = this.getListItems(cutPackings, products);
         this.setState({ listItems, loading: false });
       } else {
         const productsApi = await Api.getProductsService(keycloak);
-        const foundProducts = await productsApi.listProducts({});
+        const foundProducts = await productsApi.listProducts({ facility: facility });
         const listItems = this.getListItems(cutPackings, foundProducts);
   
         onProductsFound(foundProducts);
         this.setState({ listItems, loading: false });
       }
-    } catch (exception) {
+    } catch (exception: any) {
       console.log(exception);
       onError({
         message: strings.defaultApiErrorMessage,
@@ -142,7 +143,7 @@ class CutPackingsList extends React.Component<Props, State> {
    * @param createdAfter return only packings created after this date
    */
   private updatePackingsList = async (productId?: string, createdBefore?: string, createdAfter?: string) => {
-    const { keycloak, products, onError } = this.props;
+    const { keycloak, products, facility, onError } = this.props;
 
     if (!keycloak || !products) {
       return;
@@ -151,11 +152,16 @@ class CutPackingsList extends React.Component<Props, State> {
     try {
       this.setState({ loading: true });
       const cutPackingsApi = await Api.getCutPackingsService(keycloak);
-      const cutPackings = await cutPackingsApi.listCutPackings({productId, createdAfter, createdBefore});
+      const cutPackings = await cutPackingsApi.listCutPackings({
+        productId: productId,
+        createdAfter: createdAfter,
+        createdBefore: createdBefore,
+        facility: facility
+      });
       const listItems = this.getListItems(cutPackings, products);
   
       this.setState({ listItems, loading: false });
-    } catch (exception) {
+    } catch (exception: any) {
       onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -185,23 +191,23 @@ class CutPackingsList extends React.Component<Props, State> {
   /**
    * Handles changing "created after"-date filter
    */
-  private onChangeCreatedAfter = async (e: any, { value }: InputOnChangeData) => {
-    this.setState({ createdAfterFilter: moment(value, "DD.MM.YYYY").toISOString() });
-    await this.updatePackingsList(this.state.selectedProductId, this.state.createdBeforeFilter, moment(value, "DD.MM.YYYY").toISOString());
+  private onChangeCreatedAfter = async (e: any, { value }: DropdownProps) => {
+    this.setState({ createdAfterFilter: moment(value as any, "DD.MM.YYYY").toISOString() });
+    await this.updatePackingsList(this.state.selectedProductId, this.state.createdBeforeFilter, moment(value as any, "DD.MM.YYYY").toISOString());
   }
 
   /**
    * Handles changing "created before"-date filter
    */
-  private onChangeCreatedBefore = async (e: any, { value }: InputOnChangeData) => {
-    this.setState({ createdBeforeFilter: moment(value, "DD.MM.YYYY").toISOString() });
-    await this.updatePackingsList(this.state.selectedProductId, moment(value, "DD.MM.YYYY").toISOString(), this.state.createdAfterFilter);
+  private onChangeCreatedBefore = async (e: any, { value }: DropdownProps) => {
+    this.setState({ createdBeforeFilter: moment(value as any, "DD.MM.YYYY").toISOString() });
+    await this.updatePackingsList(this.state.selectedProductId, moment(value as any, "DD.MM.YYYY").toISOString(), this.state.createdAfterFilter);
   }
 
   /**
    * Handles changing selected product
    */
-  private onChangeProduct = async (e: any, { value }: InputOnChangeData) => {
+  private onChangeProduct = async (e: any, { value }: DropdownProps) => {
     const { products } = this.props;
     if (!products) {
       return;
@@ -217,7 +223,7 @@ class CutPackingsList extends React.Component<Props, State> {
       selectedProductName: productName
     });
 
-    await this.updatePackingsList(value, this.state.createdBeforeFilter, this.state.createdAfterFilter);
+    await this.updatePackingsList(value as string, this.state.createdBeforeFilter, this.state.createdAfterFilter);
 
   }
 
@@ -274,7 +280,8 @@ class CutPackingsList extends React.Component<Props, State> {
  */
 export function mapStateToProps(state: StoreState) {
   return {
-    products: state.products
+    products: state.products,
+    facility: state.facility
   };
 }
 
@@ -285,7 +292,7 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error)),
+    onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error)),
     onProductsFound: (products: Product[]) => dispatch(actions.productsFound(products))
   };
 }

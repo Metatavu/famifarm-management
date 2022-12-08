@@ -5,9 +5,9 @@ import { StoreState } from "../types/index";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
-import { LocalizedValue, Pest } from "../generated/client";
-import { Redirect } from 'react-router';
-import strings from "src/localization/strings";
+import { Facility, LocalizedValue, Pest } from "../generated/client";
+import { Navigate } from 'react-router-dom';
+import strings from "../localization/strings";
 
 import {
   Grid,
@@ -18,8 +18,8 @@ import {
   Confirm
 } from "semantic-ui-react";
 import LocalizedValueInput from "./LocalizedValueInput";
-import LocalizedUtils from "src/localization/localizedutils";
-import { ErrorMessage } from "src/types";
+import LocalizedUtils from "../localization/localizedutils";
+import { ErrorMessage } from "../types";
 import { FormContainer } from "./FormContainer";
 
 /**
@@ -27,8 +27,9 @@ import { FormContainer } from "./FormContainer";
  */
 interface Props {
   keycloak?: Keycloak.KeycloakInstance;
-  pestId: string,
-  onError: (error: ErrorMessage) => void
+  pestId: string;
+  facility: Facility;
+  onError: (error: ErrorMessage | undefined) => void;
 }
 
 /**
@@ -70,17 +71,21 @@ class EditPest extends React.Component<Props, State> {
    * Component did mount life-sycle method
    */
   public async componentDidMount() {
+    const { pestId, keycloak, facility, onError } = this.props;
     try {
-      if (!this.props.keycloak) {
+      if (!keycloak) {
         return;
       }
   
-      const pestsService = await Api.getPestsService(this.props.keycloak);
-      const pest = await pestsService.findPest({pestId: this.props.pestId});
+      const pestsService = await Api.getPestsService(keycloak);
+      const pest = await pestsService.findPest({
+        pestId: pestId,
+        facility: facility
+      });
       this.setState({pest: pest});
 
-    } catch (e) {
-      this.props.onError({
+    } catch (e: any) {
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -104,23 +109,29 @@ class EditPest extends React.Component<Props, State> {
    * Handle form submit
    */
   private async handleSubmit() {
+    const { keycloak, facility, onError } = this.props;
+    const { pest } = this.state;
     try {
-      if (!this.props.keycloak || !this.state.pest) {
+      if (!keycloak || !pest) {
         return;
       }
   
-      const pestsService = await Api.getPestsService(this.props.keycloak);
+      const pestsService = await Api.getPestsService(keycloak);
   
       this.setState({saving: true});
-      await pestsService.updatePest({pestId: this.state.pest.id!, pest: this.state.pest});
+      await pestsService.updatePest({
+        pestId: pest.id!,
+        pest: pest,
+        facility: facility
+      });
       this.setState({saving: false});
   
       this.setState({messageVisible: true});
       setTimeout(() => {
         this.setState({messageVisible: false});
       }, 3000);
-    } catch (e) {
-      this.props.onError({
+    } catch (e: any) {
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -132,18 +143,23 @@ class EditPest extends React.Component<Props, State> {
    * Handle pest delete
    */
   private async handleDelete() {
+    const { keycloak, facility, onError } = this.props;
+    const { pest } = this.state;
     try {
-      if (!this.props.keycloak || !this.state.pest) {
+      if (!keycloak || !pest) {
         return;
       }
   
-      const pestsService = await Api.getPestsService(this.props.keycloak);
-      const id = this.state.pest.id || "";
-      await pestsService.deletePest({pestId: id});
+      const pestsService = await Api.getPestsService(keycloak);
+      const id = pest.id || "";
+      await pestsService.deletePest({
+        pestId: id,
+        facility: facility
+      });
       
       this.setState({redirect: true});
-    } catch (e) {
-      this.props.onError({
+    } catch (e: any) {
+      onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
         exception: e
@@ -164,7 +180,7 @@ class EditPest extends React.Component<Props, State> {
     }
 
     if (this.state.redirect) {
-      return <Redirect to="/pests" push={true} />;
+      return <Navigate replace={true} to="/pests"/>;
     }
 
     return (
@@ -221,6 +237,7 @@ class EditPest extends React.Component<Props, State> {
  */
 export function mapStateToProps(state: StoreState) {
   return {
+    facility: state.facility
   };
 }
 
@@ -231,7 +248,7 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

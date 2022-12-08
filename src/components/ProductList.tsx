@@ -6,8 +6,8 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Product } from "../generated/client";
-import strings from "src/localization/strings";
+import { Facility, Product } from "../generated/client";
+import strings from "../localization/strings";
 
 import {
   List,
@@ -16,13 +16,14 @@ import {
   Loader,
   Checkbox
 } from "semantic-ui-react";
-import LocalizedUtils from "src/localization/localizedutils";
+import LocalizedUtils from "../localization/localizedutils";
 
 export interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   products?: Product[];
+  facility: Facility;
   onProductsFound?: (products: Product[]) => void,
-  onError: (error: ErrorMessage) => void
+  onError: (error: ErrorMessage | undefined) => void
 }
 
 export interface State {
@@ -70,7 +71,7 @@ class ProductList extends React.Component<Props, State> {
     const products = this.props.products.map((product, i) => {
       const productPath = `/products/${product.id}`;
       return (
-        <List.Item style={i % 2 == 0 ? {backgroundColor: "#ddd"} : {}} key={product.id}>
+        <List.Item style={i % 2 === 0 ? {backgroundColor: "#ddd"} : {}} key={product.id}>
           <List.Content floated='right'>
             <NavLink to={productPath}>
               <Button className="submit-button">{strings.open}</Button>
@@ -105,14 +106,18 @@ class ProductList extends React.Component<Props, State> {
 
   private loadData = async () => {
     const { showInActive } = this.state;
-    const { keycloak } = this.props;
+    const { keycloak, facility } = this.props;
     try {
       if (!keycloak) {
         return;
       }
   
       const productsService = await Api.getProductsService(keycloak);
-      const products = await productsService.listProducts({includeSubcontractorProducts: true, includeInActiveProducts: showInActive});
+      const products = await productsService.listProducts({
+        includeSubcontractorProducts: true,
+        includeInActiveProducts: showInActive,
+        facility: facility
+      });
       products.sort((a, b) => {
         let aActive = a.active as any;
         let bActive = b.active as any;
@@ -124,7 +129,7 @@ class ProductList extends React.Component<Props, State> {
         return 0;
       });
       this.props.onProductsFound && this.props.onProductsFound(products);
-    } catch (e) {
+    } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
         title: strings.defaultApiErrorTitle,
@@ -142,7 +147,8 @@ class ProductList extends React.Component<Props, State> {
 export function mapStateToProps(state: StoreState) {
   return {
     products: state.products,
-    product: state.product
+    product: state.product,
+    facility: state.facility
   };
 }
 
@@ -154,7 +160,7 @@ export function mapStateToProps(state: StoreState) {
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onProductsFound: (products: Product[]) => dispatch(actions.productsFound(products)),
-    onError: (error: ErrorMessage) => dispatch(actions.onErrorOccurred(error))
+    onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

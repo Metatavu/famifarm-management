@@ -1,9 +1,9 @@
 import * as React from "react";
-import * as Noty from "noty";
+import Noty from "noty";
 
 import "../../node_modules/noty/lib/noty.css";
 import "../../node_modules/noty/lib/themes/mint.css";
-import strings from "src/localization/strings";
+import strings from "../localization/strings";
 
 const CONNECTION_CHECK_RATE = 10000;
 const API_URL = process.env.REACT_APP_FAMIFARM_API_BASE_PATH || "http://localhost:8080"
