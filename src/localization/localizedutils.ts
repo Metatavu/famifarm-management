@@ -8,8 +8,8 @@ export default class LocalizedUtils {
 
   /**
    * Returns localized value
-   * 
-   * @param entry localized entry 
+   *
+   * @param entry localized entry
    * @param locale Locale
    * @returns value
    */
@@ -32,9 +32,22 @@ export default class LocalizedUtils {
     if (locale != "fi") {
       return this.getLocalizedValue(entry, "fi");
     }
-    
+
     return "";
   }
 
-}
+  /**
+   * Get facility specific overrides for locale
+   *
+   * @param locale string
+   * @param facility string
+   * @returns locales object with facility overrides
+   */
+  public static getFacilityOverrides = (locale: string, facility: string) => {
+    const baseLocale = require(`./${locale}.json`);
+    const facilityOverrides = require(`./${locale}.${facility}.json`);
 
+    return { ...baseLocale, ...facilityOverrides };
+  }
+
+}

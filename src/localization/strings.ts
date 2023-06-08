@@ -1,6 +1,7 @@
-import LocalizedStrings, { 
+import LocalizedStrings, {
   LocalizedStringsMethods
 } from 'localized-strings';
+import LocalizedUtils from './localizedutils';
 
 export interface IStrings extends LocalizedStringsMethods {
 
@@ -36,7 +37,7 @@ export interface IStrings extends LocalizedStringsMethods {
   newProduct: string;
   productName: string;
   selectProduct: string;
-  
+
   productionLine: string;
   productionLines: string;
   newProductionLine: string;
@@ -232,7 +233,7 @@ export interface IStrings extends LocalizedStringsMethods {
   storageCondition: string
   createCutPacking: string
   cutPackings: string
-  
+
   editCutPacking: string
   events: string
   total: string
@@ -268,8 +269,10 @@ export interface IStrings extends LocalizedStringsMethods {
 }
 
 const strings: IStrings = new LocalizedStrings({
-  en: require("./en.json"),
-  fi: require("./fi.json")
+  en_joroinen: require("./en.json"),
+  en_juva: LocalizedUtils.getFacilityOverrides("en", "juva"),
+  fi_joroinen: require("./fi.json"),
+  fi_juva: LocalizedUtils.getFacilityOverrides("fi", "juva")
 });
 
 export default strings;

@@ -1,11 +1,11 @@
 import { AppAction } from '../actions';
 import { StoreState } from '../types/index';
-import { 
-  USER_LOGIN, 
+import {
+  USER_LOGIN,
   USER_LOGOUT,
   PACKINGS_FOUND,
-  PRODUCTS_FOUND, 
-  PRODUCT_SELECTED, 
+  PRODUCTS_FOUND,
+  PRODUCT_SELECTED,
   PRODUCT_DELETED,
   PACKAGE_SIZES_FOUND,
   PACKAGE_SIZE_DELETED,
@@ -21,7 +21,7 @@ import {
   SEED_BATCH_DELETED,
   PERFORMED_CULTIVATION_ACTIONS_FOUND,
   PERFORMED_CULTIVATION_ACTION_DELETED,
-  PERFORMED_CULTIVATION_ACTION_SELECTED, 
+  PERFORMED_CULTIVATION_ACTION_SELECTED,
   WASTAGE_REASONS_FOUND,
   WASTAGE_REASON_DELETED,
   WASTAGE_REASON_SELECTED,
@@ -36,8 +36,8 @@ import { Reducer } from 'redux';
 import { Facility } from '../generated/client/models/Facility';
 
 /**
- * Process action 
- * 
+ * Process action
+ *
  * @param state state
  * @param action action
  */
@@ -45,7 +45,7 @@ export const processAction: Reducer<StoreState, AppAction> = (state: StoreState 
   if (!state) {
     state = {
       authenticated: false,
-      locale: "fi",
+      locale: "fi_joroinen",
       events: [],
       eventListFilters: {},
       campaigns: [],

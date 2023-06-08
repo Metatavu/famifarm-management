@@ -5,7 +5,7 @@ import { StoreState } from "../types/index";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { Facility } from "../generated/client";
-
+import strings from "../localization/strings";
 
 /**
  * Interface representing component properties
@@ -14,6 +14,8 @@ interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   facility: Facility;
   onFacilityChange: (facility: Facility) => void;
+  onLocaleUpdate: (locale: string) => void;
+  locale: string;
 }
 
 /**
@@ -28,7 +30,7 @@ class FacilitySelect extends React.Component<Props, State> {
 
   /**
    * Constructor
-   * @param props component properties 
+   * @param props component properties
    */
   constructor(props: Props) {
     super(props);
@@ -67,36 +69,48 @@ class FacilitySelect extends React.Component<Props, State> {
 
   /**
    * Handle facility change
-   * @param facility 
+   * @param facility
    */
   private handleFacilityChange = (facility: Facility) => {
     if (this.props.facility !== facility) {
       window.localStorage.setItem("facility", facility);
-      window.location.reload();
+      this.props.onFacilityChange(facility);
+      if (this.props.locale.includes("fi")) {
+        strings.setLanguage(`fi_${facility.toLowerCase()}`);
+        this.props.onLocaleUpdate(`fi_${facility.toLowerCase()}`);
+      } else {
+        strings.setLanguage(`en_${facility.toLowerCase()}`);
+        this.props.onLocaleUpdate(`en_${facility.toLowerCase()}`);
+      }
+
+      // TODO: Removing this updates the locales and returns user to welcome screen. Leaving it in does not navigate, but does not update locales either.
+      // window.location.reload();
     }
   }
 }
 
 /**
  * Redux mapper for mapping store state to component props
- * 
+ *
  * @param state store state
  */
 function mapStateToProps(state: StoreState) {
   return {
     facility: state.facility,
-    keycloak: state.keycloak
+    keycloak: state.keycloak,
+    locale: state.locale
   };
 }
 
 /**
- * Redux mapper for mapping component dispatches 
- * 
+ * Redux mapper for mapping component dispatches
+ *
  * @param dispatch dispatch method
  */
 function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onFacilityChange: (facility: Facility) => dispatch(actions.facilityUpdate(facility))
+    onFacilityChange: (facility: Facility) => dispatch(actions.facilityUpdate(facility)),
+    onLocaleUpdate: (locale: string) => dispatch(actions.localeUpdate(locale))
   };
 }
 
