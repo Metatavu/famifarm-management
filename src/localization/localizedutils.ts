@@ -1,12 +1,11 @@
-import strings from "./strings";
 import { LocalizedValue } from "../generated/client";
+import { store } from "../index";
 
 /**
  * Helper class for using localized values
  */
 export default class LocalizedUtils {
-
-  // TODO: This needs to be updated to use the new LocalizedValue including facility specific overrides
+  // TODO: This is incomplete as only works once the locale or facility is changed.
   /**
    * Returns localized value
    *
@@ -15,23 +14,31 @@ export default class LocalizedUtils {
    * @returns value
    */
   public static getLocalizedValue(entry?: LocalizedValue[], localeParam?: string): string {
+    const state = store.getState();
+    const facility: string = state.facility;
+    const localeFromStore = state.locale;
+
     if (!entry) {
       return "";
     }
 
-    let locale = localeParam || strings.getLanguage();
+    let locale = localeParam || localeFromStore;
     if (!locale) {
-      locale = "en";
+      locale = `en_${facility}`;
     }
 
     for (let i = 0; i < entry.length; i++) {
+      if (entry[i].language === "fi") entry[i].language = `fi_${facility.toLowerCase()}`;
+      if (entry[i].language === "en") entry[i].language = `en_${facility.toLowerCase()}`;
+
       if (locale === entry[i].language) {
         return entry[i].value;
       }
     }
 
-    if (locale != "fi") {
-      return this.getLocalizedValue(entry, "fi");
+    if (!locale.includes("fi")) {
+      // This is currently the only place the localeParam is passed into this function and so no need to update to include facility int he above usage.
+      return this.getLocalizedValue(entry, `fi_${facility}`);
     }
 
     return "";
