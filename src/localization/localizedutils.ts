@@ -6,6 +6,7 @@ import { LocalizedValue } from "../generated/client";
  */
 export default class LocalizedUtils {
 
+  // TODO: This needs to be updated to use the new LocalizedValue including facility specific overrides
   /**
    * Returns localized value
    *
