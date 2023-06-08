@@ -273,6 +273,8 @@ const strings: IStrings = new LocalizedStrings({
   en_juva: LocalizedUtils.getFacilityOverrides("en", "juva"),
   fi_joroinen: require("./fi.json"),
   fi_juva: LocalizedUtils.getFacilityOverrides("fi", "juva")
+}, {
+  customLanguageInterface: () => "fi_joroinen"
 });
 
 export default strings;
