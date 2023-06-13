@@ -72,16 +72,14 @@ class FacilitySelect extends React.Component<Props, State> {
    * @param facility
    */
   private handleFacilityChange = (facility: Facility) => {
+    const { locale, onFacilityChange, onLocaleUpdate } = this.props;
+
     if (this.props.facility !== facility) {
       window.localStorage.setItem("facility", facility);
-      this.props.onFacilityChange(facility);
-      if (this.props.locale.includes("fi")) {
-        strings.setLanguage(`fi_${facility.toLowerCase()}`);
-        this.props.onLocaleUpdate(`fi_${facility.toLowerCase()}`);
-      } else {
-        strings.setLanguage(`en_${facility.toLowerCase()}`);
-        this.props.onLocaleUpdate(`en_${facility.toLowerCase()}`);
-      }
+      onFacilityChange(facility);
+
+      strings.setLanguage(`${locale.slice(0, 2)}_${facility.toLowerCase()}`);
+      onLocaleUpdate(`${locale.slice(0, 2)}_${facility.toLowerCase()}`);
 
       // TODO: Removing this updates the locales and returns user to welcome screen. Leaving it in does not navigate, but does not update locales either.
       // window.location.reload();

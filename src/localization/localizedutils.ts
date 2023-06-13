@@ -5,7 +5,6 @@ import { store } from "../index";
  * Helper class for using localized values
  */
 export default class LocalizedUtils {
-  // TODO: This is incomplete as only works once the locale or facility is changed.
   /**
    * Returns localized value
    *
@@ -37,7 +36,7 @@ export default class LocalizedUtils {
     }
 
     if (!locale.includes("fi")) {
-      // This is currently the only place the localeParam is passed into this function and so no need to update to include facility int he above usage.
+      // This is currently the only place the localeParam is passed into this function and so no need to update to include facility in the above usage of localeParam.
       return this.getLocalizedValue(entry, `fi_${facility}`);
     }
 

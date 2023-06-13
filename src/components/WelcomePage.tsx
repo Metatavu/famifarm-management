@@ -64,8 +64,10 @@ export interface Props {
   authenticated: boolean,
   keycloak?: Keycloak.KeycloakInstance,
   facility: Facility,
-  onLogin?: (keycloak: Keycloak.KeycloakInstance, authenticated: boolean) => void
-  onFacilityUpdate: (facility: Facility) => void
+  onLogin?: (keycloak: Keycloak.KeycloakInstance, authenticated: boolean) => void,
+  onFacilityUpdate: (facility: Facility) => void,
+  onLocaleUpdate: (locale: string) => void,
+  locale: string;
 }
 
 class WelcomePage extends React.Component<Props, any> {
@@ -77,10 +79,10 @@ class WelcomePage extends React.Component<Props, any> {
   }
 
   /**
-   * Component did mount life-sycle event
+   * Component did mount life-cycle event
    */
   componentDidMount = async () => {
-    const { onFacilityUpdate, onLogin } = this.props;
+    const { onFacilityUpdate, onLogin, onLocaleUpdate, locale } = this.props;
     const kcConf = {
       "realm": process.env.REACT_APP_KEYCLOAK_REALM as string,
       "url": process.env.REACT_APP_AUTH_SERVER_URL as string,
@@ -95,8 +97,13 @@ class WelcomePage extends React.Component<Props, any> {
 
     if (keycloak.hasRealmRole("juva") && keycloak.hasRealmRole("joroinen")) {
       onFacilityUpdate(previousFacility);
+      strings.setLanguage(`${locale.slice(0, 2)}_${previousFacility.toLowerCase()}`);
+      onLocaleUpdate(`${locale.slice(0, 2)}_${previousFacility.toLowerCase()}`);
     } else {
       onFacilityUpdate(keycloak.hasRealmRole("joroinen") ? Facility.Joroinen : Facility.Juva);
+      onLocaleUpdate(keycloak.hasRealmRole("joroinen")
+        ? `${locale.slice(0, 2)}_${Facility.Joroinen.toLowerCase()}`
+        : `${locale.slice(0, 2)}_${Facility.Juva.toLowerCase()}`);
     }
 
     this.setState({keycloak: keycloak});
@@ -172,7 +179,7 @@ class WelcomePage extends React.Component<Props, any> {
 
       return (
         <Menu.Item
-          key={index} 
+          key={index}
           {...itemParams}>
           {navigationRoute.text}
         </Menu.Item>
@@ -243,19 +250,19 @@ class WelcomePage extends React.Component<Props, any> {
                   />
                 }
               />
-              <Route 
+              <Route
                 path="/packings/:packingId"
                 element={
                   <WithParams Component={EditPacking} keycloak={this.state.keycloak} routeParamNames={["packingId"]} />
                 }
               />
-              <Route 
+              <Route
                 path="/cutPackings/:cutPackingId"
                 element={
                   <WithParams Component={EditCutPacking} keycloak={this.state.keycloak} routeParamNames={["cutPackingId"]} />
                 }
               />
-              <Route 
+              <Route
                 path="/campaigns/:campaignId"
                 element={
                   <WithParams Component={EditCampaign} keycloak={this.state.keycloak} routeParamNames={["campaignId"]} />
@@ -513,7 +520,7 @@ class WelcomePage extends React.Component<Props, any> {
 
 /**
  * Redux mapper for mapping store state to component props
- * 
+ *
  * @param state store state
  */
 export function mapStateToProps(state: StoreState) {
@@ -526,14 +533,15 @@ export function mapStateToProps(state: StoreState) {
 }
 
 /**
- * Redux mapper for mapping component dispatches 
- * 
+ * Redux mapper for mapping component dispatches
+ *
  * @param dispatch dispatch method
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
     onLogin: (keycloak: Keycloak.KeycloakInstance, authenticated: boolean) => dispatch(actions.userLogin(keycloak, authenticated)),
     onFacilityUpdate: (facility: Facility) => dispatch(actions.facilityUpdate(facility)),
+    onLocaleUpdate: (locale: string) => dispatch(actions.localeUpdate(locale))
   };
 }
 
