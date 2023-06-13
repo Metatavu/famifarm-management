@@ -80,9 +80,6 @@ class FacilitySelect extends React.Component<Props, State> {
 
       strings.setLanguage(`${locale.slice(0, 2)}_${facility.toLowerCase()}`);
       onLocaleUpdate(`${locale.slice(0, 2)}_${facility.toLowerCase()}`);
-
-      // TODO: Removing this updates the locales and returns user to welcome screen. Leaving it in does not navigate, but does not update locales either.
-      // window.location.reload();
     }
   }
 }
