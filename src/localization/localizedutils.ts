@@ -1,5 +1,5 @@
 import { LocalizedValue } from "../generated/client";
-import { store } from "../index";
+import strings from "./strings";
 
 /**
  * Helper class for using localized values
@@ -13,31 +13,22 @@ export default class LocalizedUtils {
    * @returns value
    */
   public static getLocalizedValue(entry?: LocalizedValue[], localeParam?: string): string {
-    const state = store.getState();
-    const facility: string = state.facility;
-    const localeFromStore = state.locale;
-
     if (!entry) {
       return "";
     }
 
-    let locale = localeParam || localeFromStore;
-    if (!locale) {
-      locale = `en_${facility}`;
+    if (!localeParam) {
+      localeParam = strings.getLanguage().slice(0, 2);
     }
 
     for (let i = 0; i < entry.length; i++) {
-      if (entry[i].language === "fi") entry[i].language = `fi_${facility.toLowerCase()}`;
-      if (entry[i].language === "en") entry[i].language = `en_${facility.toLowerCase()}`;
-
-      if (locale === entry[i].language) {
+      if (localeParam === entry[i].language) {
         return entry[i].value;
       }
     }
 
-    if (!locale.includes("fi")) {
-      // This is currently the only place the localeParam is passed into this function and so no need to update to include facility in the above usage of localeParam.
-      return this.getLocalizedValue(entry, `fi_${facility}`);
+    if (localeParam !== "fi") {
+      return this.getLocalizedValue(entry, "fi");
     }
 
     return "";
