@@ -56,7 +56,7 @@ class EditProduct extends React.Component<Props, State> {
 
   /**
    * Constructor
-   * 
+   *
    * @param props component props
    */
   constructor(props: Props) {
@@ -88,10 +88,10 @@ class EditProduct extends React.Component<Props, State> {
         productId: productId,
         facility: facility
       });
-  
+
       onProductSelected && onProductSelected(product);
       this.setState({ product });
-  
+
       const packageSizes = await packageSizeService.listPackageSizes({ facility: facility });
       onPackageSizesFound && onPackageSizesFound(packageSizes);
     } catch (e: any) {
@@ -123,7 +123,7 @@ class EditProduct extends React.Component<Props, State> {
         facility: facility
       });
       this.setState({ saving: false });
-  
+
       this.setState({ messageVisible: true });
       setTimeout(() => {
         this.setState({ messageVisible: false });
@@ -162,7 +162,7 @@ class EditProduct extends React.Component<Props, State> {
 
   /**
    *  Updates performed cultivation action name
-   * 
+   *
    * @param name localized entry representing name
    */
   private updateName = (name: LocalizedValue[]) => {
@@ -173,7 +173,7 @@ class EditProduct extends React.Component<Props, State> {
 
   /**
    * Handle package size select change
-   * 
+   *
    * @param e event
    * @param value updated list of package sizes from DropdownProps
    */
@@ -188,7 +188,7 @@ class EditProduct extends React.Component<Props, State> {
 
   /**
    * Handle allowd harvest types event change
-   * 
+   *
    * @param e event
    * @param value updated list of package sizes from DropdownProps
    */
@@ -203,8 +203,8 @@ class EditProduct extends React.Component<Props, State> {
 
   /**
    * Sets the isSubcontractorProduct boolean
-   * 
-   * @param e event 
+   *
+   * @param e event
    * @param checked checked state from CheckboxProps
    */
   private updateIsSubcontractorProduct = (e: any, { checked }: CheckboxProps) => {
@@ -216,11 +216,26 @@ class EditProduct extends React.Component<Props, State> {
     })
   }
 
+  /**
+   * Sets the isEndProduct boolean
+   *
+   * @param e event
+   * @param checked checked state from CheckboxProps
+   */
+  private updateIsEndProduct = (e: any, { checked }: CheckboxProps) => {
+    this.setState({
+      product: {
+        ...this.state.product!,
+        isEndProduct: checked || false
+      }
+    })
+  }
+
 
   /**
    * Sets the active boolean
-   * 
-   * @param e event 
+   *
+   * @param e event
    * @param { checked } new value
    */
   updateIsActive = (e: any, { checked }: CheckboxProps) => {
@@ -292,7 +307,7 @@ class EditProduct extends React.Component<Props, State> {
                   value={ product ? product.name : undefined }
                   languages={[ "fi", "en" ]}
                 />
-                <Form.Select 
+                <Form.Select
                   fluid
                   required
                   multiple
@@ -302,7 +317,7 @@ class EditProduct extends React.Component<Props, State> {
                   onChange={ this.onPackageSizeChange }
                   value={ product ? product.defaultPackageSizeIds || [] : [] }
                 />
-                <Form.Select 
+                <Form.Select
                   fluid
                   required
                   multiple
@@ -325,14 +340,20 @@ class EditProduct extends React.Component<Props, State> {
                 onChange={ this.updateIsActive }
                 label={ strings.activeProductLabel }
               />
+              <Form.Checkbox
+                required
+                checked={ this.state.product ? this.state.product.isEndProduct : undefined }
+                onChange={ this.updateIsEndProduct }
+                label={ strings.isEndProduct }
+              />
               <Message
                 success
                 visible={ this.state.messageVisible }
                 header={ strings.savedSuccessfully }
               />
-              <Button 
-                className="submit-button" 
-                onClick={ this.handleSubmit } 
+              <Button
+                className="submit-button"
+                onClick={ this.handleSubmit }
                 type='submit'
                 loading={ saving }
               >
@@ -355,7 +376,7 @@ class EditProduct extends React.Component<Props, State> {
 
 /**
  * Redux mapper for mapping store state to component props
- * 
+ *
  * @param state store state
  */
 const mapStateToProps = (state: StoreState) => ({
@@ -366,8 +387,8 @@ const mapStateToProps = (state: StoreState) => ({
 });
 
 /**
- * Redux mapper for mapping component dispatches 
- * 
+ * Redux mapper for mapping component dispatches
+ *
  * @param dispatch dispatch method
  */
 const mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({

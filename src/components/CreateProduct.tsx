@@ -51,7 +51,8 @@ class CreateProduct extends React.Component<Props, State> {
       redirect: false,
       productData: {
         isSubcontractorProduct: false,
-        active: true
+        active: true,
+        isEndProduct: false
       }
     };
   }
@@ -89,18 +90,19 @@ class CreateProduct extends React.Component<Props, State> {
       return;
     }
 
-    try {  
-      const productsService = await Api.getProductsService(keycloak);  
+    try {
+      const productsService = await Api.getProductsService(keycloak);
       await productsService.createProduct({
         facility: facility,
         product: {
           name: productData.name,
           defaultPackageSizeIds: productData.defaultPackageSizeIds,
           isSubcontractorProduct: productData.isSubcontractorProduct!,
-          active: productData.active
+          active: productData.active,
+          isEndProduct: productData.isEndProduct!
         }
       });
-  
+
       this.setState({ redirect: true });
     } catch (e: any) {
       this.props.onError({
@@ -113,7 +115,7 @@ class CreateProduct extends React.Component<Props, State> {
 
   /**
    * Handle default package size change
-   * 
+   *
    * @param e event
    * @param value updated list of package sizes from DropdownProps
    */
@@ -128,7 +130,7 @@ class CreateProduct extends React.Component<Props, State> {
 
   /**
    * Handle allowd harvest types event change
-   * 
+   *
    * @param e event
    * @param value updated list of package sizes from DropdownProps
    */
@@ -143,7 +145,7 @@ class CreateProduct extends React.Component<Props, State> {
 
   /**
    *  Updates performed cultivation action name
-   * 
+   *
    * @param name localized entry representing name
    */
   private updateName = (name: LocalizedValue[]) => {
@@ -154,7 +156,7 @@ class CreateProduct extends React.Component<Props, State> {
 
   /**
    * Sets the isSubcontractorProduct boolean
-   * 
+   *
    * @param e event
    * @param checked checked state from CheckboxProps
    */
@@ -167,11 +169,26 @@ class CreateProduct extends React.Component<Props, State> {
     })
   }
 
+  /**
+   * Sets the isEndProduct boolean
+   *
+   * @param e event
+   * @param checked checked state from CheckboxProps
+   */
+  private updateIsEndProduct = (e: any, { checked }: CheckboxProps) => {
+    this.setState({
+      productData: {
+        ...this.state.productData,
+        isEndProduct: checked || false
+      }
+    })
+  }
+
 
   /**
    * Sets the active boolean
-   * 
-   * @param e event 
+   *
+   * @param e event
    * @param { checked } new value
    */
   updateIsActive = (e: any, { checked }: CheckboxProps) => {
@@ -221,13 +238,13 @@ class CreateProduct extends React.Component<Props, State> {
             <FormContainer>
               <Form.Field required>
                 <label>{ strings.productName }</label>
-                <LocalizedValueInput 
+                <LocalizedValueInput
                   onValueChange={ this.updateName }
                   value={ productData.name }
                   languages={[ "fi", "en" ]}
                 />
               </Form.Field>
-              <Form.Select 
+              <Form.Select
                 fluid
                 required
                 multiple
@@ -237,7 +254,7 @@ class CreateProduct extends React.Component<Props, State> {
                 value={ productData.defaultPackageSizeIds || [] }
                 onChange={ this.onUpdateDefaultPackageSize }
               />
-              <Form.Select 
+              <Form.Select
                   fluid
                   required
                   multiple
@@ -259,6 +276,12 @@ class CreateProduct extends React.Component<Props, State> {
                 onChange={ this.updateIsActive }
                 label={ strings.activeProductLabel }
               />
+              <Form.Checkbox
+                required
+                checked={ this.state.productData.isEndProduct }
+                onChange={ this.updateIsEndProduct }
+                label={ strings.isEndProduct }
+              />
               <Button
                 className="submit-button"
                 onClick={ this.handleSubmit }
@@ -276,7 +299,7 @@ class CreateProduct extends React.Component<Props, State> {
 
 /**
  * Redux mapper for mapping store state to component props
- * 
+ *
  * @param state store state
  */
 const mapStateToProps = (state: StoreState) => ({
@@ -287,8 +310,8 @@ const mapStateToProps = (state: StoreState) => ({
 });
 
 /**
- * Redux mapper for mapping component dispatches 
- * 
+ * Redux mapper for mapping component dispatches
+ *
  * @param dispatch dispatch method
  */
 const mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({

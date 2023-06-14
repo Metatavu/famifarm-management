@@ -1,4 +1,4 @@
-import LocalizedStrings, { 
+import LocalizedStrings, {
   LocalizedStringsMethods
 } from 'localized-strings';
 
@@ -36,7 +36,7 @@ export interface IStrings extends LocalizedStringsMethods {
   newProduct: string;
   productName: string;
   selectProduct: string;
-  
+
   productionLine: string;
   productionLines: string;
   newProductionLine: string;
@@ -232,7 +232,7 @@ export interface IStrings extends LocalizedStringsMethods {
   storageCondition: string
   createCutPacking: string
   cutPackings: string
-  
+
   editCutPacking: string
   events: string
   total: string
@@ -265,6 +265,8 @@ export interface IStrings extends LocalizedStringsMethods {
   dashboard: string
   dashboardFormDescription: string;
   dashboardCount: string;
+
+  isEndProduct: string;
 }
 
 const strings: IStrings = new LocalizedStrings({
