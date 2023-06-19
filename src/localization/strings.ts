@@ -267,6 +267,7 @@ export interface IStrings extends LocalizedStringsMethods {
   dashboardCount: string;
 
   isEndProduct: string;
+  isRawMaterial: string;
 }
 
 const strings: IStrings = new LocalizedStrings({

@@ -239,6 +239,6 @@
     "dashboardFormDescription": "Valitse päivä nähdäksesi kumulatiiviset pakkaukset",
     "dashboardCount": "Pakkauksien määrä",
 
-    "isEndProduct": "Lopputuote"
-
+    "isEndProduct": "Lopputuote",
+    "isRawMaterial": "Raaka materiaali"
 }

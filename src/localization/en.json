@@ -240,6 +240,7 @@
   "dashboardFormDescription": "Select date to display cumulative packings data:",
   "dashboardCount": "Package count",
 
-  "isEndProduct": "End product"
+  "isEndProduct": "End product",
+  "isRawMaterial": "Raw material"
 
 }

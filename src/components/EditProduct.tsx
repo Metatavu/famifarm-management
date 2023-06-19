@@ -231,6 +231,21 @@ class EditProduct extends React.Component<Props, State> {
     })
   }
 
+  /**
+   * Sets the isRawMaterial boolean
+   *
+   * @param e event
+   * @param checked checked state from CheckboxProps
+   */
+  private updateIsRawMaterial = (e: any, { checked }: CheckboxProps) => {
+    this.setState({
+      product: {
+        ...this.state.product!,
+        isRawMaterial: checked || false
+      }
+    })
+  }
+
 
   /**
    * Sets the active boolean
@@ -345,6 +360,12 @@ class EditProduct extends React.Component<Props, State> {
                 checked={ this.state.product ? this.state.product.isEndProduct : undefined }
                 onChange={ this.updateIsEndProduct }
                 label={ strings.isEndProduct }
+              />
+              <Form.Checkbox
+                required
+                checked={ this.state.product ? this.state.product.isRawMaterial : undefined }
+                onChange={ this.updateIsRawMaterial }
+                label={ strings.isRawMaterial }
               />
               <Message
                 success

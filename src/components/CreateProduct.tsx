@@ -52,7 +52,8 @@ class CreateProduct extends React.Component<Props, State> {
       productData: {
         isSubcontractorProduct: false,
         active: true,
-        isEndProduct: false
+        isEndProduct: false,
+        isRawMaterial: false
       }
     };
   }
@@ -99,7 +100,8 @@ class CreateProduct extends React.Component<Props, State> {
           defaultPackageSizeIds: productData.defaultPackageSizeIds,
           isSubcontractorProduct: productData.isSubcontractorProduct!,
           active: productData.active,
-          isEndProduct: productData.isEndProduct!
+          isEndProduct: productData.isEndProduct,
+          isRawMaterial: productData.isRawMaterial
         }
       });
 
@@ -180,6 +182,21 @@ class CreateProduct extends React.Component<Props, State> {
       productData: {
         ...this.state.productData,
         isEndProduct: checked || false
+      }
+    })
+  }
+
+  /**
+   * Sets the isRawMaterial boolean
+   *
+   * @param e event
+   * @param checked checked state from CheckboxProps
+   */
+  private updateIsRawMaterial = (e: any, { checked }: CheckboxProps) => {
+    this.setState({
+      productData: {
+        ...this.state.productData,
+        isRawMaterial: checked || false
       }
     })
   }
@@ -281,6 +298,12 @@ class CreateProduct extends React.Component<Props, State> {
                 checked={ this.state.productData.isEndProduct }
                 onChange={ this.updateIsEndProduct }
                 label={ strings.isEndProduct }
+              />
+              <Form.Checkbox
+                required
+                checked={ this.state.productData.isRawMaterial }
+                onChange={ this.updateIsRawMaterial }
+                label={ strings.isRawMaterial }
               />
               <Button
                 className="submit-button"
