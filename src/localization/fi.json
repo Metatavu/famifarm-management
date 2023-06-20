@@ -103,6 +103,7 @@
     "labelAmount" : "Määrä",
     "labelGutterHoleCount" : "Kourun reikämäärä",
     "labelGutterCount" : "Kourujen määrä",
+    "labelNumberOfBaskets" : "Korien määrä",
     "labelTrayCount" : "Kennojen määrä",
     "labelPackageSize" : "Pakkauskoko",
     "labelPackedCount" : "Pakkausten määrä",
