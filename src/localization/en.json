@@ -241,6 +241,7 @@
   "dashboardCount": "Package count",
 
   "isEndProduct": "End product",
-  "isRawMaterial": "Raw material"
+  "isRawMaterial": "Raw material",
+  "salesWeight": "Sales weight"
 
 }

@@ -16,7 +16,8 @@ import {
   Message,
   Confirm,
   CheckboxProps,
-  DropdownProps
+  DropdownProps,
+  InputOnChangeData
 } from "semantic-ui-react";
 import LocalizedUtils from "../localization/localizedutils";
 import LocalizedValueInput from "./LocalizedValueInput";
@@ -202,6 +203,21 @@ class EditProduct extends React.Component<Props, State> {
   }
 
   /**
+   * Handle sales weight event change
+   *
+   * @param e event
+   * @param value sales weight
+   */
+  private onSalesWeightChange = (e: any, { value }: InputOnChangeData) => {
+    this.setState({
+      product: {
+        ...this.state.product!,
+        salesWeight: Number.parseFloat(value)
+      }
+    });
+  }
+
+  /**
    * Sets the isSubcontractorProduct boolean
    *
    * @param e event
@@ -341,6 +357,14 @@ class EditProduct extends React.Component<Props, State> {
                   placeholder={ strings.labelHarvestType }
                   onChange={ this.onAllowedHarvestTypesChange }
                   value={ product ? product.allowedHarvestTypes || [] : [] }
+                />
+                <Form.Input
+                  required
+                  label={ strings.salesWeight }
+                  name="salesWeight"
+                  type="number"
+                  value={ product ? product.salesWeight : 0 }
+                  onChange={ this.onSalesWeightChange }
                 />
               </Form.Field>
               <Form.Checkbox

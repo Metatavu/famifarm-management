@@ -14,7 +14,8 @@ import {
   Button,
   Form,
   CheckboxProps,
-  DropdownProps
+  DropdownProps,
+  InputOnChangeData
 } from "semantic-ui-react";
 import LocalizedUtils from "../localization/localizedutils";
 import LocalizedValueInput from "./LocalizedValueInput";
@@ -53,7 +54,8 @@ class CreateProduct extends React.Component<Props, State> {
         isSubcontractorProduct: false,
         active: true,
         isEndProduct: false,
-        isRawMaterial: false
+        isRawMaterial: false,
+        salesWeight: 0
       }
     };
   }
@@ -101,7 +103,8 @@ class CreateProduct extends React.Component<Props, State> {
           isSubcontractorProduct: productData.isSubcontractorProduct!,
           active: productData.active,
           isEndProduct: productData.isEndProduct,
-          isRawMaterial: productData.isRawMaterial
+          isRawMaterial: productData.isRawMaterial,
+          salesWeight: productData.salesWeight
         }
       });
 
@@ -141,6 +144,21 @@ class CreateProduct extends React.Component<Props, State> {
       productData: {
         ...this.state.productData,
         allowedHarvestTypes: value as HarvestEventType[]
+      }
+    });
+  }
+
+  /**
+   * Handle sales weight event change
+   *
+   * @param e event
+   * @param value sales weight
+   */
+  private onSalesWeightChange = (e: any, { value }: InputOnChangeData) => {
+    this.setState({
+      productData: {
+        ...this.state.productData,
+        salesWeight: Number.parseFloat(value)
       }
     });
   }
@@ -272,15 +290,23 @@ class CreateProduct extends React.Component<Props, State> {
                 onChange={ this.onUpdateDefaultPackageSize }
               />
               <Form.Select
-                  fluid
-                  required
-                  multiple
-                  label={ strings.allowedHarvestTypes }
-                  options={ allowedHarvestTypeOptions }
-                  placeholder={ strings.labelHarvestType }
-                  onChange={ this.onAllowedHarvestTypesChange }
-                  value={ productData ? productData.allowedHarvestTypes || [] : [] }
-                />
+                fluid
+                required
+                multiple
+                label={ strings.allowedHarvestTypes }
+                options={ allowedHarvestTypeOptions }
+                placeholder={ strings.labelHarvestType }
+                onChange={ this.onAllowedHarvestTypesChange }
+                value={ productData ? productData.allowedHarvestTypes || [] : [] }
+              />
+              <Form.Input
+                required
+                label={ strings.salesWeight }
+                name="salesWeight"
+                type="number"
+                value={ productData.salesWeight }
+                onChange={ this.onSalesWeightChange }
+              />
               <Form.Checkbox
                 required
                 checked={ productData.isSubcontractorProduct }

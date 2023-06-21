@@ -240,5 +240,6 @@
     "dashboardCount": "Pakkauksien määrä",
 
     "isEndProduct": "Lopputuote",
-    "isRawMaterial": "Raaka materiaali"
+    "isRawMaterial": "Raaka materiaali",
+    "salesWeight": "Myyntipaino"
 }

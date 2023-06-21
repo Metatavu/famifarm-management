@@ -268,6 +268,7 @@ export interface IStrings extends LocalizedStringsMethods {
 
   isEndProduct: string;
   isRawMaterial: string;
+  salesWeight: string;
 }
 
 const strings: IStrings = new LocalizedStrings({
