@@ -5,7 +5,7 @@ import { StoreState } from "../types/index";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { Facility } from "../generated/client";
-
+import strings from "../localization/strings";
 
 /**
  * Interface representing component properties
@@ -14,6 +14,8 @@ interface Props {
   keycloak?: Keycloak.KeycloakInstance;
   facility: Facility;
   onFacilityChange: (facility: Facility) => void;
+  onLocaleUpdate: (locale: string) => void;
+  locale: string;
 }
 
 /**
@@ -28,7 +30,7 @@ class FacilitySelect extends React.Component<Props, State> {
 
   /**
    * Constructor
-   * @param props component properties 
+   * @param props component properties
    */
   constructor(props: Props) {
     super(props);
@@ -67,36 +69,43 @@ class FacilitySelect extends React.Component<Props, State> {
 
   /**
    * Handle facility change
-   * @param facility 
+   * @param facility
    */
   private handleFacilityChange = (facility: Facility) => {
+    const { locale, onFacilityChange, onLocaleUpdate } = this.props;
+
     if (this.props.facility !== facility) {
       window.localStorage.setItem("facility", facility);
-      window.location.reload();
+      onFacilityChange(facility);
+
+      strings.setLanguage(`${locale.slice(0, 2)}_${facility.toLowerCase()}`);
+      onLocaleUpdate(`${locale.slice(0, 2)}_${facility.toLowerCase()}`);
     }
   }
 }
 
 /**
  * Redux mapper for mapping store state to component props
- * 
+ *
  * @param state store state
  */
 function mapStateToProps(state: StoreState) {
   return {
     facility: state.facility,
-    keycloak: state.keycloak
+    keycloak: state.keycloak,
+    locale: state.locale
   };
 }
 
 /**
- * Redux mapper for mapping component dispatches 
- * 
+ * Redux mapper for mapping component dispatches
+ *
  * @param dispatch dispatch method
  */
 function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onFacilityChange: (facility: Facility) => dispatch(actions.facilityUpdate(facility))
+    onFacilityChange: (facility: Facility) => dispatch(actions.facilityUpdate(facility)),
+    onLocaleUpdate: (locale: string) => dispatch(actions.localeUpdate(locale))
   };
 }
 
