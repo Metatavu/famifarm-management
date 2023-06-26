@@ -105,6 +105,7 @@
   "labelAmount" : "Amount",
   "labelGutterHoleCount" : "Gutter hole count",
   "labelGutterCount" : "Gutter count",
+  "labelNumberOfBaskets" : "Number of baskets",
   "labelTrayCount" : "Tray count",
   "labelPackageSize" : "Package size",
   "labelPackedCount" : "Packed count",

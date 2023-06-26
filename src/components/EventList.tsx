@@ -79,7 +79,7 @@ class EventList extends React.Component<Props, State> {
           productionLines: productionLines
         });
       }
-      
+
       await this.updateEvents(eventListFilters || {});
     } catch(e) {
       console.error(e);
@@ -105,6 +105,7 @@ class EventList extends React.Component<Props, State> {
     const productionLineText = productionLine ? productionLine.lineNumber || "" : "";
     const gutterCountText = eventData.gutterCount !== undefined ? eventData.gutterCount : "";
     const gutterHoleCountText = eventData.gutterHoleCount !== undefined ? eventData.gutterHoleCount : "";
+    const numberOfBasketsText = eventData.numberOfBaskets !== undefined ? eventData.numberOfBaskets : "";
 
     return (
       <Table.Row key={event.id}>
@@ -114,6 +115,7 @@ class EventList extends React.Component<Props, State> {
         <Table.Cell>{ productionLineText }</Table.Cell>
         <Table.Cell>{ gutterCountText }</Table.Cell>
         <Table.Cell>{ gutterHoleCountText }</Table.Cell>
+        <Table.Cell>{ numberOfBasketsText }</Table.Cell>
         <Table.Cell textAlign='right'>
           <NavLink to={`/events/${event.id}`}>
               <Button className="submit-button">{strings.open}</Button>
@@ -137,7 +139,7 @@ class EventList extends React.Component<Props, State> {
 
     const possibleLoader = (): any => {
       if (this.state.loading) {
-        return <Loader 
+        return <Loader
           style={{ marginLeft: "auto", marginRight: "auto" }}
           inline
           active
@@ -196,6 +198,7 @@ class EventList extends React.Component<Props, State> {
                   <Table.HeaderCell>{ strings.labelProductionLine }</Table.HeaderCell>
                   <Table.HeaderCell>{ strings.labelGutterCount }</Table.HeaderCell>
                   <Table.HeaderCell>{ strings.labelGutterHoleCount }</Table.HeaderCell>
+                  <Table.HeaderCell>{ strings.labelNumberOfBaskets }</Table.HeaderCell>
                   <Table.HeaderCell></Table.HeaderCell>
                 </Table.Row>
               </Table.Header>
@@ -363,7 +366,7 @@ class EventList extends React.Component<Props, State> {
 
 /**
  * Redux mapper for mapping store state to component props
- * 
+ *
  * @param state store state
  */
 export function mapStateToProps(state: StoreState) {
@@ -376,8 +379,8 @@ export function mapStateToProps(state: StoreState) {
 }
 
 /**
- * Redux mapper for mapping component dispatches 
- * 
+ * Redux mapper for mapping component dispatches
+ *
  * @param dispatch dispatch method
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
