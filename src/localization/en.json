@@ -83,7 +83,7 @@
   "wastageReasons": "Wastage reasons",
   "newWastageReason": "New wastage reasons",
   "wastageReasonReason": "Reason",
-  
+
   "deleteConfirmationText": "Are you sure you want to delete: ",
   "pests": "Pests",
   "newPest": "New pest",
@@ -184,7 +184,7 @@
   "openAll": "Open all",
   "closeAll": "Close all",
   "filterByDate": "Filter by date",
-    
+
   "campaigns": "Campaigns",
   "newCampaign": "New campaign",
   "campaignName": "Campaign name",
@@ -238,6 +238,10 @@
 
   "dashboard": "Dashboard",
   "dashboardFormDescription": "Select date to display cumulative packings data:",
-  "dashboardCount": "Package count"
+  "dashboardCount": "Package count",
+
+  "isEndProduct": "End product",
+  "isRawMaterial": "Raw material",
+  "salesWeight": "Sales weight"
 
 }

@@ -266,6 +266,10 @@ export interface IStrings extends LocalizedStringsMethods {
   dashboard: string
   dashboardFormDescription: string;
   dashboardCount: string;
+
+  isEndProduct: string;
+  isRawMaterial: string;
+  salesWeight: string;
 }
 
 const strings: IStrings = new LocalizedStrings({
