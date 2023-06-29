@@ -1,4 +1,9 @@
 {
-  "events": "Juvan Tapahtumat",
-  "productionLineDefaultGutterHoleCount": "Taulukossa olevien reikien oletusmäärä"
+  "productionLineDefaultGutterHoleCount": "Oletus pöydän kennomäärä",
+  "harvestEventText": "Korjatut kennot",
+  "wastageEventText": "Poisheitetyt kennot: {0}",
+  "labelGutterHoleCount": "Pöydän kennomäärä",
+  "labelGutterCount": "Pöytien määrä",
+  "gutterCount": "Pöytien määrä",
+  "gutterHoleCount": "Pöytien kennomäärä"
 }

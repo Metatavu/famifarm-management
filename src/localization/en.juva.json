@@ -1,4 +1,9 @@
 {
-  "events": "Events in Juva",
-  "productionLineDefaultGutterHoleCount": "Default table hole count"
+  "productionLineDefaultGutterHoleCount": "Default table tray count",
+  "harvestEventText": "Harvested trays",
+  "wastageEventText": "Wasted trays: {0}",
+  "labelGutterHoleCount": "Table tray count",
+  "labelGutterCount": "Table count",
+  "gutterCount": "Table count",
+  "gutterHoleCount": "Table tray count"
 }
