@@ -8,14 +8,16 @@ import { StoreState } from "../types/index";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { Navigate } from 'react-router-dom';
+import { Facility } from "../generated/client";
 
 
 /**
  * Interface representing component properties
  */
 interface Props {
-  onLocaleUpdate: (locale: string) => void
-  locale: string
+  onLocaleUpdate: (locale: string) => void;
+  locale: string;
+  facility: Facility;
 }
 
 /**
@@ -32,7 +34,7 @@ class ToggleLocalization extends React.Component<Props, State> {
 
   /**
    * Constructor
-   * @param props component properties 
+   * @param props component properties
    */
   constructor(props: Props) {
     super(props);
@@ -42,7 +44,7 @@ class ToggleLocalization extends React.Component<Props, State> {
   }
   /**
    * Component did update lifecycle method
-   * 
+   *
    * @param prevProps previous properties
    */
   componentDidUpdate(prevProps: Props) {
@@ -58,12 +60,12 @@ class ToggleLocalization extends React.Component<Props, State> {
    */
   private toggleLocale = () => {
     const currentLocale = strings.getLanguage();
-    if (currentLocale === "fi") {
-      strings.setLanguage("en");
-      this.props.onLocaleUpdate("en");
+    if (currentLocale.includes("fi")) {
+      strings.setLanguage(`en_${this.props.facility.toLowerCase()}`);
+      this.props.onLocaleUpdate(`en_${this.props.facility.toLowerCase()}`);
     } else {
-      strings.setLanguage("fi");
-      this.props.onLocaleUpdate("fi");
+      strings.setLanguage(`fi_${this.props.facility.toLowerCase()}`);
+      this.props.onLocaleUpdate(`fi_${this.props.facility.toLowerCase()}`);
     }
   }
 
@@ -76,25 +78,26 @@ class ToggleLocalization extends React.Component<Props, State> {
     }
     return (
       <Menu.Item onClick={() => this.toggleLocale()} position={"right"}>
-        {this.props.locale === "fi" ? "In english" : "Suomeksi"}
+        {this.props.locale.includes("fi") ? "In english" : "Suomeksi"}
       </Menu.Item>
     );
   }
 }
 /**
  * Redux mapper for mapping store state to component props
- * 
+ *
  * @param state store state
  */
 function mapStateToProps(state: StoreState) {
   return {
-    locale: state.locale
+    locale: state.locale,
+    facility: state.facility
   };
 }
 
 /**
- * Redux mapper for mapping component dispatches 
- * 
+ * Redux mapper for mapping component dispatches
+ *
  * @param dispatch dispatch method
  */
 function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {

@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { 
+import {
   PackageSize,
   Event,
   CultivationObservationEventData,
@@ -15,7 +15,7 @@ import {
   ProductionLine,
   SeedBatch,
   WastageReason,
-  Seed, 
+  Seed,
   EventType,
   Product,
   Facility} from "../generated/client";
@@ -81,7 +81,7 @@ class CreateEvent extends React.Component<Props, State> {
 
   /**
    * Constructor
-   * 
+   *
    * @param props component props
    */
   constructor(props: Props) {
@@ -245,9 +245,9 @@ class CreateEvent extends React.Component<Props, State> {
                 visible={this.state.messageVisible}
                 header={strings.savedSuccessfully}
               />
-              <Button 
-                className="submit-button" 
-                onClick={this.handleSubmit} 
+              <Button
+                className="submit-button"
+                onClick={this.handleSubmit}
                 type='submit'
                 loading={this.state.saving}
               >
@@ -266,7 +266,7 @@ class CreateEvent extends React.Component<Props, State> {
 
     /**
    * Handle value change
-   * 
+   *
    * @param event event
    */
   private handleTimeChange = (e: any, { name, value }: DropdownProps | TextAreaProps) => {
@@ -280,7 +280,7 @@ class CreateEvent extends React.Component<Props, State> {
   }
 
   /**
-   * Event handler for product change 
+   * Event handler for product change
    */
   private handleProductChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
     this.setState({
@@ -290,7 +290,7 @@ class CreateEvent extends React.Component<Props, State> {
 
   /**
    * Handle value change
-   * 
+   *
    * @param event event
    */
   private handleBaseChange = (e: any, { name, value }: DropdownProps | TextAreaProps) => {
@@ -305,7 +305,7 @@ class CreateEvent extends React.Component<Props, State> {
 
   /**
    * Handle value change
-   * 
+   *
    * @param event event
    */
   private handleDataChange = (e: any, { name, value }: InputOnChangeData | DropdownProps | TextAreaProps) => {
@@ -321,7 +321,7 @@ class CreateEvent extends React.Component<Props, State> {
 
   /**
    * Handle value change
-   * 
+   *
    * @param event event
    */
   private handleDataTimeChange = (e: any, { name, value }: DropdownProps | TextAreaProps) => {
@@ -348,7 +348,7 @@ class CreateEvent extends React.Component<Props, State> {
 
   /**
    * Get containing numbers in string
-   * 
+   *
    * @param string string
    * @returns Number
    */
@@ -385,6 +385,7 @@ class CreateEvent extends React.Component<Props, State> {
           data = {
             gutterCount: eventData.gutterCount,
             gutterHoleCount: eventData.gutterHoleCount,
+            numberOfBaskets: eventData.numberOfBaskets,
             productionLineId: eventData.productionLineId,
             type: eventData.type,
             sowingDate: moment(eventData.sowingDate).toDate()
@@ -394,7 +395,7 @@ class CreateEvent extends React.Component<Props, State> {
           data = {
             gutterCount: eventData.gutterCount,
             gutterHoleCount: eventData.gutterHoleCount,
-            productionLineId: eventData.productionLineId, 
+            productionLineId: eventData.productionLineId,
             trayCount: eventData.trayCount,
             workerCount: eventData.workerCount,
             sowingDate: moment(eventData.sowingDate).toDate()
@@ -422,7 +423,7 @@ class CreateEvent extends React.Component<Props, State> {
         break;
       }
       event.data = data;
-      
+
       await eventsService.createEvent({
         event: event as Event,
         facility: facility
@@ -451,15 +452,15 @@ class CreateEvent extends React.Component<Props, State> {
       if (!keycloak || !event) {
         return;
       }
-  
+
       const eventsService = await Api.getEventsService(keycloak);
       const id = event.id || "";
-  
+
       await eventsService.deleteEvent({
         eventId: id,
         facility: facility
       });
-      
+
       this.setState({redirect: true});
     } catch (e: any) {
       onError({
@@ -559,8 +560,8 @@ class CreateEvent extends React.Component<Props, State> {
     });
 
     const selectedProductId = this.state.event.productId;
-    const selectedProduct = selectedProductId ? 
-      this.state.products.find(product => product.id === selectedProductId) 
+    const selectedProduct = selectedProductId ?
+      this.state.products.find(product => product.id === selectedProductId)
       : undefined;
 
     const harvestTypeOptions = (selectedProduct ? selectedProduct.allowedHarvestTypes || [] : []).map((harvestType) => {
@@ -581,6 +582,7 @@ class CreateEvent extends React.Component<Props, State> {
         <Form.Input  required label={strings.labelGutterCount} name="gutterCount" type="number" value={data.gutterCount} onChange={this.handleDataChange} />
         <Form.Select required label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
         <Form.Input  required label={strings.labelGutterHoleCount} name="gutterHoleCount" type="number" value={data.gutterHoleCount} onChange={this.handleDataChange} />
+        <Form.Input  required label={strings.labelNumberOfBaskets} name="numberOfBaskets" type="number" value={data.numberOfBaskets} onChange={this.handleDataChange} />
       </React.Fragment>
     )
   }
@@ -870,7 +872,7 @@ class CreateEvent extends React.Component<Props, State> {
 
 /**
  * Redux mapper for mapping store state to component props
- * 
+ *
  * @param state store state
  */
 export function mapStateToProps(state: StoreState) {
@@ -880,8 +882,8 @@ export function mapStateToProps(state: StoreState) {
 }
 
 /**
- * Redux mapper for mapping component dispatches 
- * 
+ * Redux mapper for mapping component dispatches
+ *
  * @param dispatch dispatch method
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {

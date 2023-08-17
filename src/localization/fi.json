@@ -103,6 +103,7 @@
     "labelAmount" : "Määrä",
     "labelGutterHoleCount" : "Kourun reikämäärä",
     "labelGutterCount" : "Kourujen määrä",
+    "labelNumberOfBaskets" : "Korien määrä",
     "labelTrayCount" : "Kennojen määrä",
     "labelPackageSize" : "Pakkauskoko",
     "labelPackedCount" : "Pakkausten määrä",
@@ -183,7 +184,7 @@
     "openAll": "Avaa kaikki",
     "closeAll": "Sulje kaikki",
     "filterByDate": "Rajaa päivämäärällä",
-    
+
     "campaigns": "Kampanjat",
     "newCampaign": "Uusi kampanja",
     "campaignName": "Kampanjan nimi",
@@ -237,6 +238,9 @@
 
     "dashboard": "Työpöytä",
     "dashboardFormDescription": "Valitse päivä nähdäksesi kumulatiiviset pakkaukset",
-    "dashboardCount": "Pakkauksien määrä"
+    "dashboardCount": "Pakkauksien määrä",
 
+    "isEndProduct": "Lopputuote",
+    "isRawMaterial": "Raaka materiaali",
+    "salesWeight": "Myyntipaino"
 }
