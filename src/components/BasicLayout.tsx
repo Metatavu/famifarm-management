@@ -84,6 +84,7 @@ class BasicLayout extends React.Component<Props, State> {
           <Menu.Item as={NavLink} to="/" header>
             {strings.managementHeaderText}
           </Menu.Item>
+          <FacilitySelect/>
           <ToggleLocalization />
           <LogoutButton />
         </Menu>
