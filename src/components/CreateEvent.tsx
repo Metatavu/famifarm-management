@@ -382,10 +382,12 @@ class CreateEvent extends React.Component<Props, State> {
           } as CultivationObservationEventData;
         break;
         case "HARVEST":
+          // TODO: NumOfBaskets needs to be set as optional on API then can be undefined here.
           data = {
             gutterCount: eventData.gutterCount,
             gutterHoleCount: eventData.gutterHoleCount,
-            numberOfBaskets: eventData.numberOfBaskets,
+            numberOfBaskets:  facility === Facility.Juva
+              ? eventData.numberOfBaskets : 0,
             productionLineId: eventData.productionLineId,
             type: eventData.type,
             sowingDate: moment(eventData.sowingDate).toDate()
@@ -582,7 +584,7 @@ class CreateEvent extends React.Component<Props, State> {
         <Form.Input  required label={strings.labelGutterCount} name="gutterCount" type="number" value={data.gutterCount} onChange={this.handleDataChange} />
         <Form.Select required label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
         <Form.Input  required label={strings.labelGutterHoleCount} name="gutterHoleCount" type="number" value={data.gutterHoleCount} onChange={this.handleDataChange} />
-        <Form.Input  required label={strings.labelNumberOfBaskets} name="numberOfBaskets" type="number" value={data.numberOfBaskets} onChange={this.handleDataChange} />
+        {this.props.facility === Facility.Juva && <Form.Input  required label={strings.labelNumberOfBaskets} name="numberOfBaskets" type="number" value={data.numberOfBaskets} onChange={this.handleDataChange} />}
       </React.Fragment>
     )
   }
