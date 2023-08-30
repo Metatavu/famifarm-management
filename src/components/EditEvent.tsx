@@ -299,7 +299,6 @@ class EditEvent extends React.Component<Props, State> {
           } as CultivationObservationEventData;
         break;
         case "HARVEST":
-          // TODO: NumOfBaskets to be set to undefined after backend changes?
           data = {
             gutterCount: eventData.gutterCount,
             gutterHoleCount: eventData.gutterHoleCount,
