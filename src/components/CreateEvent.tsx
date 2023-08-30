@@ -382,7 +382,6 @@ class CreateEvent extends React.Component<Props, State> {
           } as CultivationObservationEventData;
         break;
         case "HARVEST":
-          // TODO: NumOfBaskets needs to be set as optional on API then can be undefined here.
           data = {
             gutterCount: eventData.gutterCount,
             gutterHoleCount: eventData.gutterHoleCount,
