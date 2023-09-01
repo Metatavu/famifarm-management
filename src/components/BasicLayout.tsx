@@ -39,7 +39,7 @@ class BasicLayout extends React.Component<Props, State> {
 
   /**
    * Constructor
-   * @param props component properties 
+   * @param props component properties
    */
   constructor(props: Props) {
     super(props);
@@ -48,10 +48,10 @@ class BasicLayout extends React.Component<Props, State> {
       facility: props.facility
     }
   }
-  
+
   /**
-   * Component did catch life-cycle event 
-   * 
+   * Component did catch life-cycle event
+   *
    * @param error error
    * @param errorInfo error info
    */
@@ -90,7 +90,7 @@ class BasicLayout extends React.Component<Props, State> {
         </Menu>
         <div style={{marginTop: '0'}}>
           <Sidebar.Pushable>
-            <Sidebar 
+            <Sidebar
               as={Menu}
               vertical
               visible={this.state.sidebarOpen}
@@ -102,7 +102,7 @@ class BasicLayout extends React.Component<Props, State> {
               {this.props.sidebarItems}
             </Sidebar>
             <Sidebar.Pusher>
-              <Container style={{minHeight: "100vh", paddingTop: '6em', paddingBottom: '3em'}}> 
+              <Container style={{minHeight: "100vh", paddingTop: '6em', paddingBottom: '3em'}}>
                 {
                   this.renderError()
                 }
@@ -135,7 +135,7 @@ class BasicLayout extends React.Component<Props, State> {
 
 /**
  * Redux mapper for mapping store state to component props
- * 
+ *
  * @param state store state
  */
 export function mapStateToProps(state: StoreState) {
@@ -146,8 +146,8 @@ export function mapStateToProps(state: StoreState) {
 }
 
 /**
- * Redux mapper for mapping component dispatches 
- * 
+ * Redux mapper for mapping component dispatches
+ *
  * @param dispatch dispatch method
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
