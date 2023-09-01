@@ -115,7 +115,7 @@ class EventList extends React.Component<Props, State> {
         <Table.Cell>{ productionLineText }</Table.Cell>
         <Table.Cell>{ gutterCountText }</Table.Cell>
         <Table.Cell>{ gutterHoleCountText }</Table.Cell>
-        <Table.Cell>{ numberOfBasketsText }</Table.Cell>
+        {this.props.facility === Facility.Juva &&  <Table.Cell>{ numberOfBasketsText }</Table.Cell>}
         <Table.Cell textAlign='right'>
           <NavLink to={`/events/${event.id}`}>
               <Button className="submit-button">{strings.open}</Button>
@@ -198,7 +198,7 @@ class EventList extends React.Component<Props, State> {
                   <Table.HeaderCell>{ strings.labelProductionLine }</Table.HeaderCell>
                   <Table.HeaderCell>{ strings.labelGutterCount }</Table.HeaderCell>
                   <Table.HeaderCell>{ strings.labelGutterHoleCount }</Table.HeaderCell>
-                  <Table.HeaderCell>{ strings.labelNumberOfBaskets }</Table.HeaderCell>
+                  {this.props.facility === Facility.Juva && <Table.HeaderCell>{ strings.labelNumberOfBaskets }</Table.HeaderCell>}
                   <Table.HeaderCell></Table.HeaderCell>
                 </Table.Row>
               </Table.Header>
