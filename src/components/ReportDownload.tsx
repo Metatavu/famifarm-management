@@ -52,7 +52,7 @@ class ReportDownload extends React.Component<Props, State> {
    * Render create pest view
    */
   public render() {
-    const reportTypeOptions = [ 
+    const reportTypeOptions = [
       "WASTAGE",
       "GROWTH_TIME",
       "YIELD",
@@ -64,7 +64,8 @@ class ReportDownload extends React.Component<Props, State> {
       "PACKED",
       "PACKED_CAMPAINGS",
       "PRODUCT_PHASE_COUNT",
-      "SEEDLING_TIME"
+      "SEEDLING_TIME",
+      "SUMMARY"
     ].map((reportType) => {
       return {
         key: reportType,
@@ -72,7 +73,7 @@ class ReportDownload extends React.Component<Props, State> {
         text: strings.getString(`reportTypeItem${reportType}`, strings.getLanguage())
       };
     });
-    
+
     return (
       <Grid>
         <Grid.Row className="content-page-header-row">
@@ -162,18 +163,18 @@ class ReportDownload extends React.Component<Props, State> {
 
 /**
  * Redux mapper for mapping store state to component props
- * 
+ *
  * @param state store state
  */
- export function mapStateToProps(state: StoreState) {
+export function mapStateToProps(state: StoreState) {
   return {
     facility: state.facility
   };
 }
 
 /**
- * Redux mapper for mapping component dispatches 
- * 
+ * Redux mapper for mapping component dispatches
+ *
  * @param dispatch dispatch method
  */
 export function mapDispatchToProps(dispatch: React.Dispatch<actions.AppAction>) {
