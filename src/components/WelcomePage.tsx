@@ -100,10 +100,10 @@ class WelcomePage extends React.Component<Props, any> {
       strings.setLanguage(`${locale.slice(0, 2)}_${previousFacility.toLowerCase()}`);
       onLocaleUpdate(`${locale.slice(0, 2)}_${previousFacility.toLowerCase()}`);
     } else {
-      onFacilityUpdate(keycloak.hasRealmRole("joroinen") ? Facility.Joroinen : Facility.Juva);
-      onLocaleUpdate(keycloak.hasRealmRole("joroinen")
-        ? `${locale.slice(0, 2)}_${Facility.Joroinen.toLowerCase()}`
-        : `${locale.slice(0, 2)}_${Facility.Juva.toLowerCase()}`);
+      const userFacility = keycloak.hasRealmRole("joroinen") ? Facility.Joroinen : Facility.Juva;
+      onFacilityUpdate(userFacility);
+      strings.setLanguage(`${locale.slice(0, 2)}_${userFacility.toLowerCase()}`);
+      onLocaleUpdate(`${locale.slice(0, 2)}_${userFacility.toLowerCase()}`);
     }
 
     this.setState({keycloak: keycloak});
