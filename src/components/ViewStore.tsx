@@ -188,6 +188,7 @@ class ViewStore extends React.Component<Props, State> {
                 maxDate={ moment().endOf("day").toDate() }
                 onChange={ this.onSelectDate }
                 value={ moment(selectedDate).format("DD.MM.YYYY HH.mm") }
+                localization="fi-FI"
               />
             </div>
             <Button
@@ -203,7 +204,7 @@ class ViewStore extends React.Component<Props, State> {
               { strings.closeAll }
             </Button>
           </div>
-        </Grid.Row>  
+        </Grid.Row>
         <Grid.Row>
           <Grid.Column style={{ overflowX: "auto" }}>
             { basicProductListItems }
@@ -360,7 +361,7 @@ class ViewStore extends React.Component<Props, State> {
         <Table.Cell style={{ paddingLeft: 30 }}>
           { LocalizedUtils.getLocalizedValue(productRowData.packageSize.name) }
         </Table.Cell>
-        { productRowData.dates.map(({ header, value }) => 
+        { productRowData.dates.map(({ header, value }) =>
           <Table.Cell key={ header }>
             { value }
           </Table.Cell>
@@ -548,7 +549,7 @@ class ViewStore extends React.Component<Props, State> {
 
 /**
  * Redux mapper for mapping store state to component props
- * 
+ *
  * @param state store state
  */
 export function mapStateToProps(state: StoreState) {
@@ -558,8 +559,8 @@ export function mapStateToProps(state: StoreState) {
 }
 
 /**
- * Redux mapper for mapping component dispatches 
- * 
+ * Redux mapper for mapping component dispatches
+ *
  * @param dispatch dispatch method
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {

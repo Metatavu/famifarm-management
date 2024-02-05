@@ -167,11 +167,11 @@ class EditEvent extends React.Component<Props, State> {
               </Form.Field>
               <Form.Field required>
                 <label>{strings.labelStartTime}</label>
-                <DateTimeInput dateTimeFormat="DD.MM.YYYY HH:mm" onChange={this.handleTimeChange} name="startTime" value={moment(event.startTime).format("DD.MM.YYYY HH:mm")} />
+                <DateTimeInput localization="fi-FI" dateTimeFormat="DD.MM.YYYY HH:mm" onChange={this.handleTimeChange} name="startTime" value={moment(event.startTime).format("DD.MM.YYYY HH:mm")} />
               </Form.Field>
               <Form.Field>
                 <label>{strings.labelEndTime}</label>
-                <DateTimeInput dateTimeFormat="DD.MM.YYYY HH:mm" onChange={this.handleTimeChange} name="endTime" value={moment(event.endTime).format("DD.MM.YYYY HH:mm")} />
+                <DateTimeInput localization="fi-FI" dateTimeFormat="DD.MM.YYYY HH:mm" onChange={this.handleTimeChange} name="endTime" value={moment(event.endTime).format("DD.MM.YYYY HH:mm")} />
               </Form.Field>
               {this.renderEventDataForm(event)}
               <Form.TextArea label={strings.labelAdditionalInformation} onChange={this.handleBaseChange} name="additionalInformation" value={event.additionalInformation} />
@@ -511,7 +511,7 @@ class EditEvent extends React.Component<Props, State> {
       <React.Fragment>
         <Form.Field required>
           <label>{strings.labelSowingDate}</label>
-          <DateInput dateTimeFormat="DD.MM.YYYY" onChange={this.handleDataTimeChange} name="sowingDate" value={data.sowingDate ? moment(data.sowingDate).format("DD.MM.YYYY") : ""} />
+          <DateInput localization="fi-FI" dateTimeFormat="DD.MM.YYYY" onChange={this.handleDataTimeChange} name="sowingDate" value={data.sowingDate ? moment(data.sowingDate).format("DD.MM.YYYY") : ""} />
         </Form.Field>
         <Form.Select required label={strings.labelHarvestType} name="type" options={harvestTypeOptions} value={data.type} onChange={this.handleDataChange} />
         <Form.Input required label={strings.labelGutterCount} name="gutterCount" type="number" value={data.gutterCount} onChange={this.handleDataChange} />
@@ -550,7 +550,7 @@ class EditEvent extends React.Component<Props, State> {
       <React.Fragment>
         <Form.Field required>
           <label>{strings.labelSowingDate}</label>
-          <DateInput dateTimeFormat="DD.MM.YYYY" onChange={this.handleDataTimeChange} name="sowingDate" value={data.sowingDate ? moment(data.sowingDate).format("DD.MM.YYYY") : ""} />
+          <DateInput localization="fi-FI" dateTimeFormat="DD.MM.YYYY" onChange={this.handleDataTimeChange} name="sowingDate" value={data.sowingDate ? moment(data.sowingDate).format("DD.MM.YYYY") : ""} />
         </Form.Field>
         <Form.Select required label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
         <Form.Input required label={strings.labelTrayCount} name="trayCount" type="number" value={data.trayCount} onChange={this.handleDataChange} />

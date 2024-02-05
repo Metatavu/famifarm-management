@@ -167,7 +167,7 @@ class EventList extends React.Component<Props, State> {
             <Form.Field>
               <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem", paddingRight: "2rem"}}>
                 <label>{strings.date}</label>
-                <DateInput dateFormat="DD.MM.YYYY" onChange={this.onChangeDate} name="date" value={dateText} />
+                <DateInput localization="fi-FI" dateFormat="DD.MM.YYYY" onChange={this.onChangeDate} name="date" value={dateText} />
               </div>
               <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem"}}>
                 <label>{strings.productName}</label>

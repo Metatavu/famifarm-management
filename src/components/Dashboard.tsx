@@ -148,6 +148,7 @@ class Dashboard extends React.Component<Props, State> {
             <div style={filterStyles}>
               <label>{strings.selectDate}</label>
               <DateInput
+                localization="fi-FI"
                 dateFormat="DD.MM.YYYY"
                 onChange={this.onChangeDateAfter}
                 name="selectedDate"
@@ -161,7 +162,7 @@ class Dashboard extends React.Component<Props, State> {
 
     /**
      * Render visualizaton of packings data
-     * 
+     *
      * @returns recharts visualization
      */
     const renderLineChart = () => {
@@ -178,7 +179,7 @@ class Dashboard extends React.Component<Props, State> {
 
       /**
        * Get timestamps for a particular hour on the same day as the provided time
-       * 
+       *
        * @param time timestamp on a given day
        * @param hour hour of timestamp to return
        * @returns timestamp
@@ -189,8 +190,8 @@ class Dashboard extends React.Component<Props, State> {
 
       /**
        * Create a placeholder data to contain the x-axis static label
-       * 
-       * @param staticHours 
+       *
+       * @param staticHours
        * @returns List of VisualizePackingsData
        */
       const createLabelPackings = (staticHours: number[]): VisualizePackingsData[] => (
@@ -202,8 +203,8 @@ class Dashboard extends React.Component<Props, State> {
       );
 
       /**
-       * Get the timestamps for label times on a given day 
-       * 
+       * Get the timestamps for label times on a given day
+       *
        * @param time timestamp
        * @param packingsData
        * @returns static times timestamps
@@ -222,7 +223,7 @@ class Dashboard extends React.Component<Props, State> {
 
       /**
        * Accumulate the counts for packings data by hour
-       * 
+       *
        * @param staticLabels timestamps for each hour
        * @param packingsData packings data to visualize
        * @returns packings data with cumulative counts
@@ -312,7 +313,7 @@ class Dashboard extends React.Component<Props, State> {
 
 /**
  * Redux mapper for mapping store state to component props
- * 
+ *
  * @param state store state
  */
 const mapStateToProps = (state: StoreState) => ({
@@ -321,8 +322,8 @@ const mapStateToProps = (state: StoreState) => ({
 });
 
 /**
- * Redux mapper for mapping component dispatches 
- * 
+ * Redux mapper for mapping component dispatches
+ *
  * @param dispatch dispatch method
  */
 const mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({

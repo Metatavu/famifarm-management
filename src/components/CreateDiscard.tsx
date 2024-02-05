@@ -91,7 +91,7 @@ class CreateDiscard extends React.Component<Props, State> {
         </Grid>
       );
     }
-      
+
     if (this.state.redirect) {
       return <Navigate replace={true} to={`/discards/${this.state.discardId}`}/>;
     }
@@ -104,7 +104,7 @@ class CreateDiscard extends React.Component<Props, State> {
 
     const filteredPackageSizeOptions = this.filterOptions();
 
-    return (    
+    return (
       <Grid>
         <Grid.Row className="content-page-header-row">
           <Grid.Column width={8}>
@@ -130,7 +130,7 @@ class CreateDiscard extends React.Component<Props, State> {
                     value={ packageSizeId }
                     onChange={ this.onDiscardedSizeChange }
                   />
-                } 
+                }
               </Form.Field>
               <Form.Field>
                 <label>{ strings.labelPackedCount }</label>
@@ -142,6 +142,7 @@ class CreateDiscard extends React.Component<Props, State> {
               </Form.Field>
               <Form.Field>
                 <DateInput
+                  localization="fi-FI"
                   dateFormat="DD.MM.YYYY"
                   onChange={ this.onChangeDate }
                   name="date"
@@ -155,7 +156,7 @@ class CreateDiscard extends React.Component<Props, State> {
               >
                 { strings.save }
               </Button>
-            </FormContainer>            
+            </FormContainer>
           </Grid.Column>
         </Grid.Row>
       </Grid>
@@ -264,7 +265,7 @@ class CreateDiscard extends React.Component<Props, State> {
     packageSizes.forEach(size => {
       if(!selectedProduct || !selectedProduct.defaultPackageSizeIds) return;
       selectedProduct.defaultPackageSizeIds.forEach(packageSizeId =>
-        size.id === packageSizeId && newOptions.push({ 
+        size.id === packageSizeId && newOptions.push({
           key: size.id,
           value: size.id,
           text: LocalizedUtils.getLocalizedValue(size.name)
@@ -285,7 +286,7 @@ class CreateDiscard extends React.Component<Props, State> {
     }
 
     this.setState({ loading: true });
-  
+
     const productsService = await Api.getProductsService(keycloak);
     const packageSizeService = await Api.getPackageSizesService(keycloak);
 
@@ -294,7 +295,7 @@ class CreateDiscard extends React.Component<Props, State> {
       facility: facility
     });
     const packageSizes = await packageSizeService.listPackageSizes({ facility: facility });
-      
+
     this.setState({
       products,
       packageSizes,
@@ -307,20 +308,20 @@ class CreateDiscard extends React.Component<Props, State> {
 
 /**
  * Redux mapper for mapping store state to component props
- * 
+ *
  * @param state store state
  */
 const mapStateToProps = (state: StoreState) => ({
   facility: state.facility
 });
-  
+
 /**
- * Redux mapper for mapping component dispatches 
- * 
+ * Redux mapper for mapping component dispatches
+ *
  * @param dispatch dispatch method
  */
 const mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({
    onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
 });
-  
+
 export default connect(mapStateToProps, mapDispatchToProps)(CreateDiscard);
