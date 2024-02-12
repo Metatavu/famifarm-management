@@ -23,7 +23,6 @@ import {
 import { DateInput } from 'semantic-ui-calendar-react';
 import LocalizedUtils from "../localization/localizedutils";
 
-
 /**
  * Interface representing component properties
  */
