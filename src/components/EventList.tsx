@@ -2,7 +2,7 @@ import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Event, EventType, Facility, Product, ProductionLine } from "../generated/client";
+import { Event, EventType, Facility, Product, ProductionLine, HarvestBasket } from "../generated/client";
 import strings from "../localization/strings";
 import moment from "moment";
 import * as actions from "../actions";
@@ -105,7 +105,8 @@ class EventList extends React.Component<Props, State> {
     const productionLineText = productionLine ? productionLine.lineNumber || "" : "";
     const gutterCountText = eventData.gutterCount !== undefined ? eventData.gutterCount : "";
     const gutterHoleCountText = eventData.gutterHoleCount !== undefined ? eventData.gutterHoleCount : "";
-    const numberOfBasketsText = eventData.numberOfBaskets !== undefined ? eventData.numberOfBaskets : "";
+    const numberOfBasketsText = eventData.baskets !== undefined ? eventData.baskets.length : "";
+    const totalBasketsWeightText = eventData.baskets !== undefined ? this.sumBaskets(eventData.baskets) : "";
 
     return (
       <Table.Row key={event.id}>
@@ -116,6 +117,7 @@ class EventList extends React.Component<Props, State> {
         <Table.Cell>{ gutterCountText }</Table.Cell>
         <Table.Cell>{ gutterHoleCountText }</Table.Cell>
         {this.props.facility === Facility.Juva &&  <Table.Cell>{ numberOfBasketsText }</Table.Cell>}
+        {this.props.facility === Facility.Juva &&  <Table.Cell>{ totalBasketsWeightText }</Table.Cell>}
         <Table.Cell textAlign='right'>
           <NavLink to={`/events/${event.id}`}>
               <Button className="submit-button">{strings.open}</Button>
@@ -199,6 +201,7 @@ class EventList extends React.Component<Props, State> {
                   <Table.HeaderCell>{ strings.labelGutterCount }</Table.HeaderCell>
                   <Table.HeaderCell>{ strings.labelGutterHoleCount }</Table.HeaderCell>
                   {this.props.facility === Facility.Juva && <Table.HeaderCell>{ strings.labelNumberOfBaskets }</Table.HeaderCell>}
+                  {this.props.facility === Facility.Juva && <Table.HeaderCell>{ strings.labelTotalBasketWeight }</Table.HeaderCell>}
                   <Table.HeaderCell></Table.HeaderCell>
                 </Table.Row>
               </Table.Header>
@@ -212,6 +215,19 @@ class EventList extends React.Component<Props, State> {
         {possibleLoader()}
       </Grid>
     );
+  }
+
+  /**
+   * Sum the weight of baskets
+   *
+   * @param baskets
+   * @returns total weight of baskets
+   */
+  private sumBaskets = (baskets: HarvestBasket[]) => {
+    let totalWeight = 0;
+    baskets.forEach(basket  => totalWeight += basket.weight);
+
+    return totalWeight;
   }
 
   /**
