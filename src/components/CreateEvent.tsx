@@ -315,7 +315,6 @@ class CreateEvent extends React.Component<Props, State> {
     }
 
     if (name.includes("baskets")) {
-      // TODO: Need to clarify if customer wants 1.8kg removed from each basket on creation here as in the app.
       const basketNumber = name.split("-")[1];
       eventData.data.baskets[basketNumber].weight = value;
       this.setState({ event: eventData });
