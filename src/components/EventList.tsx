@@ -107,6 +107,23 @@ class EventList extends React.Component<Props, State> {
     const gutterHoleCountText = eventData.gutterHoleCount !== undefined ? eventData.gutterHoleCount : "";
     const numberOfBasketsText = eventData.baskets !== undefined ? eventData.baskets.length : "";
     const totalBasketsWeightText = eventData.baskets !== undefined ? this.sumBaskets(eventData.baskets) : "";
+    // let totalBasketsWeightText;
+
+    // TODO: Need to clarify if/how total weight unit is calculated for Wastage, Planting, Sowing and other event types, should amount be treated as total weight? Planting has GHCount, GH, trays but no amount. 
+    // switch (event.type) {
+    //   case EventType.Harvest:
+    //     totalBasketsWeightText = eventData.baskets !== undefined ? this.sumBaskets(eventData.baskets) : "";
+    //     break;
+    //   case EventType.Wastage:
+    //     totalBasketsWeightText = eventData.amount !== undefined ? eventData.amount : "";
+    //     break;
+    //   case EventType.Sowing:
+    //     totalBasketsWeightText = eventData.amount !== undefined ? eventData.amount : "";
+    //     break;
+    //   case EventType.CultivationObservation:
+    //     totalBasketsWeightText = eventData.weight !== undefined ? eventData.amount : "";
+    //     break;
+    // }
 
     return (
       <Table.Row key={event.id}>
