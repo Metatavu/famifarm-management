@@ -47,7 +47,8 @@ interface State {
   loading: boolean
   errorCount: number,
   loadingFirstTime: boolean,
-  productionLines: ProductionLine[]
+  productionLines: ProductionLine[],
+  previousBottomVisibility?: number
 }
 
 /**
@@ -309,9 +310,11 @@ class EventList extends React.Component<Props, State> {
    */
   private loadMoreEvents = async (e: any, { calculations }: any) => {
     const { eventListFilters } = this.props;
-    if (calculations.bottomVisible === true && !this.state.loading) {
+    if (calculations.bottomVisible === true && !this.state.loading && calculations.percentagePassed !== this.state.previousBottomVisibility) {
       const firstResult = ((eventListFilters || {}).firstResult || 0) + 20;
       await this.updateEvents({...eventListFilters, firstResult});
+      // This prevents the updateEvents from being called repeatedly
+      this.setState({previousBottomVisibility: calculations.percentagePassed})
     }
   }
 
