@@ -58,7 +58,7 @@ class EditDiscard extends React.Component<Props, State> {
       redirect: false,
       packageSizes: [],
       discardCount: 0,
-      loading: false, 
+      loading: false,
       productId: "",
     }
   }
@@ -77,12 +77,12 @@ class EditDiscard extends React.Component<Props, State> {
       });
     }
   }
-  
+
   /**
    * render
    */
   render = () =>  {
-    const { 
+    const {
       loading,
       products,
       packageSizes,
@@ -100,11 +100,11 @@ class EditDiscard extends React.Component<Props, State> {
         </Grid>
       );
     }
-    
+
     if (this.state.redirect) {
       return <Navigate replace={true} to="/discards"/>;
     }
-    
+
     const productOptions = products.map(({ id, name }) => ({
       key: id!,
       value: id!,
@@ -116,7 +116,7 @@ class EditDiscard extends React.Component<Props, State> {
       value: id!,
       text: LocalizedUtils.getLocalizedValue(name)
     }));
-      
+
     return (
       <Grid>
         <Grid.Row className="content-page-header-row">
@@ -155,6 +155,7 @@ class EditDiscard extends React.Component<Props, State> {
               </Form.Field>
               <Form.Field>
                 <DateInput
+                  localization="fi-FI"
                   dateFormat="DD.MM.YYYY"
                   onChange={ this.onChangeDate }
                   name="date"
@@ -199,7 +200,7 @@ class EditDiscard extends React.Component<Props, State> {
   private getDeleteConfirmationText = (): string => {
     const { discard } = this.state;
     if (discard) {
-      const productText = this.getProductName(discard) 
+      const productText = this.getProductName(discard)
       return strings.deleteConfirmationText + productText + "?";
     }
 
@@ -208,18 +209,18 @@ class EditDiscard extends React.Component<Props, State> {
 
   /**
    * Returns a discarded products name
-   * 
-   * @param discardedProduct discarded product 
+   *
+   * @param discardedProduct discarded product
    */
     private getProductName = (discardedProduct: StorageDiscard): string => {
       const { products } = this.state;
       const discard = (products || []).find(product => product.id == discardedProduct.productId);
-    
+
       const productName = discard ? LocalizedUtils.getLocalizedValue(discard.name) : "";
-    
+
       return productName;
     }
-  
+
 
   /**
    * method for fetching data from api
@@ -244,7 +245,7 @@ class EditDiscard extends React.Component<Props, State> {
       storageDiscardId: discardId,
       facility: facility
     })
-        
+
     const packageSizesSerivce = await Api.getPackageSizesService(keycloak);
     const packageSizes = await packageSizesSerivce.listPackageSizes({ facility: facility });
 
@@ -288,18 +289,18 @@ class EditDiscard extends React.Component<Props, State> {
           discardAmount: discardCount,
           packageSizeId: packageSizeId,
         }
-  
+
         if (!updatedDiscard.id) {
           throw new Error("Discard id is undefined.");
         }
-  
+
         const discardService = await Api.getStorageDiscardsService(keycloak);
         await discardService.updateStorageDiscard({
           storageDiscardId: updatedDiscard.id,
           storageDiscard: updatedDiscard,
           facility: facility
         });
-  
+
         this.setState({ messageVisible: true });
         setTimeout(() => {
           this.setState({ messageVisible: false });
@@ -325,7 +326,7 @@ class EditDiscard extends React.Component<Props, State> {
       if (!discard) {
         throw new Error("Discard is undefined");
       }
-  
+
       if (!discard.id) {
         throw new Error("Discard id is undefined")
       }
@@ -345,7 +346,7 @@ class EditDiscard extends React.Component<Props, State> {
       });
     }
   }
-  
+
 
   /**
    * Event handler for discarded product change
@@ -356,7 +357,7 @@ class EditDiscard extends React.Component<Props, State> {
     private onDiscardedProductChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
       this.setState({ productId: data.value as string });
     }
-  
+
   /**
    * Event handler for discarded product change
    *
@@ -366,7 +367,7 @@ class EditDiscard extends React.Component<Props, State> {
     private onDiscardedSizeChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
       this.setState({ packageSizeId: data.value as string });
     }
-    
+
   /**
    * Event handler for discarded count change
    *
@@ -394,7 +395,7 @@ class EditDiscard extends React.Component<Props, State> {
 
 /**
  * Redux mapper for mapping store state to component props
- * 
+ *
  * @param state store state
  */
 export function mapStateToProps(state: StoreState) {
@@ -402,16 +403,16 @@ export function mapStateToProps(state: StoreState) {
     facility: state.facility
   };
 };
-  
+
 /**
- * Redux mapper for mapping component dispatches 
- * 
+ * Redux mapper for mapping component dispatches
+ *
  * @param dispatch dispatch method
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
      onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
-  };  
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditDiscard)

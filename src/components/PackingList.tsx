@@ -106,8 +106,8 @@ class PackingList extends React.Component<Props, State> {
 
   /**
    * Returns a text for a basic packing list entry
-   * 
-   * @param packing packing 
+   *
+   * @param packing packing
    */
   private getPackingName = (packing: Packing): string => {
     const { products } = this.props;
@@ -122,7 +122,7 @@ class PackingList extends React.Component<Props, State> {
 
     /**
    * Returns a text for a campaign packing list entry
-   * 
+   *
    * @param packing packing
    */
   private getCampaignPackingName = (packing: Packing): string => {
@@ -130,13 +130,13 @@ class PackingList extends React.Component<Props, State> {
     const packingCampaign = (campaigns || []).find(campaign => campaign.id === packing.campaignId);
     const campaignName = packingCampaign ? packingCampaign.name : packing.id;
     const packingDate = moment(packing.time).format("DD.MM.YYYY");
-    
+
     return `${campaignName} - ${packingDate}`;
   }
 
   /**
    * Removes packing from storage ( Updates the state to removed )
-   * 
+   *
    * @param packing Packing to remove from storage
    */
   private removePackingFromStorage = async (packing: Packing) => {
@@ -165,7 +165,7 @@ class PackingList extends React.Component<Props, State> {
 
     const possibleLoader = (): any => {
       if (this.state.loading) {
-        return <Loader 
+        return <Loader
           style={{ marginLeft: "auto", marginRight: "auto" }}
           inline
           active
@@ -200,6 +200,7 @@ class PackingList extends React.Component<Props, State> {
               <div style={ filterStyles }>
                 <label>{ strings.dateBefore }</label>
                 <DateInput
+                  localization="fi-FI"
                   dateFormat="DD.MM.YYYY"
                   onChange={ this.onChangeDateBefore }
                   name="dateBefore"
@@ -209,6 +210,7 @@ class PackingList extends React.Component<Props, State> {
               <div style={ filterStyles }>
                 <label>{ strings.dateAfter }</label>
                 <DateInput
+                  localization="fi-FI"
                   dateFormat="DD.MM.YYYY"
                   onChange={ this.onChangeDateAfter }
                   name="dateAfter"
@@ -292,7 +294,7 @@ class PackingList extends React.Component<Props, State> {
       await this.updatePackings({...filters, firstResult}, true);
     }
   }
-  
+
   private getAmountOfBoxes = (packing: Packing) => {
     if (packing.type == "BASIC") {
       return packing.packedCount;
@@ -302,7 +304,7 @@ class PackingList extends React.Component<Props, State> {
   }
 
   private renderPackingTableRow = (packing: Packing) => {
-    const name = packing.type == "BASIC" ? 
+    const name = packing.type == "BASIC" ?
       this.getPackingName(packing) :
       this.getCampaignPackingName(packing);
 
@@ -321,7 +323,7 @@ class PackingList extends React.Component<Props, State> {
         <Table.Cell>{ amount }</Table.Cell>
         <Table.Cell>{ packageSizeName }</Table.Cell>
         <Table.Cell textAlign='right'>
-          { packing.state == PackingState.InStore && 
+          { packing.state == PackingState.InStore &&
             <Button
               loading={ removingFromStorageIds.indexOf(packing.id!) > -1 }
               onClick={ () => this.removePackingFromStorage(packing) }>
@@ -338,7 +340,7 @@ class PackingList extends React.Component<Props, State> {
 
   /**
    * Returns a localized name for packing state
-   * 
+   *
    * @param state packing state
    */
   private resolveLocalizedPackingState = (state: string): string => {
@@ -566,7 +568,7 @@ class PackingList extends React.Component<Props, State> {
 
 /**
  * Redux mapper for mapping store state to component props
- * 
+ *
  * @param state store state
  */
 const mapStateToProps = (state: StoreState) => ({
@@ -578,8 +580,8 @@ const mapStateToProps = (state: StoreState) => ({
 });
 
 /**
- * Redux mapper for mapping component dispatches 
- * 
+ * Redux mapper for mapping component dispatches
+ *
  * @param dispatch dispatch method
  */
 const mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({

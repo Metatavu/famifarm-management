@@ -63,7 +63,7 @@ class CutPackingsList extends React.Component<Props, State> {
     try {
       const cutPackingsApi= await Api.getCutPackingsService(keycloak);
       const cutPackings = await cutPackingsApi.listCutPackings({ facility: facility });
-  
+
       if (products) {
         const listItems = this.getListItems(cutPackings, products);
         this.setState({ listItems, loading: false });
@@ -71,7 +71,7 @@ class CutPackingsList extends React.Component<Props, State> {
         const productsApi = await Api.getProductsService(keycloak);
         const foundProducts = await productsApi.listProducts({ facility: facility });
         const listItems = this.getListItems(cutPackings, foundProducts);
-  
+
         onProductsFound(foundProducts);
         this.setState({ listItems, loading: false });
       }
@@ -109,12 +109,12 @@ class CutPackingsList extends React.Component<Props, State> {
             <Form.Field>
               <div style={{ display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem", paddingRight: "2rem" }}>
                 <label>{ strings.dateBefore }</label>
-                <DateInput dateFormat="DD.MM.YYYY" onChange={ this.onChangeCreatedBefore } name="dateBefore" value={ createdBeforeFilter ? moment(createdBeforeFilter).format("DD.MM.YYYY") : "" } />
+                <DateInput localization="fi-FI" dateFormat="DD.MM.YYYY" onChange={ this.onChangeCreatedBefore } name="dateBefore" value={ createdBeforeFilter ? moment(createdBeforeFilter).format("DD.MM.YYYY") : "" } />
               </div>
 
               <div style={{ display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem", paddingRight: "2rem" }}>
                 <label>{ strings.dateAfter }</label>
-                <DateInput dateFormat="DD.MM.YYYY" onChange={ this.onChangeCreatedAfter } name="dateAfter" value={ createdAfterFilter ? moment(createdAfterFilter).format("DD.MM.YYYY") : "" } />
+                <DateInput localization="fi-FI" dateFormat="DD.MM.YYYY" onChange={ this.onChangeCreatedAfter } name="dateAfter" value={ createdAfterFilter ? moment(createdAfterFilter).format("DD.MM.YYYY") : "" } />
               </div>
 
               <div style={{ display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem", paddingRight: "2rem" }}>
@@ -137,7 +137,7 @@ class CutPackingsList extends React.Component<Props, State> {
 
   /**
    * Updates the list
-   * 
+   *
    * @param productId return only packings belonging to this product
    * @param createdBefore return only packings created before this date
    * @param createdAfter return only packings created after this date
@@ -159,7 +159,7 @@ class CutPackingsList extends React.Component<Props, State> {
         facility: facility
       });
       const listItems = this.getListItems(cutPackings, products);
-  
+
       this.setState({ listItems, loading: false });
     } catch (exception: any) {
       onError({
@@ -184,7 +184,7 @@ class CutPackingsList extends React.Component<Props, State> {
     for (let i = 0; i < products.length; i++) {
       options.push({ text: LocalizedUtils.getLocalizedValue(products[i].name) || "", value: products[i].id || "" });
     }
-    
+
     return options;
   }
 
@@ -248,7 +248,7 @@ class CutPackingsList extends React.Component<Props, State> {
 
   /**
    * Gets the list items
-   * 
+   *
    * @param cutPackings packings to render
    * @param products products to get the names from
    */
@@ -263,7 +263,7 @@ class CutPackingsList extends React.Component<Props, State> {
 
   /**
    * Gets a display name for a packing name
-   * 
+   *
    * @param productName the name of a product
    * @param cuttingDay the day on which a packing was cut
    */
@@ -275,7 +275,7 @@ class CutPackingsList extends React.Component<Props, State> {
 
 /**
  * Redux mapper for mapping store state to component props
- * 
+ *
  * @param state store state
  */
 export function mapStateToProps(state: StoreState) {
@@ -286,8 +286,8 @@ export function mapStateToProps(state: StoreState) {
 }
 
 /**
- * Redux mapper for mapping component dispatches 
- * 
+ * Redux mapper for mapping component dispatches
+ *
  * @param dispatch dispatch method
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {

@@ -101,20 +101,20 @@ class EditPacking extends React.Component<Props, State> {
           facility: facility
         });
         const packedCount = packing.packedCount || 0;
-  
+
         await this.refreshPrinters();
-        
+
         const productId = product.id;
-  
+
         if (!productId) {
           throw new Error("Product id undefined");
         }
-  
+
         const productName = LocalizedUtils.getLocalizedValue(product.name);
-  
+
         const packageSizesSerivce = await Api.getPackageSizesService(keycloak);
         const packageSizes = await packageSizesSerivce.listPackageSizes({ facility: facility });
-  
+
         this.setState({
           packing,
           productName,
@@ -160,7 +160,7 @@ class EditPacking extends React.Component<Props, State> {
       });
     }
   }
-  
+
   public render() {
     if (this.state.loading) {
       return (
@@ -169,11 +169,11 @@ class EditPacking extends React.Component<Props, State> {
         </Grid>
       );
     }
-    
+
     if (this.state.redirect) {
       return <Navigate replace={true} to="/packings"/>;
     }
-    
+
     const productOptions: DropdownItemProps[] = this.state.products.map((product) => {
       const id = product.id!;
       const name = LocalizedUtils.getLocalizedValue(product.name);
@@ -210,7 +210,7 @@ class EditPacking extends React.Component<Props, State> {
         text: name
       };
     });
-    
+
     return (
       <Grid>
         <Grid.Row className="content-page-header-row">
@@ -221,7 +221,7 @@ class EditPacking extends React.Component<Props, State> {
         <Grid.Row>
             <Grid.Column width={8}>
             {
-              this.state.packingType == "BASIC" && 
+              this.state.packingType == "BASIC" &&
               <FormContainer>
                 <Form.Field required>
                   <label>{ strings.product }</label>
@@ -262,6 +262,7 @@ class EditPacking extends React.Component<Props, State> {
                 </Form.Field>
                 <Form.Field>
                   <DateTimeInput
+                    localization="fi-FI"
                     dateFormat="DD.MM.YYYY HH:mm"
                     onChange={ this.onChangeDate }
                     name="date"
@@ -288,7 +289,7 @@ class EditPacking extends React.Component<Props, State> {
                 </Button>
               </FormContainer>
             }
-                
+
             {
               this.state.packingType == "CAMPAIGN" &&
               <FormContainer>
@@ -315,6 +316,7 @@ class EditPacking extends React.Component<Props, State> {
                 </Form.Field>
                 <Form.Field>
                   <DateTimeInput
+                    localization="fi-FI"
                     dateFormat="DD.MM.YYYY HH:mm"
                     onChange={ this.onChangeDate }
                     name="date"
@@ -344,7 +346,7 @@ class EditPacking extends React.Component<Props, State> {
             </Grid.Column>
         </Grid.Row>
 
-     
+
         <Grid.Row className="content-page-header-row">
           <Grid.Column width={8}>
              <h2>{ strings.printPacking }</h2>
@@ -398,8 +400,8 @@ class EditPacking extends React.Component<Props, State> {
 
   /**
    * Returns a text for a basic packing list entry
-   * 
-   * @param packing packing 
+   *
+   * @param packing packing
    */
   private getPackingName = (packing: Packing): string => {
     const products = this.state.products;
@@ -412,7 +414,7 @@ class EditPacking extends React.Component<Props, State> {
 
   /**
    * Returns a text for a campaign packing list entry
-   * 
+   *
    * @param packing packing
    */
   private getCampaignPackingName = (packing: Packing): string => {
@@ -420,7 +422,7 @@ class EditPacking extends React.Component<Props, State> {
     const packingCampaign = campaigns.find((campaign) => campaign.id === packing.campaignId)
     const campaignName = packingCampaign ? packingCampaign.name : packing.id;
     const packingDate = moment(packing.time).format("DD.MM.YYYY");
-    
+
     return `${campaignName} - ${packingDate}`;
   }
 
@@ -494,7 +496,7 @@ class EditPacking extends React.Component<Props, State> {
   }
 
   /**
-    * Event handler for product change 
+    * Event handler for product change
     */
   private onPackingProductChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
     this.setState({
@@ -503,7 +505,7 @@ class EditPacking extends React.Component<Props, State> {
   }
 
   /**
-    * Event handler for product change 
+    * Event handler for product change
     */
    private onPackageSizeChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
     this.setState({
@@ -519,7 +521,7 @@ class EditPacking extends React.Component<Props, State> {
   }
 
   /**
-    * Event handler for packed count change 
+    * Event handler for packed count change
     */
   private onPackedCountChange = (event: any, { value }: InputOnChangeData) => {
     const actualNumber = Number.parseInt(value) >= 0 ? Number.parseInt(value) : 0;
@@ -593,8 +595,8 @@ class EditPacking extends React.Component<Props, State> {
       });
     }
 
-  } 
-  
+  }
+
   /**
    * Deletes a packing
    */
@@ -606,7 +608,7 @@ class EditPacking extends React.Component<Props, State> {
       if (!packing) {
         throw new Error("Packing is undefined");
       }
-  
+
       if (!packing.id) {
         throw new Error("Packing id is undefined")
       }
@@ -628,10 +630,10 @@ class EditPacking extends React.Component<Props, State> {
 
   }
 }
- 
+
 /**
  * Redux mapper for mapping store state to component props
- * 
+ *
  * @param state store state
  */
 export function mapStateToProps(state: StoreState) {
@@ -639,16 +641,16 @@ export function mapStateToProps(state: StoreState) {
       facility: state.facility
     };
 }
-  
+
 /**
- * Redux mapper for mapping component dispatches 
- * 
+ * Redux mapper for mapping component dispatches
+ *
  * @param dispatch dispatch method
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
      onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
-  };  
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditPacking)
