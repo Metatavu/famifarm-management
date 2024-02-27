@@ -107,23 +107,6 @@ class EventList extends React.Component<Props, State> {
     const gutterHoleCountText = eventData.gutterHoleCount !== undefined ? eventData.gutterHoleCount : "";
     const numberOfBasketsText = eventData.baskets !== undefined ? eventData.baskets.length : "";
     const totalBasketsWeightText = eventData.baskets !== undefined ? this.sumBaskets(eventData.baskets) : "";
-    // let totalBasketsWeightText;
-
-    // TODO: Need to clarify if/how total weight unit is calculated for Wastage, Planting, Sowing and other event types, should amount be treated as total weight? Planting has GHCount, GH, trays but no amount. 
-    // switch (event.type) {
-    //   case EventType.Harvest:
-    //     totalBasketsWeightText = eventData.baskets !== undefined ? this.sumBaskets(eventData.baskets) : "";
-    //     break;
-    //   case EventType.Wastage:
-    //     totalBasketsWeightText = eventData.amount !== undefined ? eventData.amount : "";
-    //     break;
-    //   case EventType.Sowing:
-    //     totalBasketsWeightText = eventData.amount !== undefined ? eventData.amount : "";
-    //     break;
-    //   case EventType.CultivationObservation:
-    //     totalBasketsWeightText = eventData.weight !== undefined ? eventData.amount : "";
-    //     break;
-    // }
 
     return (
       <Table.Row key={event.id}>
@@ -166,7 +149,15 @@ class EventList extends React.Component<Props, State> {
       }
     }
 
-    const tableRows = (this.props.events || []).map((event, i) => this.renderEventTableRow(event));
+    const events = this.props.events || [];
+    const { facility } = this.props;
+    const tableRows = events.map((event, i) => this.renderEventTableRow(event));
+    const {
+      totalBasketWeight,
+      totalGutterCount,
+      totalGutterHoleCount,
+      totalNumberOfBaskets
+    } = this.sumEventRowValues(events);
 
     const { eventListFilters } = this.props;
     const productText = eventListFilters && eventListFilters.product ? LocalizedUtils.getLocalizedValue(eventListFilters.product.name) : strings.selectProduct;
@@ -225,6 +216,19 @@ class EventList extends React.Component<Props, State> {
               <Table.Body>
                 { tableRows }
               </Table.Body>
+              {facility ===  Facility.Juva &&
+              <Table.Footer>
+                <Table.Row>
+                  <Table.HeaderCell style={{ fontWeight: "bold" }} colSpan="4">
+                    { strings.total }:
+                  </Table.HeaderCell>
+                  <Table.HeaderCell>{ totalGutterCount }</Table.HeaderCell>
+                  <Table.HeaderCell>{ totalGutterHoleCount }</Table.HeaderCell>
+                  <Table.HeaderCell>{ totalNumberOfBaskets }</Table.HeaderCell>
+                  <Table.HeaderCell>{ totalBasketWeight }</Table.HeaderCell>
+                  <Table.HeaderCell></Table.HeaderCell>
+                </Table.Row>
+              </Table.Footer>}
             </Table>
           </Visibility>
           </Grid.Column>
@@ -232,6 +236,52 @@ class EventList extends React.Component<Props, State> {
         {possibleLoader()}
       </Grid>
     );
+  }
+
+  /**
+   * Sum the values of all event rows
+   *
+   * @param events list of events
+   * @returns totalGutterHoleCount, totalGutterCount, totalBasketWeight, totalNumberOfBaskets
+   */
+  private sumEventRowValues = (events: Event[]) => {
+    const totalGutterHoleCount = events.reduce((acc, event) =>{
+      if (!(event.data as any).gutterHoleCount) return acc;
+
+      acc += (event.data as any).gutterHoleCount || 0;
+      return acc;
+    }, 0);
+
+    const totalGutterCount = events.reduce((acc, event) =>{
+      if (!(event.data as any).gutterCount) return acc;
+
+      acc += (event.data as any).gutterCount || 0;
+      return acc;
+    }, 0);
+
+    let totalBasketWeight = events.reduce((acc, event) => {
+      if (!(event.data as any).baskets) return acc;
+
+      (event.data as any).baskets.forEach((basket: HarvestBasket) => {
+          acc += Math.round(basket.weight * 10) / 10 || 0;
+      });
+      return acc;
+    }, 0);
+    totalBasketWeight = Math.round(totalBasketWeight * 10) / 10;
+
+    const totalNumberOfBaskets = events.reduce((acc, event) => {
+      if (!(event.data as any).baskets) return acc;
+
+      acc += (event.data as any).baskets.length || 0;
+      return acc;
+    }, 0);
+
+    return {
+      totalGutterHoleCount,
+      totalGutterCount,
+      totalBasketWeight,
+      totalNumberOfBaskets
+    }
   }
 
   /**
@@ -423,7 +473,7 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
     onProductsFound: (products: Product[]) => dispatch(actions.productsFound(products)),
     onEventListFiltersUpdated: (filters: EventListFilters) => dispatch(actions.eventListFiltersUpdated(filters)),
     onEventsFound: (events: Event[]) => dispatch(actions.eventsFound(events)),
-     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
+    onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 
