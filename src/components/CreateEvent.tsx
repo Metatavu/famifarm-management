@@ -623,7 +623,7 @@ class CreateEvent extends React.Component<Props, State> {
         <Form.Input required label={strings.labelGutterHoleCount} name="gutterHoleCount" type="number" value={data.gutterHoleCount} onChange={this.handleDataChange} />
         {this.props.facility === Facility.Juva &&
           data.baskets?.map((basket, index) =>
-          <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+          <div key={index} style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
             <Form.Input required label={index === 0 && strings.labelBasketWeights} name={`baskets-${index}`} type="number" value={basket.weight} onChange={this.handleDataChange} />
             <Button className="danger-button" style={{ marginLeft: 5, marginBottom: index === 0 ? "-10px" : 14, padding: 0, justifyContent: "center", height: 36, width: 36 }} onClick={() => this.removeBasket(index)}>
               <Icon fitted name="trash" />
