@@ -2,7 +2,7 @@ import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
-import { Event, EventType, Facility, Product, ProductionLine } from "../generated/client";
+import { Event, EventType, Facility, Product, ProductionLine, HarvestBasket } from "../generated/client";
 import strings from "../localization/strings";
 import moment from "moment";
 import * as actions from "../actions";
@@ -22,7 +22,6 @@ import {
 } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import LocalizedUtils from "../localization/localizedutils";
-
 
 /**
  * Interface representing component properties
@@ -48,7 +47,8 @@ interface State {
   loading: boolean
   errorCount: number,
   loadingFirstTime: boolean,
-  productionLines: ProductionLine[]
+  productionLines: ProductionLine[],
+  previousBottomVisibility?: number
 }
 
 /**
@@ -105,7 +105,8 @@ class EventList extends React.Component<Props, State> {
     const productionLineText = productionLine ? productionLine.lineNumber || "" : "";
     const gutterCountText = eventData.gutterCount !== undefined ? eventData.gutterCount : "";
     const gutterHoleCountText = eventData.gutterHoleCount !== undefined ? eventData.gutterHoleCount : "";
-    const numberOfBasketsText = eventData.numberOfBaskets !== undefined ? eventData.numberOfBaskets : "";
+    const numberOfBasketsText = eventData.baskets !== undefined ? eventData.baskets.length : "";
+    const totalBasketsWeightText = eventData.baskets !== undefined ? this.sumBaskets(eventData.baskets) : "";
 
     return (
       <Table.Row key={event.id}>
@@ -116,6 +117,7 @@ class EventList extends React.Component<Props, State> {
         <Table.Cell>{ gutterCountText }</Table.Cell>
         <Table.Cell>{ gutterHoleCountText }</Table.Cell>
         {this.props.facility === Facility.Juva &&  <Table.Cell>{ numberOfBasketsText }</Table.Cell>}
+        {this.props.facility === Facility.Juva &&  <Table.Cell>{ totalBasketsWeightText }</Table.Cell>}
         <Table.Cell textAlign='right'>
           <NavLink to={`/events/${event.id}`}>
               <Button className="submit-button">{strings.open}</Button>
@@ -147,7 +149,15 @@ class EventList extends React.Component<Props, State> {
       }
     }
 
-    const tableRows = (this.props.events || []).map((event, i) => this.renderEventTableRow(event));
+    const events = this.props.events || [];
+    const { facility } = this.props;
+    const tableRows = events.map((event, i) => this.renderEventTableRow(event));
+    const {
+      totalBasketWeight,
+      totalGutterCount,
+      totalGutterHoleCount,
+      totalNumberOfBaskets
+    } = this.sumEventRowValues(events);
 
     const { eventListFilters } = this.props;
     const productText = eventListFilters && eventListFilters.product ? LocalizedUtils.getLocalizedValue(eventListFilters.product.name) : strings.selectProduct;
@@ -167,7 +177,7 @@ class EventList extends React.Component<Props, State> {
             <Form.Field>
               <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem", paddingRight: "2rem"}}>
                 <label>{strings.date}</label>
-                <DateInput dateFormat="DD.MM.YYYY" onChange={this.onChangeDate} name="date" value={dateText} />
+                <DateInput localization="fi-FI" dateFormat="DD.MM.YYYY" onChange={this.onChangeDate} name="date" value={dateText} />
               </div>
               <div style={{display:"inline-block", paddingTop: "2rem", paddingBottom: "2rem"}}>
                 <label>{strings.productName}</label>
@@ -199,12 +209,26 @@ class EventList extends React.Component<Props, State> {
                   <Table.HeaderCell>{ strings.labelGutterCount }</Table.HeaderCell>
                   <Table.HeaderCell>{ strings.labelGutterHoleCount }</Table.HeaderCell>
                   {this.props.facility === Facility.Juva && <Table.HeaderCell>{ strings.labelNumberOfBaskets }</Table.HeaderCell>}
+                  {this.props.facility === Facility.Juva && <Table.HeaderCell>{ strings.labelTotalBasketWeight }</Table.HeaderCell>}
                   <Table.HeaderCell></Table.HeaderCell>
                 </Table.Row>
               </Table.Header>
               <Table.Body>
                 { tableRows }
               </Table.Body>
+              {facility ===  Facility.Juva &&
+              <Table.Footer>
+                <Table.Row>
+                  <Table.HeaderCell style={{ fontWeight: "bold" }} colSpan="4">
+                    { strings.total }:
+                  </Table.HeaderCell>
+                  <Table.HeaderCell>{ totalGutterCount }</Table.HeaderCell>
+                  <Table.HeaderCell>{ totalGutterHoleCount }</Table.HeaderCell>
+                  <Table.HeaderCell>{ totalNumberOfBaskets }</Table.HeaderCell>
+                  <Table.HeaderCell>{ totalBasketWeight }</Table.HeaderCell>
+                  <Table.HeaderCell></Table.HeaderCell>
+                </Table.Row>
+              </Table.Footer>}
             </Table>
           </Visibility>
           </Grid.Column>
@@ -212,6 +236,65 @@ class EventList extends React.Component<Props, State> {
         {possibleLoader()}
       </Grid>
     );
+  }
+
+  /**
+   * Sum the values of all event rows
+   *
+   * @param events list of events
+   * @returns totalGutterHoleCount, totalGutterCount, totalBasketWeight, totalNumberOfBaskets
+   */
+  private sumEventRowValues = (events: Event[]) => {
+    const totalGutterHoleCount = events.reduce((acc, event) =>{
+      if (!(event.data as any).gutterHoleCount) return acc;
+
+      acc += (event.data as any).gutterHoleCount || 0;
+      return acc;
+    }, 0);
+
+    const totalGutterCount = events.reduce((acc, event) =>{
+      if (!(event.data as any).gutterCount) return acc;
+
+      acc += (event.data as any).gutterCount || 0;
+      return acc;
+    }, 0);
+
+    let totalBasketWeight = events.reduce((acc, event) => {
+      if (!(event.data as any).baskets) return acc;
+
+      (event.data as any).baskets.forEach((basket: HarvestBasket) => {
+          acc += Math.round(basket.weight * 10) / 10 || 0;
+      });
+      return acc;
+    }, 0);
+    totalBasketWeight = Math.round(totalBasketWeight * 10) / 10;
+
+    const totalNumberOfBaskets = events.reduce((acc, event) => {
+      if (!(event.data as any).baskets) return acc;
+
+      acc += (event.data as any).baskets.length || 0;
+      return acc;
+    }, 0);
+
+    return {
+      totalGutterHoleCount,
+      totalGutterCount,
+      totalBasketWeight,
+      totalNumberOfBaskets
+    }
+  }
+
+  /**
+   * Sum the weight of baskets
+   *
+   * @param baskets
+   * @returns total weight of baskets
+   */
+  private sumBaskets = (baskets: HarvestBasket[]) => {
+    let totalWeight = 0;
+    baskets.forEach(basket  => totalWeight += basket.weight);
+
+    return totalWeight;
   }
 
   /**
@@ -294,9 +377,11 @@ class EventList extends React.Component<Props, State> {
    */
   private loadMoreEvents = async (e: any, { calculations }: any) => {
     const { eventListFilters } = this.props;
-    if (calculations.bottomVisible === true && !this.state.loading) {
+    if (calculations.bottomVisible === true && !this.state.loading && calculations.percentagePassed !== this.state.previousBottomVisibility) {
       const firstResult = ((eventListFilters || {}).firstResult || 0) + 20;
       await this.updateEvents({...eventListFilters, firstResult});
+      // This prevents the updateEvents from being called repeatedly
+      this.setState({previousBottomVisibility: calculations.percentagePassed})
     }
   }
 
@@ -388,7 +473,7 @@ export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
     onProductsFound: (products: Product[]) => dispatch(actions.productsFound(products)),
     onEventListFiltersUpdated: (filters: EventListFilters) => dispatch(actions.eventListFiltersUpdated(filters)),
     onEventsFound: (events: Event[]) => dispatch(actions.eventsFound(events)),
-     onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
+    onError: (error: ErrorMessage | undefined) => dispatch(actions.onErrorOccurred(error))
   };
 }
 

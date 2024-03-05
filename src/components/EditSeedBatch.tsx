@@ -55,10 +55,10 @@ interface State {
 /**
  * React component for edit seed batch view
  */
-class EditSeedBatch extends React.Component<Props, State> {  
+class EditSeedBatch extends React.Component<Props, State> {
   /**
    * Constructor
-   * 
+   *
    * @param props component properties
    */
   constructor(props: Props) {
@@ -73,11 +73,12 @@ class EditSeedBatch extends React.Component<Props, State> {
       messageVisible: false,
       seeds: [],
       open:false
-    };    
+    };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handeCodeChange = this.handeCodeChange.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
-  }  
+  }
+  
   /**
    * Component did mount life-sycle method
    */
@@ -86,16 +87,16 @@ class EditSeedBatch extends React.Component<Props, State> {
     try {
       if (!keycloak) {
         return;
-      }      
+      }
       const seedBatchesService = await Api.getSeedBatchesService(keycloak);
-      const seedsService = await Api.getSeedsService(keycloak);      
+      const seedsService = await Api.getSeedsService(keycloak);
       const seedBatch = await seedBatchesService.findSeedBatch({
         seedBatchId: this.props.seedBatchId,
         facility: facility
       });
       onSeedBatchSelected && onSeedBatchSelected(seedBatch);
-      this.setState({seedBatch: seedBatch});      
-      const seeds = await seedsService.listSeeds({ facility: facility });      
+      this.setState({seedBatch: seedBatch});
+      const seeds = await seedsService.listSeeds({ facility: facility });
       onSeedsFound && onSeedsFound(seeds);
       this.setState({seeds: seeds});
     } catch (e: any) {
@@ -105,10 +106,10 @@ class EditSeedBatch extends React.Component<Props, State> {
         exception: e
       });
     }
-  }  
+  }
   /**
    * Handle name change
-   * 
+   *
    * @param event event
    */
   private handeCodeChange(event: React.FormEvent<HTMLInputElement>) {
@@ -121,67 +122,67 @@ class EditSeedBatch extends React.Component<Props, State> {
       seedId: this.state.seedBatch.seedId,
       time: this.state.seedBatch.time,
       active: this.state.seedBatch.active
-    };    
+    };
     this.setState({seedBatch: seedBatch});
-  }  
+  }
   /**
    * Handle select change
-   * 
+   *
    * @param e event
    * @param {value} value
    */
   private onSelectChange = (e: any, { value }: DropdownProps) => {
     if (!this.state.seedBatch) {
       return;
-    }    
+    }
     const seedBatch = {
       id: this.state.seedBatch.id,
       code: this.state.seedBatch.code,
       seedId: value as string,
       time: this.state.seedBatch.time,
       active: this.state.seedBatch.active
-    };    
+    };
     this.setState({seedBatch: seedBatch});
-  }  
+  }
   /**
    * Handle time change
-   * 
+   *
    * @param event event
    * @param {name, value} name and value
    */
   private handleTimeChange = (event: any, {name, value} : any) => {
     if (!this.state.seedBatch) {
       return;
-    }    
+    }
     const seedBatch = {
       id: this.state.seedBatch.id,
       code: this.state.seedBatch.code,
       seedId: this.state.seedBatch.seedId,
       time: moment(value as any, DATE_FORMAT).toDate(),
       active: this.state.seedBatch.active
-    };    
+    };
     this.setState({seedBatch: seedBatch});
-  }  
+  }
   /**
    * Handle time change
-   * 
+   *
    * @param event event
    * @param {name, value} name and value
    */
   private handleActiveChange = () => {
     if (!this.state.seedBatch) {
       return;
-    } 
-    const active = !this.state.seedBatch.active;   
+    }
+    const active = !this.state.seedBatch.active;
     const seedBatch = {
       id: this.state.seedBatch.id,
       code: this.state.seedBatch.code,
       seedId: this.state.seedBatch.seedId,
       time: this.state.seedBatch.time,
       active: active
-    };    
+    };
     this.setState({seedBatch: seedBatch});
-  }  
+  }
   /**
    * Handle form submit
    */
@@ -190,8 +191,8 @@ class EditSeedBatch extends React.Component<Props, State> {
     try {
       if (!keycloak || !this.state.seedBatch) {
         return;
-      }      
-      const seedBatchesService = await Api.getSeedBatchesService(keycloak);      
+      }
+      const seedBatchesService = await Api.getSeedBatchesService(keycloak);
       this.setState({saving: true});
       await seedBatchesService.updateSeedBatch({
         seedBatchId: this.state.seedBatch.id!,
@@ -199,7 +200,7 @@ class EditSeedBatch extends React.Component<Props, State> {
         facility: facility
       });
       onSeedBatchSelected && onSeedBatchSelected(this.state.seedBatch);
-      this.setState({saving: false});      
+      this.setState({saving: false});
       this.setState({messageVisible: true});
       setTimeout(() => {
         this.setState({messageVisible: false});
@@ -211,7 +212,7 @@ class EditSeedBatch extends React.Component<Props, State> {
         exception: e
       });
     }
-  }  
+  }
   /**
    * Handle seedBatch delete
    */
@@ -220,13 +221,13 @@ class EditSeedBatch extends React.Component<Props, State> {
     try {
       if (!keycloak || !this.state.seedBatch) {
         return;
-      }      
+      }
       const seedBatchesService = await Api.getSeedBatchesService(keycloak);
       const id = this.state.seedBatch.id || "";
       await seedBatchesService.deleteSeedBatch({
         seedBatchId: id,
         facility: facility
-      });      
+      });
       onSeedBatchDeleted && onSeedBatchDeleted(id!);
       this.setState({redirect: true});
     } catch (e: any) {
@@ -236,7 +237,7 @@ class EditSeedBatch extends React.Component<Props, State> {
         exception: e
       });
     }
-  }  
+  }
   /**
    * Render edit seedBatch view
    */
@@ -247,17 +248,17 @@ class EditSeedBatch extends React.Component<Props, State> {
           <Loader inline active size="medium" />
         </Grid>
       );
-    }    
+    }
     if (this.state.redirect) {
       return <Navigate to="/seedBatches" replace={true} />;
-    }    
+    }
     const seedOptions = (this.props.seeds || []).map((seed) => {
       return {
         key: seed.id,
         text: seed.name![0].value,
         value: seed.id
       };
-    });    
+    });
     return (
       <Grid>
         <Grid.Row className="content-page-header-row">
@@ -273,17 +274,17 @@ class EditSeedBatch extends React.Component<Props, State> {
           <FormContainer>
             <Form.Field required>
               <label>{strings.seedBatchCode}</label>
-              <Input 
-                value={this.state.seedBatch ? this.state.seedBatch.code : ""} 
+              <Input
+                value={this.state.seedBatch ? this.state.seedBatch.code : ""}
                 placeholder={strings.seedBatchCode}
                 onChange={this.handeCodeChange}
               />
             </Form.Field>
-            <Form.Select 
+            <Form.Select
               fluid
-              required 
-              label={strings.seed} 
-              options={seedOptions} 
+              required
+              label={strings.seed}
+              options={seedOptions}
               placeholder={strings.seed}
               onChange={this.onSelectChange}
               defaultValue={this.props.seedBatch ? this.props.seedBatch.seedId : ""}
@@ -296,6 +297,7 @@ class EditSeedBatch extends React.Component<Props, State> {
                 value={this.state.seedBatch ? moment(this.state.seedBatch.time).format(DATE_FORMAT) : ""}
                 iconPosition="left"
                 dateFormat={DATE_FORMAT}
+                localization="fi-FI"
                 onChange={this.handleTimeChange}
               />
             </Form.Field>
@@ -307,9 +309,9 @@ class EditSeedBatch extends React.Component<Props, State> {
               visible={this.state.messageVisible}
               header={strings.savedSuccessfully}
             />
-            <Button 
-              className="submit-button" 
-              onClick={this.handleSubmit} 
+            <Button
+              className="submit-button"
+              onClick={this.handleSubmit}
               type='submit'
               loading={this.state.saving}
             >
@@ -324,7 +326,7 @@ class EditSeedBatch extends React.Component<Props, State> {
   }
 }/**
  * Redux mapper for mapping store state to component props
- * 
+ *
  * @param state store state
  */
 export function mapStateToProps(state: StoreState) {
@@ -335,8 +337,8 @@ export function mapStateToProps(state: StoreState) {
     facility: state.facility
   };
 }/**
- * Redux mapper for mapping component dispatches 
- * 
+ * Redux mapper for mapping component dispatches
+ *
  * @param dispatch dispatch method
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {

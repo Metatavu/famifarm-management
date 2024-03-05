@@ -61,7 +61,7 @@ class CreateSeedBatch extends React.Component<Props, State> {
       if (!keycloak) {
         return;
       }
-  
+
       const seedsService = await Api.getSeedsService(keycloak);
       const seeds = await seedsService.listSeeds({ facility: facility });
       onSeedsFound && onSeedsFound(seeds);
@@ -76,7 +76,7 @@ class CreateSeedBatch extends React.Component<Props, State> {
 
   /**
    * Handle select change
-   * 
+   *
    * @param e event
    * @param {value} value
    */
@@ -86,7 +86,7 @@ class CreateSeedBatch extends React.Component<Props, State> {
 
   /**
    * Handle time change
-   * 
+   *
    * @param event event
    * @param {name, value} name and value
    */
@@ -104,19 +104,19 @@ class CreateSeedBatch extends React.Component<Props, State> {
       if (!keycloak) {
         return;
       }
-  
+
       const seedBatchObject = {
         code: code,
         seedId: seedId,
         time: moment(time, DATE_FORMAT).toDate()
       };
-  
+
       const seedBatchService = await Api.getSeedBatchesService(keycloak);
       await seedBatchService.createSeedBatch({
         seedBatch: seedBatchObject,
         facility: facility
       });
-  
+
       this.setState({redirect: true});
     } catch (e: any) {
       onError({
@@ -155,18 +155,18 @@ class CreateSeedBatch extends React.Component<Props, State> {
             <FormContainer>
               <Form.Field required>
                 <label>{strings.seedBatchCode}</label>
-                <Input 
+                <Input
                   value={this.state.code}
                   placeholder={strings.seedBatchCode}
                   onChange={(e) => this.setState({code: e.currentTarget.value})}
                 />
               </Form.Field>
-              <Form.Select 
+              <Form.Select
                 fluid
                 required
                 value={this.state.seedId}
-                label={strings.seed} 
-                options={seedOptions} 
+                label={strings.seed}
+                options={seedOptions}
                 placeholder={strings.seed}
                 onChange={this.onSelectChange}
               />
@@ -178,6 +178,7 @@ class CreateSeedBatch extends React.Component<Props, State> {
                   value={this.state.time}
                   iconPosition="left"
                   dateFormat={DATE_FORMAT}
+                  localization="fi-FI"
                   onChange={this.handleTimeChange}
                 />
               </Form.Field>
@@ -192,7 +193,7 @@ class CreateSeedBatch extends React.Component<Props, State> {
 
 /**
  * Redux mapper for mapping store state to component props
- * 
+ *
  * @param state store state
  */
 export function mapStateToProps(state: StoreState) {
@@ -205,8 +206,8 @@ export function mapStateToProps(state: StoreState) {
 }
 
 /**
- * Redux mapper for mapping component dispatches 
- * 
+ * Redux mapper for mapping component dispatches
+ *
  * @param dispatch dispatch method
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {

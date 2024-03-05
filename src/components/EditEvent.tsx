@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Keycloak from 'keycloak-js';
 import Api from "../api";
-import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, ProductionLine, SeedBatch, WastageReason, Seed, Product, Facility } from "../generated/client";
+import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, ProductionLine, SeedBatch, WastageReason, Seed, Product, Facility, HarvestBasket } from "../generated/client";
 import { Navigate } from 'react-router-dom';
 import strings from "../localization/strings";
 import { DateTimeInput, DateInput } from 'semantic-ui-calendar-react';
@@ -21,7 +21,8 @@ import {
   Select,
   DropdownItemProps,
   DropdownProps,
-  InputOnChangeData
+  InputOnChangeData,
+  Icon
 } from "semantic-ui-react";
 import LocalizedUtils from "../localization/localizedutils";
 import moment from "moment";
@@ -167,11 +168,11 @@ class EditEvent extends React.Component<Props, State> {
               </Form.Field>
               <Form.Field required>
                 <label>{strings.labelStartTime}</label>
-                <DateTimeInput dateTimeFormat="DD.MM.YYYY HH:mm" onChange={this.handleTimeChange} name="startTime" value={moment(event.startTime).format("DD.MM.YYYY HH:mm")} />
+                <DateTimeInput localization="fi-FI" dateTimeFormat="DD.MM.YYYY HH:mm" onChange={this.handleTimeChange} name="startTime" value={moment(event.startTime).format("DD.MM.YYYY HH:mm")} />
               </Form.Field>
               <Form.Field>
                 <label>{strings.labelEndTime}</label>
-                <DateTimeInput dateTimeFormat="DD.MM.YYYY HH:mm" onChange={this.handleTimeChange} name="endTime" value={moment(event.endTime).format("DD.MM.YYYY HH:mm")} />
+                <DateTimeInput localization="fi-FI" dateTimeFormat="DD.MM.YYYY HH:mm" onChange={this.handleTimeChange} name="endTime" value={moment(event.endTime).format("DD.MM.YYYY HH:mm")} />
               </Form.Field>
               {this.renderEventDataForm(event)}
               <Form.TextArea label={strings.labelAdditionalInformation} onChange={this.handleBaseChange} name="additionalInformation" value={event.additionalInformation} />
@@ -249,6 +250,13 @@ class EditEvent extends React.Component<Props, State> {
       return;
     }
 
+    if (name.includes("baskets")) {
+      const basketNumber = name.split("-")[1];
+      eventData.data.baskets[basketNumber].weight = value;
+      this.setState({ event: eventData });
+      return;
+    }
+
     eventData.data[name] = value;
     this.setState({ event: eventData });
   }
@@ -271,6 +279,37 @@ class EditEvent extends React.Component<Props, State> {
    */
   private getStringsNumber = (string ?: string) : Number => {
     return string && string.match(/\d+/g) ? Number(string.match(/\d+/g)) : 0;
+  }
+
+    /**
+   * Adds an empty basket to baskets
+   */
+  private addBasket = () => {
+    const eventData: any = this.state.event;
+    if (!eventData) {
+      return;
+    }
+
+    const newBasket = {
+      weight: 0
+    }
+    eventData.data.baskets = [...eventData.data.baskets, newBasket];
+
+    this.setState({ event: eventData })
+  }
+
+  /**
+   * Removes the selected basket from baskets
+   */
+  private removeBasket = (basketIndex: number) => {
+    const eventData: any = this.state.event;
+    if (!eventData) {
+      return;
+    }
+
+    const updatedBaskets = eventData.data.baskets.filter((_basket: HarvestBasket, index: number) => index !== basketIndex);
+    eventData.data.baskets = [...updatedBaskets];
+    this.setState({ event: eventData });
   }
 
   /**
@@ -302,7 +341,7 @@ class EditEvent extends React.Component<Props, State> {
           data = {
             gutterCount: eventData.gutterCount,
             gutterHoleCount: eventData.gutterHoleCount,
-            numberOfBaskets: facility === Facility.Juva ? eventData.numberOfBaskets : 0,
+            baskets: facility === Facility.Juva ? eventData.baskets : [],
             productionLineId: eventData.productionLineId,
             type: eventData.type,
             sowingDate: moment(eventData.sowingDate).toDate()
@@ -511,13 +550,24 @@ class EditEvent extends React.Component<Props, State> {
       <React.Fragment>
         <Form.Field required>
           <label>{strings.labelSowingDate}</label>
-          <DateInput dateTimeFormat="DD.MM.YYYY" onChange={this.handleDataTimeChange} name="sowingDate" value={data.sowingDate ? moment(data.sowingDate).format("DD.MM.YYYY") : ""} />
+          <DateInput localization="fi-FI" dateTimeFormat="DD.MM.YYYY" onChange={this.handleDataTimeChange} name="sowingDate" value={data.sowingDate ? moment(data.sowingDate).format("DD.MM.YYYY") : ""} />
         </Form.Field>
         <Form.Select required label={strings.labelHarvestType} name="type" options={harvestTypeOptions} value={data.type} onChange={this.handleDataChange} />
         <Form.Input required label={strings.labelGutterCount} name="gutterCount" type="number" value={data.gutterCount} onChange={this.handleDataChange} />
         <Form.Select required label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
         <Form.Input required label={strings.labelGutterHoleCount} name="gutterHoleCount" type="number" value={data.gutterHoleCount} onChange={this.handleDataChange} />
-        {this.props.facility === Facility.Juva && <Form.Input  required label={strings.labelNumberOfBaskets} name="numberOfBaskets" type="number" value={data.numberOfBaskets} onChange={this.handleDataChange} />}
+        {this.props.facility === Facility.Juva &&
+          data.baskets?.map((basket, index) =>
+          <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+            <Form.Input required label={index === 0 && strings.labelBasketWeights} name={`baskets-${index}`} type="number" value={basket.weight} onChange={this.handleDataChange} />
+            <Button className="danger-button" style={{ marginLeft: 5, marginBottom: index === 0 ? "-10px" : 14, padding: 0, justifyContent: "center", height: 36, width: 36 }} onClick={() => this.removeBasket(index)}>
+              <Icon fitted name="trash" />
+            </Button>
+          </div>)}
+        <Button className="submit-button" onClick={() => this.addBasket()}>
+          {strings.labelAddBasket}
+          <Icon name="add" size="small" style={{ paddingLeft : 10 }} />
+        </Button>
       </React.Fragment>
     )
   }
@@ -550,7 +600,7 @@ class EditEvent extends React.Component<Props, State> {
       <React.Fragment>
         <Form.Field required>
           <label>{strings.labelSowingDate}</label>
-          <DateInput dateTimeFormat="DD.MM.YYYY" onChange={this.handleDataTimeChange} name="sowingDate" value={data.sowingDate ? moment(data.sowingDate).format("DD.MM.YYYY") : ""} />
+          <DateInput localization="fi-FI" dateTimeFormat="DD.MM.YYYY" onChange={this.handleDataTimeChange} name="sowingDate" value={data.sowingDate ? moment(data.sowingDate).format("DD.MM.YYYY") : ""} />
         </Form.Field>
         <Form.Select required label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
         <Form.Input required label={strings.labelTrayCount} name="trayCount" type="number" value={data.trayCount} onChange={this.handleDataChange} />

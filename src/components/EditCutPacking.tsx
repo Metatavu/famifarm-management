@@ -120,11 +120,11 @@ class EditCutPacking extends React.Component<Props, State> {
   }
 
   public render = () => {
-    const { 
-      loading, 
-      printers, 
-      selectedProductName, 
-      selectedProductionLineName,   
+    const {
+      loading,
+      printers,
+      selectedProductName,
+      selectedProductionLineName,
       weight,
       messageVisible,
       gutterCount,
@@ -168,20 +168,20 @@ class EditCutPacking extends React.Component<Props, State> {
             <FormContainer>
               <Form.Field required>
                 <label>{ strings.product }</label>
-                <Form.Select 
-                  name="product" 
-                  options={ this.getProductOptions() } 
-                  text={ selectedProductName ? selectedProductName : strings.selectProduct } 
-                  onChange={ this.onChangeProduct } 
+                <Form.Select
+                  name="product"
+                  options={ this.getProductOptions() }
+                  text={ selectedProductName ? selectedProductName : strings.selectProduct }
+                  onChange={ this.onChangeProduct }
                 />
               </Form.Field>
 
               <Form.Field required>
                 <label>{ strings.productionLine }</label>
-                <Form.Select 
-                name="productionLine" 
-                options={ this.getProductionLineOptions() } 
-                text={ selectedProductionLineName ? selectedProductionLineName : strings.productionLines } 
+                <Form.Select
+                name="productionLine"
+                options={ this.getProductionLineOptions() }
+                text={ selectedProductionLineName ? selectedProductionLineName : strings.productionLines }
                 onChange={ this.onChangeProductionLine } />
               </Form.Field>
 
@@ -244,21 +244,23 @@ class EditCutPacking extends React.Component<Props, State> {
 
               <Form.Field required>
                 <label>{ strings.sowingDay }</label>
-                <DateInput 
-                  dateFormat="DD.MM.YYYY" 
-                  onChange={ this.onSowingDayChange } 
-                  name="sowingDay" 
-                  value={ sowingDay ? moment(sowingDay).format("DD.MM.YYYY") : "" } 
+                <DateInput
+                  localization="fi-FI"
+                  dateFormat="DD.MM.YYYY"
+                  onChange={ this.onSowingDayChange }
+                  name="sowingDay"
+                  value={ sowingDay ? moment(sowingDay).format("DD.MM.YYYY") : "" }
                 />
               </Form.Field>
 
               <Form.Field required>
                 <label>{ strings.cuttingDay }</label>
-                <DateInput 
-                  dateFormat="DD.MM.YYYY" 
-                  onChange={ this.onCuttingDayChange } 
-                  name="cuttingDay" 
-                  value={ cuttingDay ? moment(cuttingDay).format("DD.MM.YYYY") : ""} 
+                <DateInput
+                  localization="fi-FI"
+                  dateFormat="DD.MM.YYYY"
+                  onChange={ this.onCuttingDayChange }
+                  name="cuttingDay"
+                  value={ cuttingDay ? moment(cuttingDay).format("DD.MM.YYYY") : ""}
                 />
               </Form.Field>
 
@@ -299,11 +301,11 @@ class EditCutPacking extends React.Component<Props, State> {
             value={ selectedPrinter ? selectedPrinter.id : undefined }
             onChange={ this.onPrinterChange }
           />
-            <Button 
-              style={{ marginLeft: 10 }} 
-              loading={ refreshingPrinters } 
-              className="submit-button" 
-              onClick={ this.refreshPrinters } 
+            <Button
+              style={{ marginLeft: 10 }}
+              loading={ refreshingPrinters }
+              className="submit-button"
+              onClick={ this.refreshPrinters }
               type='submit'>
                 { strings.update }
             </Button>
@@ -313,11 +315,11 @@ class EditCutPacking extends React.Component<Props, State> {
 
         <Grid.Row>
           <Grid.Column width={8}>
-            <Button 
-              disabled={ printing } 
-              loading={ printing } 
-              className="submit-button" 
-              onClick={ this.print } 
+            <Button
+              disabled={ printing }
+              loading={ printing }
+              className="submit-button"
+              onClick={ this.print }
               type='submit'>{ strings.print }
             </Button>
           </Grid.Column>
@@ -336,14 +338,14 @@ class EditCutPacking extends React.Component<Props, State> {
 
   /**
    * Loads data for dropdowns
-   * 
+   *
    * @param keycloak a keycloak instance to use for API-requests
-   * 
+   *
    * @returns data for dropdowns
    */
   private loadDataForDropdowns = async (keycloak: KeycloakInstance): Promise<{ products: Product[], productionLines: ProductionLine[] }> => {
     const { products, productionLines, facility, onProductsFound, onProductionLinesFound } = this.props;
-    
+
     const dropdownsData = { products, productionLines };
 
     if (!products) {
@@ -394,7 +396,7 @@ class EditCutPacking extends React.Component<Props, State> {
 
   /**
    * Gets a display name for a packing name
-   * 
+   *
    * @param productName the name of a product
    * @param cuttingDay the day on which a packing was cut
    */
@@ -490,7 +492,7 @@ class EditCutPacking extends React.Component<Props, State> {
           storageCondition
         }
       });
-    
+
       this.setState({messageVisible: true});
       setTimeout(() => {
          this.setState({messageVisible: false});
@@ -506,7 +508,7 @@ class EditCutPacking extends React.Component<Props, State> {
 
   /**
    * Renders product options
-   * 
+   *
    * @returns product options
    */
   private getProductOptions = (): { text: string, value: string }[] => {
@@ -594,7 +596,7 @@ class EditCutPacking extends React.Component<Props, State> {
 
   /**
    * Return production line options
-   * 
+   *
    * @returns production line options
    */
   private getProductionLineOptions = (): { text: string, value: string }[] => {
@@ -635,7 +637,7 @@ class EditCutPacking extends React.Component<Props, State> {
 
 /**
  * Redux mapper for mapping store state to component props
- * 
+ *
  * @param state store state
  */
 export function mapStateToProps(state: StoreState) {
@@ -647,8 +649,8 @@ export function mapStateToProps(state: StoreState) {
 }
 
 /**
- * Redux mapper for mapping component dispatches 
- * 
+ * Redux mapper for mapping component dispatches
+ *
  * @param dispatch dispatch method
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {

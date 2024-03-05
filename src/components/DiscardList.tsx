@@ -91,9 +91,9 @@ class DiscardList extends React.Component<Props, State> {
       });
     }
   }
-  
+
   /**
-   * Render 
+   * Render
    */
   public render = () => {
     const { filters, discardedProducts, products, loading } = this.state;
@@ -101,7 +101,7 @@ class DiscardList extends React.Component<Props, State> {
     const possibleLoader = (): any=> {
       if (loading) {
         return (
-        <Loader 
+        <Loader
           style={{ marginLeft: "auto", marginRight: "auto" }}
           inline
           active
@@ -144,6 +144,7 @@ class DiscardList extends React.Component<Props, State> {
               <div style={ filterStyles }>
                 <label>{ strings.dateBefore }</label>
                 <DateInput
+                  localization="fi-FI"
                   dateFormat="DD.MM.YYYY"
                   onChange={ this.onChangeDateBefore }
                   name="dateBefore"
@@ -153,6 +154,7 @@ class DiscardList extends React.Component<Props, State> {
               <div style={ filterStyles }>
                 <label>{ strings.dateAfter }</label>
                 <DateInput
+                  localization="fi-FI"
                   dateFormat="DD.MM.YYYY"
                   onChange={ this.onChangeDateAfter }
                   name="dateAfter"
@@ -197,7 +199,7 @@ class DiscardList extends React.Component<Props, State> {
   }
 
   /**
-   * method for loading more discarded products 
+   * method for loading more discarded products
    *
    * @param event React change event
    * @param data element visibility data
@@ -212,7 +214,7 @@ class DiscardList extends React.Component<Props, State> {
 
   /**
    * method for rendering table row
-   * 
+   *
    * @param discardedProduct discarded product to render
    */
   private renderDiscardRow = (discardedProduct: StorageDiscard) => {
@@ -247,8 +249,8 @@ class DiscardList extends React.Component<Props, State> {
 
    /**
    * Returns a products name
-   * 
-   * @param discardedProduct discarded product 
+   *
+   * @param discardedProduct discarded product
    */
     private getProductName = (discardedProduct: StorageDiscard): string => {
       const { products, discardedProducts } = this.state;
@@ -256,7 +258,7 @@ class DiscardList extends React.Component<Props, State> {
 
       return discard ? LocalizedUtils.getLocalizedValue(discard.name) : "";
     }
-  
+
 
   /**
    * Method for fetching discarded products
@@ -296,7 +298,7 @@ class DiscardList extends React.Component<Props, State> {
       maxResults: 20,
       firstResult: fr
     });
-    
+
     if (append) {
       this.setState({
         discardedProducts: [ ...discardedProducts, ...discards ],
@@ -329,7 +331,7 @@ class DiscardList extends React.Component<Props, State> {
         ...this.state.filters,
         dateAfter: moment(value as any, "DD.MM.YYYY").toISOString()
       };
-  
+
       this.setState({ filters: updatedFilters });
 
       await this.fetchData(updatedFilters, false).catch(err => {
@@ -340,7 +342,7 @@ class DiscardList extends React.Component<Props, State> {
         });
       });
     }
-  
+
     /**
      * Handles changing date
      *
@@ -354,7 +356,7 @@ class DiscardList extends React.Component<Props, State> {
       };
 
       this.setState({ filters: updatedFilters });
-  
+
       await this.fetchData(updatedFilters, false).catch(err => {
         this.props.onError({
           message: strings.defaultApiErrorMessage,
@@ -398,12 +400,12 @@ class DiscardList extends React.Component<Props, State> {
    */
      private renderOptions = () => {
       const { products } = this.state;
-  
+
       const options = [{
         text: strings.allProducts,
         value: "all-products"
       }];
-  
+
       if (products) {
         options.push(
           ...products.map(({ name, id }) => ({
@@ -412,14 +414,14 @@ class DiscardList extends React.Component<Props, State> {
           }))
         );
       }
-  
+
       return options;
     }
 }
 
 /**
  * Redux mapper for mapping store state to component props
- * 
+ *
  * @param state store state
  */
 const mapStateToProps = (state: StoreState) => ({
@@ -427,8 +429,8 @@ const mapStateToProps = (state: StoreState) => ({
 });
 
 /**
- * Redux mapper for mapping component dispatches 
- * 
+ * Redux mapper for mapping component dispatches
+ *
  * @param dispatch dispatch method
  */
 const mapDispatchToProps = (dispatch: Dispatch<actions.AppAction>) => ({

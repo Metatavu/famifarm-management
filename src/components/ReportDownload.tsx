@@ -87,11 +87,11 @@ class ReportDownload extends React.Component<Props, State> {
               <Form.Select onChange={this.updateReportType} value={this.state.reportType} label={strings.reportTypeLabel} options={reportTypeOptions} placeholder={strings.reportTypePlaceholder} />
               <Form.Field>
                 <label>{strings.labelStartTime}</label>
-                <DateInput dateFormat="DD.MM.YYYY" onChange={this.updateStartTime} name="startTime" value={moment(this.state.startTime).format("DD.MM.YYYY")} />
+                <DateInput localization="fi-FI" dateFormat="DD.MM.YYYY" onChange={this.updateStartTime} name="startTime" value={moment(this.state.startTime).format("DD.MM.YYYY")} />
               </Form.Field>
               <Form.Field>
                 <label>{strings.labelEndTime}</label>
-                <DateInput dateFormat="DD.MM.YYYY" onChange={this.updateEndTime} name="endTime" value={moment(this.state.endTime).format("DD.MM.YYYY")} />
+                <DateInput localization="fi-FI" dateFormat="DD.MM.YYYY" onChange={this.updateEndTime} name="endTime" value={moment(this.state.endTime).format("DD.MM.YYYY")} />
               </Form.Field>
               <Button loading={this.state.loading} className="submit-button" onClick={this.handleSubmit} type='submit'>{strings.print}</Button>
             </Form>

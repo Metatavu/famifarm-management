@@ -124,6 +124,9 @@ export interface IStrings extends LocalizedStringsMethods {
   labelGutterHoleCount: string
   labelGutterCount: string
   labelNumberOfBaskets: string
+  labelTotalBasketWeight: string
+  labelBasketWeights: string
+  labelAddBasket: string
   labelTrayCount: string
   labelPackageSize: string
   labelPackedCount: string

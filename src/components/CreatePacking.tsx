@@ -59,9 +59,9 @@ class CreatePacking extends React.Component<Props, State> {
       if (!keycloak) {
         return;
       }
-    
+
       this.setState({loading: true});
-    
+
       const productsService = await Api.getProductsService(keycloak);
       const products = await productsService.listProducts({ facility: facility });
 
@@ -70,15 +70,15 @@ class CreatePacking extends React.Component<Props, State> {
 
       const packageSizeService = await Api.getPackageSizesService(keycloak);
       const packageSizes = await packageSizeService.listPackageSizes({ facility: facility });
-      
+
       this.setState({
         productId: products.length ? products[0].id! : "",
-        packageSizes, 
+        packageSizes,
         products,
         campaigns,
         loading: false
       });
-    
+
       } catch (e: any) {
       this.props.onError({
         message: strings.defaultApiErrorMessage,
@@ -96,7 +96,7 @@ class CreatePacking extends React.Component<Props, State> {
         </Grid>
       );
       }
-      
+
     if (this.state.redirect) {
       return <Navigate replace={true} to={`/packings/${this.state.packingId}`}/>;
     }
@@ -104,7 +104,7 @@ class CreatePacking extends React.Component<Props, State> {
     const productOptions = this.state.products.map((product) => {
       const id = product.id!;
       const name = LocalizedUtils.getLocalizedValue(product.name);
-    
+
       return {
         key: id,
         value: id,
@@ -126,15 +126,15 @@ class CreatePacking extends React.Component<Props, State> {
     const packageSizeOptions = this.state.packageSizes.map((size) => {
       const id = size.id!;
       const name = LocalizedUtils.getLocalizedValue(size.name);
-    
+
       return {
         key: id,
         value: id,
         text: name
       };
     });
-      
-    return (    
+
+    return (
       <Grid>
         <Grid.Row className="content-page-header-row">
         <Grid.Column width={8}>
@@ -157,7 +157,7 @@ class CreatePacking extends React.Component<Props, State> {
               </Form.Field>
             </FormContainer>
 
-            { this.state.packingType === "BASIC" && 
+            { this.state.packingType === "BASIC" &&
               <FormContainer>
                 <Form.Field required>
                   <label>{ strings.product }</label>
@@ -198,6 +198,7 @@ class CreatePacking extends React.Component<Props, State> {
                 </Form.Field>
                 <Form.Field>
                   <DateInput
+                    localization="fi-FI"
                     dateFormat="DD.MM.YYYY"
                     onChange={ this.onChangeDate }
                     name="date"
@@ -215,7 +216,7 @@ class CreatePacking extends React.Component<Props, State> {
             }
 
             {
-              this.state.packingType === "CAMPAIGN" && 
+              this.state.packingType === "CAMPAIGN" &&
               <FormContainer>
                 <Form.Field required>
                   <label>{ strings.campaign }</label>
@@ -240,6 +241,7 @@ class CreatePacking extends React.Component<Props, State> {
                 </Form.Field>
                 <Form.Field>
                   <DateInput
+                    localization="fi-FI"
                     dateFormat="DD.MM.YYYY"
                     onChange={ this.onChangeDate }
                     name="date"
@@ -255,7 +257,7 @@ class CreatePacking extends React.Component<Props, State> {
                 </Button>
               </FormContainer>
             }
-            
+
           </Grid.Column>
         </Grid.Row>
       </Grid>
@@ -279,7 +281,7 @@ class CreatePacking extends React.Component<Props, State> {
   }
 
   /**
-   * Event handler for product change 
+   * Event handler for product change
    */
   private onPackingProductChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
     this.setState({
@@ -300,7 +302,7 @@ class CreatePacking extends React.Component<Props, State> {
   }
 
   /**
-   * Event handler for product change 
+   * Event handler for product change
    */
   private onPackageSizeChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
     this.setState({
@@ -309,13 +311,13 @@ class CreatePacking extends React.Component<Props, State> {
   }
 
   /**
-   * Event handler for packed count change 
+   * Event handler for packed count change
    */
   private onPackedCountChange = (event: any, { value }: InputOnChangeData) => {
     const actualNumber = Number.parseInt(value) >= 0 ? Number.parseInt(value) : 0;
     this.setState({packedCount: actualNumber})
   }
-  
+
   /**
    * Event handler for packing status
    */
@@ -332,7 +334,7 @@ class CreatePacking extends React.Component<Props, State> {
   private onPackingTypeChange = (event: any, { value }: DropdownProps) => {
     this.setState({ packingType: value as PackingType });
   }
-  
+
   /**
    * Handles changing date
    */
@@ -360,7 +362,7 @@ class CreatePacking extends React.Component<Props, State> {
         return;
       }
 
-      const packingObject = type == "BASIC" ? 
+      const packingObject = type == "BASIC" ?
       {
         state: packingStatus as PackingState,
         productId: productId,
@@ -392,12 +394,12 @@ class CreatePacking extends React.Component<Props, State> {
       });
     }
   }
-  
+
 }
 
 /**
  * Redux mapper for mapping store state to component props
- * 
+ *
  * @param state store state
  */
 export function mapStateToProps(state: StoreState) {
@@ -405,10 +407,10 @@ export function mapStateToProps(state: StoreState) {
     facility: state.facility
   };
 }
-  
+
 /**
- * Redux mapper for mapping component dispatches 
- * 
+ * Redux mapper for mapping component dispatches
+ *
  * @param dispatch dispatch method
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
