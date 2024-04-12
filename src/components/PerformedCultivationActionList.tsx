@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as Keycloak from 'keycloak-js';
+import Keycloak from 'keycloak-js';
 import * as actions from "../actions";
 import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
@@ -18,7 +18,7 @@ import {
 import LocalizedUtils from "../localization/localizedutils";
 
 export interface Props {
-  keycloak?: Keycloak.KeycloakInstance;
+  keycloak?: Keycloak;
   performedCultivationActions?: PerformedCultivationAction[];
   facility: Facility;
   onPerformedCultivationActionsFound?: (performedCultivationActions: PerformedCultivationAction[]) => void,

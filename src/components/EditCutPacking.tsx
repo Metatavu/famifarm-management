@@ -1,5 +1,5 @@
 import { Facility, Printer, Product, ProductionLine } from "../generated/client";
-import { KeycloakInstance } from "keycloak-js";
+import Keycloak from "keycloak-js";
 import * as React from "react";
 import { Button, Confirm, Form, Grid, DropdownProps, Loader, Message, Select, InputOnChangeData } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
@@ -15,7 +15,7 @@ import { Dispatch } from "redux";
 import * as actions from "../actions";
 
 interface Props {
-  keycloak?: KeycloakInstance;
+  keycloak?: Keycloak;
   cutPackingId: string;
   products?: Product[];
   productionLines?: ProductionLine[];
@@ -343,7 +343,7 @@ class EditCutPacking extends React.Component<Props, State> {
    *
    * @returns data for dropdowns
    */
-  private loadDataForDropdowns = async (keycloak: KeycloakInstance): Promise<{ products: Product[], productionLines: ProductionLine[] }> => {
+  private loadDataForDropdowns = async (keycloak: Keycloak): Promise<{ products: Product[], productionLines: ProductionLine[] }> => {
     const { products, productionLines, facility, onProductsFound, onProductionLinesFound } = this.props;
 
     const dropdownsData = { products, productionLines };

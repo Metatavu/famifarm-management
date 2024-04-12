@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as Keycloak from 'keycloak-js';
+import Keycloak from 'keycloak-js';
 import * as actions from "../actions";
 import { ErrorMessage, StoreState } from "../types";
 import { connect } from "react-redux";
@@ -23,7 +23,7 @@ import {
 const DATE_FORMAT = "DD.MM.YYYY";
 
 interface Props {
-  keycloak?: Keycloak.KeycloakInstance;
+  keycloak?: Keycloak;
   seedBatch?: SeedBatch;
   facility: Facility;
   onSeedBatchCreated?: (seedBatch: SeedBatch) => void;

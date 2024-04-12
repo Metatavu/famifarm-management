@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as Keycloak from 'keycloak-js';
+import Keycloak from 'keycloak-js';
 import Api from "../api";
 import { PackageSize, Event, CultivationObservationEventData, HarvestEventData, PlantingEventData, SowingEventData, TableSpreadEventData, WastageEventData, PerformedCultivationAction, Pest, ProductionLine, SeedBatch, WastageReason, Seed, Product, Facility, HarvestBasket } from "../generated/client";
 import { Navigate } from 'react-router-dom';
@@ -33,7 +33,7 @@ import { FormContainer } from "./FormContainer";
  * Interface representing component properties
  */
 interface Props {
-  keycloak?: Keycloak.KeycloakInstance;
+  keycloak?: Keycloak;
   eventId: string;
   facility: Facility;
   onError: (error: ErrorMessage | undefined) => void;

@@ -62,9 +62,9 @@ import { Facility } from "../generated/client";
 
 export interface Props {
   authenticated: boolean,
-  keycloak?: Keycloak.KeycloakInstance,
+  keycloak?: Keycloak,
   facility: Facility,
-  onLogin?: (keycloak: Keycloak.KeycloakInstance, authenticated: boolean) => void,
+  onLogin?: (keycloak: Keycloak, authenticated: boolean) => void,
   onFacilityUpdate: (facility: Facility) => void,
   onLocaleUpdate: (locale: string) => void,
   locale: string;
@@ -89,9 +89,11 @@ class WelcomePage extends React.Component<Props, any> {
       "clientId": process.env.REACT_APP_AUTH_RESOURCE as string
     };
     const keycloak = new Keycloak(kcConf);
-    await keycloak.init({onLoad: "login-required", checkLoginIframe: false}).success((authenticated) => {
-      onLogin && onLogin(keycloak, authenticated);
-    });
+    const authenticated = await keycloak.init({onLoad: "login-required", checkLoginIframe: false})
+    
+    if (onLogin) {
+      onLogin(keycloak, authenticated);
+    }
 
     const previousFacility = window.localStorage.getItem("facility") ? (window.localStorage.getItem("facility")) as Facility || Facility.Joroinen : Facility.Joroinen;
 
@@ -539,7 +541,7 @@ export function mapStateToProps(state: StoreState) {
  */
 export function mapDispatchToProps(dispatch: Dispatch<actions.AppAction>) {
   return {
-    onLogin: (keycloak: Keycloak.KeycloakInstance, authenticated: boolean) => dispatch(actions.userLogin(keycloak, authenticated)),
+    onLogin: (keycloak: Keycloak, authenticated: boolean) => dispatch(actions.userLogin(keycloak, authenticated)),
     onFacilityUpdate: (facility: Facility) => dispatch(actions.facilityUpdate(facility)),
     onLocaleUpdate: (locale: string) => dispatch(actions.localeUpdate(locale))
   };

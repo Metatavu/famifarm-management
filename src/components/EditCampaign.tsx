@@ -1,4 +1,4 @@
-import { KeycloakInstance } from "keycloak-js";
+import Keycloak from "keycloak-js";
 import * as React from "react";
 import { StoreState, ErrorMessage } from "../types";
 import { Dispatch } from "redux";
@@ -13,7 +13,7 @@ import { FormContainer } from "./FormContainer";
 import { Navigate } from "react-router-dom";
 
 interface Props {
-  keycloak?: KeycloakInstance,
+  keycloak?: Keycloak,
   onError: (error: ErrorMessage | undefined) => void,
   campaignId: string;
   facility: Facility;

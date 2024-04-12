@@ -5,14 +5,14 @@ import * as actions from "../actions";
 import { StoreState } from "../types/index";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import { KeycloakInstance } from "keycloak-js";
+import Keycloak from "keycloak-js";
 
 
 /**
  * Interface representing component properties
  */
 interface Props {
-  keycloak?: KeycloakInstance
+  keycloak?: Keycloak
 }
 
 /**
