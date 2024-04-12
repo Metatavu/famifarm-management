@@ -1,5 +1,5 @@
 import { CutPacking, Facility, Product } from "../generated/client";
-import { KeycloakInstance } from "keycloak-js";
+import Keycloak from "keycloak-js";
 import * as React from "react";
 import Api from "../api";
 import strings from "../localization/strings";
@@ -14,7 +14,7 @@ import * as actions from "../actions";
 import { connect } from "react-redux";
 
 interface Props {
-  keycloak?: KeycloakInstance;
+  keycloak?: Keycloak;
   products?: Product[];
   facility: Facility;
   onProductsFound: typeof actions.productsFound;

@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as Keycloak from 'keycloak-js';
+import Keycloak from 'keycloak-js';
 import Api from "../api";
 import { Campaign, Facility, PackageSize, Packing, Product } from "../generated/client";
 import strings from "../localization/strings";
@@ -25,7 +25,7 @@ import { X_AXIS_TIMES } from "../constants";
  * Interface representing component properties
  */
 interface Props {
-  keycloak?: Keycloak.KeycloakInstance;
+  keycloak?: Keycloak;
   packings?: Packing[];
   products?: Product[];
   packageSizes?: PackageSize[];

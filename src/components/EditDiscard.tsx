@@ -5,7 +5,7 @@ import { StoreState, ErrorMessage } from "../types";
 import * as actions from "../actions";
 import { Product, PackageSize, StorageDiscard, Facility } from "../generated/client";
 import Api from "../api";
-import { KeycloakInstance } from "keycloak-js";
+import Keycloak from "keycloak-js";
 import strings from "../localization/strings";
 import LocalizedUtils from "../localization/localizedutils";
 import { Grid, Button, Form, Select, Input, DropdownProps, Loader, Message, Confirm, InputOnChangeData } from "semantic-ui-react";
@@ -18,7 +18,7 @@ import { Navigate } from "react-router-dom";
  * Interface representing component properties
  */
 export interface Props {
-  keycloak: KeycloakInstance,
+  keycloak: Keycloak,
   onError: (error: ErrorMessage | undefined) => void;
   discardId: string;
   facility: Facility;

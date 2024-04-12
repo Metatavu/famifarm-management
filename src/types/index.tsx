@@ -1,4 +1,4 @@
-import { KeycloakInstance } from "keycloak-js";
+import Keycloak from "keycloak-js";
 import { Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, WastageReason, Pest, Packing, Campaign, EventType, Event, StorageDiscard, Facility } from "../generated/client";
 
 export interface EventListFilters {
@@ -10,7 +10,7 @@ export interface EventListFilters {
 }
 
 export interface StoreState {
-  keycloak?: KeycloakInstance
+  keycloak?: Keycloak
   authenticated: boolean
   packings: Packing[]
   storageDiscards: StorageDiscard[]

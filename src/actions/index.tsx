@@ -1,11 +1,11 @@
 import * as constants from '../constants'
-import { KeycloakInstance } from 'keycloak-js';
+import Keycloak from 'keycloak-js';
 import { Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, WastageReason, Pest, Packing, Campaign, Event, Facility } from "../generated/client";
 import { ErrorMessage, EventListFilters } from '../types';
 
 export interface UserLogin {
   type: constants.USER_LOGIN;
-  keycloak?: KeycloakInstance;
+  keycloak?: Keycloak;
   authenticated: boolean;
 }
 
@@ -240,7 +240,7 @@ export function campaignsFound(campaigns: Campaign[]): CampaignsFound {
   }
 }
 
-export function userLogin(keycloak: KeycloakInstance, authenticated: boolean): UserLogin {
+export function userLogin(keycloak: Keycloak, authenticated: boolean): UserLogin {
   return {
     type: constants.USER_LOGIN,
     keycloak: keycloak,

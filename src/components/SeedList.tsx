@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as Keycloak from 'keycloak-js';
+import Keycloak from 'keycloak-js';
 import * as actions from "../actions";
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
@@ -18,7 +18,7 @@ import {
 import LocalizedUtils from "../localization/localizedutils";
 
 export interface Props {
-  keycloak?: Keycloak.KeycloakInstance;
+  keycloak?: Keycloak;
   seeds?: Seed[];
   onSeedsFound?: (seeds: Seed[]) => void;
   onError: (error: ErrorMessage | undefined) => void;

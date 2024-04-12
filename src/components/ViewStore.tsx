@@ -12,6 +12,7 @@ import AnimateHeight from "react-animate-height";
 import { DateTimeInput } from 'semantic-ui-calendar-react';
 import * as Moment from 'moment';
 import { extendMoment } from 'moment-range';
+import Keycloak from "keycloak-js";
 import "moment/locale/fi";
 import "moment/locale/en-gb";
 
@@ -24,7 +25,7 @@ const moment = extendMoment(Moment);
  * Interface describing component props
  */
 interface Props {
-  keycloak?: Keycloak.KeycloakInstance;
+  keycloak?: Keycloak;
   facility: Facility;
 }
 

@@ -1,5 +1,5 @@
 import { Facility, Product, ProductionLine } from "../generated/client";
-import { KeycloakInstance } from "keycloak-js";
+import Keycloak from "keycloak-js";
 import * as React from "react";
 import { Button, DropdownProps, Form, Grid, InputOnChangeData, Loader } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
@@ -15,7 +15,7 @@ import { connect } from "react-redux";
 import * as actions from "../actions";
 
 interface Props {
-  keycloak?: KeycloakInstance;
+  keycloak?: Keycloak;
   products?: Product[];
   productionLines?: ProductionLine[];
   facility: Facility;
