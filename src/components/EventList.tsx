@@ -245,43 +245,33 @@ class EventList extends React.Component<Props, State> {
    * @returns totalGutterHoleCount, totalGutterCount, totalBasketWeight, totalNumberOfBaskets
    */
   private sumEventRowValues = (events: Event[]) => {
-    const totalGutterHoleCount = events.reduce((acc, event) =>{
-      if (!(event.data as any).gutterHoleCount) return acc;
+    const result = events.reduce((acc, event) => {
+      if ((event.data as any).gutterHoleCount && (event.data as any).gutterCount) {
+        acc.totalGutterHoleCount += ((event.data as any).gutterHoleCount || 0) * ((event.data as any).gutterCount || 0);
+      }
 
-      acc += (event.data as any).gutterHoleCount || 0;
+      if ((event.data as any).gutterCount) {
+        acc.totalGutterCount += (event.data as any).gutterCount || 0;
+      }
+
+      if ((event.data as any).baskets) {
+        (event.data as any).baskets.forEach((basket: HarvestBasket) => {
+          acc.totalBasketWeight += Math.round(basket.weight * 10) / 10 || 0;
+        });
+        acc.totalNumberOfBaskets += (event.data as any).baskets.length || 0;
+      }
+
       return acc;
-    }, 0);
+    }, {
+      totalGutterHoleCount: 0,
+      totalGutterCount: 0,
+      totalBasketWeight: 0,
+      totalNumberOfBaskets: 0
+    });
 
-    const totalGutterCount = events.reduce((acc, event) =>{
-      if (!(event.data as any).gutterCount) return acc;
+    result.totalBasketWeight = Math.round(result.totalBasketWeight * 10) / 10;
 
-      acc += (event.data as any).gutterCount || 0;
-      return acc;
-    }, 0);
-
-    let totalBasketWeight = events.reduce((acc, event) => {
-      if (!(event.data as any).baskets) return acc;
-
-      (event.data as any).baskets.forEach((basket: HarvestBasket) => {
-          acc += Math.round(basket.weight * 10) / 10 || 0;
-      });
-      return acc;
-    }, 0);
-    totalBasketWeight = Math.round(totalBasketWeight * 10) / 10;
-
-    const totalNumberOfBaskets = events.reduce((acc, event) => {
-      if (!(event.data as any).baskets) return acc;
-
-      acc += (event.data as any).baskets.length || 0;
-      return acc;
-    }, 0);
-
-    return {
-      totalGutterHoleCount,
-      totalGutterCount,
-      totalBasketWeight,
-      totalNumberOfBaskets
-    }
+    return result;
   }
 
   /**
