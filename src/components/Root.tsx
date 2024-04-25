@@ -1,10 +1,10 @@
 import * as React from "react";
-import * as Keycloak from 'keycloak-js';
+import Keycloak from 'keycloak-js';
 import { Header, Icon, Grid } from 'semantic-ui-react';
 import strings from "../localization/strings";
 
 export interface Props {
-  keycloak?: Keycloak.KeycloakInstance,
+  keycloak?: Keycloak,
 }
 
 class WelcomePage extends React.Component<Props, any> {

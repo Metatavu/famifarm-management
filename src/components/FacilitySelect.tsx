@@ -6,12 +6,13 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { Facility } from "../generated/client";
 import strings from "../localization/strings";
+import Keycloak from "keycloak-js";
 
 /**
  * Interface representing component properties
  */
 interface Props {
-  keycloak?: Keycloak.KeycloakInstance;
+  keycloak?: Keycloak;
   facility: Facility;
   onFacilityChange: (facility: Facility) => void;
   onLocaleUpdate: (locale: string) => void;

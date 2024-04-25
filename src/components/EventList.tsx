@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as Keycloak from 'keycloak-js';
+import Keycloak from 'keycloak-js';
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
 import { Event, EventType, Facility, Product, ProductionLine, HarvestBasket } from "../generated/client";
@@ -27,7 +27,7 @@ import LocalizedUtils from "../localization/localizedutils";
  * Interface representing component properties
  */
 interface Props {
-  keycloak?: Keycloak.KeycloakInstance;
+  keycloak?: Keycloak;
   events: Event[];
   eventListFilters?: EventListFilters;
   products?: Product[];

@@ -5,7 +5,7 @@ import { StoreState, ErrorMessage } from "../types";
 import * as actions from "../actions";
 import { Packing, Product, PackageSize, PackingState, Printer, PackingType, Campaign, Facility } from "../generated/client";
 import Api from "../api";
-import { KeycloakInstance } from "keycloak-js";
+import Keycloak from "keycloak-js";
 import strings from "../localization/strings";
 import LocalizedUtils from "../localization/localizedutils";
 import { Grid, Button, Form, Select, Input, DropdownItemProps, DropdownProps, Loader, Message, Confirm, InputOnChangeData } from "semantic-ui-react";
@@ -15,7 +15,7 @@ import moment from "moment";
 import { Navigate } from "react-router-dom";
 
 export interface Props {
-  keycloak: KeycloakInstance;
+  keycloak: Keycloak;
   packingId: string;
   facility: Facility;
   onError: (error: ErrorMessage | undefined) => void;

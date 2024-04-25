@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as Keycloak from 'keycloak-js';
+import Keycloak from 'keycloak-js';
 import Api from "../api";
 import { Facility, LocalizedValue, Pest } from "../generated/client";
 import { Navigate } from 'react-router-dom';
@@ -21,7 +21,7 @@ import { FormContainer } from "./FormContainer";
  * Component props
  */
 interface Props {
-  keycloak?: Keycloak.KeycloakInstance;
+  keycloak?: Keycloak;
   pest?: Pest;
   facility: Facility;
   onError: (error: ErrorMessage | undefined) => void;

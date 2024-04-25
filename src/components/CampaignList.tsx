@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as Keycloak from 'keycloak-js';
+import Keycloak from 'keycloak-js';
 import Api from "../api";
 import { NavLink } from 'react-router-dom';
 import { Campaign, Facility } from "../generated/client";
@@ -21,7 +21,7 @@ import {
  * Interface representing component properties
  */
 interface Props {
-  keycloak?: Keycloak.KeycloakInstance;
+  keycloak?: Keycloak;
   facility: Facility;
   campaigns?: Campaign[];
   onCampaignsFound?: (campaigns: Campaign[]) => void;

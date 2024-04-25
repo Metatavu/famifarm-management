@@ -12,12 +12,13 @@ import LocalizedUtils from "../localization/localizedutils";
 import moment from "moment";
 import Api from "../api";
 import { Navigate } from "react-router-dom";
+import Keycloak from "keycloak-js";
 
 /**
  * Interface representing component properties
  */
 export interface Props {
-  keycloak?: Keycloak.KeycloakInstance;
+  keycloak?: Keycloak;
   facility: Facility;
   onPackingCreated?: (packing: Packing) => void;
   onError: (error: ErrorMessage | undefined) => void;
