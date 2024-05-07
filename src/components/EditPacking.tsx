@@ -3,12 +3,12 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { StoreState, ErrorMessage } from "../types";
 import * as actions from "../actions";
-import { Packing, Product, PackageSize, PackingState, Printer, PackingType, Campaign, Facility } from "../generated/client";
+import { Packing, Product, PackageSize, PackingState, Printer, PackingType, Campaign, Facility, PackingVerificationWeighing, PackingUsedBasket } from "../generated/client";
 import Api from "../api";
 import Keycloak from "keycloak-js";
 import strings from "../localization/strings";
 import LocalizedUtils from "../localization/localizedutils";
-import { Grid, Button, Form, Select, Input, DropdownItemProps, DropdownProps, Loader, Message, Confirm, InputOnChangeData } from "semantic-ui-react";
+import { Grid, Button, Form, Select, Input, DropdownItemProps, DropdownProps, Loader, Message, Confirm, InputOnChangeData, TextAreaProps } from "semantic-ui-react";
 import { FormContainer } from "./FormContainer";
 import { DateTimeInput } from 'semantic-ui-calendar-react';
 import moment from "moment";
@@ -42,7 +42,12 @@ export interface State {
   campaignId?: string,
   packingType?: PackingType,
   campaigns: Campaign[],
-  campaignName?: string
+  campaignName?: string,
+  startTime?: Date,
+  endTime?: Date,
+  additionalInformation?: string,
+  verificationWeightings?: Array<PackingVerificationWeighing>,
+  basketsUsed?: Array<PackingUsedBasket>
 }
 
 class EditPacking extends React.Component<Props, State> {
@@ -63,7 +68,12 @@ class EditPacking extends React.Component<Props, State> {
       printers: [],
       printing: false,
       refreshingPrinters: false,
-      campaigns: []
+      campaigns: [],
+      startTime: new Date(),
+      endTime: new Date(),
+      additionalInformation: "",
+      verificationWeightings: [],
+      basketsUsed: []
     }
     this.handleSubmit = this.handleSubmit.bind(this);
 }
@@ -90,6 +100,12 @@ class EditPacking extends React.Component<Props, State> {
 
       const packingStatus = packing.state;
       const date = packing.time;
+
+      const startTime = packing.startTime;
+      const endTime = packing.endTime;
+      const additionalInformation = packing.additionalInformation;
+      const verificationWeightings = packing.verificationWeightings;
+      const basketsUsed = packing.basketsUsed;
 
       if (!packing) {
         throw new Error("Could not find packing");
@@ -127,7 +143,12 @@ class EditPacking extends React.Component<Props, State> {
           packageSizeId: packing.packageSizeId,
           loading: false,
           campaigns,
-          packingType: PackingType.Basic
+          packingType: PackingType.Basic,
+          startTime,
+          endTime,
+          additionalInformation,
+          verificationWeightings,
+          basketsUsed
         });
       }
 
@@ -269,6 +290,57 @@ class EditPacking extends React.Component<Props, State> {
                     value={ moment(this.state.date).format("DD.MM.YYYY HH:mm") }
                   />
                 </Form.Field>
+                  {this.props.facility === Facility.Juva &&
+                    <>
+                      <label style={{ fontWeight: 700}}>{strings.verificationWeighings}</label>
+                      <Form.Field className="packing-list-container">
+                          {this.state.verificationWeightings?.map(weighing =>
+                            <div
+                              style={{
+                                display: "flex",
+                                flexDirection: "row",
+                                alignItems: "center"
+                              }}
+                            >
+                              {strings.formatString(strings.verificationWeighingRow, String(weighing.weight), moment(weighing.time).format("DD.MM.YYYY HH:mm"))}
+                            </div>)}
+                      </ Form.Field>
+                      <label style={{ fontWeight: 700}}>{strings.basketsUsed}</label>
+                      <Form.Field className="packing-list-container">
+                          {this.state.basketsUsed?.map(basket =>
+                            <div
+                              style={{
+                                display: "flex",
+                                flexDirection: "row",
+                                alignItems: "center"
+                              }}
+                            >
+                              {strings.formatString(strings.usedBasketRow, this.getProductName(basket.productId), String(basket.basketCount))}
+                            </div>)}
+                      </Form.Field>
+                      <Form.Field>
+                        <label>{strings.labelStartTime}</label>
+                        <DateTimeInput
+                          localization="fi-FI"
+                          dateFormat="DD.MM.YYYY HH:mm"
+                          onChange={ this.onChangeStartTime }
+                          name="date"
+                          value={ moment(this.state.startTime).format("DD.MM.YYYY HH:mm") }
+                        />
+                      </Form.Field>
+                      <Form.Field>
+                        <label>{strings.labelEndTime}</label>
+                        <DateTimeInput
+                          localization="fi-FI"
+                          dateFormat="DD.MM.YYYY HH:mm"
+                          onChange={ this.onChangeEndTime }
+                          name="date"
+                          value={ moment(this.state.endTime).format("DD.MM.YYYY HH:mm") }
+                        />
+                      </Form.Field>
+                      <Form.TextArea label={strings.labelAdditionalInformation} onChange={this.onChangeAdditionalInformation} name="additionalInformation" value={this.state.additionalInformation} />
+                    </>
+                  }
                 <Message
                   success
                   visible={ this.state.messageVisible }
@@ -349,7 +421,7 @@ class EditPacking extends React.Component<Props, State> {
 
         <Grid.Row className="content-page-header-row">
           <Grid.Column width={8}>
-             <h2>{ strings.printPacking }</h2>
+            <h2>{ strings.printPacking }</h2>
           </Grid.Column>
         </Grid.Row>
 
@@ -413,6 +485,17 @@ class EditPacking extends React.Component<Props, State> {
   }
 
   /**
+   * Returns a products name
+   *
+   */
+  private getProductName = (productId: string) => {
+    const { products } = this.state;
+    const product = (products || []).find(product => product.id === productId);
+
+    return product ? LocalizedUtils.getLocalizedValue(product.name) : "";
+  }
+
+  /**
    * Returns a text for a campaign packing list entry
    *
    * @param packing packing
@@ -438,10 +521,10 @@ class EditPacking extends React.Component<Props, State> {
     });
   }
 
-   /**
+  /**
     * @summary Handles updating printers
     */
-   private onPrinterChange = (event: any, { value }: DropdownProps) => {
+  private onPrinterChange = (event: any, { value }: DropdownProps) => {
     this.setState({ selectedPrinter: this.state.printers.find(printer => printer.id == value)! });
   }
 
@@ -507,7 +590,7 @@ class EditPacking extends React.Component<Props, State> {
   /**
     * Event handler for product change
     */
-   private onPackageSizeChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+  private onPackageSizeChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
     this.setState({
       packageSizeId: data.value as string
     });
@@ -529,10 +612,31 @@ class EditPacking extends React.Component<Props, State> {
   }
 
   /**
-    * Handles changing date
-    */
-    private onChangeDate = (e: any, { value }: DropdownProps) => {
-      this.setState({date: moment(value as any, "DD.MM.YYYY HH:mm").toDate()});
+  * Handles changing date
+  */
+  private onChangeDate = (e: any, { value }: DropdownProps) => {
+    this.setState({date: moment(value as any, "DD.MM.YYYY HH:mm").toDate()});
+  }
+
+  /**
+  * Handles changing startTime
+  */
+  private onChangeStartTime = (e: any, { value }: DropdownProps) => {
+    this.setState({startTime: moment(value as any, "DD.MM.YYYY HH:mm").toDate()});
+  }
+
+  /**
+  * Handles changing endTime
+  */
+  private onChangeEndTime = (e: any, { value }: DropdownProps) => {
+    this.setState({endTime: moment(value as any, "DD.MM.YYYY HH:mm").toDate()});
+  }
+
+  /**
+  * Handles changing additional information
+  */
+  private onChangeAdditionalInformation = (e: any, { value }: TextAreaProps) => {
+    this.setState({additionalInformation: value as string});
   }
 
   /**
@@ -540,7 +644,7 @@ class EditPacking extends React.Component<Props, State> {
    */
   private handleSubmit = async () => {
     const { keycloak, facility, onError } = this.props;
-    const { packing, productId, campaignId, packageSizeId, packedCount, packingStatus, date, packingType } = this.state;
+    const { packing, productId, campaignId, packageSizeId, packedCount, packingStatus, date, packingType, startTime, endTime, additionalInformation, verificationWeightings, basketsUsed } = this.state;
     try {
       const type = packingType;
 
@@ -569,7 +673,12 @@ class EditPacking extends React.Component<Props, State> {
         packedCount: packedCount,
         packageSizeId: packageSizeId,
         state: packingStatus,
-        type
+        type,
+        startTime,
+        endTime,
+        additionalInformation,
+        verificationWeightings,
+        basketsUsed
       }
 
       if (!updatedPacking.id) {

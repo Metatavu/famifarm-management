@@ -32,8 +32,8 @@
 .content-card {
   margin: 10px !important;
   height: 100px;
-  background-color: #fff !important; 
-  display: flex; 
+  background-color: #fff !important;
+  display: flex;
   flex-direction: column;
   justify-content: center;
 }
@@ -42,4 +42,10 @@
   color: #2DA457 !important;
   font-size: 30px !important;
   text-align: center;
+}
+
+.packing-list-container {
+  background-color: #fff;
+  padding: 10px !important;
+  border-radius: 3px;
 }
