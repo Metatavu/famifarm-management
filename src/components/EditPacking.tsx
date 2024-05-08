@@ -489,6 +489,7 @@ class EditPacking extends React.Component<Props, State> {
   /**
    * Returns a products name
    *
+   * @param productId string
    */
   private getProductName = (productId: string) => {
     const { products } = this.state;
