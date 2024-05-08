@@ -231,136 +231,186 @@ class EditPacking extends React.Component<Props, State> {
     });
 
     return (
-      <>
-        <Grid>
-          <Grid.Row className="content-page-header-row">
-            <Grid.Column width={8}>
-              <h2>{strings.editPacking}</h2>
-            </Grid.Column>
-          </Grid.Row>
-          <Grid.Row>
-            <Grid.Column width={8}>
-              {this.state.packingType == "BASIC" &&
-                <FormContainer>
-                  <Form.Field required>
-                    <label>{strings.product}</label>
-                    <Select
-                      options={productOptions}
-                      value={this.state.productId}
-                      onChange={this.onPackingProductChange} />
-                  </Form.Field>
-                  <Form.Field required>
-                    <label>{strings.packageSize}</label>
-                    <Select
-                      options={packageSizeOptions}
-                      value={this.state.packageSizeId}
-                      onChange={this.onPackageSizeChange} />
-                  </Form.Field>
-                  <Form.Field required>
-                    <label>{strings.packingStatus}</label>
-                    <Select
-                      options={[
-                        { value: "IN_STORE", text: strings.packingStoreStatus },
-                        { value: "REMOVED", text: strings.packingRemovedStatus },
-                        { value: "WASTAGE", text: strings.packingWastageStatus }
-                      ]}
-                      text={this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus}
-                      value={this.state.packingStatus}
-                      onChange={this.onStatusChange} />
-                  </Form.Field>
+      <Grid>
+        <Grid.Row className="content-page-header-row">
+          <Grid.Column width={8}>
+            <h2>{strings.editPacking}</h2>
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row>
+          <Grid.Column width={8}>
+            {this.state.packingType == "BASIC" &&
+              <FormContainer>
+                <Form.Field required>
+                  <label>{strings.product}</label>
+                  <Select
+                    options={productOptions}
+                    value={this.state.productId}
+                    onChange={this.onPackingProductChange} />
+                </Form.Field>
+                <Form.Field required>
+                  <label>{strings.packageSize}</label>
+                  <Select
+                    options={packageSizeOptions}
+                    value={this.state.packageSizeId}
+                    onChange={this.onPackageSizeChange} />
+                </Form.Field>
+                <Form.Field required>
+                  <label>{strings.packingStatus}</label>
+                  <Select
+                    options={[
+                      { value: "IN_STORE", text: strings.packingStoreStatus },
+                      { value: "REMOVED", text: strings.packingRemovedStatus },
+                      { value: "WASTAGE", text: strings.packingWastageStatus }
+                    ]}
+                    text={this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus}
+                    value={this.state.packingStatus}
+                    onChange={this.onStatusChange} />
+                </Form.Field>
+                <Form.Field>
+                  <label>{strings.labelPackedCount}</label>
+                  <Input
+                    type="number"
+                    value={this.state.packedCount}
+                    onChange={this.onPackedCountChange} />
+                </Form.Field>
+                <Form.Field>
+                  <DateTimeInput
+                    localization="fi-FI"
+                    dateFormat="DD.MM.YYYY HH:mm"
+                    onChange={this.onChangeDate}
+                    name="date"
+                    value={moment(this.state.date).format("DD.MM.YYYY HH:mm")} />
+                </Form.Field>
+                {this.props.facility === Facility.Juva && !!this.state.verificationWeightings?.length &&
+                  <>
+                    <label style={{ fontWeight: 700 }}>{strings.verificationWeighings}</label>
+                    <List as="ul">
+                      {this.state.verificationWeightings?.map((weighing, index) => <ListItem
+                        key={index}
+                        as="li"
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center"
+                        }}
+                      >
+                        <ListContent style={{ marginRight: "10px" }}>
+                          <span style={{ fontWeight: "bold" }}>
+                            {strings.verificationWeighingWeight}
+                          </span>
+                          {weighing.weight}
+                        </ListContent>
+                        <ListContent>
+                          <span style={{ fontWeight: "bold" }}>
+                            {strings.verificationWeighingTime}
+                          </span>
+                          {moment(weighing.time).format("DD.MM.YYYY HH:mm")}
+                        </ListContent>
+                      </ListItem>)}
+                    </List>
+                  </>}
+                {this.props.facility === Facility.Juva && !!this.state.basketsUsed?.length &&
+                  <>
+                    <label style={{ fontWeight: 700 }}>{strings.basketsUsed}</label>
+                    <List as="ul">
+                      {this.state.basketsUsed?.map((basket, index) => <ListItem
+                        key={index}
+                        as="li"
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center"
+                        }}
+                      >
+                        <ListContent style={{ marginRight: "10px" }}>
+                          <span style={{ fontWeight: "bold" }}>
+                            {strings.usedBasketProductName}
+                          </span>
+                          {this.getProductName(basket.productId)}
+                        </ListContent>
+                        <ListContent>
+                          <span style={{ fontWeight: "bold" }}>
+                            {strings.usedBasketBasketCount}
+                          </span>
+                          {basket.basketCount}
+                        </ListContent>
+                      </ListItem>)}
+                    </List>
+                  </>}
+                {this.props.facility === Facility.Juva &&
+                <>
                   <Form.Field>
-                    <label>{strings.labelPackedCount}</label>
-                    <Input
-                      type="number"
-                      value={this.state.packedCount}
-                      onChange={this.onPackedCountChange} />
-                  </Form.Field>
-                  <Form.Field>
+                    <label>{strings.labelStartTime}</label>
                     <DateTimeInput
                       localization="fi-FI"
                       dateFormat="DD.MM.YYYY HH:mm"
-                      onChange={this.onChangeDate}
+                      onChange={this.onChangeStartTime}
                       name="date"
-                      value={moment(this.state.date).format("DD.MM.YYYY HH:mm")} />
-                  </Form.Field>
-                  {this.props.facility === Facility.Juva && !!this.state.verificationWeightings?.length &&
-                    <>
-                      <label style={{ fontWeight: 700 }}>{strings.verificationWeighings}</label>
-                      <List as="ul">
-                        {this.state.verificationWeightings?.map((weighing, index) => <ListItem
-                          as="li"
-                          style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            alignItems: "center"
-                          }}
-                        >
-                          <ListContent style={{ marginRight: "10px" }}>
-                            <span style={{ fontWeight: "bold" }}>
-                              {strings.verificationWeighingWeight}
-                            </span>
-                            {weighing.weight}
-                          </ListContent>
-                          <ListContent>
-                            <span style={{ fontWeight: "bold" }}>
-                              {strings.verificationWeighingTime}
-                            </span>
-                            {moment(weighing.time).format("DD.MM.YYYY HH:mm")}
-                          </ListContent>
-                        </ListItem>)}
-                      </List>
-                    </>}
-                  {this.props.facility === Facility.Juva && !!this.state.basketsUsed?.length &&
-                    <>
-                      <label style={{ fontWeight: 700 }}>{strings.basketsUsed}</label>
-                      <List as="ul">
-                        {this.state.basketsUsed?.map(basket => <ListItem
-                          as="li"
-                          style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            alignItems: "center"
-                          }}
-                        >
-                          <ListContent style={{ marginRight: "10px" }}>
-                            <span style={{ fontWeight: "bold" }}>
-                              {strings.usedBasketProductName}
-                            </span>
-                            {this.getProductName(basket.productId)}
-                          </ListContent>
-                          <ListContent>
-                            <span style={{ fontWeight: "bold" }}>
-                              {strings.usedBasketBasketCount}
-                            </span>
-                            {basket.basketCount}
-                          </ListContent>
-                        </ListItem>)}
-                      </List>
-                    </>}
-                  {this.props.facility === Facility.Juva &&
-                  <>
-                    <Form.Field>
-                      <label>{strings.labelStartTime}</label>
-                      <DateTimeInput
-                        localization="fi-FI"
-                        dateFormat="DD.MM.YYYY HH:mm"
-                        onChange={this.onChangeStartTime}
-                        name="date"
-                        value={this.state.startTime ? moment(this.state.startTime).format("DD.MM.YYYY HH:mm") : ""}
+                      value={this.state.startTime ? moment(this.state.startTime).format("DD.MM.YYYY HH:mm") : ""}
 
-                      />
-                    </Form.Field>
-                    <Form.Field>
-                      <label>{strings.labelEndTime}</label>
-                      <DateTimeInput
-                        localization="fi-FI"
-                        dateFormat="DD.MM.YYYY HH:mm"
-                        onChange={this.onChangeEndTime}
-                        name="date"
-                        value={this.state.endTime ? moment(this.state.endTime).format("DD.MM.YYYY HH:mm") : ""} />
-                    </Form.Field>
-                    <Form.TextArea label={strings.labelAdditionalInformation} onChange={this.onChangeAdditionalInformation} name="additionalInformation" value={this.state.additionalInformation} />
-                </>}
+                    />
+                  </Form.Field>
+                  <Form.Field>
+                    <label>{strings.labelEndTime}</label>
+                    <DateTimeInput
+                      localization="fi-FI"
+                      dateFormat="DD.MM.YYYY HH:mm"
+                      onChange={this.onChangeEndTime}
+                      name="date"
+                      value={this.state.endTime ? moment(this.state.endTime).format("DD.MM.YYYY HH:mm") : ""} />
+                  </Form.Field>
+                  <Form.TextArea label={strings.labelAdditionalInformation} onChange={this.onChangeAdditionalInformation} name="additionalInformation" value={this.state.additionalInformation} />
+              </>}
+            <Message
+              success
+              visible={this.state.messageVisible}
+              header={strings.savedSuccessfully} />
+            <Button
+              className="submit-button"
+              onClick={this.handleSubmit}
+              type='submit'
+            >
+              {strings.save}
+            </Button>
+            <Button
+              className="danger-button"
+              onClick={() => this.setState({ confirmOpen: true })}
+            >
+              {strings.delete}
+            </Button>
+          </FormContainer>
+          }
+
+          {this.state.packingType == "CAMPAIGN" &&
+            <FormContainer>
+              <Form.Field required>
+                <label>{strings.campaign}</label>
+                <Select
+                  options={campaignOptions}
+                  value={this.state.campaignId}
+                  onChange={this.onPackingCampaignChange} />
+              </Form.Field>
+              <Form.Field required>
+                <label>{strings.packingStatus}</label>
+                <Select
+                  options={[
+                    { value: "IN_STORE", text: strings.packingStoreStatus },
+                    { value: "REMOVED", text: strings.packingRemovedStatus },
+                    { value: "WASTAGE", text: strings.packingWastageStatus }
+                  ]}
+                  text={this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus}
+                  value={this.state.packingStatus}
+                  onChange={this.onStatusChange} />
+              </Form.Field>
+              <Form.Field>
+                <DateTimeInput
+                  localization="fi-FI"
+                  dateFormat="DD.MM.YYYY HH:mm"
+                  onChange={this.onChangeDate}
+                  name="date"
+                  value={moment(this.state.date).format("DD.MM.YYYY HH:mm")} />
+              </Form.Field>
               <Message
                 success
                 visible={this.state.messageVisible}
@@ -378,82 +428,32 @@ class EditPacking extends React.Component<Props, State> {
               >
                 {strings.delete}
               </Button>
-            </FormContainer>
-            }
-
-            {this.state.packingType == "CAMPAIGN" &&
-              <FormContainer>
-                <Form.Field required>
-                  <label>{strings.campaign}</label>
-                  <Select
-                    options={campaignOptions}
-                    value={this.state.campaignId}
-                    onChange={this.onPackingCampaignChange} />
-                </Form.Field>
-                <Form.Field required>
-                  <label>{strings.packingStatus}</label>
-                  <Select
-                    options={[
-                      { value: "IN_STORE", text: strings.packingStoreStatus },
-                      { value: "REMOVED", text: strings.packingRemovedStatus },
-                      { value: "WASTAGE", text: strings.packingWastageStatus }
-                    ]}
-                    text={this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus}
-                    value={this.state.packingStatus}
-                    onChange={this.onStatusChange} />
-                </Form.Field>
-                <Form.Field>
-                  <DateTimeInput
-                    localization="fi-FI"
-                    dateFormat="DD.MM.YYYY HH:mm"
-                    onChange={this.onChangeDate}
-                    name="date"
-                    value={moment(this.state.date).format("DD.MM.YYYY HH:mm")} />
-                </Form.Field>
-                <Message
-                  success
-                  visible={this.state.messageVisible}
-                  header={strings.savedSuccessfully} />
-                <Button
-                  className="submit-button"
-                  onClick={this.handleSubmit}
-                  type='submit'
-                >
-                  {strings.save}
-                </Button>
-                <Button
-                  className="danger-button"
-                  onClick={() => this.setState({ confirmOpen: true })}
-                >
-                  {strings.delete}
-                </Button>
-              </FormContainer>}
+            </FormContainer>}
+        </Grid.Column>
+      </Grid.Row><Grid.Row className="content-page-header-row">
+          <Grid.Column width={8}>
+            <h2>{strings.printPacking}</h2>
           </Grid.Column>
-        </Grid.Row><Grid.Row className="content-page-header-row">
-            <Grid.Column width={8}>
-              <h2>{strings.printPacking}</h2>
-            </Grid.Column>
-          </Grid.Row><Grid.Row>
-            <Grid.Column width={8}>
-              <Select
-                options={printers}
-                text={this.state.selectedPrinter ? this.state.selectedPrinter.name : strings.selectPrinter}
-                value={this.state.selectedPrinter ? this.state.selectedPrinter.id : undefined}
-                onChange={this.onPrinterChange} />
-              <Button style={{ marginLeft: 10 }} loading={this.state.refreshingPrinters} className="submit-button" onClick={this.refreshPrinters} type='submit'>{strings.update}</Button>
-            </Grid.Column>
-          </Grid.Row><Grid.Row>
-            <Grid.Column width={8}>
-              <Button disabled={this.state.printing} loading={this.state.printing} className="submit-button" onClick={this.print} type='submit'>{strings.print}</Button>
-            </Grid.Column>
-          </Grid.Row><Confirm
-            open={this.state.confirmOpen}
-            size="mini"
-            content={this.getDeleteConfirmationText()}
-            onCancel={() => this.setState({ confirmOpen: false })}
-            onConfirm={this.handleDelete} />
-        </Grid>
-      </>
+        </Grid.Row><Grid.Row>
+          <Grid.Column width={8}>
+            <Select
+              options={printers}
+              text={this.state.selectedPrinter ? this.state.selectedPrinter.name : strings.selectPrinter}
+              value={this.state.selectedPrinter ? this.state.selectedPrinter.id : undefined}
+              onChange={this.onPrinterChange} />
+            <Button style={{ marginLeft: 10 }} loading={this.state.refreshingPrinters} className="submit-button" onClick={this.refreshPrinters} type='submit'>{strings.update}</Button>
+          </Grid.Column>
+        </Grid.Row><Grid.Row>
+          <Grid.Column width={8}>
+            <Button disabled={this.state.printing} loading={this.state.printing} className="submit-button" onClick={this.print} type='submit'>{strings.print}</Button>
+          </Grid.Column>
+        </Grid.Row><Confirm
+          open={this.state.confirmOpen}
+          size="mini"
+          content={this.getDeleteConfirmationText()}
+          onCancel={() => this.setState({ confirmOpen: false })}
+          onConfirm={this.handleDelete} />
+      </Grid>
     )
   }
 
