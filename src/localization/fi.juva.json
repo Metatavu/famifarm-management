@@ -6,8 +6,10 @@
   "labelGutterCount": "Pöytien määrä",
   "gutterCount": "Pöytien määrä",
   "gutterHoleCount": "Pöytien kennomäärä",
-  "verificationWeighingRow": "Paino: {0}g Aika: {1}",
-  "usedBasketRow": "Tuotteen nimi: {0} Ostoskorimäärä: {1}",
+  "verificationWeighingWeight": "Paino (g): ",
+  "verificationWeighingTime": "Aika: ",
+  "usedBasketProductName": "Tuotteen nimi: ",
+  "usedBasketBasketCount": "Korien määrä: ",
   "verificationWeighings": "Varmistuspainot",
   "basketsUsed": "Käytetyt korit"
 }

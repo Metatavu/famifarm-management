@@ -6,8 +6,10 @@
   "labelGutterCount": "Table count",
   "gutterCount": "Table count",
   "gutterHoleCount": "Table tray count",
-  "verificationWeighingRow": "Weight: {0}g Time: {1}",
-  "usedBasketRow": "Product name: {0} Basket count: {1}",
+  "verificationWeighingWeight": "Weight (g): ",
+  "verificationWeighingTime": "Time: ",
+  "usedBasketProductName": "Product name: ",
+  "usedbasketBasketCount": "Basket count: ",
   "verificationWeighings": "Verification weighings",
   "basketsUsed": "Baskets used"
 }
