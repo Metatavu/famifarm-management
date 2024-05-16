@@ -32,8 +32,8 @@
 .content-card {
   margin: 10px !important;
   height: 100px;
-  background-color: #fff !important; 
-  display: flex; 
+  background-color: #fff !important;
+  display: flex;
   flex-direction: column;
   justify-content: center;
 }

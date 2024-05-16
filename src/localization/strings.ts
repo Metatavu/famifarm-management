@@ -275,6 +275,12 @@ export interface IStrings extends LocalizedStringsMethods {
   isEndProduct: string;
   isRawMaterial: string;
   salesWeight: string;
+  verificationWeighingWeight: string;
+  verificationWeighingTime: string;
+  usedBasketProductName: string;
+  usedBasketBasketCount: string;
+  verificationWeighings: string;
+  basketsUsed: string;
 }
 
 const strings: IStrings = new LocalizedStrings({

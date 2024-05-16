@@ -3,12 +3,12 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { StoreState, ErrorMessage } from "../types";
 import * as actions from "../actions";
-import { Packing, Product, PackageSize, PackingState, Printer, PackingType, Campaign, Facility } from "../generated/client";
+import { Packing, Product, PackageSize, PackingState, Printer, PackingType, Campaign, Facility, PackingVerificationWeighing, PackingUsedBasket } from "../generated/client";
 import Api from "../api";
 import Keycloak from "keycloak-js";
 import strings from "../localization/strings";
 import LocalizedUtils from "../localization/localizedutils";
-import { Grid, Button, Form, Select, Input, DropdownItemProps, DropdownProps, Loader, Message, Confirm, InputOnChangeData } from "semantic-ui-react";
+import { Grid, Button, Form, Select, Input, DropdownItemProps, DropdownProps, Loader, Message, Confirm, InputOnChangeData, TextAreaProps, List, ListItem, ListContent } from "semantic-ui-react";
 import { FormContainer } from "./FormContainer";
 import { DateTimeInput } from 'semantic-ui-calendar-react';
 import moment from "moment";
@@ -42,7 +42,12 @@ export interface State {
   campaignId?: string,
   packingType?: PackingType,
   campaigns: Campaign[],
-  campaignName?: string
+  campaignName?: string,
+  startTime?: Date,
+  endTime?: Date,
+  additionalInformation?: string,
+  verificationWeightings?: Array<PackingVerificationWeighing>,
+  basketsUsed?: Array<PackingUsedBasket>
 }
 
 class EditPacking extends React.Component<Props, State> {
@@ -63,7 +68,10 @@ class EditPacking extends React.Component<Props, State> {
       printers: [],
       printing: false,
       refreshingPrinters: false,
-      campaigns: []
+      campaigns: [],
+      additionalInformation: "",
+      verificationWeightings: [],
+      basketsUsed: []
     }
     this.handleSubmit = this.handleSubmit.bind(this);
 }
@@ -90,6 +98,12 @@ class EditPacking extends React.Component<Props, State> {
 
       const packingStatus = packing.state;
       const date = packing.time;
+
+      const startTime = packing.startTime;
+      const endTime = packing.endTime;
+      const additionalInformation = packing.additionalInformation;
+      const verificationWeightings = packing.verificationWeightings;
+      const basketsUsed = packing.basketsUsed;
 
       if (!packing) {
         throw new Error("Could not find packing");
@@ -127,7 +141,12 @@ class EditPacking extends React.Component<Props, State> {
           packageSizeId: packing.packageSizeId,
           loading: false,
           campaigns,
-          packingType: PackingType.Basic
+          packingType: PackingType.Basic,
+          startTime,
+          endTime,
+          additionalInformation,
+          verificationWeightings,
+          basketsUsed
         });
       }
 
@@ -214,171 +233,226 @@ class EditPacking extends React.Component<Props, State> {
     return (
       <Grid>
         <Grid.Row className="content-page-header-row">
-        <Grid.Column width={8}>
+          <Grid.Column width={8}>
             <h2>{strings.editPacking}</h2>
-        </Grid.Column>
+          </Grid.Column>
         </Grid.Row>
         <Grid.Row>
-            <Grid.Column width={8}>
-            {
-              this.state.packingType == "BASIC" &&
+          <Grid.Column width={8}>
+            {this.state.packingType == "BASIC" &&
               <FormContainer>
                 <Form.Field required>
-                  <label>{ strings.product }</label>
+                  <label>{strings.product}</label>
                   <Select
-                    options={ productOptions }
-                    value={ this.state.productId }
-                    onChange={ this.onPackingProductChange }
-                  />
+                    options={productOptions}
+                    value={this.state.productId}
+                    onChange={this.onPackingProductChange} />
                 </Form.Field>
                 <Form.Field required>
-                  <label>{ strings.packageSize }</label>
+                  <label>{strings.packageSize}</label>
                   <Select
-                    options={ packageSizeOptions }
-                    value={ this.state.packageSizeId }
-                    onChange={ this.onPackageSizeChange }
-                  />
+                    options={packageSizeOptions}
+                    value={this.state.packageSizeId}
+                    onChange={this.onPackageSizeChange} />
                 </Form.Field>
                 <Form.Field required>
-                  <label>{ strings.packingStatus }</label>
+                  <label>{strings.packingStatus}</label>
                   <Select
                     options={[
-                      { value:"IN_STORE", text: strings.packingStoreStatus },
+                      { value: "IN_STORE", text: strings.packingStoreStatus },
                       { value: "REMOVED", text: strings.packingRemovedStatus },
                       { value: "WASTAGE", text: strings.packingWastageStatus }
                     ]}
-                    text={ this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus }
-                    value={ this.state.packingStatus }
-                    onChange={ this.onStatusChange }
-                  />
+                    text={this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus}
+                    value={this.state.packingStatus}
+                    onChange={this.onStatusChange} />
                 </Form.Field>
                 <Form.Field>
-                  <label>{ strings.labelPackedCount }</label>
+                  <label>{strings.labelPackedCount}</label>
                   <Input
                     type="number"
-                    value={ this.state.packedCount }
-                    onChange={ this.onPackedCountChange }
-                  />
+                    value={this.state.packedCount}
+                    onChange={this.onPackedCountChange} />
                 </Form.Field>
                 <Form.Field>
                   <DateTimeInput
                     localization="fi-FI"
                     dateFormat="DD.MM.YYYY HH:mm"
-                    onChange={ this.onChangeDate }
+                    onChange={this.onChangeDate}
                     name="date"
-                    value={ moment(this.state.date).format("DD.MM.YYYY HH:mm") }
-                  />
+                    value={moment(this.state.date).format("DD.MM.YYYY HH:mm")} />
                 </Form.Field>
-                <Message
-                  success
-                  visible={ this.state.messageVisible }
-                  header={ strings.savedSuccessfully }
-                />
-                <Button
-                  className="submit-button"
-                  onClick={ this.handleSubmit }
-                  type='submit'
-                >
-                  { strings.save }
-                </Button>
-                <Button
-                  className="danger-button"
-                  onClick={ () => this.setState({ confirmOpen: true }) }
-                >
-                  { strings.delete }
-                </Button>
-              </FormContainer>
-            }
+                {this.props.facility === Facility.Juva && !!this.state.verificationWeightings?.length &&
+                  <>
+                    <label style={{ fontWeight: 700 }}>{strings.verificationWeighings}</label>
+                    <List as="ul">
+                      {this.state.verificationWeightings?.map((weighing, index) => <ListItem
+                        key={index}
+                        as="li"
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center"
+                        }}
+                      >
+                        <ListContent style={{ marginRight: "10px" }}>
+                          <span style={{ fontWeight: "bold" }}>
+                            {strings.verificationWeighingWeight}
+                          </span>
+                          {weighing.weight}
+                        </ListContent>
+                        <ListContent>
+                          <span style={{ fontWeight: "bold" }}>
+                            {strings.verificationWeighingTime}
+                          </span>
+                          {moment(weighing.time).format("DD.MM.YYYY HH:mm")}
+                        </ListContent>
+                      </ListItem>)}
+                    </List>
+                  </>}
+                {this.props.facility === Facility.Juva && !!this.state.basketsUsed?.length &&
+                  <>
+                    <label style={{ fontWeight: 700 }}>{strings.basketsUsed}</label>
+                    <List as="ul">
+                      {this.state.basketsUsed?.map((basket, index) => <ListItem
+                        key={index}
+                        as="li"
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center"
+                        }}
+                      >
+                        <ListContent style={{ marginRight: "10px" }}>
+                          <span style={{ fontWeight: "bold" }}>
+                            {strings.usedBasketProductName}
+                          </span>
+                          {this.getProductName(basket.productId)}
+                        </ListContent>
+                        <ListContent>
+                          <span style={{ fontWeight: "bold" }}>
+                            {strings.usedBasketBasketCount}
+                          </span>
+                          {basket.basketCount}
+                        </ListContent>
+                      </ListItem>)}
+                    </List>
+                  </>}
+                {this.props.facility === Facility.Juva &&
+                <>
+                  <Form.Field>
+                    <label>{strings.labelStartTime}</label>
+                    <DateTimeInput
+                      localization="fi-FI"
+                      dateFormat="DD.MM.YYYY HH:mm"
+                      onChange={this.onChangeStartTime}
+                      name="date"
+                      value={this.state.startTime ? moment(this.state.startTime).format("DD.MM.YYYY HH:mm") : ""}
 
-            {
-              this.state.packingType == "CAMPAIGN" &&
-              <FormContainer>
-                <Form.Field required>
-                  <label>{ strings.campaign }</label>
-                  <Select
-                    options={ campaignOptions }
-                    value={ this.state.campaignId }
-                    onChange={ this.onPackingCampaignChange }
-                  />
-                </Form.Field>
-                <Form.Field required>
-                  <label>{ strings.packingStatus }</label>
-                  <Select
-                    options={[
-                      { value:"IN_STORE", text: strings.packingStoreStatus },
-                      { value: "REMOVED", text: strings.packingRemovedStatus },
-                      { value: "WASTAGE", text: strings.packingWastageStatus }
-                    ]}
-                    text={ this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus }
-                    value={ this.state.packingStatus }
-                    onChange={ this.onStatusChange }
-                  />
-                </Form.Field>
-                <Form.Field>
-                  <DateTimeInput
-                    localization="fi-FI"
-                    dateFormat="DD.MM.YYYY HH:mm"
-                    onChange={ this.onChangeDate }
-                    name="date"
-                    value={ moment(this.state.date).format("DD.MM.YYYY HH:mm") }
-                  />
-                </Form.Field>
-                <Message
-                  success
-                  visible={ this.state.messageVisible }
-                  header={ strings.savedSuccessfully }
-                />
-                <Button
-                  className="submit-button"
-                  onClick={ this.handleSubmit }
-                  type='submit'
-                >
-                  { strings.save }
-                </Button>
-                <Button
-                  className="danger-button"
-                  onClick={ () => this.setState({ confirmOpen: true }) }
-                >
-                  { strings.delete }
-                </Button>
-              </FormContainer>
-            }
-            </Grid.Column>
-        </Grid.Row>
+                    />
+                  </Form.Field>
+                  <Form.Field>
+                    <label>{strings.labelEndTime}</label>
+                    <DateTimeInput
+                      localization="fi-FI"
+                      dateFormat="DD.MM.YYYY HH:mm"
+                      onChange={this.onChangeEndTime}
+                      name="date"
+                      value={this.state.endTime ? moment(this.state.endTime).format("DD.MM.YYYY HH:mm") : ""} />
+                  </Form.Field>
+                  <Form.TextArea label={strings.labelAdditionalInformation} onChange={this.onChangeAdditionalInformation} name="additionalInformation" value={this.state.additionalInformation} />
+              </>}
+            <Message
+              success
+              visible={this.state.messageVisible}
+              header={strings.savedSuccessfully} />
+            <Button
+              className="submit-button"
+              onClick={this.handleSubmit}
+              type='submit'
+            >
+              {strings.save}
+            </Button>
+            <Button
+              className="danger-button"
+              onClick={() => this.setState({ confirmOpen: true })}
+            >
+              {strings.delete}
+            </Button>
+          </FormContainer>
+          }
 
-
-        <Grid.Row className="content-page-header-row">
+          {this.state.packingType == "CAMPAIGN" &&
+            <FormContainer>
+              <Form.Field required>
+                <label>{strings.campaign}</label>
+                <Select
+                  options={campaignOptions}
+                  value={this.state.campaignId}
+                  onChange={this.onPackingCampaignChange} />
+              </Form.Field>
+              <Form.Field required>
+                <label>{strings.packingStatus}</label>
+                <Select
+                  options={[
+                    { value: "IN_STORE", text: strings.packingStoreStatus },
+                    { value: "REMOVED", text: strings.packingRemovedStatus },
+                    { value: "WASTAGE", text: strings.packingWastageStatus }
+                  ]}
+                  text={this.state.packingStatus ? this.resolveStatusLocalizedName() : strings.selectPackingStatus}
+                  value={this.state.packingStatus}
+                  onChange={this.onStatusChange} />
+              </Form.Field>
+              <Form.Field>
+                <DateTimeInput
+                  localization="fi-FI"
+                  dateFormat="DD.MM.YYYY HH:mm"
+                  onChange={this.onChangeDate}
+                  name="date"
+                  value={moment(this.state.date).format("DD.MM.YYYY HH:mm")} />
+              </Form.Field>
+              <Message
+                success
+                visible={this.state.messageVisible}
+                header={strings.savedSuccessfully} />
+              <Button
+                className="submit-button"
+                onClick={this.handleSubmit}
+                type='submit'
+              >
+                {strings.save}
+              </Button>
+              <Button
+                className="danger-button"
+                onClick={() => this.setState({ confirmOpen: true })}
+              >
+                {strings.delete}
+              </Button>
+            </FormContainer>}
+        </Grid.Column>
+      </Grid.Row><Grid.Row className="content-page-header-row">
           <Grid.Column width={8}>
-             <h2>{ strings.printPacking }</h2>
+            <h2>{strings.printPacking}</h2>
           </Grid.Column>
-        </Grid.Row>
-
-        <Grid.Row>
+        </Grid.Row><Grid.Row>
           <Grid.Column width={8}>
-          <Select
-            options={ printers }
-            text={ this.state.selectedPrinter ? this.state.selectedPrinter.name : strings.selectPrinter }
-            value={ this.state.selectedPrinter ? this.state.selectedPrinter.id : undefined }
-            onChange={ this.onPrinterChange }
-          />
-            <Button style={{ marginLeft: 10 }} loading={ this.state.refreshingPrinters } className="submit-button" onClick={ this.refreshPrinters } type='submit'>{ strings.update }</Button>
+            <Select
+              options={printers}
+              text={this.state.selectedPrinter ? this.state.selectedPrinter.name : strings.selectPrinter}
+              value={this.state.selectedPrinter ? this.state.selectedPrinter.id : undefined}
+              onChange={this.onPrinterChange} />
+            <Button style={{ marginLeft: 10 }} loading={this.state.refreshingPrinters} className="submit-button" onClick={this.refreshPrinters} type='submit'>{strings.update}</Button>
           </Grid.Column>
-        </Grid.Row>
-
-
-        <Grid.Row>
+        </Grid.Row><Grid.Row>
           <Grid.Column width={8}>
-            <Button disabled={ this.state.printing } loading={ this.state.printing } className="submit-button" onClick={ this.print } type='submit'>{ strings.print }</Button>
+            <Button disabled={this.state.printing} loading={this.state.printing} className="submit-button" onClick={this.print} type='submit'>{strings.print}</Button>
           </Grid.Column>
-        </Grid.Row>
-
-        <Confirm
-          open={ this.state.confirmOpen }
+        </Grid.Row><Confirm
+          open={this.state.confirmOpen}
           size="mini"
-          content={ this.getDeleteConfirmationText() }
-          onCancel={ () => this.setState({ confirmOpen : false }) }
-          onConfirm={ this.handleDelete }
-        />
+          content={this.getDeleteConfirmationText()}
+          onCancel={() => this.setState({ confirmOpen: false })}
+          onConfirm={this.handleDelete} />
       </Grid>
     )
   }
@@ -413,6 +487,18 @@ class EditPacking extends React.Component<Props, State> {
   }
 
   /**
+   * Returns a products name
+   *
+   * @param productId string
+   */
+  private getProductName = (productId: string) => {
+    const { products } = this.state;
+    const product = (products || []).find(product => product.id === productId);
+
+    return product ? LocalizedUtils.getLocalizedValue(product.name) : "";
+  }
+
+  /**
    * Returns a text for a campaign packing list entry
    *
    * @param packing packing
@@ -438,10 +524,10 @@ class EditPacking extends React.Component<Props, State> {
     });
   }
 
-   /**
+  /**
     * @summary Handles updating printers
     */
-   private onPrinterChange = (event: any, { value }: DropdownProps) => {
+  private onPrinterChange = (event: any, { value }: DropdownProps) => {
     this.setState({ selectedPrinter: this.state.printers.find(printer => printer.id == value)! });
   }
 
@@ -507,7 +593,7 @@ class EditPacking extends React.Component<Props, State> {
   /**
     * Event handler for product change
     */
-   private onPackageSizeChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+  private onPackageSizeChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
     this.setState({
       packageSizeId: data.value as string
     });
@@ -529,10 +615,31 @@ class EditPacking extends React.Component<Props, State> {
   }
 
   /**
-    * Handles changing date
-    */
-    private onChangeDate = (e: any, { value }: DropdownProps) => {
-      this.setState({date: moment(value as any, "DD.MM.YYYY HH:mm").toDate()});
+  * Handles changing date
+  */
+  private onChangeDate = (e: any, { value }: DropdownProps) => {
+    this.setState({date: moment(value as any, "DD.MM.YYYY HH:mm").toDate()});
+  }
+
+  /**
+  * Handles changing startTime
+  */
+  private onChangeStartTime = (e: any, { value }: DropdownProps) => {
+    this.setState({startTime: moment(value as any, "DD.MM.YYYY HH:mm").toDate()});
+  }
+
+  /**
+  * Handles changing endTime
+  */
+  private onChangeEndTime = (e: any, { value }: DropdownProps) => {
+    this.setState({endTime: moment(value as any, "DD.MM.YYYY HH:mm").toDate()});
+  }
+
+  /**
+  * Handles changing additional information
+  */
+  private onChangeAdditionalInformation = (e: any, { value }: TextAreaProps) => {
+    this.setState({additionalInformation: value as string});
   }
 
   /**
@@ -540,7 +647,7 @@ class EditPacking extends React.Component<Props, State> {
    */
   private handleSubmit = async () => {
     const { keycloak, facility, onError } = this.props;
-    const { packing, productId, campaignId, packageSizeId, packedCount, packingStatus, date, packingType } = this.state;
+    const { packing, productId, campaignId, packageSizeId, packedCount, packingStatus, date, packingType, startTime, endTime, additionalInformation, verificationWeightings, basketsUsed } = this.state;
     try {
       const type = packingType;
 
@@ -569,7 +676,12 @@ class EditPacking extends React.Component<Props, State> {
         packedCount: packedCount,
         packageSizeId: packageSizeId,
         state: packingStatus,
-        type
+        type,
+        startTime,
+        endTime,
+        additionalInformation,
+        verificationWeightings,
+        basketsUsed
       }
 
       if (!updatedPacking.id) {
