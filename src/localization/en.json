@@ -154,6 +154,8 @@
   "reportTypeItemPRODUCT_PHASE_COUNT": "Products by phase",
   "reportTypeItemSEEDLING_TIME": "Seedling time",
   "reportTypeItemSUMMARY": "Yield (Juva)",
+  "reportTypeItemJUVA_PLANTING_LIST_REPORT": "Plant events (Juva)",
+  "reportTypeItemJUVA_HARVEST_LIST_REPORT": "Harvest events (Juva)",
   "userManagementLink": "User management",
   "accountUrl": "Account",
   "logoutUrl": "Logout",

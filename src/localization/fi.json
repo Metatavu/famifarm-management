@@ -153,6 +153,8 @@
     "reportTypeItemPRODUCT_PHASE_COUNT": "Tuotteet vaiheittain",
     "reportTypeItemSEEDLING_TIME": "Taimiaika",
     "reportTypeItemSUMMARY": "Saanto (Juva)",
+    "reportTypeItemJUVA_PLANTING_LIST_REPORT": "Istutukset (Juva)",
+    "reportTypeItemJUVA_HARVEST_LIST_REPORT": "Sadonkorjuut (Juva)",
     "userManagementLink": "Käyttäjähallinta",
     "accountUrl": "Käyttäjätili",
     "logoutUrl": "Kirjaudu ulos",
