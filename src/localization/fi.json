@@ -155,6 +155,7 @@
     "reportTypeItemSUMMARY": "Saanto (Juva)",
     "reportTypeItemJUVA_PLANTING_LIST_REPORT": "Istutukset (Juva)",
     "reportTypeItemJUVA_HARVEST_LIST_REPORT": "Sadonkorjuut (Juva)",
+    "reportTypeItemJUVA_PACKING_LIST_REPORT": "Pakkaukset (Juva)",
     "userManagementLink": "Käyttäjähallinta",
     "accountUrl": "Käyttäjätili",
     "logoutUrl": "Kirjaudu ulos",
