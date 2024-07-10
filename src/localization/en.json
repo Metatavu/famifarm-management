@@ -156,6 +156,7 @@
   "reportTypeItemSUMMARY": "Yield (Juva)",
   "reportTypeItemJUVA_PLANTING_LIST_REPORT": "Plant events (Juva)",
   "reportTypeItemJUVA_HARVEST_LIST_REPORT": "Harvest events (Juva)",
+  "reportTypeItemJUVA_PACKING_LIST_REPORT": "Packing events (Juva)",
   "userManagementLink": "User management",
   "accountUrl": "Account",
   "logoutUrl": "Logout",
