@@ -172,6 +172,14 @@ export interface IStrings extends LocalizedStringsMethods {
   reportTypeItemPACKED: string
   reportTypeItemPACKED_CAMPAINGS: string
   reportTypeItemSUMMARY: string
+  reportTypeItemJUVA_PLANTING_LIST_REPORT: string
+  reportTypeItemJUVA_HARVEST_LIST_REPORT: string
+  reportTypeItemJUVA_PACKING_LIST_REPORT: string
+  reportTypeItemJUVA_SOWING_SUMMARY_REPORT: string
+  reportTypeItemJUVA_PLANTING_SUMMARY_REPORT: string
+  reportTypeItemJUVA_PACKING_SUMMARY_REPORT: string
+  reportTypeItemJUVA_HARVEST_SUMMARY_REPORT: string
+  reportTypeItemJUVA_YIELD_SUMMARY_REPORT: string
   userManagementLink: string
   accountUrl: string
   logoutUrl: string
