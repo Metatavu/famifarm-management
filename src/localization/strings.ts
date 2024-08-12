@@ -180,6 +180,14 @@ export interface IStrings extends LocalizedStringsMethods {
   reportTypeItemJUVA_PACKING_SUMMARY_REPORT: string
   reportTypeItemJUVA_HARVEST_SUMMARY_REPORT: string
   reportTypeItemJUVA_YIELD_SUMMARY_REPORT: string
+  reportTypeItemJUVA_SOWING_WORK_HOURS_REPORT: string
+  reportTypeItemJUVA_PLANTING_WORK_HOURS_REPORT: string
+  reportTypeItemJUVA_PACKING_WORK_HOURS_REPORT: string
+  reportTypeItemJUVA_HARVEST_WORK_HOURS_REPORT: string
+  reportTypeItemJUVA_PLANTING_WORK_HOUR_SUMMARY_REPORT: string
+  reportTypeItemJUVA_SOWING_WORK_HOUR_SUMMARY_REPORT: string
+  reportTypeItemJUVA_HARVEST_WORK_HOUR_SUMMARY_REPORT: string
+  reportTypeItemJUVA_PACKING_WORK_HOUR_SUMMARY_REPORT: string
   userManagementLink: string
   accountUrl: string
   logoutUrl: string
