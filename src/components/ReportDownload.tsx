@@ -13,8 +13,8 @@ import {
 } from "semantic-ui-react";
 import moment from "moment";
 import { connect } from "react-redux";
-import { Facility, SeedBatch } from "../generated/client";
-import { StoreState, ErrorMessage } from "../types";
+import { Facility } from "../generated/client";
+import { StoreState } from "../types";
 
 /**
  * Component props
