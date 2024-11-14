@@ -427,7 +427,9 @@ class CreateEvent extends React.Component<Props, State> {
               ? eventData.baskets : [],
             productionLineId: eventData.productionLineId,
             type: eventData.type,
-            sowingDate: moment(eventData.sowingDate).toDate()
+            sowingDate: moment(eventData.sowingDate).toDate(),
+            // TODO: Uncomment when API ready
+            // cuttingHeight: eventData.cuttingHeight
           } as HarvestEventData;
         break;
         case "PLANTING":
@@ -629,10 +631,12 @@ class CreateEvent extends React.Component<Props, State> {
               <Icon fitted name="trash" />
             </Button>
           </div>)}
-        <Button className="submit-button" onClick={() => this.addBasket()}>
+        <Button className="submit-button" type="button" onClick={() => this.addBasket()} style={{ marginBottom: "1rem"}}>
           {strings.labelAddBasket}
           <Icon name="add" size="small" style={{ paddingLeft : 10 }} />
         </Button>
+        {/* TODO: Uncomment when API ready */}
+        {/* <Form.Input required label={strings.labelCuttingHeight} name="cuttingHeight" type="number" value={data.cuttingHeight} onChange={this.handleDataChange} /> */}
       </React.Fragment>
     )
   }
