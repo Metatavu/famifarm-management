@@ -138,6 +138,7 @@ export interface IStrings extends LocalizedStringsMethods {
   labelStartTime: string
   labelEndTime: string
   labelEventType: string
+  labelCuttingHeight: string
   editEventHeader: string
   deleteEventConfirmText: string
   harvestTypeBAGGING: string

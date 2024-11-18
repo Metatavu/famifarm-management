@@ -344,7 +344,8 @@ class EditEvent extends React.Component<Props, State> {
             baskets: facility === Facility.Juva ? eventData.baskets : [],
             productionLineId: eventData.productionLineId,
             type: eventData.type,
-            sowingDate: moment(eventData.sowingDate).toDate()
+            sowingDate: moment(eventData.sowingDate).toDate(),
+            cuttingHeight: facility === Facility.Juva ? eventData.cuttingHeight : undefined
           } as HarvestEventData;
         break;
         case "PLANTING":
@@ -557,17 +558,20 @@ class EditEvent extends React.Component<Props, State> {
         <Form.Select required label={strings.labelProductionLine} name="productionLineId" options={productionLineOptions} value={data.productionLineId} onChange={this.handleDataChange} />
         <Form.Input required label={strings.labelGutterHoleCount} name="gutterHoleCount" type="number" value={data.gutterHoleCount} onChange={this.handleDataChange} />
         {this.props.facility === Facility.Juva &&
-          data.baskets?.map((basket, index) =>
-          <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-            <Form.Input required label={index === 0 && strings.labelBasketWeights} name={`baskets-${index}`} type="number" value={basket.weight} onChange={this.handleDataChange} />
-            <Button className="danger-button" style={{ marginLeft: 5, marginBottom: index === 0 ? "-10px" : 14, padding: 0, justifyContent: "center", height: 36, width: 36 }} onClick={() => this.removeBasket(index)}>
-              <Icon fitted name="trash" />
+          <div>
+            {data.baskets?.map((basket, index) =>
+            <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+              <Form.Input required label={index === 0 && strings.labelBasketWeights} name={`baskets-${index}`} type="number" value={basket.weight} onChange={this.handleDataChange} />
+              <Button className="danger-button" style={{ marginLeft: 5, marginBottom: index === 0 ? "-10px" : 14, padding: 0, justifyContent: "center", height: 36, width: 36 }} onClick={() => this.removeBasket(index)}>
+                <Icon fitted name="trash" />
+              </Button>
+            </div>)}
+              <Button className="submit-button" type="button" onClick={() => this.addBasket()}>
+              {strings.labelAddBasket}
+              <Icon name="add" size="small" style={{ paddingLeft : 10 }} />
             </Button>
-          </div>)}
-        <Button className="submit-button" onClick={() => this.addBasket()}>
-          {strings.labelAddBasket}
-          <Icon name="add" size="small" style={{ paddingLeft : 10 }} />
-        </Button>
+            <Form.Input required label={strings.labelCuttingHeight} name="cuttingHeight" type="number" value={data.cuttingHeight} onChange={this.handleDataChange} />
+          </div>}
       </React.Fragment>
     )
   }
