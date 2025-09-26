@@ -298,6 +298,17 @@ export interface IStrings extends LocalizedStringsMethods {
   usedBasketBasketCount: string;
   verificationWeighings: string;
   basketsUsed: string;
+
+  packagingFilmBatch: string;
+  packagingFilmBatches: string;
+  packagingFilm: {
+    newPackingFilmBatch: string;
+    packingFilmBatchName: string;
+    packingFilm: string;
+    packingFilmBatchArrived: string;
+    showPassivePackagingFilmBatches: string;
+    packagingFilmBatchState: string;
+  }
 }
 
 const strings: IStrings = new LocalizedStrings({

@@ -1,6 +1,6 @@
 import * as constants from '../constants'
 import Keycloak from 'keycloak-js';
-import { Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, WastageReason, Pest, Packing, Campaign, Event, Facility } from "../generated/client";
+import { Product, PackageSize, Seed, ProductionLine, SeedBatch, PerformedCultivationAction, WastageReason, Pest, Packing, Campaign, Event, Facility, PackagingFilmBatch } from "../generated/client";
 import { ErrorMessage, EventListFilters } from '../types';
 
 export interface UserLogin {
@@ -217,6 +217,25 @@ export interface EventsFound {
   events: Event[];
 }
 
+export interface PackingFilmBatchesFound {
+  type: constants.PACKING_FILM_BATCHES_FOUND;
+  packingFilmBatches: PackagingFilmBatch[];
+}
+
+export interface PackingFilmBatchSelected {
+  type: constants.PACKING_FILM_BATCH_SELECTED;
+  packingFilmBatches: PackagingFilmBatch;
+}
+
+export interface PackingFilmBatchCreated {
+  type: constants.PACKING_FILM_BATCH_CREATED;
+  packingFilmBatches: PackagingFilmBatch;
+}
+
+export interface PackingFilmBatchDeleted {
+  type: constants.PACKING_FILM_BATCH_DELETED;
+  packingFilmBatches: string;
+}
 
 
 export type AppAction = UserLogin | UserLogout
@@ -400,6 +419,35 @@ export function seedBatchDeleted(seedBatchId: string): SeedBatchDeleted {
     seedBatchId: seedBatchId
   }
 }
+
+export function packingFilmBatchesFound(packingFilmBatches: PackagingFilmBatch[]): PackingFilmBatchesFound {
+  return {
+    type: constants.PACKING_FILM_BATCHES_FOUND,
+    packingFilmBatches: packingFilmBatches
+  }
+}
+
+export function packingFilmBatchSelected(packingFilmBatch: PackagingFilmBatch): PackingFilmBatchSelected {
+  return {
+    type: constants.PACKING_FILM_BATCH_SELECTED,
+    packingFilmBatches: packingFilmBatch
+  }
+}
+
+export function packingFilmBatchCreated(packingFilmBatch: PackagingFilmBatch): PackingFilmBatchCreated {
+  return {
+    type: constants.PACKING_FILM_BATCH_CREATED,
+    packingFilmBatches: packingFilmBatch
+  }
+}
+
+export function packingFilmBatchDeleted(packingFilmBatchId: string): PackingFilmBatchDeleted {
+  return {
+    type: constants.PACKING_FILM_BATCH_DELETED,
+    packingFilmBatches: packingFilmBatchId
+  }
+}
+
 
 export function performedCultivationActionsFound(performedCultivationActions: PerformedCultivationAction[]): PerformedCultivationActionsFound {
   return {
