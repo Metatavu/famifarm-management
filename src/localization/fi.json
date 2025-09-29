@@ -41,6 +41,8 @@
   "seedName": "Siemenen nimi",
   "seedBatch": "Siemenerä",
   "seedBatches": "Siemenerät",
+  "packagingFilmBatch": "Pakkauskalvoerä",
+  "packagingFilmBatches": "Pakkauskalvoerät",
   "newSeedBatch": "Uusi siemenerä",
   "seedBatchCode": "Siemenerä koodi",
   "seedBatchArrived": "Siemenerä saapui",
@@ -249,5 +251,13 @@
   "dashboardCount": "Pakkauksien määrä",
   "isEndProduct": "Lopputuote",
   "isRawMaterial": "Raaka materiaali",
-  "salesWeight": "Myyntipaino"
+  "salesWeight": "Myyntipaino",
+  "packagingFilm": {
+    "newPackingFilmBatch": "Uusi pakkauskalvoerä",
+    "packingFilmBatchName": "Pakkauskalvoerän nimi",
+    "packingFilm": "Pakkauskalvo",
+    "packingFilmBatchArrived": "Pakkauskalvoerä saapunut",
+    "showPassivePackagingFilmBatches": "Näytä ei-aktiiviset pakkauskalvoerät",
+    "packagingFilmBatchState": "Pakkauskalvoerä on aktiivinen"
+  }
 }

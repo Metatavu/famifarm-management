@@ -59,6 +59,9 @@ import EditDiscard from "./EditDiscard";
 import { WithParams } from "./WithParams";
 import Dashboard from "./Dashboard";
 import { Facility } from "../generated/client";
+import PackingFilmBatchList from "./PackingFilmBatchList";
+import CreatePackingFilmBatch from "./CreatePackingFilmBatch";
+import EditPackingFilmBatch from "./EditPackingFilmBatch";
 
 export interface Props {
   authenticated: boolean,
@@ -148,11 +151,14 @@ class WelcomePage extends React.Component<Props, any> {
     },{
       "text": strings.seedBatches,
       "route": "/seedBatches"
-    },{
-      "text": strings.performedCultivationActions,
-      "route": "/performedCultivationActions"
-    },{
-      "text": strings.wastageReasons,
+    },
+    ...(this.props.facility === Facility.Juva ? [{
+      "text": strings.packagingFilmBatches,
+      "route": "/packingFilmBatches"
+    }] : []),
+
+      {
+        "text": strings.wastageReasons,
       "route": "/wastageReasons"
     },{
       "text": strings.pests,
@@ -446,6 +452,36 @@ class WelcomePage extends React.Component<Props, any> {
                   />
                 }
               />
+              { this.props.facility === Facility.Juva ? 
+                <Route
+                  path="/packingFilmBatches"
+                  element={
+                    <PackingFilmBatchList
+                      keycloak={this.state.keycloak}
+                    />
+                    
+                  }
+                />
+              : null }
+              { this.props.facility === Facility.Juva ? 
+                <Route
+                  path="/createPackingFilmBatch"
+                  element={
+                    <CreatePackingFilmBatch
+                      keycloak={this.state.keycloak}
+                    />
+                    
+                  }
+                />
+              : null }
+              { this.props.facility === Facility.Juva ? 
+                <Route
+                  path="/editPackagingFilmBatch/:packingFilmBatchId"
+                  element={
+                  <WithParams Component={EditPackingFilmBatch} keycloak={this.state.keycloak} routeParamNames={["packingFilmBatchId"]} />
+                }
+                />
+              : null }
               <Route
                 path="/performedCultivationActions"
                 element={
