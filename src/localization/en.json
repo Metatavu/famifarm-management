@@ -249,5 +249,16 @@
   "dashboardCount": "Package count",
   "isEndProduct": "End product",
   "isRawMaterial": "Raw material",
-  "salesWeight": "Sales weight"
+  "salesWeight": "Sales weight",
+  "packagingFilmBatch": "Packing film batch",
+  "packagingFilmBatches": "Packing film batches",
+  "packagingFilm": {
+    "newPackingFilmBatch": "New packaging film batch",
+    "packingFilmBatchName": "Packaging film batch name",
+    "packingFilm": "Packaging film",
+    "packingFilmBatchArrived": "Packaging film batch arrived",
+    "newPackingFilm": "New packaging film",
+    "showPassivePackagingFilmBatches": "Show non-active packaging film batches",
+    "packagingFilmBatchState": "Packaging film batch is active"
+  }
 }

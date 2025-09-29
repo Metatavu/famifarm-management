@@ -16,7 +16,9 @@ import {
   SeedBatchesApi,
   SeedsApi,
   WastageReasonsApi,
-  StorageDiscardsApi } from '../generated/client';
+  StorageDiscardsApi,
+  PackagingFilmBatchesApi
+} from '../generated/client';
 
 const API_URL = process.env.REACT_APP_FAMIFARM_API_BASE_PATH || "http://localhost:8080";
 
@@ -200,6 +202,16 @@ export class Api {
    */
   public async getStorageDiscardsService(keycloak: Keycloak): Promise<StorageDiscardsApi> {
     return new StorageDiscardsApi(await this.getApiConfiguration(keycloak));
+  }
+
+  /**
+   * Returns promise of packaging film batches service authenticated with valid token
+   * 
+   * @param keycloak keycloak instance
+   * @returns promise of packaging film batches service authenticated with valid token 
+   */
+  public async getPackagingFilmBatchesService(keycloak: Keycloak): Promise<PackagingFilmBatchesApi> {
+    return new PackagingFilmBatchesApi(await this.getApiConfiguration(keycloak));
   }
   
   private getApiConfiguration = async (keycloak: Keycloak): Promise<Configuration> => {

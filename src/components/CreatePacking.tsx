@@ -7,7 +7,7 @@ import strings from "../localization/strings";
 import { Grid, Form, Button, Select, DropdownProps, Input, Loader, InputOnChangeData } from "semantic-ui-react";
 import { DateInput } from 'semantic-ui-calendar-react';
 import { FormContainer } from "./FormContainer";
-import { Packing, Product, PackageSize, PackingState, PackingType, Campaign, Facility } from "../generated/client";
+import { Packing, Product, PackageSize, PackingState, PackingType, Campaign, Facility, PackagingFilmBatch } from "../generated/client";
 import LocalizedUtils from "../localization/localizedutils";
 import moment from "moment";
 import Api from "../api";
@@ -25,6 +25,7 @@ export interface State {
   productId?: string,
   packingStatus?: PackingState,
   packageSizeId?: string,
+  packingFilmBatchId?: string,
   packedCount: number,
   products: Product[],
   loading: boolean,
@@ -34,7 +35,8 @@ export interface State {
   packingId?: string,
   packingType: PackingType,
   campaignId?: string,
-  campaigns: Campaign[]
+  campaigns: Campaign[],
+  packingFilmBatches: PackagingFilmBatch[]
 }
 
 class CreatePacking extends React.Component<Props, State> {
@@ -48,7 +50,8 @@ class CreatePacking extends React.Component<Props, State> {
       date: moment().toDate(),
       redirect: false,
       packingType: PackingType.Basic,
-      campaigns: []
+      campaigns: [],
+      packingFilmBatches: []
     }
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -72,11 +75,15 @@ class CreatePacking extends React.Component<Props, State> {
       const packageSizeService = await Api.getPackageSizesService(keycloak);
       const packageSizes = await packageSizeService.listPackageSizes({ facility: facility });
 
+      const packingFilmBatchService = await Api.getPackagingFilmBatchesService(keycloak);
+      const packingFilmBatches = await packingFilmBatchService.listPackagingFilmBatches({ facility: facility, includePassive: false });
+
       this.setState({
         productId: products.length ? products[0].id! : "",
         packageSizes,
         products,
         campaigns,
+        packingFilmBatches,
         loading: false
       });
 
@@ -135,6 +142,17 @@ class CreatePacking extends React.Component<Props, State> {
       };
     });
 
+    const packingFilmBatchOptions = this.state.packingFilmBatches.map((batch) => {
+      const id = batch.id!;
+      const name = batch.name;
+
+      return {
+        key: id,
+        value: id,
+        text: name
+      };
+    });
+
     return (
       <Grid>
         <Grid.Row className="content-page-header-row">
@@ -174,6 +192,14 @@ class CreatePacking extends React.Component<Props, State> {
                     options={ packageSizeOptions }
                     value={ this.state.packageSizeId }
                     onChange={ this.onPackageSizeChange }
+                  />
+                </Form.Field>
+                <Form.Field>
+                  <label>{ strings.packagingFilm.packingFilm }</label>
+                  <Select
+                    options={ packingFilmBatchOptions }
+                    value={ this.state.packingFilmBatchId }
+                    onChange={ this.onPackingFilmBatchChange }
                   />
                 </Form.Field>
                 <Form.Field required>
@@ -342,11 +368,19 @@ class CreatePacking extends React.Component<Props, State> {
   private onChangeDate = async (e: any, { value }: DropdownProps) => {
     this.setState({date: moment(value as any, "DD.MM.YYYY HH:mm").toDate()});
   }
+
+  /**
+   * Event handler for packing film batch change
+   */
+  private onPackingFilmBatchChange = (event: any, { value }: DropdownProps) => {
+    this.setState({ packingFilmBatchId: value as string });
+  }
+
   /**
    * Handle form submit
    */
   private async handleSubmit() {
-    const { packingType, productId, campaignId, packageSizeId, packedCount, packingStatus, date } = this.state;
+    const { packingType, productId, campaignId, packageSizeId, packedCount, packingStatus, date, packingFilmBatchId } = this.state;
     const { keycloak, facility, onError } = this.props;
     try {
       if (!keycloak) {
@@ -370,12 +404,14 @@ class CreatePacking extends React.Component<Props, State> {
         time: date,
         packageSizeId: packageSizeId,
         packedCount: packedCount,
+        packagingFilmBatchId: packingFilmBatchId,
         type
       } : {
         state: packingStatus as PackingState,
         type,
         time: date,
-        campaignId: campaignId
+        campaignId: campaignId,
+        packagingFilmBatchId: packingFilmBatchId
       };
 
       const packingsService = await Api.getPackingsService(keycloak);

@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { StoreState, ErrorMessage } from "../types";
 import * as actions from "../actions";
-import { Packing, Product, PackageSize, PackingState, Printer, PackingType, Campaign, Facility, PackingVerificationWeighing, PackingUsedBasket } from "../generated/client";
+import { Packing, Product, PackageSize, PackingState, Printer, PackingType, Campaign, Facility, PackingVerificationWeighing, PackingUsedBasket, PackagingFilmBatch } from "../generated/client";
 import Api from "../api";
 import Keycloak from "keycloak-js";
 import strings from "../localization/strings";
@@ -47,7 +47,9 @@ export interface State {
   endTime?: Date,
   additionalInformation?: string,
   verificationWeightings?: Array<PackingVerificationWeighing>,
-  basketsUsed?: Array<PackingUsedBasket>
+  basketsUsed?: Array<PackingUsedBasket>,
+  packingFilmBatches: PackagingFilmBatch[],
+  packingFilmBatchId?: string
 }
 
 class EditPacking extends React.Component<Props, State> {
@@ -71,7 +73,9 @@ class EditPacking extends React.Component<Props, State> {
       campaigns: [],
       additionalInformation: "",
       verificationWeightings: [],
-      basketsUsed: []
+      basketsUsed: [],
+      packingFilmBatches: [],
+      packingFilmBatchId: undefined
     }
     this.handleSubmit = this.handleSubmit.bind(this);
 }
@@ -129,6 +133,9 @@ class EditPacking extends React.Component<Props, State> {
         const packageSizesSerivce = await Api.getPackageSizesService(keycloak);
         const packageSizes = await packageSizesSerivce.listPackageSizes({ facility: facility });
 
+        const packingFilmBatchService = await Api.getPackagingFilmBatchesService(keycloak);
+        const packingFilmBatches = await packingFilmBatchService.listPackagingFilmBatches({ facility: facility, includePassive: true });
+
         this.setState({
           packing,
           productName,
@@ -146,7 +153,9 @@ class EditPacking extends React.Component<Props, State> {
           endTime,
           additionalInformation,
           verificationWeightings,
-          basketsUsed
+          basketsUsed,
+          packingFilmBatches,
+          packingFilmBatchId: packing.packagingFilmBatchId
         });
       }
 
@@ -166,7 +175,8 @@ class EditPacking extends React.Component<Props, State> {
           campaignName: name,
           campaignId: id,
           loading: false,
-          packingType: PackingType.Campaign
+          packingType: PackingType.Campaign,
+          packingFilmBatchId: packing.packagingFilmBatchId
         });
       }
 
@@ -230,6 +240,17 @@ class EditPacking extends React.Component<Props, State> {
       };
     });
 
+    const packingFilmBatchOptions = this.state.packingFilmBatches.map((batch) => {
+      const id = batch.id!;
+      const name = batch.name;
+
+      return {
+        key: id,
+        value: id,
+        text: name
+      };
+    });
+
     return (
       <Grid>
         <Grid.Row className="content-page-header-row">
@@ -248,12 +269,21 @@ class EditPacking extends React.Component<Props, State> {
                     value={this.state.productId}
                     onChange={this.onPackingProductChange} />
                 </Form.Field>
+
                 <Form.Field required>
                   <label>{strings.packageSize}</label>
                   <Select
                     options={packageSizeOptions}
                     value={this.state.packageSizeId}
                     onChange={this.onPackageSizeChange} />
+                </Form.Field>
+                <Form.Field>
+                  <label>{ strings.packagingFilm.packingFilm }</label>
+                  <Select
+                    options={ packingFilmBatchOptions }
+                    value={ this.state.packingFilmBatchId }
+                    onChange={ this.onPackingFilmBatchChange }
+                  />
                 </Form.Field>
                 <Form.Field required>
                   <label>{strings.packingStatus}</label>
@@ -513,6 +543,13 @@ class EditPacking extends React.Component<Props, State> {
   }
 
   /**
+   * Event handler for packing film batch change
+   */
+  private onPackingFilmBatchChange = (event: any, { value }: DropdownProps) => {
+    this.setState({ packingFilmBatchId: value as string });
+  }
+
+  /**
    * Event handler for campaign change
    *
    * @param event React change event
@@ -647,7 +684,7 @@ class EditPacking extends React.Component<Props, State> {
    */
   private handleSubmit = async () => {
     const { keycloak, facility, onError } = this.props;
-    const { packing, productId, campaignId, packageSizeId, packedCount, packingStatus, date, packingType, startTime, endTime, additionalInformation, verificationWeightings, basketsUsed } = this.state;
+    const { packing, productId, campaignId, packageSizeId, packedCount, packingStatus, date, packingType, startTime, endTime, additionalInformation, verificationWeightings, basketsUsed, packingFilmBatchId } = this.state;
     try {
       const type = packingType;
 
@@ -668,7 +705,8 @@ class EditPacking extends React.Component<Props, State> {
         id: packing ? packing.id : undefined,
         campaignId: campaignId,
         state: packingStatus,
-        time: date
+        time: date,
+        packagingFilmBatchId: packingFilmBatchId
       } : {
         id: packing ? packing.id : undefined,
         productId: productId,
@@ -681,7 +719,8 @@ class EditPacking extends React.Component<Props, State> {
         endTime,
         additionalInformation,
         verificationWeightings,
-        basketsUsed
+        basketsUsed,
+        packagingFilmBatchId: packingFilmBatchId
       }
 
       if (!updatedPacking.id) {
