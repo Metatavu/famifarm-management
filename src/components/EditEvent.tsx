@@ -620,7 +620,7 @@ class EditEvent extends React.Component<Props, State> {
    */
   private renderSowingDataForm = (data: SowingEventData) => {
     if (!this.state.productionLines || !this.state.seedBatches) {
-      this.loadSowingData().catch((e) => {
+      this.loadSowingData(data.seedBatchIds || []).catch((e) => {
         this.props.onError({
           message: strings.defaultApiErrorMessage,
           title: strings.defaultApiErrorTitle,
@@ -808,7 +808,7 @@ class EditEvent extends React.Component<Props, State> {
   /**
    * Loads data required for sowing event
    */
-  private loadSowingData = async () => {
+  private loadSowingData = async (eventSeedBatchIds: string[]) => {
     const { keycloak, facility } = this.props;
     if (!keycloak) {
       return;
@@ -824,6 +824,14 @@ class EditEvent extends React.Component<Props, State> {
       seedBatchesService.listSeedBatches({ facility: facility }),
       productionLinesService.listProductionLines({ facility: facility })
     ]);
+
+    for (let i = 0; i < eventSeedBatchIds.length; i++) {
+      let eventSeedBatchId = eventSeedBatchIds[i];
+      if (seedBatches.findIndex(b => b.id == eventSeedBatchId) == -1) {
+        let eventSeedBatch = await seedBatchesService.findSeedBatch({facility: facility, seedBatchId: eventSeedBatchId});
+        seedBatches.push(eventSeedBatch);
+      }
+    }
 
     this.setState({
       loading: false,
